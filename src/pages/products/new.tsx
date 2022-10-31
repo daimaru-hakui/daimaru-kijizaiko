@@ -1,10 +1,13 @@
 import {
   Box,
+  Button,
   Checkbox,
   CheckboxGroup,
   Container,
   Divider,
   Flex,
+  FormControl,
+  FormLabel,
   Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -14,24 +17,24 @@ import {
   Select,
   Stack,
   Text,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import MaterialsModal from '../../components/products/MaterialsModal';
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import MaterialsModal from "../../components/products/MaterialsModal";
 
 const ProductsNew = () => {
   const [items, setItems] = useState<any>({});
 
   const features = [
-    '制電',
-    '制菌',
-    '抗菌',
-    '撥水',
-    '防水',
-    '吸汗',
-    '速乾',
-    '涼感',
-    '接触冷感',
-    'ストレッチ',
+    "制電",
+    "制菌",
+    "抗菌",
+    "撥水",
+    "防水",
+    "吸汗",
+    "速乾",
+    "涼感",
+    "接触冷感",
+    "ストレッチ",
   ];
 
   const handleSelectchange = (
@@ -49,65 +52,86 @@ const ProductsNew = () => {
   };
 
   return (
-    <Container maxW='800px' p={6} bg='white' rounded='md'>
-      <Box as='h1' fontSize='2xl'>
+    <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
+      <Box as="h1" fontSize="2xl">
         生地の登録
       </Box>
       <Stack spacing={6} mt={6}>
         <Flex gap={6}>
-          <Box w='100%'>
+          <Box w="100%">
             <Text>メーカー名</Text>
             <Select
-              placeholder='メーカーを選択してください'
-              onChange={(e) => handleSelectchange(e, 'maker')}
+              mt={1}
+              placeholder="メーカーを選択してください"
+              onChange={(e) => handleSelectchange(e, "maker")}
             >
               <option>クラボウインターナショナル</option>
             </Select>
           </Box>
         </Flex>
-        <Flex gap={6} alignItems='center' justifyContent='space-between'>
-          <Box w='100%' flex='1'>
+        <Flex
+          gap={6}
+          alignItems="center"
+          justifyContent="space-between"
+          flexDirection={{ base: "column", md: "row" }}
+        >
+          <Box w="100%" flex="1">
             <Text>品番</Text>
             <Input
-              name='productNum'
-              type='text'
-              placeholder='例）M2000 '
+              mt={1}
+              name="productNum"
+              type="text"
+              placeholder="例）M2000 "
               onChange={handleInputChange}
             />
           </Box>
-          <Box w='100%' flex='1'>
+          <Box w="100%" flex="1">
             <Text>色番</Text>
             <Input
-              name='colorNum'
-              type='text'
-              placeholder='例）G-1'
+              mt={1}
+              name="colorNum"
+              type="text"
+              placeholder="例）G-1"
               onChange={handleInputChange}
             />
           </Box>
-          <Box w='100%' flex='1'>
+          <Box w="100%" flex="1">
             <Text>色</Text>
             <Input
-              name='colorName'
-              type='text'
-              placeholder='例）晒'
+              mt={1}
+              name="colorName"
+              type="text"
+              placeholder="例）晒"
               onChange={handleInputChange}
             />
           </Box>
         </Flex>
-        <Flex gap={6} alignItems='center' justifyContent='space-between'>
-          <Box flex={2}>
+        <Flex
+          gap={6}
+          alignItems="center"
+          justifyContent="space-between"
+          flexDirection={{ base: "column", md: "row" }}
+        >
+          <Box flex={2} w="100%">
             <Text>品名</Text>
             <Input
-              name='productName'
-              type='text'
-              placeholder='例）アーバンツイル'
+              mt={1}
+              name="productName"
+              type="text"
+              placeholder="例）アーバンツイル"
               onChange={handleInputChange}
             />
           </Box>
-          <Box flex={1}>
+          <Box flex={1} w="100%">
             <Text>単価（円）</Text>
-            <NumberInput name='price' defaultValue={0} min={0} max={10000}>
-              <NumberInputField textAlign='right' />
+            <NumberInput
+              mt={1}
+              name="price"
+              defaultValue={0}
+              min={0}
+              max={10000}
+            >
+              <NumberInputField textAlign="right" />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
@@ -120,23 +144,25 @@ const ProductsNew = () => {
 
         <Flex
           gap={6}
-          w='100%'
-          alignItems='flex-start'
-          justifyContent='space-between'
+          w="100%"
+          alignItems="flex-start"
+          justifyContent="space-between"
+          flexDirection={{ base: "column", md: "row" }}
         >
-          <Stack spacing={6} flex={1}>
-            <Box w='100%'>
+          <Stack spacing={6} flex={1} w="100%">
+            <Box w="100%">
               <Text>組織</Text>
               <Select
-                placeholder='組織を選択してください'
-                onChange={(e) => handleSelectchange(e, 'maker')}
+                mt={1}
+                placeholder="組織を選択してください"
+                onChange={(e) => handleSelectchange(e, "maker")}
               >
                 <option>ツイル</option>
               </Select>
             </Box>
-            <Box w='100%'>
+            <Box w="100%">
               <Text>規格（巾）cm</Text>
-              <NumberInput defaultValue={150} min={0} max={200}>
+              <NumberInput mt={1} defaultValue={150} min={0} max={200}>
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
@@ -144,9 +170,9 @@ const ProductsNew = () => {
                 </NumberInputStepper>
               </NumberInput>
             </Box>
-            <Box w='100%'>
+            <Box w="100%">
               <Text>規格（長さ）m</Text>
-              <NumberInput defaultValue={50} min={0} max={200}>
+              <NumberInput mt={1} defaultValue={50} min={0} max={200}>
                 <NumberInputField />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
@@ -155,13 +181,18 @@ const ProductsNew = () => {
               </NumberInput>
             </Box>
           </Stack>
-          <Flex flex={1} gap={6}>
-            <Box w='100%'>
+          <Flex flex={1} gap={6} w="100%">
+            <Box w="100%">
               <Text>混率</Text>
-
               {items.materials && (
-                <Box p={3} rounded='md' border='1px' borderColor='gray.100'>
-                  <Stack spacing={3}>
+                <Box
+                  mt={1}
+                  p={3}
+                  rounded="md"
+                  border="1px"
+                  borderColor="gray.100"
+                >
+                  <Stack spacing={3} w="100%">
                     {items.materials?.t && (
                       <Text>ポリエステル {items.materials?.t}%</Text>
                     )}
@@ -179,18 +210,18 @@ const ProductsNew = () => {
           </Flex>
         </Flex>
 
-        <Box w='100%'>
+        <Box w="100%">
           <Text>機能性</Text>
           <CheckboxGroup
-            colorScheme='green'
-            defaultValue={['naruto', 'kakashi']}
+            colorScheme="green"
+            defaultValue={["naruto", "kakashi"]}
           >
             <Flex
-              wrap='wrap'
               m={1}
-              rounded='md'
-              border='1px'
-              borderColor='gray.100'
+              wrap="wrap"
+              rounded="md"
+              border="1px"
+              borderColor="gray.100"
             >
               {features.map((f) => (
                 <Checkbox key={f} value={f} mt={2} mx={2} mb={2}>
@@ -200,6 +231,34 @@ const ProductsNew = () => {
             </Flex>
           </CheckboxGroup>
         </Box>
+
+        <Box w="100%">
+          <Text>画像</Text>
+          <FormControl mt={1}>
+            <FormLabel htmlFor="gazo" mb="0" w="150px" cursor="pointer">
+              <Box
+                p={2}
+                fontWeight="bold"
+                textAlign="center"
+                color="#385898"
+                border="1px"
+                borderColor="#385898"
+                rounded="md"
+              >
+                アップロード
+              </Box>
+            </FormLabel>
+            <Input
+              mt={1}
+              id="gazo"
+              display="none"
+              type="file"
+              accept="image/*"
+            />
+          </FormControl>
+        </Box>
+        <Divider />
+        <Button colorScheme="facebook">登録</Button>
       </Stack>
     </Container>
   );
