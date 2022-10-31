@@ -57,7 +57,7 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
         .map((m) => materials[m.id] && materials[m.id])
         .filter((m) => m)
         .reduce((prev, current) => (prev = prev + current), 0);
-      const result = sum > 100 ? true : false;
+      const result = sum !== 100 ? true : false;
       setTotal(result);
     };
     calcSum(materials);
@@ -71,7 +71,7 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
 
   return (
     <>
-      <Button mt={3} onClick={onOpen}>
+      <Button mt={1} variant="outline" colorScheme="facebook" onClick={onOpen}>
         選択
       </Button>
 
@@ -108,7 +108,14 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
             <Button variant="outline" mr={3} onClick={onClose}>
               閉じる
             </Button>
-            <Button disabled={total} colorScheme="blue" onClick={addMaterials}>
+            <Button
+              disabled={total}
+              colorScheme="blue"
+              onClick={() => {
+                addMaterials();
+                onClose();
+              }}
+            >
               追加
             </Button>
           </ModalFooter>
