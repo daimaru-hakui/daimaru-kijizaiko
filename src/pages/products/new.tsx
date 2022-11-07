@@ -14,9 +14,12 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Radio,
+  RadioGroup,
   Select,
   Stack,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import MaterialsModal from "../../components/products/MaterialsModal";
@@ -51,12 +54,29 @@ const ProductsNew = () => {
     setItems({ ...items, [name]: value });
   };
 
+  const handleRadioChange = (e: string, type: string) => {
+    const value = e;
+    setItems({ ...items, [type]: value });
+  };
+
   return (
     <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
       <Box as="h1" fontSize="2xl">
         生地の登録
       </Box>
       <Stack spacing={6} mt={6}>
+        <Box w="100%">
+          <RadioGroup onChange={(e) => handleRadioChange(e, "type")}>
+            <Stack direction="row">
+              <Radio value="1">既製品</Radio>
+              <Radio value="2">別注品</Radio>
+            </Stack>
+          </RadioGroup>
+        </Box>
+        <Box w="100%">
+          <Text>担当者</Text>
+          <Input w="100px" />
+        </Box>
         <Flex gap={6}>
           <Box w="100%">
             <Text>メーカー名</Text>
@@ -139,6 +159,10 @@ const ProductsNew = () => {
             </NumberInput>
           </Box>
         </Flex>
+        <Box flex={1} w="100%">
+          <Text>備考（使用製品品番）</Text>
+          <Textarea mt={1} />
+        </Box>
 
         <Divider />
 
@@ -212,10 +236,7 @@ const ProductsNew = () => {
 
         <Box w="100%">
           <Text>機能性</Text>
-          <CheckboxGroup
-            colorScheme="green"
-            defaultValue={["naruto", "kakashi"]}
-          >
+          <CheckboxGroup colorScheme="green">
             <Flex
               m={1}
               wrap="wrap"
@@ -257,7 +278,15 @@ const ProductsNew = () => {
             />
           </FormControl>
         </Box>
+        <Box flex={1} w="100%">
+          <Text>備考（生地の性質など）</Text>
+          <Textarea mt={1} />
+        </Box>
         <Divider />
+        <Box flex={1} w="100%">
+          <Text>備考（その他）</Text>
+          <Textarea mt={1} />
+        </Box>
         <Button colorScheme="facebook">登録</Button>
       </Stack>
     </Container>

@@ -29,8 +29,8 @@ const Products = () => {
               <Th>単価</Th>
               <Th>徳島在庫</Th>
               <Th>外部在庫</Th>
-              <Th>キープ数量</Th>
               <Th>仕掛数量</Th>
+              <Th>キープ数量</Th>
               <Th>混率</Th>
               <Th>規格</Th>
               <Th>機能性</Th>
