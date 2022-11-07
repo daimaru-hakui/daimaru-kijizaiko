@@ -4,6 +4,7 @@ import {
   Divider,
   Flex,
   Input,
+  InputGroup,
   Select,
   Stack,
   Text,
@@ -32,7 +33,23 @@ const InAndOut: NextPage<Props> = ({ title, type }) => {
       <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
         <Box w="100%" flex={2}>
           <Text>生地品番</Text>
-          <Input mt={1} name="productNum" type="text" placeholder="" />
+
+          <InputGroup>
+            <Input
+              mt={1}
+              list="search"
+              name="productNum"
+              type="text"
+              placeholder=""
+              autoComplete="off"
+              padding="^[a-zA-Z0-9]+$"
+            />
+            <datalist id="search">
+              <option value="DM3420-20">制電ツイル</option>
+              <option value="IF5956">アイスフレッシュ</option>
+              <option value="AQSK2336">アクアクール</option>
+            </datalist>
+          </InputGroup>
         </Box>
       </Flex>
       <Flex gap={6} alignItems="center" justifyContent="space-between">
