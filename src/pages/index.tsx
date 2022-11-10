@@ -1,5 +1,56 @@
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+} from "firebase/firestore";
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { auth, db } from "../../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { currentUserAuth, usersAuth } from "../../store";
+
 export default function Home() {
+  const [user] = useAuthState(auth);
+  const [users, setUsers] = useRecoilState(usersAuth);
+  const currentUser = useRecoilValue(currentUserAuth);
+
+  // users情報;
+  useEffect(() => {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, orderBy("rank", "asc"));
+    getDocs(q).then((querySnapshot) => {
+      setUsers(
+        querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    });
+  }, [setUsers]);
+
+  // 未登録であればauthorityに登録;
+  useEffect(() => {
+    if (currentUser) {
+      const docRef = doc(db, "users", `${currentUser}`);
+      const addUsers = async () => {
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          await setDoc(docRef, {
+            uid: currentUser,
+            name: user?.email || "",
+            rank: 1000,
+          });
+        }
+      };
+      addUsers();
+    }
+  }, [currentUser, user]);
+
   return (
     <div>
       <Head>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Box, Button, Container, Flex, Input } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
@@ -6,9 +6,11 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { auth } from "../../firebase/index";
 import { currentUserAuth, loadingState } from "../../store";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const Login = () => {
   const router = useRouter();
+  const [user] = useAuthState(auth);
   const setLoading = useSetRecoilState(loadingState);
   const [account, setAccount] = useState({
     email: "",
@@ -16,11 +18,12 @@ const Login = () => {
   });
   const [currentUser, setCurrentUser] = useRecoilState(currentUserAuth);
 
-  useEffect(() => {
-    if (currentUser) {
+  useLayoutEffect(() => {
+    if (user) {
+      setCurrentUser(user.uid);
       router.push("/");
     }
-  }, [currentUser, router]);
+  }, [user, router, setCurrentUser]);
 
   // サインイン
   const signInUser = () => {

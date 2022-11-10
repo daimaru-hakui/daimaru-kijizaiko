@@ -38,6 +38,8 @@ const ProductsNew = () => {
     "涼感",
     "接触冷感",
     "ストレッチ",
+    "ECO",
+    "その他",
   ];
 
   const handleSelectchange = (
@@ -96,7 +98,7 @@ const ProductsNew = () => {
           flexDirection={{ base: "column", md: "row" }}
         >
           <Box w="100%" flex="1">
-            <Text>品番</Text>
+            <Text fontWeight="bold">品番</Text>
             <Input
               mt={1}
               name="productNum"
@@ -175,7 +177,7 @@ const ProductsNew = () => {
         >
           <Stack spacing={6} flex={1} w="100%">
             <Box w="100%">
-              <Text>組織</Text>
+              <Text>組織名</Text>
               <Select
                 mt={1}
                 placeholder="組織を選択してください"
@@ -184,18 +186,30 @@ const ProductsNew = () => {
                 <option>ツイル</option>
               </Select>
             </Box>
+            <Flex gap={6}>
+              <Box w="100%">
+                <Text>規格（巾）cm</Text>
+                <NumberInput mt={1} defaultValue={150} min={0} max={200}>
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </Box>
+              <Box w="100%">
+                <Text>規格（長さ）m</Text>
+                <NumberInput mt={1} defaultValue={50} min={0} max={200}>
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </Box>
+            </Flex>
             <Box w="100%">
-              <Text>規格（巾）cm</Text>
-              <NumberInput mt={1} defaultValue={150} min={0} max={200}>
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </Box>
-            <Box w="100%">
-              <Text>規格（長さ）m</Text>
+              <Text>規格（重さ）</Text>
               <NumberInput mt={1} defaultValue={50} min={0} max={200}>
                 <NumberInputField />
                 <NumberInputStepper>
@@ -223,8 +237,17 @@ const ProductsNew = () => {
                     {items.materials?.c && (
                       <Text>綿 {items.materials?.c}%</Text>
                     )}
+                    {items.materials?.n && (
+                      <Text>ナイロン {items.materials?.n}%</Text>
+                    )}
+                    {items.materials?.f && (
+                      <Text>レーヨン {items.materials?.f}%</Text>
+                    )}
                     {items.materials?.pu && (
                       <Text>ポリウレタン {items.materials?.pu}%</Text>
+                    )}
+                    {items.materials?.z && (
+                      <Text>指定外繊維 {items.materials?.z}%</Text>
                     )}
                   </Stack>
                 </Box>
