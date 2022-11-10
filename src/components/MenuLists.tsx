@@ -20,6 +20,9 @@ const MenuLists = () => {
         <ListItem fontSize="sm">
           <Link href="/products">トップページ</Link>
         </ListItem>
+        <ListItem fontSize="sm">
+          <Link href="/auth">権限</Link>
+        </ListItem>
       </List>
       <Divider />
 
