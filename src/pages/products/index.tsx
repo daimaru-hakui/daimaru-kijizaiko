@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -9,18 +9,20 @@ import {
   Td,
   TableContainer,
   Button,
-} from '@chakra-ui/react';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { colors, materialNames } from '../../../datalist';
-import Link from 'next/link';
+  Text,
+  Flex,
+} from "@chakra-ui/react";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { colors, materialNames } from "../../../datalist";
+import Link from "next/link";
 
 const Products = () => {
   const [products, setProducts] = useState<any>();
 
   useEffect(() => {
     const getProducts = async () => {
-      const q = query(collection(db, 'products'), orderBy('productNum', 'asc'));
+      const q = query(collection(db, "products"), orderBy("productNum", "asc"));
       try {
         onSnapshot(q, (querySnap) =>
           setProducts(
@@ -35,9 +37,9 @@ const Products = () => {
     getProducts();
   }, []);
 
-  const dispColor = (colorNum: number) => {
+  const dispColor = (color: number | string) => {
     const result = colors.find(
-      (color: { id: number; name: string }) => color.id === colorNum
+      (c: { id: number; name: string }) => c.id === color
     );
     return result?.name;
   };
@@ -50,35 +52,51 @@ const Products = () => {
   };
 
   const dispMixed = (materials: any) => {
-    const t = materials.t ? `ポリエステル${materials.t}% ` : '';
-    const c = materials.c ? `綿${materials.c}% ` : '';
-    const n = materials.n ? `ナイロン${materials.n}% ` : '';
-    const r = materials.r ? `レーヨン${materials.r}% ` : '';
-    const f = materials.f ? `麻${materials.f}% ` : '';
-    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : '';
-    const w = materials.w ? `ウール${materials.w}% ` : '';
-    const ac = materials.ac ? `アクリル${materials.ac}% ` : '';
-    const cu = materials.cu ? `キュプラ${materials.cu}% ` : '';
-    const si = materials.si ? `シルク${materials.si}% ` : '';
-    const z = materials.z ? `指定外繊維${materials.z}% ` : '';
+    let array = [];
+    const t = materials.t ? `ポリエステル${materials.t}% ` : "";
+    const c = materials.c ? `綿${materials.c}% ` : "";
+    const n = materials.n ? `ナイロン${materials.n}% ` : "";
+    const r = materials.r ? `レーヨン${materials.r}% ` : "";
+    const f = materials.f ? `麻${materials.f}% ` : "";
+    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
+    const w = materials.w ? `ウール${materials.w}% ` : "";
+    const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
+    const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
+    const si = materials.si ? `シルク${materials.si}% ` : "";
+    const z = materials.z ? `指定外繊維${materials.z}% ` : "";
+    array.push(t, c, n, r, f, pu, w, ac, cu, si, z);
 
-    return t + c + n + r + f + pu + w + ac + cu + si + z;
+    return array
+      .filter((item) => item)
+      .map((item) => <Text key={item}>{item}</Text>);
   };
 
-  const dispStd = (fabricWidth: number, fabricLength: number) => {
-    const width = fabricWidth ? `巾:${fabricWidth}cm` : '';
-    const length = fabricLength ? `長さ:${fabricLength}m` : '';
-    const mark = width && length ? '×' : '';
-    return `${width}${mark}${length}`;
+  const dispStd = (
+    fabricWidth: number,
+    fabricLength: number,
+    fabricWeight: number | null
+  ) => {
+    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
+    const length = fabricLength ? `長さ:${fabricLength}m` : "";
+    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
+    const mark = width && length ? "×" : "";
+    return (
+      <>
+        <Text>{width}</Text>
+        <Text>{mark}</Text>
+        <Text>{length}</Text>
+        <Text ml={3}>{weigth}</Text>
+      </>
+    );
   };
 
   return (
-    <Box w='100%' my={6} rounded='md' bg='white' boxShadow='md'>
-      <TableContainer p={6} maxW='100%'>
-        <Box as='h2' fontSize='2xl'>
+    <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
+      <TableContainer p={6} maxW="100%">
+        <Box as="h2" fontSize="2xl">
           生地品番一覧
         </Box>
-        <Table mt={6} variant='simple' size='sm'>
+        <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
               <Th>詳細</Th>
@@ -100,27 +118,26 @@ const Products = () => {
             {products?.map(
               (product: {
                 id: string;
-                productNum: string;
+                productNumber: string;
                 productName: string;
                 colorNum: number;
-                colorName: string;
+                color: number;
                 price: string;
                 materialName: number;
                 fabricWidth: number;
                 fabricLength: number;
                 materials: any;
+                features: [];
               }) => (
                 <Tr key={product.id}>
                   <Td>
                     <Link href={`/products/${product.id}`}>
-                      <Button size='sm'>詳細</Button>
+                      <Button size="sm">詳細</Button>
                     </Link>
                   </Td>
-                  <Td>
-                    {product.productNum}-{product.colorName}
-                  </Td>
+                  <Td>{product.productNumber}</Td>
 
-                  <Td>{dispColor(product?.colorNum)}</Td>
+                  <Td>{dispColor(product?.color)}</Td>
                   <Td>{product.productName}</Td>
                   <Td isNumeric>{product.price}円</Td>
                   <Td isNumeric>0m</Td>
@@ -128,12 +145,22 @@ const Products = () => {
                   <Td isNumeric>0m</Td>
                   <Td isNumeric>0m</Td>
                   <Td>{dispMaterialName(product.materialName)}</Td>
-                  <Td isNumeric>
-                    {dispStd(product.fabricWidth, product.fabricLength)}
+                  <Td>
+                    <Flex gap={1}>{dispMixed(product.materials)}</Flex>
                   </Td>
-                  <Td isNumeric>{dispMixed(product.materials)}</Td>
+                  <Td>
+                    <Flex>
+                      {dispStd(product.fabricWidth, product.fabricLength, null)}
+                    </Flex>
+                  </Td>
 
-                  <Td>防汚・制電</Td>
+                  <Td>
+                    <Flex gap={2}>
+                      {product?.features.map((f, index) => (
+                        <Text key={index}>{f}</Text>
+                      ))}
+                    </Flex>
+                  </Td>
                 </Tr>
               )
             )}

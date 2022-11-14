@@ -13,3 +13,8 @@ export const usersAuth = atom<any>({
   key: "usersAuthState",
   default: "",
 });
+
+export const suppliersState = atom<any>({
+  key: "suppliersState",
+  default: "",
+});
