@@ -30,12 +30,13 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { colors, features, materialNames } from "../../../datalist";
 import { db } from "../../../firebase";
-import { loadingState, usersAuth } from "../../../store";
+import { loadingState, suppliersState, usersAuth } from "../../../store";
 import MaterialsModal from "../../components/products/MaterialsModal";
 
 const ProductsId = () => {
@@ -43,36 +44,9 @@ const ProductsId = () => {
   const productId = router.query.productId;
   const [items, setItems] = useState<any>({});
   const [product, setProduct] = useState<any>();
-  const [suppliers, setSuppliers] = useState<any>();
+  const suppliers = useRecoilValue(suppliersState);
   const users = useRecoilValue(usersAuth);
   const setLoading = useSetRecoilState(loadingState);
-
-  const handleSelectchange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    name: string
-  ) => {
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleNumberChange = (e: string, name: string) => {
-    console.log(e);
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
-  const handleRadioChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
 
   useEffect(() => {
     const getProduct = async () => {
@@ -89,27 +63,25 @@ const ProductsId = () => {
     getProduct();
   }, []);
 
-  console.log(product);
+  // 担当者名の表示
+  const dispStaff = (id: string) => {
+    const user = users?.find(
+      (user: { id: string; name: string }) => id === user.id
+    );
+    return user?.name;
+  };
 
-  useEffect(() => {
-    const getSuppliers = async () => {
-      const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
-      try {
-        const querySnap = await getDocs(q);
-        setSuppliers(
-          querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        );
-      } catch (err) {
-        console.log(err);
-      } finally {
-      }
-    };
-    getSuppliers();
-  }, []);
+  // 仕入先名の表示
+  const dispSupplier = (id: string) => {
+    const supplier = suppliers?.find(
+      (supplier: { id: string; name: string }) => id === supplier.id
+    );
+    return supplier?.name;
+  };
 
-  const dispColor = (colorNum: number) => {
+  const dispColor = (color: number) => {
     const result = colors.find(
-      (color: { id: number; name: string }) => color.id === colorNum
+      (c: { id: number; name: string }) => c.id === color
     );
     return result?.name;
   };
@@ -138,7 +110,7 @@ const ProductsId = () => {
 
     return array
       .filter((item) => item)
-      .map((item) => <Box key={item}>{item}</Box>);
+      .map((item) => <Text key={item}>{item}</Text>);
   };
 
   const dispStd = (
@@ -150,26 +122,40 @@ const ProductsId = () => {
     const length = fabricLength ? `長さ:${fabricLength}m` : "";
     const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
     const mark = width && length ? "×" : "";
-    return `${width}${mark}${length}　${weigth}`;
+    return (
+      <>
+        <Text>{width}</Text>
+        <Text>{mark}</Text>
+        <Text>{length}</Text>
+        <Text ml={3}>{weigth}</Text>
+      </>
+    );
   };
 
   return (
     <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
-      <Box as="h1" fontSize="2xl">
-        生地詳細
-      </Box>
+      <Flex justifyContent="space-between">
+        <Box as="h1" fontSize="2xl">
+          生地詳細
+        </Box>
+        <Link href={`/products/edit/${productId}`}>
+          <Button>編集</Button>
+        </Link>
+      </Flex>
       <Stack spacing={6} mt={6}>
-        <Box w="100%">{product?.productType === 1 ? "既製品" : "別注品"}</Box>
+        <Box p={2} bg="#f4f4f4" textAlign="center">
+          {product?.productType === 1 ? "既製品" : "別注品"}
+        </Box>
         {product?.productType === 2 && (
           <Box>
             <Text fontWeight="bold">担当者</Text>
-            <Box>{product?.staff}</Box>
+            <Box>{dispStaff(product?.staff)}</Box>
           </Box>
         )}
         <Flex gap={6}>
           <Box w="100%">
             <Text fontWeight="bold">仕入先</Text>
-            <Box>{product?.supplier}</Box>
+            <Box>{dispSupplier(product?.supplier)}</Box>
           </Box>
         </Flex>
         <Flex
@@ -180,13 +166,11 @@ const ProductsId = () => {
         >
           <Box w="100%">
             <Text fontWeight="bold">品番</Text>
-            <Box>
-              {product?.productNum}-{product?.colorNum}
-            </Box>
+            <Box>{product?.productNum}</Box>
           </Box>
           <Box w="100%">
             <Text fontWeight="bold">色</Text>
-            <Box>{dispColor(product?.colorName)}</Box>
+            <Box>{dispColor(product?.color)}</Box>
           </Box>
           <Box w="100%">
             <Text fontWeight="bold">品名</Text>
@@ -220,13 +204,13 @@ const ProductsId = () => {
             <Flex gap={6}>
               <Box w="100%">
                 <Text>規格</Text>
-                <Box>
+                <Flex>
                   {dispStd(
                     product?.fabricWidth,
                     product?.fabricLength,
                     product?.fabricWeight
                   )}
-                </Box>
+                </Flex>
               </Box>
             </Flex>
           </Stack>
@@ -253,17 +237,9 @@ const ProductsId = () => {
         <Box w="100%">
           <Text>機能性</Text>
           <CheckboxGroup colorScheme="green">
-            <Flex
-              m={1}
-              wrap="wrap"
-              rounded="md"
-              border="1px"
-              borderColor="gray.100"
-            >
-              {features.map((f) => (
-                <Checkbox key={f} value={f} mt={2} mx={2} mb={2}>
-                  {f}
-                </Checkbox>
+            <Flex m={1} wrap="wrap" gap={3}>
+              {product?.features.map((f: string, index: number) => (
+                <Text key={index}>{f}</Text>
               ))}
             </Flex>
           </CheckboxGroup>
@@ -271,47 +247,17 @@ const ProductsId = () => {
 
         <Box w="100%">
           <Text>画像</Text>
-          <FormControl mt={1}>
-            <FormLabel htmlFor="gazo" mb="0" w="150px" cursor="pointer">
-              <Box
-                p={2}
-                fontWeight="bold"
-                textAlign="center"
-                color="#385898"
-                border="1px"
-                borderColor="#385898"
-                rounded="md"
-              >
-                アップロード
-              </Box>
-            </FormLabel>
-            <Input
-              mt={1}
-              id="gazo"
-              display="none"
-              type="file"
-              accept="image/*"
-            />
-          </FormControl>
         </Box>
         <Box flex={1} w="100%">
-          <Text>備考（生地の性質など）</Text>
-          <Textarea
-            mt={1}
-            name="noteFabric"
-            value={items.noteFabric}
-            onChange={handleInputChange}
-          />
+          <Box flex={1} w="100%">
+            <Text>備考（生地の性質など）</Text>
+            <Textarea mt={1} name="noteProduct" value={product?.noteFabric} />
+          </Box>
         </Box>
         <Divider />
         <Box flex={1} w="100%">
           <Text>備考（その他）</Text>
-          <Textarea
-            mt={1}
-            name="noteEtc"
-            value={items.noteEtc}
-            onChange={handleInputChange}
-          />
+          <Textarea mt={1} name="noteProduct" value={product?.noteEtc} />
         </Box>
       </Stack>
     </Container>

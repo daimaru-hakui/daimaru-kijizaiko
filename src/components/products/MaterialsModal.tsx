@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -17,11 +17,11 @@ import {
   NumberDecrementStepper,
   NumberInputStepper,
   Stack,
-} from '@chakra-ui/react';
-import { NextPage } from 'next';
+} from "@chakra-ui/react";
+import { NextPage } from "next";
 
 type Props = {
-  items: {};
+  items: any;
   setItems: Function;
 };
 
@@ -31,17 +31,17 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
   const [total, setTotal] = useState(true);
 
   const list = [
-    { id: 't', name: 'ポリエステル' },
-    { id: 'c', name: '綿' },
-    { id: 'n', name: 'ナイロン' },
-    { id: 'r', name: 'レーヨン' },
-    { id: 'f', name: '麻' },
-    { id: 'pu', name: 'ポリウレタン' },
-    { id: 'si', name: 'シルク' },
-    { id: 'w', name: 'ウール' },
-    { id: 'ac', name: 'アクリル' },
-    { id: 'cu', name: 'キュプラ' },
-    { id: 'z', name: '指定外繊維' },
+    { id: "t", name: "ポリエステル" },
+    { id: "c", name: "綿" },
+    { id: "n", name: "ナイロン" },
+    { id: "r", name: "レーヨン" },
+    { id: "f", name: "麻" },
+    { id: "pu", name: "ポリウレタン" },
+    { id: "si", name: "シルク" },
+    { id: "w", name: "ウール" },
+    { id: "ac", name: "アクリル" },
+    { id: "cu", name: "キュプラ" },
+    { id: "z", name: "指定外繊維" },
   ];
 
   const handleInputChange = (e: string, name: string) => {
@@ -67,7 +67,10 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
     calcSum(materials);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materials]);
-  console.log('items', items);
+
+  useEffect(() => {
+    setMaterials({ ...items.materials });
+  }, [items.materials]);
 
   const addMaterials = () => {
     setItems({ ...items, materials });
@@ -75,11 +78,11 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
 
   return (
     <>
-      <Button mt={1} variant='outline' colorScheme='facebook' onClick={onOpen}>
+      <Button mt={1} variant="outline" colorScheme="facebook" onClick={onOpen}>
         選択
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size='xs'>
+      <Modal isOpen={isOpen} onClose={onClose} size="xs">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>素材の選択</ModalHeader>
@@ -87,17 +90,18 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
           <ModalBody>
             <Stack spacing={6}>
               {list.map((m: { id: any; name: string }) => (
-                <Flex key={m.id} alignItems='center'>
-                  <Text w='100%'>{m.name}</Text>
+                <Flex key={m.id} alignItems="center">
+                  <Text w="100%">{m.name}</Text>
                   <NumberInput
                     name={m.id}
-                    w='100%'
+                    w="100%"
                     defaultValue={materials[m.id] || 0}
                     min={0}
                     max={100}
+                    value={materials && materials[m.id]}
                     onChange={(e) => handleInputChange(e, m.id)}
                   >
-                    <NumberInputField textAlign='right' />
+                    <NumberInputField textAlign="right" />
                     <NumberInputStepper>
                       <NumberIncrementStepper />
                       <NumberDecrementStepper />
@@ -109,12 +113,12 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
+            <Button variant="outline" mr={3} onClick={onClose}>
               閉じる
             </Button>
             <Button
               disabled={total}
-              colorScheme='blue'
+              colorScheme="blue"
               onClick={() => {
                 addMaterials();
                 onClose();
