@@ -1,20 +1,20 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 export const loadingState = atom<boolean>({
-  key: "loadingState",
+  key: 'loadingState',
   default: false,
 });
 
 export const currentUserAuth = atom<any>({
-  key: "currentUserState",
-  default: "",
+  key: 'currentUserState',
+  default: '',
 });
 
 export const usersAuth = atom<any>({
-  key: "usersAuthState",
-  default: "",
+  key: 'usersAuthState',
+  default: [],
 });
 
 export const suppliersState = atom<any>({
-  key: "suppliersState",
-  default: "",
+  key: 'suppliersState',
+  default: [],
 });
