@@ -9,25 +9,26 @@ import {
   ModalHeader,
   ModalOverlay,
   useDisclosure,
-} from "@chakra-ui/react";
-import { doc, updateDoc } from "firebase/firestore";
-import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
-import { db } from "../../../firebase";
+} from '@chakra-ui/react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { NextPage } from 'next';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../firebase';
 
 type Props = {
-  color: {
+  obj: {
     id: string;
     name: string;
   };
+  pathName: string;
 };
 
-const ColorEditModal: NextPage<Props> = ({ color }) => {
+const EditModal: NextPage<Props> = ({ obj, pathName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState<any>();
   useEffect(() => {
-    setItems(color);
-  }, [color]);
+    setItems(obj);
+  }, [obj]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -37,16 +38,15 @@ const ColorEditModal: NextPage<Props> = ({ color }) => {
     setItems({ ...items, [name]: value });
   };
 
-  const updateColor = async () => {
-    const colorsRef = doc(db, "colors", `${color.id}`);
-    await updateDoc(colorsRef, {
+  const updateDocEdit = async () => {
+    const docRef = doc(db, `${pathName}`, `${obj.id}`);
+    await updateDoc(docRef, {
       name: items.name,
     });
-    onClose();
   };
 
   const reset = () => {
-    setItems(color);
+    setItems(obj);
   };
 
   return (
@@ -62,9 +62,9 @@ const ColorEditModal: NextPage<Props> = ({ color }) => {
           <ModalCloseButton />
           <ModalBody>
             <Input
-              type="text"
-              name="name"
-              value={items.name}
+              type='text'
+              name='name'
+              value={items?.name}
               onChange={handleInputChange}
             />
           </ModalBody>
@@ -72,7 +72,7 @@ const ColorEditModal: NextPage<Props> = ({ color }) => {
           <ModalFooter>
             <Button
               mr={3}
-              variant="ghost"
+              variant='ghost'
               onClick={() => {
                 reset();
                 onClose();
@@ -80,7 +80,13 @@ const ColorEditModal: NextPage<Props> = ({ color }) => {
             >
               Close
             </Button>
-            <Button colorScheme="blue" onClick={updateColor}>
+            <Button
+              colorScheme='blue'
+              onClick={() => {
+                updateDocEdit();
+                onClose();
+              }}
+            >
               更新
             </Button>
           </ModalFooter>
@@ -90,4 +96,4 @@ const ColorEditModal: NextPage<Props> = ({ color }) => {
   );
 };
 
-export default ColorEditModal;
+export default EditModal;

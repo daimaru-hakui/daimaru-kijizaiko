@@ -5,7 +5,6 @@ import {
   Flex,
   Input,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -13,14 +12,14 @@ import {
   Th,
   Thead,
   Tr,
-} from "@chakra-ui/react";
-import { addDoc, collection, getDocs, onSnapshot } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
-import { db } from "../../../../firebase";
-import ColorEditModal from "../../../components/settings/ColorEditModal";
+} from '@chakra-ui/react';
+import { addDoc, collection, onSnapshot } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../../firebase';
+import EditModal from '../../../components/settings/EditModal';
 
 const ColorIndex = () => {
-  const [items, setItems] = useState({ name: "" });
+  const [items, setItems] = useState({ name: '' });
   const [colors, setColors] = useState<any>();
 
   const handleInputChange = (
@@ -33,16 +32,16 @@ const ColorIndex = () => {
 
   // 色を追加
   const addColors = async () => {
-    const colorsRef = collection(db, "colors");
+    const colorsRef = collection(db, 'colors');
     await addDoc(colorsRef, {
       name: items.name,
     });
-    setItems({ name: "" });
+    setItems({ name: '' });
   };
 
   useEffect(() => {
     const getColors = () => {
-      const colorsRef = collection(db, "colors");
+      const colorsRef = collection(db, 'colors');
       onSnapshot(colorsRef, (querySnap) =>
         setColors(querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
       );
@@ -51,19 +50,19 @@ const ColorIndex = () => {
   }, []);
 
   return (
-    <Container maxW="600px" p={6} my={6} rounded="md" bg="white" boxShadow="md">
+    <Container maxW='600px' p={6} my={6} rounded='md' bg='white' boxShadow='md'>
       <Text>色を追加</Text>
       <Flex
         gap={2}
-        alignItems="center"
-        justifyContent="flex-start"
-        flexDirection={{ base: "column", md: "row" }}
+        alignItems='center'
+        justifyContent='flex-start'
+        flexDirection={{ base: 'column', md: 'row' }}
       >
-        <Box w="100%">
+        <Box w='100%'>
           <Input
-            name="name"
-            type="text"
-            placeholder=""
+            name='name'
+            type='text'
+            placeholder=''
             value={items.name}
             onChange={handleInputChange}
           />
@@ -72,7 +71,7 @@ const ColorIndex = () => {
       </Flex>
 
       <TableContainer mt={6}>
-        <Table variant="simple" size="sm">
+        <Table variant='simple' size='sm'>
           <Thead>
             <Tr>
               <Th>色</Th>
@@ -82,10 +81,10 @@ const ColorIndex = () => {
           <Tbody>
             {colors?.map((c: { id: string; name: string }) => (
               <Tr key={c.id}>
-                <Td w="100%">{c.name}</Td>
-                <Td w="20px">
-                  <ColorEditModal color={c} />
-                  <Button colorScheme="red">削除</Button>
+                <Td w='100%'>{c.name}</Td>
+                <Td w='20px'>
+                  <EditModal obj={c} pathName='colors' />
+                  <Button colorScheme='red'>削除</Button>
                 </Td>
               </Tr>
             ))}
