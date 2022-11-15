@@ -32,7 +32,7 @@ const MenuDrawerButton = () => {
           <DrawerHeader>Menu</DrawerHeader>
 
           <DrawerBody>
-            <MenuLists />
+            <MenuLists onClose={onClose} />
           </DrawerBody>
 
           <DrawerFooter>

@@ -3,6 +3,9 @@ import React from "react";
 import MenuLists from "./MenuLists";
 
 const Sidebar = () => {
+  const returnNull = () => {
+    return;
+  };
   return (
     <Box
       as="nav"
@@ -17,7 +20,7 @@ const Sidebar = () => {
       top="0"
       zIndex={1}
     >
-      <MenuLists />
+      <MenuLists onClose={returnNull} />
     </Box>
   );
 };

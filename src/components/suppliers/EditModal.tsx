@@ -12,20 +12,25 @@ import {
   Text,
   Textarea,
   useDisclosure,
-} from '@chakra-ui/react';
-import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { NextPage } from 'next';
-import React, { useEffect, useState } from 'react';
-import { db } from '../../../firebase';
+} from "@chakra-ui/react";
+import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { NextPage } from "next";
+import React, { useEffect, useState } from "react";
+import { db } from "../../../firebase";
 
 type Props = {
-  supplierId: string;
+  supplier: {
+    id: string;
+    name: string;
+    kana: string;
+    comment: string;
+  };
 };
 
-const EditModal: NextPage<Props> = ({ supplierId }) => {
+const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState<any>({});
-  const [supplier, setSupplier] = useState<any>();
+  // const [supplier, setSupplier] = useState<any>();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -36,29 +41,18 @@ const EditModal: NextPage<Props> = ({ supplierId }) => {
   };
 
   useEffect(() => {
-    const getSupplier = async () => {
-      const docRef = doc(db, 'suppliers', `${supplierId}`);
-      try {
-        const docSnap = await getDoc(docRef);
-        setSupplier({ ...docSnap.data(), id: docSnap.id });
-        setItems({ ...docSnap.data(), id: docSnap.id });
-      } catch (err) {
-        console.log(err);
-      } finally {
-      }
-    };
-    getSupplier();
-  }, [supplierId]);
+    setItems(supplier);
+  }, [supplier]);
 
   const updateSupplier = async () => {
-    const result = window.confirm('変更して宜しいでしょうか');
+    const result = window.confirm("変更して宜しいでしょうか");
     if (!result) return;
-    const docRef = doc(db, 'suppliers', `${supplierId}`);
+    const docRef = doc(db, "suppliers", `${supplier.id}`);
     try {
       await updateDoc(docRef, {
-        name: items.name || '',
-        kana: items.kana || '',
-        comment: items.comment || '',
+        name: items.name || "",
+        kana: items.kana || "",
+        comment: items.comment || "",
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
@@ -86,19 +80,19 @@ const EditModal: NextPage<Props> = ({ supplierId }) => {
             <Stack spacing={3}>
               <Text>仕入先名</Text>
               <Input
-                name='name'
+                name="name"
                 value={items.name}
                 onChange={handleInputChange}
               />
               <Text>フリガナ</Text>
               <Input
-                name='kana'
+                name="kana"
                 value={items.kana}
                 onChange={handleInputChange}
               />
               <Text>備考</Text>
               <Textarea
-                name='comment'
+                name="comment"
                 value={items.comment}
                 onChange={handleInputChange}
               />
@@ -106,10 +100,10 @@ const EditModal: NextPage<Props> = ({ supplierId }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button mr={3} variant='ghost' onClick={reset}>
+            <Button mr={3} variant="ghost" onClick={reset}>
               Close
             </Button>
-            <Button colorScheme='facebook' onClick={updateSupplier}>
+            <Button colorScheme="facebook" onClick={updateSupplier}>
               OK
             </Button>
           </ModalFooter>

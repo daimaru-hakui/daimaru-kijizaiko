@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -11,16 +11,17 @@ import {
   Td,
   TableContainer,
   Button,
-} from '@chakra-ui/react';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import EditModal from '../../components/suppliers/EditModal';
+} from "@chakra-ui/react";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { db } from "../../../firebase";
+
+import Link from "next/link";
 
 const Suppliers = () => {
   const [suppliers, setSuppliers] = useState<any>();
   useEffect(() => {
     const getSuppliers = async () => {
-      const q = query(collection(db, 'suppliers'), orderBy('kana', 'asc'));
+      const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
       try {
         onSnapshot(q, (querySnap) =>
           setSuppliers(
@@ -36,12 +37,12 @@ const Suppliers = () => {
   }, []);
 
   return (
-    <Container maxW='900px' my={6} rounded='md' bg='white' boxShadow='md'>
+    <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
       <TableContainer p={6}>
-        <Box as='h2' fontSize='2xl'>
+        <Box as="h2" fontSize="2xl">
           仕入先一覧
         </Box>
-        <Table mt={6} variant='simple' size='sm'>
+        <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
               <Th>仕入先名</Th>
@@ -56,7 +57,9 @@ const Suppliers = () => {
                   <Td>{supplier.name}</Td>
                   <Td>{supplier.kana}</Td>
                   <Td>
-                    <EditModal supplierId={supplier.id} />
+                    <Link href={`/suppliers/${supplier.id}`}>
+                      <Button>詳細</Button>
+                    </Link>
                   </Td>
                 </Tr>
               )
