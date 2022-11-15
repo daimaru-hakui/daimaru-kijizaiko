@@ -16,8 +16,9 @@ export const features = [
 
 // 色
 export const colors = [
-  { id: 1, name: 'レッド' },
-  { id: 2, name: '晒' },
+  { id: 1, name: '晒' },
+  { id: 2, name: '白' },
+  { id: 3, name: 'レッド' },
 ];
 
 // 組織名
