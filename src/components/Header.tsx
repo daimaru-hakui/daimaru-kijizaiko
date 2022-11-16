@@ -80,8 +80,12 @@ const Header = () => {
                 variant="outline"
               />
               <MenuList fontSize="sm">
-                <MenuItem>トップページ</MenuItem>
-                <MenuItem>設定</MenuItem>
+                <MenuItem>
+                  <Link href="/">トップページ</Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link href="/settings">設定</Link>
+                </MenuItem>
                 <MenuItem onClick={signOut}>ログアウト</MenuItem>
               </MenuList>
             </Menu>
