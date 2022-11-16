@@ -8,6 +8,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../firebase";
@@ -34,6 +35,11 @@ const SupplierId = () => {
   }, [router, supplierId]);
   return (
     <Box w="100%" mt={12}>
+      <Container maxW="800px" mt={6} p={0}>
+        <Link href="/suppliers">
+          <Button w="100%">一覧へ</Button>
+        </Link>
+      </Container>
       <Container
         maxW="800px"
         my={6}

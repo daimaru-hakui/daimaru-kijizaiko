@@ -14,6 +14,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { db } from "../../../../firebase";
@@ -43,6 +44,11 @@ const ColorIndex = () => {
 
   return (
     <Box w="100%" mt={12}>
+      <Container maxW="600px" mt={6} p={0}>
+        <Link href="/settings">
+          <Button w="100%">一覧へ</Button>
+        </Link>
+      </Container>
       <Container
         maxW="600px"
         p={6}

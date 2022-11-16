@@ -21,17 +21,17 @@ const index = () => {
         >
           <Box w="100%">
             <Link href="/settings/auth">
-              <Button size="xs">権限の追加・編集</Button>
+              <Button>権限の追加・編集</Button>
             </Link>
           </Box>
           <Box w="100%">
             <Link href="/settings/color">
-              <Button size="xs">色の追加・編集</Button>
+              <Button>色の追加・編集</Button>
             </Link>
           </Box>
           <Box w="100%">
             <Link href="/settings/material-name">
-              <Button size="xs">組織名の追加・編集</Button>
+              <Button>組織名の追加・編集</Button>
             </Link>
           </Box>
         </Flex>

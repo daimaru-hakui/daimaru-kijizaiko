@@ -18,6 +18,7 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import EditModal from "../../../components/settings/auth/AuthEditModal";
@@ -60,6 +61,11 @@ const Auth = () => {
 
   return (
     <Box w="100%" mt={12}>
+      <Container maxW="900px" mt={6} p={0}>
+        <Link href="/settings">
+          <Button w="100%">一覧へ</Button>
+        </Link>
+      </Container>
       <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6} maxW="100%">
           <Box as="h2" fontSize="2xl">
