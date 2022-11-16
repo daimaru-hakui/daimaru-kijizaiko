@@ -110,138 +110,145 @@ const ProductsId = () => {
   };
 
   return (
-    <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
-      <Flex justifyContent="space-between">
-        <Box as="h1" fontSize="2xl">
-          生地詳細
-        </Box>
-        <Link href={`/products/edit/${productId}`}>
-          <Button>編集</Button>
+    <Box w="100%" mt={12}>
+      <Container maxW="800px" mt={6} p={0}>
+        <Link href="/products">
+          <Button w="100%">一覧へ</Button>
         </Link>
-      </Flex>
-      <Stack spacing={6} mt={6}>
-        <Box p={2} bg="#f4f4f4" textAlign="center">
-          {product?.productType === 1 ? "既製品" : "別注品"}
-        </Box>
-        {product?.productType === 2 && (
-          <Box>
-            <Text fontWeight="bold">担当者</Text>
-            <Box>{dispStaff(product?.staff)}</Box>
+      </Container>
+      <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
+        <Flex justifyContent="space-between">
+          <Box as="h1" fontSize="2xl">
+            生地詳細
           </Box>
-        )}
-        <Flex gap={6}>
-          <Box w="100%">
-            <Text fontWeight="bold">仕入先</Text>
-            <Box>{dispSupplier(product?.supplier)}</Box>
-          </Box>
+          <Link href={`/products/edit/${productId}`}>
+            <Button>編集</Button>
+          </Link>
         </Flex>
-        <Flex
-          gap={1}
-          alignItems="center"
-          justifyContent="flex-start"
-          flexDirection={{ base: "column", md: "row" }}
-        >
-          <Box w="100%">
-            <Text fontWeight="bold">品番</Text>
-            <Box>{product?.productNum}</Box>
+        <Stack spacing={6} mt={6}>
+          <Box p={2} bg="#f4f4f4" textAlign="center">
+            {product?.productType === 1 ? "既製品" : "別注品"}
           </Box>
-          <Box w="100%">
-            <Text fontWeight="bold">色番</Text>
-            <Box>{product?.colorNum}</Box>
-          </Box>
-          <Box w="100%">
-            <Text fontWeight="bold">色</Text>
-            <Box>{dispColor(product?.color)}</Box>
-          </Box>
-          <Box w="100%">
-            <Text fontWeight="bold">品名</Text>
-            {product?.productName}
-          </Box>
-          <Box w="100%">
-            <Text fontWeight="bold">単価</Text>
-            {product?.price}円
-          </Box>
-        </Flex>
-
-        <Box flex={1} w="100%">
-          <Text>備考（使用製品品番）</Text>
-          <Textarea mt={1} name="noteProduct" value={product?.noteProduct} />
-        </Box>
-
-        <Divider />
-
-        <Flex
-          gap={6}
-          w="100%"
-          alignItems="flex-start"
-          justifyContent="space-between"
-          flexDirection={{ base: "column", md: "row" }}
-        >
-          <Stack spacing={6} flex={1} w="100%">
-            <Box w="100%">
-              <Text>組織名</Text>
-              {dispMaterialName(product?.materialName)}
+          {product?.productType === 2 && (
+            <Box>
+              <Text fontWeight="bold">担当者</Text>
+              <Box>{dispStaff(product?.staff)}</Box>
             </Box>
-            <Flex gap={6}>
-              <Box w="100%">
-                <Text>規格</Text>
-                <Flex>
-                  {dispStd(
-                    product?.fabricWidth,
-                    product?.fabricLength,
-                    product?.fabricWeight
-                  )}
-                </Flex>
-              </Box>
-            </Flex>
-          </Stack>
-          <Flex flex={1} gap={6} w="100%">
+          )}
+          <Flex gap={6}>
             <Box w="100%">
-              <Text>混率</Text>
-              {product?.materials && (
-                <Box
-                  mt={1}
-                  p={3}
-                  rounded="md"
-                  border="1px"
-                  borderColor="gray.100"
-                >
-                  <Stack spacing={3} w="100%">
-                    {dispMixed(product?.materials)}
-                  </Stack>
-                </Box>
-              )}
+              <Text fontWeight="bold">仕入先</Text>
+              <Box>{dispSupplier(product?.supplier)}</Box>
             </Box>
           </Flex>
-        </Flex>
+          <Flex
+            gap={1}
+            alignItems="center"
+            justifyContent="flex-start"
+            flexDirection={{ base: "column", md: "row" }}
+          >
+            <Box w="100%">
+              <Text fontWeight="bold">品番</Text>
+              <Box>{product?.productNum}</Box>
+            </Box>
+            <Box w="100%">
+              <Text fontWeight="bold">色番</Text>
+              <Box>{product?.colorNum}</Box>
+            </Box>
+            <Box w="100%">
+              <Text fontWeight="bold">色</Text>
+              <Box>{dispColor(product?.color)}</Box>
+            </Box>
+            <Box w="100%">
+              <Text fontWeight="bold">品名</Text>
+              {product?.productName}
+            </Box>
+            <Box w="100%">
+              <Text fontWeight="bold">単価</Text>
+              {product?.price}円
+            </Box>
+          </Flex>
 
-        <Box w="100%">
-          <Text>機能性</Text>
-          <CheckboxGroup colorScheme="green">
-            <Flex m={1} wrap="wrap" gap={3}>
-              {product?.features.map((f: string, index: number) => (
-                <Text key={index}>{f}</Text>
-              ))}
-            </Flex>
-          </CheckboxGroup>
-        </Box>
-
-        <Box w="100%">
-          <Text>画像</Text>
-        </Box>
-        <Box flex={1} w="100%">
           <Box flex={1} w="100%">
-            <Text>備考（生地の性質など）</Text>
-            <Textarea mt={1} name="noteProduct" value={product?.noteFabric} />
+            <Text>備考（使用製品品番）</Text>
+            <Textarea mt={1} name="noteProduct" value={product?.noteProduct} />
           </Box>
-        </Box>
-        <Divider />
-        <Box flex={1} w="100%">
-          <Text>備考（その他）</Text>
-          <Textarea mt={1} name="noteProduct" value={product?.noteEtc} />
-        </Box>
-      </Stack>
-    </Container>
+
+          <Divider />
+
+          <Flex
+            gap={6}
+            w="100%"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            flexDirection={{ base: "column", md: "row" }}
+          >
+            <Stack spacing={6} flex={1} w="100%">
+              <Box w="100%">
+                <Text>組織名</Text>
+                {dispMaterialName(product?.materialName)}
+              </Box>
+              <Flex gap={6}>
+                <Box w="100%">
+                  <Text>規格</Text>
+                  <Flex>
+                    {dispStd(
+                      product?.fabricWidth,
+                      product?.fabricLength,
+                      product?.fabricWeight
+                    )}
+                  </Flex>
+                </Box>
+              </Flex>
+            </Stack>
+            <Flex flex={1} gap={6} w="100%">
+              <Box w="100%">
+                <Text>混率</Text>
+                {product?.materials && (
+                  <Box
+                    mt={1}
+                    p={3}
+                    rounded="md"
+                    border="1px"
+                    borderColor="gray.100"
+                  >
+                    <Stack spacing={3} w="100%">
+                      {dispMixed(product?.materials)}
+                    </Stack>
+                  </Box>
+                )}
+              </Box>
+            </Flex>
+          </Flex>
+
+          <Box w="100%">
+            <Text>機能性</Text>
+            <CheckboxGroup colorScheme="green">
+              <Flex m={1} wrap="wrap" gap={3}>
+                {product?.features.map((f: string, index: number) => (
+                  <Text key={index}>{f}</Text>
+                ))}
+              </Flex>
+            </CheckboxGroup>
+          </Box>
+
+          <Box w="100%">
+            <Text>画像</Text>
+          </Box>
+          <Box flex={1} w="100%">
+            <Box flex={1} w="100%">
+              <Text>備考（生地の性質など）</Text>
+              <Textarea mt={1} name="noteProduct" value={product?.noteFabric} />
+            </Box>
+          </Box>
+          <Divider />
+          <Box flex={1} w="100%">
+            <Text>備考（その他）</Text>
+            <Textarea mt={1} name="noteProduct" value={product?.noteEtc} />
+          </Box>
+        </Stack>
+      </Container>
+    </Box>
   );
 };
 

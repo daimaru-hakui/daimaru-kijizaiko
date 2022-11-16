@@ -15,6 +15,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { addDoc, collection } from "firebase/firestore";
+import Link from "next/link";
 import React, { useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
@@ -44,6 +45,11 @@ const MaterialNameIndex = () => {
 
   return (
     <Box w="100%" mt={12}>
+      <Container maxW="600px" mt={6} p={0}>
+        <Link href="/settings">
+          <Button w="100%">一覧へ</Button>
+        </Link>
+      </Container>
       <Container
         maxW="600px"
         p={6}
