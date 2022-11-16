@@ -81,19 +81,19 @@ const EditModal: NextPage<Props> = ({ supplier }) => {
               <Text>仕入先名</Text>
               <Input
                 name="name"
-                value={items.name}
+                value={items?.name}
                 onChange={handleInputChange}
               />
               <Text>フリガナ</Text>
               <Input
                 name="kana"
-                value={items.kana}
+                value={items?.kana}
                 onChange={handleInputChange}
               />
               <Text>備考</Text>
               <Textarea
                 name="comment"
-                value={items.comment}
+                value={items?.comment}
                 onChange={handleInputChange}
               />
             </Stack>

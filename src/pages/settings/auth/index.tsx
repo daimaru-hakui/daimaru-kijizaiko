@@ -19,8 +19,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { db } from "../../../firebase";
-import EditModal from "../../components/auth/AuthEditModal";
+import { db } from "../../../../firebase";
+import EditModal from "../../../components/settings/auth/AuthEditModal";
 
 const Auth = () => {
   const [users, setUsers] = useState<any>();

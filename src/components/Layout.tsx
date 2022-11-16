@@ -12,14 +12,12 @@ type Props = {
 const Layout = ({ children }: Props) => {
   const router = useRouter();
   return (
-    <Box bg="#f4f4f4" minH="100vh">
+    <Box bg="#f4f4f4" minH="100vh" w="100%">
       <Loading />
       {router.pathname !== "/login" && <Header />}
       <Flex>
         {router.pathname !== "/login" && <Sidebar />}
-        <Box w="100%" px={6} mt={12}>
-          {children}
-        </Box>
+        {children}
       </Flex>
     </Box>
   );

@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   setDoc,
@@ -12,12 +13,20 @@ import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { currentUserAuth, suppliersState, usersAuth } from "../../store";
+import {
+  colorsState,
+  currentUserAuth,
+  materialNamesState,
+  suppliersState,
+  usersAuthState,
+} from "../../store";
 
 export default function Home() {
   const [user] = useAuthState(auth);
-  const [users, setUsers] = useRecoilState(usersAuth);
+  const [users, setUsers] = useRecoilState(usersAuthState);
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
+  const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
+  const [colors, setColors] = useRecoilState(colorsState);
   const currentUser = useRecoilValue(currentUserAuth);
 
   // users情報;
@@ -33,20 +42,6 @@ export default function Home() {
       );
     });
   }, [setUsers]);
-
-  // suppliersRef情報;
-  useEffect(() => {
-    const suppliersRef = collection(db, "suppliers");
-    const q = query(suppliersRef, orderBy("kana", "asc"));
-    getDocs(q).then((querySnapshot) => {
-      setSuppliers(
-        querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }))
-      );
-    });
-  }, [setSuppliers]);
 
   // 未登録であればauthorityに登録;
   useEffect(() => {
@@ -65,6 +60,57 @@ export default function Home() {
       addUsers();
     }
   }, [currentUser, user]);
+
+  // suppliersRef情報;
+  useEffect(() => {
+    const getSuppliers = async () => {
+      const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setSuppliers(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getSuppliers();
+  }, [setSuppliers]);
+
+  // 色のデータを取得
+  useEffect(() => {
+    const getColors = async () => {
+      const q = query(collection(db, "colors"), orderBy("name", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setColors(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getColors();
+  }, [setColors]);
+
+  // 組織名のデータを取得
+  useEffect(() => {
+    const getMaterialNames = async () => {
+      const q = query(collection(db, "materialNames"), orderBy("name", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setMaterialNames(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getMaterialNames();
+  }, [setMaterialNames]);
 
   return (
     <div>
