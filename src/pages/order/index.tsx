@@ -18,7 +18,7 @@ const Order = () => {
           入出庫履歴照会
         </Box>
         <Tabs mt={6}>
-          <TabList>
+          <TabList mt={1}>
             <Tab>出庫</Tab>
             <Tab>入庫</Tab>
             <Tab>仕掛</Tab>
