@@ -16,14 +16,14 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { colors, materialNames } from "../../../datalist";
 import { db } from "../../../firebase";
-import { loadingState, suppliersState, usersAuth } from "../../../store";
+import { loadingState, suppliersState, usersState } from "../../../store";
 
 const ProductsId = () => {
   const router = useRouter();
   const productId = router.query.productId;
   const [product, setProduct] = useState<any>();
   const suppliers = useRecoilValue(suppliersState);
-  const users = useRecoilValue(usersAuth);
+  const users = useRecoilValue(usersState);
 
   useEffect(() => {
     const getProduct = async () => {

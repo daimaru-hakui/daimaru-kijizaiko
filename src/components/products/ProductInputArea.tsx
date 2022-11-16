@@ -31,7 +31,7 @@ import {
   loadingState,
   materialNamesState,
   suppliersState,
-  usersAuthState,
+  usersState,
 } from "../../../store";
 import MaterialsModal from "./MaterialsModal";
 
@@ -52,7 +52,7 @@ const ProductInputArea: NextPage<Props> = ({
 }) => {
   const router = useRouter();
   const productId = router.query.productId;
-  const users = useRecoilValue(usersAuthState);
+  const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
