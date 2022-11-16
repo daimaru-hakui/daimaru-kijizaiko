@@ -5,7 +5,7 @@ import { FaLock } from "react-icons/fa";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { auth } from "../../firebase/index";
-import { currentUserAuth, loadingState } from "../../store";
+import { currentUserState, loadingState } from "../../store";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 const Login = () => {
@@ -16,7 +16,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserAuth);
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
 
   useLayoutEffect(() => {
     if (user) {

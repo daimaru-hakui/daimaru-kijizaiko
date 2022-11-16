@@ -4,13 +4,13 @@ export const loadingState = atom<boolean>({
   default: false,
 });
 
-export const currentUserAuth = atom<any>({
+export const currentUserState = atom<any>({
   key: "currentUserState",
   default: "",
 });
 
-export const usersAuthState = atom<any>({
-  key: "usersAuthState",
+export const usersState = atom<any>({
+  key: "usersState",
   default: [],
 });
 

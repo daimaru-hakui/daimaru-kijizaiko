@@ -15,19 +15,19 @@ import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
   colorsState,
-  currentUserAuth,
+  currentUserState,
   materialNamesState,
   suppliersState,
-  usersAuthState,
+  usersState,
 } from "../../store";
 
 export default function Home() {
   const [user] = useAuthState(auth);
-  const [users, setUsers] = useRecoilState(usersAuthState);
+  const [users, setUsers] = useRecoilState(usersState);
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
   const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
   const [colors, setColors] = useRecoilState(colorsState);
-  const currentUser = useRecoilValue(currentUserAuth);
+  const currentUser = useRecoilValue(currentUserState);
 
   // users情報;
   useEffect(() => {

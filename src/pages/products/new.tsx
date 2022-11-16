@@ -31,7 +31,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
-import { loadingState, usersAuthState } from "../../../store";
+import { loadingState, usersState } from "../../../store";
 import MaterialsModal from "../../components/products/MaterialsModal";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
@@ -57,7 +57,7 @@ const ProductsNew = () => {
     noteEtc: "",
   });
   const [suppliers, setSuppliers] = useState<any>();
-  const users = useRecoilValue(usersAuthState);
+  const users = useRecoilValue(usersState);
   const setLoading = useSetRecoilState(loadingState);
 
   useEffect(() => {

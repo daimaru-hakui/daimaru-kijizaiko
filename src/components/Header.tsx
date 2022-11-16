@@ -16,14 +16,14 @@ import React, { useLayoutEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { auth } from "../../firebase";
-import { currentUserAuth, usersAuthState } from "../../store";
+import { currentUserState, usersState } from "../../store";
 import MenuDrawerButton from "./MenuDrawerButton";
 import Link from "next/link";
 
 const Header = () => {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserAuth);
-  const users = useRecoilValue(usersAuthState);
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const users = useRecoilValue(usersState);
 
   useLayoutEffect(() => {
     if (currentUser === "") {
