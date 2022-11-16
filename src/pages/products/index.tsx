@@ -14,11 +14,14 @@ import {
 } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { colors, materialNames } from "../../../datalist";
 import Link from "next/link";
+import { useRecoilValue } from "recoil";
+import { colorsState, materialNamesState } from "../../../store";
 
 const Products = () => {
   const [products, setProducts] = useState<any>();
+  const colors = useRecoilValue(colorsState);
+  const materialNames = useRecoilValue(materialNamesState);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -91,82 +94,88 @@ const Products = () => {
   };
 
   return (
-    <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
-      <TableContainer p={6} maxW="100%">
-        <Box as="h2" fontSize="2xl">
-          生地品番一覧
-        </Box>
-        <Table mt={6} variant="simple" size="sm">
-          <Thead>
-            <Tr>
-              <Th>詳細</Th>
-              <Th>生地品番</Th>
-              <Th>色</Th>
-              <Th>品名</Th>
-              <Th>単価</Th>
-              <Th>徳島在庫</Th>
-              <Th>外部在庫</Th>
-              <Th>仕掛数量</Th>
-              <Th>キープ数量</Th>
-              <Th>組織名</Th>
-              <Th>混率</Th>
-              <Th>規格</Th>
-              <Th>機能性</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {products?.map(
-              (product: {
-                id: string;
-                productNumber: string;
-                productName: string;
-                colorNum: number;
-                color: number;
-                price: string;
-                materialName: number;
-                fabricWidth: number;
-                fabricLength: number;
-                materials: any;
-                features: [];
-              }) => (
-                <Tr key={product.id}>
-                  <Td>
-                    <Link href={`/products/${product.id}`}>
-                      <Button size="sm">詳細</Button>
-                    </Link>
-                  </Td>
-                  <Td>{product.productNumber}</Td>
+    <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
+      <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
+        <TableContainer p={6} w="100%">
+          <Box as="h2" fontSize="2xl">
+            生地品番一覧
+          </Box>
+          <Table mt={6} variant="simple" size="sm">
+            <Thead>
+              <Tr>
+                <Th>詳細</Th>
+                <Th>生地品番</Th>
+                <Th>色</Th>
+                <Th>品名</Th>
+                <Th>単価</Th>
+                <Th>徳島在庫</Th>
+                <Th>外部在庫</Th>
+                <Th>仕掛数量</Th>
+                <Th>キープ数量</Th>
+                <Th>組織名</Th>
+                <Th>混率</Th>
+                <Th>規格</Th>
+                <Th>機能性</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {products?.map(
+                (product: {
+                  id: string;
+                  productNumber: string;
+                  productName: string;
+                  colorNum: number;
+                  color: number;
+                  price: string;
+                  materialName: number;
+                  fabricWidth: number;
+                  fabricLength: number;
+                  materials: any;
+                  features: [];
+                }) => (
+                  <Tr key={product.id}>
+                    <Td>
+                      <Link href={`/products/${product.id}`}>
+                        <Button size="sm">詳細</Button>
+                      </Link>
+                    </Td>
+                    <Td>{product.productNumber}</Td>
 
-                  <Td>{dispColor(product?.color)}</Td>
-                  <Td>{product.productName}</Td>
-                  <Td isNumeric>{product.price}円</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td>{dispMaterialName(product.materialName)}</Td>
-                  <Td>
-                    <Flex gap={1}>{dispMixed(product.materials)}</Flex>
-                  </Td>
-                  <Td>
-                    <Flex>
-                      {dispStd(product.fabricWidth, product.fabricLength, null)}
-                    </Flex>
-                  </Td>
+                    <Td>{dispColor(product?.color)}</Td>
+                    <Td>{product.productName}</Td>
+                    <Td isNumeric>{product.price}円</Td>
+                    <Td isNumeric>0m</Td>
+                    <Td isNumeric>0m</Td>
+                    <Td isNumeric>0m</Td>
+                    <Td isNumeric>0m</Td>
+                    <Td>{dispMaterialName(product.materialName)}</Td>
+                    <Td>
+                      <Flex gap={1}>{dispMixed(product.materials)}</Flex>
+                    </Td>
+                    <Td>
+                      <Flex>
+                        {dispStd(
+                          product.fabricWidth,
+                          product.fabricLength,
+                          null
+                        )}
+                      </Flex>
+                    </Td>
 
-                  <Td>
-                    <Flex gap={2}>
-                      {product?.features.map((f, index) => (
-                        <Text key={index}>{f}</Text>
-                      ))}
-                    </Flex>
-                  </Td>
-                </Tr>
-              )
-            )}
-          </Tbody>
-        </Table>
-      </TableContainer>
+                    <Td>
+                      <Flex gap={2}>
+                        {product?.features.map((f, index) => (
+                          <Text key={index}>{f}</Text>
+                        ))}
+                      </Flex>
+                    </Td>
+                  </Tr>
+                )
+              )}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 };

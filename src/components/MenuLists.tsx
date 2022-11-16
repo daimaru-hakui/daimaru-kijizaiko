@@ -23,17 +23,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     <>
       <List my={3} spacing={3}>
         <ListItem fontSize="sm">
-          <Link href="/products">トップページ</Link>
-        </ListItem>
-        <ListItem fontSize="sm">
-          <Link href="/auth" onClick={() => onClose()}>
-            権限
-          </Link>
-        </ListItem>
-        <ListItem fontSize="sm">
-          <Link href="/settings" onClick={() => onClose()}>
-            設定
-          </Link>
+          <Link href="/">トップページ</Link>
         </ListItem>
       </List>
       <Divider />

@@ -21,7 +21,7 @@ import {
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { db } from "../../../firebase";
+import { db } from "../../../../firebase";
 
 type Props = {
   uid: string;

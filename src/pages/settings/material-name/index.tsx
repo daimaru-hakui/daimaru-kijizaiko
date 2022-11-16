@@ -13,15 +13,17 @@ import {
   Th,
   Thead,
   Tr,
-} from '@chakra-ui/react';
-import { addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import { db } from '../../../../firebase';
-import EditModal from '../../../components/settings/EditModal';
+} from "@chakra-ui/react";
+import { addDoc, collection } from "firebase/firestore";
+import React, { useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { db } from "../../../../firebase";
+import { materialNamesState } from "../../../../store";
+import EditModal from "../../../components/settings/EditModal";
 
 const MaterialNameIndex = () => {
-  const [items, setItems] = useState({ name: '' });
-  const [materialNames, setMaterialNames] = useState<any>();
+  const [items, setItems] = useState({ name: "" });
+  const materialNames = useRecoilValue(materialNamesState);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -33,39 +35,27 @@ const MaterialNameIndex = () => {
 
   // 色を追加
   const addColors = async () => {
-    const materialRef = collection(db, 'materialNames');
+    const materialRef = collection(db, "materialNames");
     await addDoc(materialRef, {
       name: items.name,
     });
-    setItems({ name: '' });
+    setItems({ name: "" });
   };
 
-  useEffect(() => {
-    const getColors = () => {
-      const colorsRef = collection(db, 'materialNames');
-      onSnapshot(colorsRef, (querySnap) =>
-        setMaterialNames(
-          querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        )
-      );
-    };
-    getColors();
-  }, []);
-
   return (
-    <Container maxW='600px' p={6} my={6} rounded='md' bg='white' boxShadow='md'>
+    <Container maxW="600px" p={6} my={6} rounded="md" bg="white" boxShadow="md">
       <Text>組織名を追加</Text>
       <Flex
         gap={2}
-        alignItems='center'
-        justifyContent='flex-start'
-        flexDirection={{ base: 'column', md: 'row' }}
+        alignItems="center"
+        justifyContent="flex-start"
+        flexDirection={{ base: "column", md: "row" }}
       >
-        <Box w='100%'>
+        <Box w="100%">
           <Input
-            name='name'
-            type='text'
-            placeholder=''
+            name="name"
+            type="text"
+            placeholder=""
             value={items.name}
             onChange={handleInputChange}
           />
@@ -74,7 +64,7 @@ const MaterialNameIndex = () => {
       </Flex>
 
       <TableContainer mt={6}>
-        <Table variant='simple' size='sm'>
+        <Table variant="simple" size="sm">
           <Thead>
             <Tr>
               <Th>組織名</Th>
@@ -84,10 +74,12 @@ const MaterialNameIndex = () => {
           <Tbody>
             {materialNames?.map((m: { id: string; name: string }) => (
               <Tr key={m.id}>
-                <Td w='100%'>{m.name}</Td>
-                <Td w='20px'>
-                  <EditModal obj={m} pathName='materialNames' />
-                  <Button colorScheme='red'>削除</Button>
+                <Td w="100%">{m.name}</Td>
+                <Td w="20px">
+                  <EditModal obj={m} pathName="materialNames" />
+                  <Button size="xs" colorScheme="red">
+                    削除
+                  </Button>
                 </Td>
               </Tr>
             ))}

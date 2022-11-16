@@ -9,11 +9,11 @@ import {
   ModalHeader,
   ModalOverlay,
   useDisclosure,
-} from '@chakra-ui/react';
-import { doc, updateDoc } from 'firebase/firestore';
-import { NextPage } from 'next';
-import React, { useEffect, useState } from 'react';
-import { db } from '../../../firebase';
+} from "@chakra-ui/react";
+import { doc, updateDoc } from "firebase/firestore";
+import { NextPage } from "next";
+import React, { useEffect, useState } from "react";
+import { db } from "../../../firebase";
 
 type Props = {
   obj: {
@@ -51,7 +51,7 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
 
   return (
     <>
-      <Button mr={3} onClick={onOpen}>
+      <Button size="xs" mr={3} onClick={onOpen}>
         編集
       </Button>
 
@@ -62,8 +62,8 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
           <ModalCloseButton />
           <ModalBody>
             <Input
-              type='text'
-              name='name'
+              type="text"
+              name="name"
               value={items?.name}
               onChange={handleInputChange}
             />
@@ -72,7 +72,7 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
           <ModalFooter>
             <Button
               mr={3}
-              variant='ghost'
+              variant="ghost"
               onClick={() => {
                 reset();
                 onClose();
@@ -81,7 +81,7 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
               Close
             </Button>
             <Button
-              colorScheme='blue'
+              colorScheme="blue"
               onClick={() => {
                 updateDocEdit();
                 onClose();
