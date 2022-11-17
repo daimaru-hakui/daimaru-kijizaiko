@@ -92,7 +92,11 @@ const SupplierNew = () => {
             </Box>
           </Flex>
 
-          <Button colorScheme="facebook" onClick={addSupplier}>
+          <Button
+            disabled={!items.name || !items.kana}
+            colorScheme="facebook"
+            onClick={addSupplier}
+          >
             登録
           </Button>
         </Stack>
