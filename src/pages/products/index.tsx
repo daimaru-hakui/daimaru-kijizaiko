@@ -12,11 +12,19 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { colorsState, materialNamesState } from "../../../store";
+import { FaTrashAlt } from "react-icons/fa";
 
 const Products = () => {
   const [products, setProducts] = useState<any>();
@@ -93,6 +101,14 @@ const Products = () => {
     );
   };
 
+  // 削除
+  const deleteProduct = async (id: string) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+    const docRef = doc(db, "products", `${id}`);
+    await deleteDoc(docRef);
+  };
+
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
@@ -103,7 +119,7 @@ const Products = () => {
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
-                <Th>詳細</Th>
+                <Th></Th>
                 <Th>生地品番</Th>
                 <Th>色</Th>
                 <Th>品名</Th>
@@ -116,6 +132,7 @@ const Products = () => {
                 <Th>混率</Th>
                 <Th>規格</Th>
                 <Th>機能性</Th>
+                <Th>削除</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -135,9 +152,11 @@ const Products = () => {
                 }) => (
                   <Tr key={product.id}>
                     <Td>
-                      <Link href={`/products/${product.id}`}>
-                        <Button size="sm">詳細</Button>
-                      </Link>
+                      <Flex alignItems="center" gap={3}>
+                        <Link href={`/products/${product.id}`}>
+                          <Button size="sm">詳細</Button>
+                        </Link>
+                      </Flex>
                     </Td>
                     <Td>{product.productNumber}</Td>
 
@@ -168,6 +187,12 @@ const Products = () => {
                           <Text key={index}>{f}</Text>
                         ))}
                       </Flex>
+                    </Td>
+                    <Td>
+                      <FaTrashAlt
+                        cursor="pointer"
+                        onClick={() => deleteProduct(product.id)}
+                      />
                     </Td>
                   </Tr>
                 )
