@@ -17,6 +17,7 @@ import {
   colorsState,
   currentUserState,
   materialNamesState,
+  productsState,
   suppliersState,
   usersState,
 } from "../../store";
@@ -24,6 +25,7 @@ import {
 export default function Home() {
   const [user] = useAuthState(auth);
   const [users, setUsers] = useRecoilState(usersState);
+  const [products, setProducts] = useRecoilState(productsState);
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
   const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
   const [colors, setColors] = useRecoilState(colorsState);
@@ -61,7 +63,23 @@ export default function Home() {
     }
   }, [currentUser, user]);
 
-  // suppliersRef情報;
+  // products情報;
+  useEffect(() => {
+    const getProducts = async () => {
+      const q = query(collection(db, "products"), orderBy("supplier", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setProducts(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getProducts();
+  }, [setProducts]);
+  // suppliers情報;
   useEffect(() => {
     const getSuppliers = async () => {
       const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));

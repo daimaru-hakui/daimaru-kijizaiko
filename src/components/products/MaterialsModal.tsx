@@ -95,10 +95,13 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
                   <NumberInput
                     name={m.id}
                     w="100%"
-                    defaultValue={materials[m.id] || 0}
+                    defaultValue={materials[m.id] || ""}
                     min={0}
                     max={100}
-                    value={materials && materials[m.id]}
+                    value={
+                      materials &&
+                      (materials[m.id] === 0 ? "" : materials[m.id])
+                    }
                     onChange={(e) => handleInputChange(e, m.id)}
                   >
                     <NumberInputField textAlign="right" />

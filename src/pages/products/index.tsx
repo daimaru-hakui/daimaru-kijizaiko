@@ -23,45 +23,17 @@ import {
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { colorsState, materialNamesState } from "../../../store";
+import { colorsState, materialNamesState, productsState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
+import OrderButtonAreaModal from "../../components/products/OrderButtonAreaModal";
+import { ProductType } from "../../../types/productType";
 
 const Products = () => {
-  const [products, setProducts] = useState<any>();
+  const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
 
-  useEffect(() => {
-    const getProducts = async () => {
-      const q = query(collection(db, "products"), orderBy("productNum", "asc"));
-      try {
-        onSnapshot(q, (querySnap) =>
-          setProducts(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      } finally {
-      }
-    };
-    getProducts();
-  }, []);
-
-  const dispColor = (color: number | string) => {
-    const result = colors.find(
-      (c: { id: number; name: string }) => c.id === color
-    );
-    return result?.name;
-  };
-
-  const dispMaterialName = (materialName: number) => {
-    const result = materialNames.find(
-      (material: { id: number; name: string }) => material.id === materialName
-    );
-    return result?.name;
-  };
-
+  // 混率の表示
   const dispMixed = (materials: any) => {
     let array = [];
     const t = materials.t ? `ポリエステル${materials.t}% ` : "";
@@ -82,6 +54,7 @@ const Products = () => {
       .map((item) => <Text key={item}>{item}</Text>);
   };
 
+  // 規格の表示
   const dispStd = (
     fabricWidth: number,
     fabricLength: number,
@@ -126,6 +99,7 @@ const Products = () => {
                 <Th>単価</Th>
                 <Th>徳島在庫</Th>
                 <Th>外部在庫</Th>
+                <Th>生機在庫</Th>
                 <Th>仕掛数量</Th>
                 <Th>キープ数量</Th>
                 <Th>組織名</Th>
@@ -136,67 +110,51 @@ const Products = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {products?.map(
-                (product: {
-                  id: string;
-                  productNumber: string;
-                  productName: string;
-                  colorNum: number;
-                  color: number;
-                  price: string;
-                  materialName: number;
-                  fabricWidth: number;
-                  fabricLength: number;
-                  materials: any;
-                  features: [];
-                }) => (
-                  <Tr key={product.id}>
-                    <Td>
-                      <Flex alignItems="center" gap={3}>
-                        <Link href={`/products/${product.id}`}>
-                          <Button size="sm">詳細</Button>
-                        </Link>
-                      </Flex>
-                    </Td>
-                    <Td>{product.productNumber}</Td>
+              {products?.map((product: ProductType) => (
+                <Tr key={product.id}>
+                  <Td>
+                    <Flex alignItems="center" gap={3}>
+                      <Link href={`/products/${product.id}`}>
+                        <Button size="sm">詳細</Button>
+                      </Link>
+                      <OrderButtonAreaModal product={product} />
+                    </Flex>
+                  </Td>
+                  <Td>{product.productNumber}</Td>
 
-                    <Td>{dispColor(product?.color)}</Td>
-                    <Td>{product.productName}</Td>
-                    <Td isNumeric>{product.price}円</Td>
-                    <Td isNumeric>0m</Td>
-                    <Td isNumeric>0m</Td>
-                    <Td isNumeric>0m</Td>
-                    <Td isNumeric>0m</Td>
-                    <Td>{dispMaterialName(product.materialName)}</Td>
-                    <Td>
-                      <Flex gap={1}>{dispMixed(product.materials)}</Flex>
-                    </Td>
-                    <Td>
-                      <Flex>
-                        {dispStd(
-                          product.fabricWidth,
-                          product.fabricLength,
-                          null
-                        )}
-                      </Flex>
-                    </Td>
+                  <Td>{product?.color}</Td>
+                  <Td>{product.productName}</Td>
+                  <Td isNumeric>{product.price}円</Td>
+                  <Td isNumeric>0m</Td>
+                  <Td isNumeric>0m</Td>
+                  <Td isNumeric>0m</Td>
+                  <Td isNumeric>0m</Td>
+                  <Td isNumeric>0m</Td>
+                  <Td>{product.materialName}</Td>
+                  <Td>
+                    <Flex gap={1}>{dispMixed(product.materials)}</Flex>
+                  </Td>
+                  <Td>
+                    <Flex>
+                      {dispStd(product.fabricWidth, product.fabricLength, null)}
+                    </Flex>
+                  </Td>
 
-                    <Td>
-                      <Flex gap={2}>
-                        {product?.features.map((f, index) => (
-                          <Text key={index}>{f}</Text>
-                        ))}
-                      </Flex>
-                    </Td>
-                    <Td>
-                      <FaTrashAlt
-                        cursor="pointer"
-                        onClick={() => deleteProduct(product.id)}
-                      />
-                    </Td>
-                  </Tr>
-                )
-              )}
+                  <Td>
+                    <Flex gap={2}>
+                      {product?.features.map((f, index) => (
+                        <Text key={index}>{f}</Text>
+                      ))}
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <FaTrashAlt
+                      cursor="pointer"
+                      onClick={() => deleteProduct(product.id)}
+                    />
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>
