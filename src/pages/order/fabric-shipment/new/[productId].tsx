@@ -14,13 +14,13 @@ import {
   Stack,
   Text,
   Textarea,
-} from "@chakra-ui/react";
-import { doc, getDoc } from "firebase/firestore";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { db } from "../../../../../firebase";
-import { ProductType } from "../../../../../types/productType";
-import StockDisp from "../../../../components/order/StockDisp";
+} from '@chakra-ui/react';
+import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../../../firebase';
+import { ProductType } from '../../../../../types/productType';
+import StockDisp from '../../../../components/order/StockDisp';
 
 const FabricShipmentNew = () => {
   const router = useRouter();
@@ -28,14 +28,14 @@ const FabricShipmentNew = () => {
   const [product, setProduct] = useState({} as ProductType);
   const [items, setItems] = useState({
     quantity: 0,
-    date: "",
-    comment: "",
+    date: '',
+    comment: '',
     abc: 1,
   });
 
   useEffect(() => {
     const getProduct = async () => {
-      const docRef = doc(db, "products", `${productId}`);
+      const docRef = doc(db, 'products', `${productId}`);
       try {
         const docSnap = await getDoc(docRef);
         setProduct({ ...docSnap.data(), id: docSnap.id } as ProductType);
@@ -66,10 +66,10 @@ const FabricShipmentNew = () => {
   };
 
   return (
-    <Box w="100%" mt={12}>
-      <Container maxW="600px" mt={6} p={6} bg="white" boxShadow="md">
-        <Box fontSize="2xl" fontWeight="bold">
-          出荷依頼
+    <Box w='100%' mt={12}>
+      <Container maxW='600px' mt={6} p={6} bg='white' boxShadow='md'>
+        <Box fontSize='2xl' fontWeight='bold'>
+          出荷依頼数量
         </Box>
         <Box mt={12}>
           <Stack spacing={6}>
@@ -86,30 +86,30 @@ const FabricShipmentNew = () => {
               <Text>品番</Text>
               {product.productNumber} {product.productName}
             </Box>
-            <Flex gap={3} w="100%">
-              <Box w="100%">
+            <Flex gap={3} w='100%'>
+              <Box w='100%'>
                 <Box>日付</Box>
                 <Input
                   mt={1}
-                  type="date"
-                  name="date"
+                  type='date'
+                  name='date'
                   value={items.date}
                   onChange={handleInputChange}
                 />
               </Box>
-              <Box w="100%">
+              <Box w='100%'>
                 <Text>数量（m）</Text>
                 <NumberInput
                   mt={1}
-                  w="100%"
-                  name="quantity"
+                  w='100%'
+                  name='quantity'
                   defaultValue={0}
                   min={0}
                   max={10000}
-                  value={items.quantity === 0 ? "" : items.quantity}
-                  onChange={(e) => handleNumberChange(e, "quantity")}
+                  value={items.quantity === 0 ? '' : items.quantity}
+                  onChange={(e) => handleNumberChange(e, 'quantity')}
                 >
-                  <NumberInputField textAlign="right" />
+                  <NumberInputField textAlign='right' />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
                     <NumberDecrementStepper />
@@ -120,12 +120,12 @@ const FabricShipmentNew = () => {
             <Box>
               <Text>備考</Text>
               <Textarea
-                name="comment"
+                name='comment'
                 value={items.comment}
                 onChange={handleInputChange}
               />
             </Box>
-            <Button size="md" colorScheme="facebook">
+            <Button size='md' colorScheme='facebook'>
               登録
             </Button>
           </Stack>
