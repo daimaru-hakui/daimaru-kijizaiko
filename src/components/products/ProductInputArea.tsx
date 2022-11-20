@@ -22,7 +22,7 @@ import {
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { features } from "../../../datalist";
 import { db } from "../../../firebase";
@@ -30,6 +30,7 @@ import {
   colorsState,
   loadingState,
   materialNamesState,
+  productsState,
   suppliersState,
   usersState,
 } from "../../../store";
@@ -54,6 +55,7 @@ const ProductInputArea: NextPage<Props> = ({
   const productId = router.query.productId;
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
+  const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
   const setLoading = useSetRecoilState(loadingState);
@@ -75,7 +77,6 @@ const ProductInputArea: NextPage<Props> = ({
   };
 
   const handleNumberChange = (e: string, name: string) => {
-    console.log(e);
     const value = e;
     setItems({ ...items, [name]: Number(value) });
   };
@@ -84,6 +85,7 @@ const ProductInputArea: NextPage<Props> = ({
     const value = e;
     setItems({ ...items, [name]: Number(value) });
   };
+
   const handleCheckedChange = (e: any, name: string) => {
     if (e.target.checked) {
       setItems({
@@ -132,9 +134,9 @@ const ProductInputArea: NextPage<Props> = ({
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
         productName: items.productName || "",
-        colorNum: Number(items.colorNum) || "",
+        colorNum: items.colorNum || "",
         color: items.color || "",
-        price: items.price || 0,
+        price: Number(items.price) || 0,
         materialName: items.materialName || "",
         materials: items.materials || {},
         fabricWidth: items.fabricWidth || "",
@@ -149,6 +151,7 @@ const ProductInputArea: NextPage<Props> = ({
       console.log(err);
     } finally {
       setLoading(false);
+      router.push("/products");
     }
   };
 
@@ -166,9 +169,9 @@ const ProductInputArea: NextPage<Props> = ({
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
         productName: items.productName || "",
-        colorNum: Number(items.colorNum) || "",
+        colorNum: items.colorNum || "",
         color: items.color || "",
-        price: items.price || 0,
+        price: Number(items.price) || 0,
         materialName: items.materialName || "",
         materials: items.materials || {},
         fabricWidth: items.fabricWidth || "",
@@ -192,12 +195,37 @@ const ProductInputArea: NextPage<Props> = ({
     router.push(`/products/${productId}`);
   };
 
+  // 必須項目を入力しているかをチェック
+  const requiredInput = () => {
+    const staff = items.productType === 2 ? items.staff : true;
+    return (
+      !staff ||
+      !items.supplier ||
+      !items.productNum ||
+      !items.color ||
+      !items.price
+    );
+  };
+
+  // 生地が登録しているかのチェック
+  const registeredInput = () => {
+    const item = items.productNum + items.colorNum + items.color;
+    const base = products.map(
+      (product: { productNum: string; colorNum: string; color: string }) =>
+        product.productNum + product.colorNum + product.color
+    );
+    const result = base?.includes(item);
+    if (!result) return;
+    return result;
+  };
+
   return (
     <Box w="100%" mt={12}>
       <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
         <Box as="h1" fontSize="2xl">
           {title}
         </Box>
+
         <Stack spacing={6} mt={6}>
           <Box w="100%">
             <RadioGroup
@@ -213,7 +241,12 @@ const ProductInputArea: NextPage<Props> = ({
           </Box>
           {items.productType === 2 && (
             <Box>
-              <Text fontWeight="bold">担当者</Text>
+              <Text fontWeight="bold">
+                担当者
+                <Box ml={1} as="span" textColor="red">
+                  ※必須
+                </Box>
+              </Text>
               <Select
                 mt={1}
                 placeholder="担当者名を選択"
@@ -230,7 +263,12 @@ const ProductInputArea: NextPage<Props> = ({
           )}
           <Flex gap={6}>
             <Box w="100%">
-              <Text fontWeight="bold">仕入先</Text>
+              <Text fontWeight="bold">
+                仕入先
+                <Box ml={1} as="span" textColor="red">
+                  ※必須
+                </Box>
+              </Text>
               <Select
                 mt={1}
                 placeholder="メーカーを選択してください"
@@ -245,6 +283,11 @@ const ProductInputArea: NextPage<Props> = ({
               </Select>
             </Box>
           </Flex>
+          {toggleSwitch === "new" && (
+            <Box fontSize="3xl" fontWeight="bold" color="red">
+              {registeredInput() && "すでに登録されています。"}
+            </Box>
+          )}
           <Flex
             gap={6}
             alignItems="center"
@@ -252,7 +295,12 @@ const ProductInputArea: NextPage<Props> = ({
             flexDirection={{ base: "column", md: "row" }}
           >
             <Box w="100%" flex="1">
-              <Text fontWeight="bold">品番</Text>
+              <Text fontWeight="bold">
+                品番
+                <Box ml={1} as="span" textColor="red">
+                  ※必須
+                </Box>
+              </Text>
               <Input
                 mt={1}
                 name="productNum"
@@ -268,13 +316,18 @@ const ProductInputArea: NextPage<Props> = ({
                 mt={1}
                 name="colorNum"
                 type="text"
-                placeholder="例）G-1"
+                placeholder="例）G1 ハイフンなし"
                 value={items.colorNum}
                 onChange={handleInputChange}
               />
             </Box>
             <Box w="100%" flex="1">
-              <Text fontWeight="bold">色</Text>
+              <Text fontWeight="bold">
+                色
+                <Box ml={1} as="span" textColor="red">
+                  ※必須
+                </Box>
+              </Text>
               <Select
                 mt={1}
                 placeholder="色を選択"
@@ -282,7 +335,7 @@ const ProductInputArea: NextPage<Props> = ({
                 onChange={(e) => handleSelectchange(e, "color")}
               >
                 {colors?.map((c: { id: number; name: string }) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c.id} value={c.name}>
                     {c.name}
                   </option>
                 ))}
@@ -307,14 +360,19 @@ const ProductInputArea: NextPage<Props> = ({
               />
             </Box>
             <Box flex={1} w="100%">
-              <Text fontWeight="bold">単価（円）</Text>
+              <Text fontWeight="bold">
+                単価（円）
+                <Box ml={1} as="span" textColor="red">
+                  ※必須
+                </Box>
+              </Text>
               <NumberInput
                 mt={1}
                 name="price"
                 defaultValue={0}
                 min={0}
                 max={10000}
-                value={items.price}
+                value={items.price === 0 ? "" : items.price}
                 onChange={(e) => handleNumberChange(e, "price")}
               >
                 <NumberInputField textAlign="right" />
@@ -354,7 +412,7 @@ const ProductInputArea: NextPage<Props> = ({
                   onChange={(e) => handleSelectchange(e, "materialName")}
                 >
                   {materialNames?.map((m: { id: number; name: string }) => (
-                    <option key={m.id} value={m.id}>
+                    <option key={m.id} value={m.name}>
                       {m.name}
                     </option>
                   ))}
@@ -509,7 +567,17 @@ const ProductInputArea: NextPage<Props> = ({
             />
           </Box>
           {toggleSwitch === "new" && (
-            <Button colorScheme="facebook" onClick={addProduct}>
+            <Button
+              colorScheme="facebook"
+              disabled={
+                !items.supplier ||
+                !items.productNum ||
+                !items.color ||
+                !items.price ||
+                registeredInput()
+              }
+              onClick={addProduct}
+            >
               登録
             </Button>
           )}

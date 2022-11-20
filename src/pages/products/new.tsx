@@ -45,7 +45,7 @@ const ProductsNew = () => {
     productName: "",
     colorNum: "",
     color: "",
-    price: 0,
+    price: "",
     materialName: "",
     materials: "",
     fabricWidth: 0,
@@ -108,26 +108,6 @@ const ProductsNew = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const dispMixed = (materials: any) => {
-    let array = [];
-    const t = materials.t ? `ポリエステル${materials.t}% ` : "";
-    const c = materials.c ? `綿${materials.c}% ` : "";
-    const n = materials.n ? `ナイロン${materials.n}% ` : "";
-    const r = materials.r ? `レーヨン${materials.r}% ` : "";
-    const f = materials.f ? `麻${materials.f}% ` : "";
-    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
-    const w = materials.w ? `ウール${materials.w}% ` : "";
-    const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
-    const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
-    const si = materials.si ? `シルク${materials.si}% ` : "";
-    const z = materials.z ? `指定外繊維${materials.z}% ` : "";
-    array.push(t, c, n, r, f, pu, w, ac, cu, si, z);
-
-    return array
-      .filter((item) => item)
-      .map((item) => <Text key={item}>{item}</Text>);
   };
 
   return (

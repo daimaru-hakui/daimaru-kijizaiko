@@ -60,6 +60,15 @@ const SettingAddPage: NextPage<Props> = ({
     await deleteDoc(docRef);
   };
 
+  // 登録しているかのチェック
+  const registeredInput = () => {
+    const item = items.name;
+    const base = array.map((a: { name: string }) => a.name);
+    const result = base?.includes(item);
+    if (!result) return;
+    return result;
+  };
+
   return (
     <Box w="100%" mt={12} px={6}>
       <Container maxW="600px" mt={6} p={0}>
@@ -75,6 +84,9 @@ const SettingAddPage: NextPage<Props> = ({
         bg="white"
         boxShadow="md"
       >
+        <Box fontSize="2xl" fontWeight="bold" color="red">
+          {registeredInput() && "すでに登録されています。"}
+        </Box>
         <Text>{title}を追加</Text>
         <Flex
           gap={2}
@@ -91,7 +103,7 @@ const SettingAddPage: NextPage<Props> = ({
               onChange={handleInputChange}
             />
           </Box>
-          <Button disabled={!items.name} onClick={addFunc}>
+          <Button disabled={!items.name || registeredInput()} onClick={addFunc}>
             追加
           </Button>
         </Flex>

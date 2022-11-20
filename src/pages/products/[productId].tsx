@@ -14,7 +14,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { colors, materialNames } from "../../../datalist";
 import { db } from "../../../firebase";
 import { loadingState, suppliersState, usersState } from "../../../store";
 
@@ -29,9 +28,7 @@ const ProductsId = () => {
     const getProduct = async () => {
       const docRef = doc(db, "products", `${productId}`);
       try {
-        await onSnapshot(docRef, (doc) =>
-          setProduct({ ...doc.data(), id: doc.id })
-        );
+        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id }));
       } catch (err) {
         console.log(err);
       } finally {
@@ -54,20 +51,6 @@ const ProductsId = () => {
       (supplier: { id: string; name: string }) => id === supplier.id
     );
     return supplier?.name;
-  };
-
-  const dispColor = (color: number) => {
-    const result = colors.find(
-      (c: { id: number; name: string }) => c.id === color
-    );
-    return result?.name;
-  };
-
-  const dispMaterialName = (materialName: number) => {
-    const result = materialNames.find(
-      (material: { id: number; name: string }) => material.id === materialName
-    );
-    return result?.name;
   };
 
   const dispMixed = (materials: any) => {
@@ -143,30 +126,42 @@ const ProductsId = () => {
           </Flex>
           <Flex
             gap={1}
-            alignItems="center"
-            justifyContent="flex-start"
+            alignItems="flex-start"
+            justifyContent="space-between"
             flexDirection={{ base: "column", md: "row" }}
           >
-            <Box w="100%">
-              <Text fontWeight="bold">品番</Text>
-              <Box>{product?.productNum}</Box>
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="bold">色番</Text>
-              <Box>{product?.colorNum}</Box>
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="bold">色</Text>
-              <Box>{dispColor(product?.color)}</Box>
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="bold">品名</Text>
-              {product?.productName}
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="bold">単価</Text>
-              {product?.price}円
-            </Box>
+            <Flex
+              w="100%"
+              gap={3}
+              justifyContent="flex-start"
+              flexDirection={{ base: "column", md: "row" }}
+            >
+              <Box w="100%" minW="120px" flex="1">
+                <Text fontWeight="bold">品番</Text>
+                <Box>{product?.productNum}</Box>
+              </Box>
+              <Box w="100%" minW="120px" flex="1">
+                <Text fontWeight="bold">色番</Text>
+                <Box>{product?.colorNum}</Box>
+              </Box>
+              <Box w="100%" minW="120px" flex="1">
+                <Text fontWeight="bold">色</Text>
+                <Box>{product?.color}</Box>
+              </Box>
+              <Box w="100%">
+                <Text fontWeight="bold">品名</Text>
+                <Box>{product?.productName}</Box>
+              </Box>
+            </Flex>
+            <Flex
+              justifyContent={{ base: "flex-start", md: "flex-end" }}
+              minW="80px"
+            >
+              <Box>
+                <Text fontWeight="bold">単価</Text>
+                <Box>{product?.price}円</Box>
+              </Box>
+            </Flex>
           </Flex>
 
           <Box flex={1} w="100%">
@@ -186,7 +181,7 @@ const ProductsId = () => {
             <Stack spacing={6} flex={1} w="100%">
               <Box w="100%">
                 <Text>組織名</Text>
-                {dispMaterialName(product?.materialName)}
+                {product?.materialName}
               </Box>
               <Flex gap={6}>
                 <Box w="100%">
