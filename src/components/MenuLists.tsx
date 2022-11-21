@@ -13,7 +13,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menuOrder = [
     { id: 2, title: "出庫・入庫・キープ・移管", link: "/order/new" },
-    { id: 3, title: "入出庫履歴照会", link: "/order" },
+    { id: 3, title: "生機仕掛履歴", link: "/history/wipGrayFabrics" },
   ];
   const menuMaker = [
     { id: 1, title: "一覧", link: "/suppliers" },

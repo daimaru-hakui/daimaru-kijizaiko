@@ -7,7 +7,7 @@ export type ProductType = {
     productNum: string;
     productName: string;
     colorNum: string;
-    color: string;
+    colorName: string;
     price: number;
     materialName: string;
     materials: any;
@@ -18,4 +18,5 @@ export type ProductType = {
     noteProduct: string;
     noteFabric: string;
     noteEtc: string;
+    wipGrayFabricQuantity: number;
   };
