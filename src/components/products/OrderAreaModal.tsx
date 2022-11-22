@@ -18,13 +18,12 @@ import {
   Tabs,
   Text,
   useDisclosure,
-} from '@chakra-ui/react';
-import { NextPage } from 'next';
-import Link from 'next/link';
-import React from 'react';
-import { ProductType } from '../../../types/productType';
-import StockDisp from '../order/StockDisp';
-import OrderInputArea from './OrderInputArea';
+} from "@chakra-ui/react";
+import { NextPage } from "next";
+import React from "react";
+import { ProductType } from "../../../types/productType";
+import StockDisp from "../order/StockDisp";
+import OrderInputArea from "./OrderInputArea";
 
 type Props = {
   product: ProductType;
@@ -34,21 +33,21 @@ const OrderModal: NextPage<Props> = ({ product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Button size='sm' onClick={onOpen}>
+      <Button size="sm" onClick={onOpen}>
         Order
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size='xl'>
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Order</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>
-              <StockDisp />
-              <Box fontSize='xl'>
+              <StockDisp product={product} />
+              <Box fontSize="xl">
                 <Flex>
-                  <Text mr={1} fontWeight='bold'>
+                  <Text mr={1} fontWeight="bold">
                     品番
                   </Text>
                   <Flex>
@@ -57,7 +56,7 @@ const OrderModal: NextPage<Props> = ({ product }) => {
                   </Flex>
                 </Flex>
                 <Flex mt={2}>
-                  <Text mr={1} fontWeight='bold'>
+                  <Text mr={1} fontWeight="bold">
                     価格
                   </Text>
                   <Flex>
@@ -91,27 +90,39 @@ const OrderModal: NextPage<Props> = ({ product }) => {
                 </Flex>
               </Box> */}
               <Divider />
-              <Tabs variant='unstyled'>
+              <Tabs variant="unstyled">
                 <TabList>
-                  <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
+                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
                     生機発注数量
                   </Tab>
-                  <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
+                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
                     染め依頼数量
                   </Tab>
-                  <Tab _selected={{ color: 'white', bg: 'blue.500' }}>
+                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
                     出荷依頼数量
                   </Tab>
                 </TabList>
                 <TabPanels>
                   <TabPanel>
-                    <OrderInputArea product={product} orderType={1} />
+                    <OrderInputArea
+                      product={product}
+                      orderType={1}
+                      onClose={onClose}
+                    />
                   </TabPanel>
                   <TabPanel>
-                    <OrderInputArea product={product} orderType={2} />
+                    <OrderInputArea
+                      product={product}
+                      orderType={2}
+                      onClose={onClose}
+                    />
                   </TabPanel>
                   <TabPanel>
-                    <OrderInputArea product={product} orderType={3} />
+                    <OrderInputArea
+                      product={product}
+                      orderType={3}
+                      onClose={onClose}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Tabs>

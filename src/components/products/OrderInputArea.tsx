@@ -13,24 +13,39 @@ import {
   Stack,
   Text,
   Textarea,
-} from '@chakra-ui/react';
-import { NextPage } from 'next';
-import React, { useEffect, useState } from 'react';
-import { ProductType } from '../../../types/productType';
+} from "@chakra-ui/react";
+import {
+  addDoc,
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
+import { NextPage } from "next";
+import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { db } from "../../../firebase";
+import { currentUserState } from "../../../store";
+import { ProductType } from "../../../types/productType";
 
 type Props = {
   product: ProductType;
   orderType: number;
+  onClose: Function;
 };
 
-const OrderInputArea: NextPage<Props> = ({ product, orderType }) => {
+const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
+  const currentUser = useRecoilValue(currentUserState);
+  const productId = product?.id;
   const [items, setItems] = useState({
     quantity: 0,
-    date: '',
-    comment: '',
-    abc: 1,
+    orderedAt: "",
+    scheduledAt: "",
+    comment: "",
+    stockPlaceType: 1,
   });
 
+  // 今日の日付を取得
   const todayDate = () => {
     const date = new Date();
     const year = date.getFullYear();
@@ -57,46 +72,190 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
+  const stockLimit = () => {
+    const stockGrayFabricQuantity = product?.stockGrayFabricQuantity || 0;
+    return items.stockPlaceType === 1 &&
+      stockGrayFabricQuantity < items.quantity
+      ? true
+      : false;
+  };
+
+  //////////// 生機発注 関数//////////////
+  const onClickOrderGrayfabric = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        // 更新前の値を取得
+        const productDocRef = doc(db, "products", `${productId}`);
+        const productDocSnap = await transaction.get(productDocRef);
+
+        if (!productDocSnap.exists()) {
+          throw "product document does not exist!";
+        }
+
+        // 現在の生機仕掛数量
+        const oldQuantity = productDocSnap.data().wipGrayFabricQuantity || 0;
+        //　生機仕掛数量　＋　入力値
+        const newQuantity = oldQuantity + Math.abs(items?.quantity);
+
+        // 生機仕掛数量を更新
+        transaction.update(productDocRef, {
+          wipGrayFabricQuantity: newQuantity,
+        });
+
+        // 履歴を追加
+        const historyDocRef = collection(db, "historyGrayFabrics");
+        await addDoc(historyDocRef, {
+          productId,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: product?.price,
+          comment: items.comment,
+          status: 0,
+          createdAt: serverTimestamp(),
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt,
+          staff: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      onClose();
+    }
+  };
+
+  // 染色発注
+  const onClickOrderFabricDyeing = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        // 更新前の値を取得
+        const productDocRef = doc(db, "products", `${productId}`);
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) {
+          throw "product document does not exist!";
+        }
+
+        // 現在の染色仕掛数量
+        const wipFabricDyeingQuantity =
+          productDocSnap.data().wipFabricDyeingQuantity || 0;
+        //　現在の染色仕掛数量　＋　入力値
+        const newWipFabricDyeingQuantity =
+          wipFabricDyeingQuantity + Math.abs(items?.quantity);
+
+        // 現在の生機仕掛在庫
+        const stockGrayFabricQuantity =
+          productDocSnap.data().stockGrayFabricQuantity || 0;
+        // 現在の生機仕掛在庫　‐　入力値
+        const newStockGrayFabricQuantity =
+          stockGrayFabricQuantity - Math.abs(items?.quantity);
+
+        // 生機仕掛数量を更新  ランニング在庫の場合は仕掛在庫の変更無し
+        transaction.update(productDocRef, {
+          wipFabricDyeingQuantity: newWipFabricDyeingQuantity,
+          stockGrayFabricQuantity:
+            items.stockPlaceType === 1
+              ? newStockGrayFabricQuantity
+              : stockGrayFabricQuantity,
+        });
+
+        // 履歴を追加
+        const historyDocRef = collection(db, "historyFabricDyeings");
+        await addDoc(historyDocRef, {
+          productId,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: product?.price,
+          comment: items.comment,
+          status: 0,
+          stockPlaceType: items.stockPlaceType,
+          createdAt: serverTimestamp(),
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt,
+          staff: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      onClose();
+    }
+  };
+
+  // 生地発注
+  const orderfabric = () => {};
+
   return (
     <Box>
       <Stack spacing={6}>
         {orderType === 2 && (
           <RadioGroup
             mt={3}
-            onChange={(e) => handleRadioChange(e, 'abc')}
-            value={items.abc}
+            defaultValue={1}
+            onChange={(e) => handleRadioChange(e, "stockPlaceType")}
+            value={items.stockPlaceType}
           >
-            <Stack direction={{ base: 'column', md: 'row' }}>
+            <Stack direction={{ base: "column", md: "row" }}>
               <Radio value={1}>生機在庫から使用</Radio>
               <Radio value={2}>ランニング生機から使用</Radio>
             </Stack>
           </RadioGroup>
         )}
 
-        <Flex gap={3} w='100%'>
-          <Box w='100%'>
-            <Box>日付</Box>
+        {orderType === 3 && (
+          <RadioGroup
+            mt={3}
+            onChange={(e) => handleRadioChange(e, "abc")}
+            value={items.stockPlaceType}
+          >
+            <Stack direction={{ base: "column", md: "row" }}>
+              <Radio value={1}>生地在庫から出荷</Radio>
+              <Radio value={2}>ランニング生地から出荷</Radio>
+            </Stack>
+          </RadioGroup>
+        )}
+
+        <Flex gap={3} w="100%" flexDirection={{ base: "column", md: "row" }}>
+          <Box w="100%">
+            <Box>発注日</Box>
             <Input
               mt={1}
-              type='date'
-              name='date'
-              value={items.date || todayDate()}
+              type="date"
+              name="orderedAt"
+              value={items.orderedAt || todayDate()}
               onChange={handleInputChange}
             />
           </Box>
-          <Box w='100%'>
+          <Box w="100%">
+            <Box>予定日</Box>
+            <Input
+              mt={1}
+              type="date"
+              name="scheduledAt"
+              value={items.scheduledAt}
+              onChange={handleInputChange}
+            />
+          </Box>
+          <Box w="100%">
             <Text>数量（m）</Text>
             <NumberInput
               mt={1}
-              w='100%'
-              name='quantity'
+              w="100%"
+              name="quantity"
               defaultValue={0}
               min={0}
               max={10000}
-              value={items.quantity === 0 ? '' : items.quantity}
-              onChange={(e) => handleNumberChange(e, 'quantity')}
+              value={items.quantity === 0 ? "" : items.quantity}
+              onChange={(e) => handleNumberChange(e, "quantity")}
             >
-              <NumberInputField textAlign='right' />
+              <NumberInputField textAlign="right" />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
@@ -107,14 +266,30 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType }) => {
         <Box>
           <Text>備考</Text>
           <Textarea
-            name='comment'
+            name="comment"
             value={items.comment}
             onChange={handleInputChange}
           />
         </Box>
-        <Button size='md' colorScheme='facebook'>
-          登録
-        </Button>
+        {orderType === 1 && (
+          <Button
+            size="md"
+            colorScheme="facebook"
+            onClick={onClickOrderGrayfabric}
+          >
+            登録
+          </Button>
+        )}
+        {orderType === 2 && (
+          <Button
+            size="md"
+            colorScheme="facebook"
+            disabled={stockLimit()}
+            onClick={onClickOrderFabricDyeing}
+          >
+            登録
+          </Button>
+        )}
       </Stack>
     </Box>
   );

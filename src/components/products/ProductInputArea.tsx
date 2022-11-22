@@ -135,7 +135,7 @@ const ProductInputArea: NextPage<Props> = ({
         productNum: items.productNum || "",
         productName: items.productName || "",
         colorNum: items.colorNum || "",
-        color: items.color || "",
+        colorName: items.colorName || "",
         price: Number(items.price) || 0,
         materialName: items.materialName || "",
         materials: items.materials || {},
@@ -170,7 +170,7 @@ const ProductInputArea: NextPage<Props> = ({
         productNum: items.productNum || "",
         productName: items.productName || "",
         colorNum: items.colorNum || "",
-        color: items.color || "",
+        colorName: items.colorName || "",
         price: Number(items.price) || 0,
         materialName: items.materialName || "",
         materials: items.materials || {},
@@ -202,17 +202,17 @@ const ProductInputArea: NextPage<Props> = ({
       !staff ||
       !items.supplier ||
       !items.productNum ||
-      !items.color ||
+      !items.colorName ||
       !items.price
     );
   };
 
   // 生地が登録しているかのチェック
   const registeredInput = () => {
-    const item = items.productNum + items.colorNum + items.color;
+    const item = items.productNum + items.colorNum + items.colorName;
     const base = products.map(
-      (product: { productNum: string; colorNum: string; color: string }) =>
-        product.productNum + product.colorNum + product.color
+      (product: { productNum: string; colorNum: string; colorName: string }) =>
+        product.productNum + product.colorNum + product.colorName
     );
     const result = base?.includes(item);
     if (!result) return;
@@ -331,8 +331,8 @@ const ProductInputArea: NextPage<Props> = ({
               <Select
                 mt={1}
                 placeholder="色を選択"
-                value={items.color}
-                onChange={(e) => handleSelectchange(e, "color")}
+                value={items.colorName}
+                onChange={(e) => handleSelectchange(e, "colorName")}
               >
                 {colors?.map((c: { id: number; name: string }) => (
                   <option key={c.id} value={c.name}>
@@ -572,7 +572,7 @@ const ProductInputArea: NextPage<Props> = ({
               disabled={
                 !items.supplier ||
                 !items.productNum ||
-                !items.color ||
+                !items.colorName ||
                 !items.price ||
                 registeredInput()
               }

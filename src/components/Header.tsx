@@ -38,7 +38,6 @@ const Header = () => {
     );
     return user?.name;
   };
-  console.log(users);
 
   // サインアウト
   const signOut = () => {
