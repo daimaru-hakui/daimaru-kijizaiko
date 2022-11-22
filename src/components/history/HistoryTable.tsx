@@ -16,7 +16,7 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { db } from "../../../firebase";
 import ConfirmModal from "./ConfirmModal";
-import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
+// import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
 
 type Props = {
   historys: any;
@@ -233,7 +233,7 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
                 <Flex gap={3}>
                   {orderType === 1 && (
                     <>
-                      <EditWipGrayFAbricModal history={history} />
+                      {/* <EditWipGrayFAbricModal history={history} /> */}
                       <FaTrashAlt
                         cursor="pointer"
                         onClick={() => deleteHistoryGrayFabric(history)}
