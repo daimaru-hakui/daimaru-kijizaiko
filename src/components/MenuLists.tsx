@@ -12,8 +12,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 2, title: "登録", link: "/products/new" },
   ];
   const menuOrder = [
-    { id: 2, title: "出庫・入庫・キープ・移管", link: "/order/new" },
-    { id: 3, title: "生機仕掛履歴", link: "/history/wipGrayFabrics" },
+    { id: 1, title: "生機仕掛履歴", link: "/history/gray-fabrics" },
+    { id: 2, title: "生地仕掛履歴", link: "/history/fabric-dyeing" },
   ];
   const menuMaker = [
     { id: 1, title: "一覧", link: "/suppliers" },

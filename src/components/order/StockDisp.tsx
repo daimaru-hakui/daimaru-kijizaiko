@@ -25,7 +25,7 @@ const StockDisp: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">生機在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                0
+                {product?.stockGrayFabricQuantity || 0}
               </Box>
               m
             </Box>
@@ -36,7 +36,7 @@ const StockDisp: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">生地仕掛</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                0
+                {product?.wipFabricDyeingQuantity || 0}
               </Box>
               m
             </Box>
@@ -45,7 +45,7 @@ const StockDisp: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">生地在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                0
+                {product?.stockFabricDyeingQuantity || 0}
               </Box>
               m
             </Box>

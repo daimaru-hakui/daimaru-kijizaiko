@@ -23,7 +23,9 @@ import {
 } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
+import { currentUserState } from "../../../store";
 import { ProductType } from "../../../types/productType";
 
 type Props = {
@@ -33,10 +35,12 @@ type Props = {
 };
 
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
+  const currentUser = useRecoilValue(currentUserState);
   const productId = product?.id;
   const [items, setItems] = useState({
     quantity: 0,
-    date: "",
+    orderedAt: "",
+    scheduledAt: "",
     comment: "",
     stockPlaceType: 1,
   });
@@ -68,7 +72,15 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
-  // 生機発注 関数
+  const stockLimit = () => {
+    const stockGrayFabricQuantity = product?.stockGrayFabricQuantity || 0;
+    return items.stockPlaceType === 1 &&
+      stockGrayFabricQuantity < items.quantity
+      ? true
+      : false;
+  };
+
+  //////////// 生機発注 関数//////////////
   const onClickOrderGrayfabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -82,19 +94,18 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           throw "product document does not exist!";
         }
 
-        const wipGrayFabricQuantity =
-          productDocSnap.data().wipGrayFabricQuantity || 0;
-        const newWipGrayFabricQuantity =
-          wipGrayFabricQuantity + Math.abs(items?.quantity);
+        // 現在の生機仕掛数量
+        const oldQuantity = productDocSnap.data().wipGrayFabricQuantity || 0;
+        //　生機仕掛数量　＋　入力値
+        const newQuantity = oldQuantity + Math.abs(items?.quantity);
 
         // 生機仕掛数量を更新
         transaction.update(productDocRef, {
-          wipGrayFabricQuantity: newWipGrayFabricQuantity,
-          updatedAt: serverTimestamp(),
+          wipGrayFabricQuantity: newQuantity,
         });
 
         // 履歴を追加
-        const historyDocRef = collection(db, "historyWipGrayFabrics");
+        const historyDocRef = collection(db, "historyGrayFabrics");
         await addDoc(historyDocRef, {
           productId,
           productNumber: product?.productNumber,
@@ -105,6 +116,9 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           comment: items.comment,
           status: 0,
           createdAt: serverTimestamp(),
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt,
+          staff: currentUser,
         });
       });
     } catch (err) {
@@ -115,7 +129,65 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   };
 
   // 染色発注
-  const orderDyeing = () => {};
+  const onClickOrderFabricDyeing = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        // 更新前の値を取得
+        const productDocRef = doc(db, "products", `${productId}`);
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) {
+          throw "product document does not exist!";
+        }
+
+        // 現在の染色仕掛数量
+        const wipFabricDyeingQuantity =
+          productDocSnap.data().wipFabricDyeingQuantity || 0;
+        //　現在の染色仕掛数量　＋　入力値
+        const newWipFabricDyeingQuantity =
+          wipFabricDyeingQuantity + Math.abs(items?.quantity);
+
+        // 現在の生機仕掛在庫
+        const stockGrayFabricQuantity =
+          productDocSnap.data().stockGrayFabricQuantity || 0;
+        // 現在の生機仕掛在庫　‐　入力値
+        const newStockGrayFabricQuantity =
+          stockGrayFabricQuantity - Math.abs(items?.quantity);
+
+        // 生機仕掛数量を更新  ランニング在庫の場合は仕掛在庫の変更無し
+        transaction.update(productDocRef, {
+          wipFabricDyeingQuantity: newWipFabricDyeingQuantity,
+          stockGrayFabricQuantity:
+            items.stockPlaceType === 1
+              ? newStockGrayFabricQuantity
+              : stockGrayFabricQuantity,
+        });
+
+        // 履歴を追加
+        const historyDocRef = collection(db, "historyFabricDyeings");
+        await addDoc(historyDocRef, {
+          productId,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: product?.price,
+          comment: items.comment,
+          status: 0,
+          stockPlaceType: items.stockPlaceType,
+          createdAt: serverTimestamp(),
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt,
+          staff: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      onClose();
+    }
+  };
 
   // 生地発注
   const orderfabric = () => {};
@@ -126,6 +198,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         {orderType === 2 && (
           <RadioGroup
             mt={3}
+            defaultValue={1}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
             value={items.stockPlaceType}
           >
@@ -149,14 +222,24 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           </RadioGroup>
         )}
 
-        <Flex gap={3} w="100%">
+        <Flex gap={3} w="100%" flexDirection={{ base: "column", md: "row" }}>
           <Box w="100%">
-            <Box>日付</Box>
+            <Box>発注日</Box>
             <Input
               mt={1}
               type="date"
-              name="date"
-              value={items.date || todayDate()}
+              name="orderedAt"
+              value={items.orderedAt || todayDate()}
+              onChange={handleInputChange}
+            />
+          </Box>
+          <Box w="100%">
+            <Box>予定日</Box>
+            <Input
+              mt={1}
+              type="date"
+              name="scheduledAt"
+              value={items.scheduledAt}
               onChange={handleInputChange}
             />
           </Box>
@@ -188,13 +271,25 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             onChange={handleInputChange}
           />
         </Box>
-        <Button
-          size="md"
-          colorScheme="facebook"
-          onClick={onClickOrderGrayfabric}
-        >
-          登録
-        </Button>
+        {orderType === 1 && (
+          <Button
+            size="md"
+            colorScheme="facebook"
+            onClick={onClickOrderGrayfabric}
+          >
+            登録
+          </Button>
+        )}
+        {orderType === 2 && (
+          <Button
+            size="md"
+            colorScheme="facebook"
+            disabled={stockLimit()}
+            onClick={onClickOrderFabricDyeing}
+          >
+            登録
+          </Button>
+        )}
       </Stack>
     </Box>
   );

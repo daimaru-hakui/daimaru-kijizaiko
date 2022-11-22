@@ -101,7 +101,7 @@ const Products = () => {
                 <Th>外部在庫</Th>
                 <Th>生機仕掛</Th>
                 <Th>生機在庫</Th>
-                <Th>仕掛数量</Th>
+                <Th>生地仕掛</Th>
                 <Th>キープ数量</Th>
                 <Th>組織名</Th>
                 <Th>混率</Th>
@@ -128,9 +128,10 @@ const Products = () => {
                   <Td isNumeric>{product.price}円</Td>
                   <Td isNumeric>0m</Td>
                   <Td isNumeric>0m</Td>
-                  <Td isNumeric>{product?.wipGrayFabricQuantity}m</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td isNumeric>0m</Td>
+                  <Td isNumeric>{product?.wipGrayFabricQuantity || 0}m</Td>
+                  <Td isNumeric>{product?.stockGrayFabricQuantity || 0}m</Td>
+                  <Td isNumeric>{product?.wipFabricDyeingQuantity || 0}m</Td>
+                  <Td isNumeric>{product?.stockFabricDyeingQuantity || 0}m</Td>
                   <Td isNumeric>0m</Td>
                   <Td>{product.materialName}</Td>
                   <Td>
