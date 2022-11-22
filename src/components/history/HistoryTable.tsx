@@ -17,7 +17,6 @@ import { FaTrashAlt } from "react-icons/fa";
 import { db } from "../../../firebase";
 import ConfirmModal from "./ConfirmModal";
 import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
-import EditWipGrayFabricModal from "./EditWipGrayFabricModal";
 
 type Props = {
   historys: any;
