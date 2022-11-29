@@ -86,33 +86,35 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
           throw "history document does not exist!";
         }
 
-        let oldQuantity = 0;
-        let prop = "";
+        //　生機仕掛
+        let wipGrayFabricQuantity =
+          productDocSnap.data().wipGrayFabricQuantity || 0;
+
+        //　生機在庫
+        let stockGrayFabricQuantity =
+          productDocSnap.data().stockGrayFabricQuantity || 0;
+
         switch (status) {
           // 仕掛中から削除
           case 0:
-            oldQuantity = productDocSnap.data().wipGrayFabricQuantity || 0;
-            prop = "wipGrayFabricQuantity";
+            wipGrayFabricQuantity -= Math.abs(history.quantity);
             break;
           // 在庫から削除
           case 1:
-            oldQuantity = productDocSnap.data().stockGrayFabricQuantity || 0;
-            if (oldQuantity < history.quantity) {
+            if (stockGrayFabricQuantity < history.quantity) {
               window.alert("削除する数量が生機在庫を上回っています。");
               throw "削除する数量が生機在庫を上回っています。";
             }
-            prop = "stockGrayFabricQuantity";
+            stockGrayFabricQuantity -= Math.abs(history.quantity);
             break;
         }
-
-        // 新しい数量
-        const newQuantity = oldQuantity - Math.abs(history.quantity);
 
         // 履歴データを削除
         transaction.delete(historyDocRef);
         // 生機数量を更新
         transaction.update(productDocRef, {
-          [prop]: newQuantity,
+          wipGrayFabricQuantity,
+          stockGrayFabricQuantity,
         });
       });
     } catch (err) {
@@ -130,7 +132,6 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
         // 履歴のデータベースを取得
         const historyDocRef = doc(db, "historyFabricDyeings", `${history.id}`);
         const historyDocSnap = await transaction.get(historyDocRef);
-
         if (!historyDocSnap.exists()) {
           throw "history document does not exist!";
         }
@@ -170,6 +171,7 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
           // 在庫から削除
           case 1:
             stockFabricDyeingQuantity -= history.quantity;
+            wipFabricDyeingQuantity += history.quantity;
             break;
         }
 
@@ -208,7 +210,7 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
               <Th>単価</Th>
               <Th>金額</Th>
               <Th>コメント</Th>
-              <Th>削除e</Th>
+              <Th>削除</Th>
             </Tr>
           </Thead>
           <Tbody>

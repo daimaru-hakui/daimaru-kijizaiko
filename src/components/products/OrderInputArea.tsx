@@ -72,10 +72,17 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
-  const stockLimit = () => {
+  const stockLimit1 = () => {
     const stockGrayFabricQuantity = product?.stockGrayFabricQuantity || 0;
     return items.stockPlaceType === 1 &&
       stockGrayFabricQuantity < items.quantity
+      ? true
+      : false;
+  };
+
+  const stockLimit2 = () => {
+    const stockQuantity = product.stockFabricDyeingQuantity || 0;
+    return items.stockPlaceType === 1 && stockQuantity < items.quantity
       ? true
       : false;
   };
@@ -128,7 +135,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
-  // 染色発注
+  //////////// 生地発注 関数//////////////
   const onClickOrderFabricDyeing = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -190,7 +197,54 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   };
 
   // 生地発注
-  const orderfabric = () => {};
+  const onClickOrderfabric = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        // 更新前の値を取得
+        const productDocRef = doc(db, "products", `${productId}`);
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) {
+          throw "product document does not exist!";
+        }
+
+        // 現在の生地在庫数量
+        let stockFabricDyeingQuantity =
+          productDocSnap.data().stockFabricDyeingQuantity || 0;
+
+        // 生地数量を更新  ランニング在庫の場合は生地在庫の変更無し
+        transaction.update(productDocRef, {
+          stockFabricDyeingQuantity:
+            items.stockPlaceType === 1
+              ? (stockFabricDyeingQuantity -= Math.abs(items?.quantity))
+              : stockFabricDyeingQuantity,
+        });
+
+        // 履歴を追加
+        const historyDocRef = collection(db, "historyFabricShipment");
+        await addDoc(historyDocRef, {
+          productId,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: product?.price,
+          comment: items.comment,
+          status: 0,
+          stockPlaceType: items.stockPlaceType,
+          createdAt: serverTimestamp(),
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt,
+          staff: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      onClose();
+    }
+  };
 
   return (
     <Box>
@@ -212,7 +266,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         {orderType === 3 && (
           <RadioGroup
             mt={3}
-            onChange={(e) => handleRadioChange(e, "abc")}
+            onChange={(e) => handleRadioChange(e, "stockPlaceType")}
             value={items.stockPlaceType}
           >
             <Stack direction={{ base: "column", md: "row" }}>
@@ -284,8 +338,18 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={stockLimit()}
+            disabled={stockLimit1()}
             onClick={onClickOrderFabricDyeing}
+          >
+            登録
+          </Button>
+        )}
+        {orderType === 3 && (
+          <Button
+            size="md"
+            colorScheme="facebook"
+            disabled={stockLimit2()}
+            onClick={onClickOrderfabric}
           >
             登録
           </Button>
