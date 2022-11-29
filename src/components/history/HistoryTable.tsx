@@ -142,44 +142,44 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
           throw "product document does not exist!";
         }
 
-        let oldQuantity = 0;
-        let prop = "";
+        //　生機在庫
+        let stockGrayFabricQuantity =
+          productDocSnap.data().stockGrayFabricQuantity || 0;
+
+        //　生地仕掛
+        let wipFabricDyeingQuantity =
+          productDocSnap.data().wipFabricDyeingQuantity || 0;
+
+        //  生地在庫
+        let stockFabricDyeingQuantity =
+          productDocSnap.data().stockFabricDyeingQuantity || 0;
+
         switch (status) {
           // 仕掛中から削除
           case 0:
-            oldQuantity = productDocSnap.data().wipFabricDyeingQuantity || 0;
-            prop = "wipFabricDyeingQuantity";
+            if (history.stockPlaceType === 1) {
+              // 生機在庫から染色している場合
+              stockGrayFabricQuantity += history.quantity;
+              wipFabricDyeingQuantity -= history.quantity;
+            } else {
+              // ランニング在庫から染色している場合
+              wipFabricDyeingQuantity -= history.quantity;
+            }
             break;
+
           // 在庫から削除
           case 1:
-            oldQuantity = productDocSnap.data().stockFabricDyeingQuantity || 0;
-            if (oldQuantity < history.quantity) {
-              window.alert("削除する数量が生機在庫を上回っています。");
-              throw "削除する数量が生機在庫を上回っています。";
-            }
-            prop = "stockFabricDyeingQuantity";
+            stockFabricDyeingQuantity -= history.quantity;
             break;
         }
-
-        //　生機が在庫分かランニング在庫かで戻し在庫を振り分ける
-        let stockGrayFabricQuantity = 0;
-        if (history.stockPlaceType === 1) {
-          stockGrayFabricQuantity =
-            productDocSnap.data().stockGrayFabricQuantity + history.quantity;
-        } else {
-          stockGrayFabricQuantity =
-            productDocSnap.data().stockGrayFabricQuantity;
-        }
-
-        // 新しい数量
-        const newQuantity = oldQuantity - Math.abs(history.quantity);
 
         // 履歴データを削除
         transaction.delete(historyDocRef);
         // 染色数量を更新
         transaction.update(productDocRef, {
-          [prop]: newQuantity,
           stockGrayFabricQuantity,
+          wipFabricDyeingQuantity,
+          stockFabricDyeingQuantity,
         });
       });
     } catch (err) {
@@ -193,65 +193,77 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
       <Box as="h2" fontSize="2xl">
         {title}
       </Box>
-      <Table mt={6} variant="simple" size="sm">
-        <Thead>
-          <Tr>
-            {status === 0 && <Th></Th>}
-            <Th>発注日</Th>
-            {status === 0 ? <Th>仕上予定日</Th> : <Th>仕上日</Th>}
-            <Th>生地品番</Th>
-            <Th>色</Th>
-            <Th>品名</Th>
-            <Th>数量</Th>
-            <Th>単価</Th>
-            <Th>金額</Th>
-            <Th>コメント</Th>
-            <Th>処理</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {filterHistorys?.map((history: any) => (
-            <Tr key={history.id}>
-              {status === 0 && (
+      {filterHistorys?.length > 0 ? (
+        <Table mt={6} variant="simple" size="sm">
+          <Thead>
+            <Tr>
+              {status === 0 && <Th>確定</Th>}
+              {orderType === 2 && <Th>生機使用状況</Th>}
+              <Th>発注日</Th>
+              {status === 0 ? <Th>仕上予定日</Th> : <Th>仕上日</Th>}
+              <Th>生地品番</Th>
+              <Th>色</Th>
+              <Th>品名</Th>
+              <Th>数量</Th>
+              <Th>単価</Th>
+              <Th>金額</Th>
+              <Th>コメント</Th>
+              <Th>削除e</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filterHistorys?.map((history: any) => (
+              <Tr key={history.id}>
+                {status === 0 && (
+                  <Td>
+                    <ConfirmModal history={history} orderType={orderType} />
+                  </Td>
+                )}
+                {orderType === 2 && (
+                  <Td>
+                    {history?.stockPlaceType === 1
+                      ? "生機在庫"
+                      : "ランニング在庫"}
+                  </Td>
+                )}
+                <Td>{history?.orderedAt}</Td>
                 <Td>
-                  <ConfirmModal history={history} />
+                  {status === 0 ? history?.scheduledAt : history?.finishedAt}
                 </Td>
-              )}
-              <Td>{history?.orderedAt}</Td>
-              <Td>
-                {status === 0 ? history?.scheduledAt : history?.finishedAt}
-              </Td>
-              <Td>{history.productNumber}</Td>
-              <Td>{history.colorName}</Td>
-              <Td>{history.productName}</Td>
-              <Td>{history?.quantity}m</Td>
-              <Td>{history?.price}円</Td>
-              <Td>{history?.quantity * history?.price}円</Td>
-              <Td>{history?.comment}</Td>
+                <Td>{history.productNumber}</Td>
+                <Td>{history.colorName}</Td>
+                <Td>{history.productName}</Td>
+                <Td>{history?.quantity}m</Td>
+                <Td>{history?.price}円</Td>
+                <Td>{history?.quantity * history?.price}円</Td>
+                <Td>{history?.comment}</Td>
 
-              <Td>
-                <Flex gap={3}>
-                  {orderType === 1 && (
-                    <>
-                      {/* <EditWipGrayFAbricModal history={history} /> */}
+                <Td>
+                  <Flex gap={3}>
+                    {orderType === 1 && (
+                      <>
+                        {/* <EditWipGrayFAbricModal history={history} /> */}
+                        <FaTrashAlt
+                          cursor="pointer"
+                          onClick={() => deleteHistoryGrayFabric(history)}
+                        />
+                      </>
+                    )}
+                    {orderType === 2 && (
                       <FaTrashAlt
                         cursor="pointer"
-                        onClick={() => deleteHistoryGrayFabric(history)}
+                        onClick={() => deleteHistoryFabricDyeing(history)}
                       />
-                    </>
-                  )}
-                  {orderType === 2 && (
-                    <FaTrashAlt
-                      cursor="pointer"
-                      onClick={() => deleteHistoryFabricDyeing(history)}
-                    />
-                  )}
-                </Flex>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+                    )}
+                  </Flex>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      ) : (
+        <Box textAlign="center">現在登録された情報はありません。</Box>
+      )}
     </TableContainer>
   );
 };
