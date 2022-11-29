@@ -32,14 +32,14 @@ const HistoryFabricDyeings = () => {
         <Tabs>
           <TabList>
             <Tab>仕掛中</Tab>
-            <Tab>染色履歴</Tab>
+            <Tab>生地履歴</Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel>
               <HistoryTable
                 historys={historys}
-                title={"染色仕掛一覧"}
+                title={"生地仕掛一覧"}
                 status={0}
                 orderType={2}
               />
@@ -47,7 +47,7 @@ const HistoryFabricDyeings = () => {
             <TabPanel>
               <HistoryTable
                 historys={historys}
-                title={"染色発注履歴"}
+                title={"生地発注履歴"}
                 status={1}
                 orderType={2}
               />
