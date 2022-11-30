@@ -21,5 +21,6 @@ export type ProductType = {
     wipGrayFabricQuantity: number;
     stockGrayFabricQuantity: number;
     wipFabricDyeingQuantity: number;
-    stockFabricDyeingQuantity:number
+    stockFabricDyeingQuantity: number;
+
   };
