@@ -11,8 +11,8 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { db } from "../../../firebase";
-import EditModal from "../../components/suppliers/EditModal";
+import { db } from "../../../../firebase";
+import EditModal from "../../../components/suppliers/EditModal";
 
 const SupplierId = () => {
   const router = useRouter();
@@ -36,7 +36,7 @@ const SupplierId = () => {
   return (
     <Box w="100%" mt={12}>
       <Container maxW="800px" mt={6} p={0}>
-        <Link href="/suppliers">
+        <Link href="/settings/suppliers">
           <Button w="100%">一覧へ</Button>
         </Link>
       </Container>

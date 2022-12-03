@@ -11,24 +11,33 @@ import {
   Td,
   TableContainer,
   Button,
+  Flex,
 } from "@chakra-ui/react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "../../../firebase";
 
 import Link from "next/link";
 import { useRecoilState } from "recoil";
-import { suppliersState } from "../../../store";
+import { suppliersState } from "../../../../store";
 
 const Suppliers = () => {
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
 
   return (
     <Box w="100%" mt={12}>
+      <Container maxW="900px" mt={6} p={0}>
+        <Link href="/settings">
+          <Button w="100%">一覧へ</Button>
+        </Link>
+      </Container>
       <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6}>
-          <Box as="h2" fontSize="2xl">
-            仕入先一覧
-          </Box>
+          <Flex justifyContent="space-between">
+            <Box as="h2" fontSize="2xl">
+              仕入先一覧
+            </Box>
+            <Link href="/settings/suppliers/new">
+              <Button>新規登録</Button>
+            </Link>
+          </Flex>
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
@@ -44,7 +53,7 @@ const Suppliers = () => {
                     <Td>{supplier.name}</Td>
                     <Td>{supplier.kana}</Td>
                     <Td>
-                      <Link href={`/suppliers/${supplier.id}`}>
+                      <Link href={`/settings/suppliers/${supplier.id}`}>
                         <Button>詳細</Button>
                       </Link>
                     </Td>

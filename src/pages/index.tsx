@@ -79,6 +79,7 @@ export default function Home() {
     };
     getProducts();
   }, [setProducts]);
+
   // suppliers情報;
   useEffect(() => {
     const getSuppliers = async () => {

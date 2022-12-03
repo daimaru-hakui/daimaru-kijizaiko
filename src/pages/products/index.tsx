@@ -23,7 +23,12 @@ import {
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { colorsState, materialNamesState, productsState } from "../../../store";
+import {
+  colorsState,
+  materialNamesState,
+  productsState,
+  usersState,
+} from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import { ProductType } from "../../../types/productType";
@@ -31,10 +36,11 @@ import { ProductType } from "../../../types/productType";
 const Products = () => {
   const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
+  const users = useRecoilValue(usersState);
   const materialNames = useRecoilValue(materialNamesState);
 
   // 混率の表示
-  const dispMixed = (materials: any) => {
+  const displayMixed = (materials: any) => {
     let array = [];
     const t = materials.t ? `ポリエステル${materials.t}% ` : "";
     const c = materials.c ? `綿${materials.c}% ` : "";
@@ -54,8 +60,18 @@ const Products = () => {
       .map((item) => <Text key={item}>{item}</Text>);
   };
 
+  // 担当者の表示
+  const displayName = (userId: string) => {
+    if (userId === "R&D") {
+      return "R&D";
+    } else {
+      const user = users.find((user: { uid: string }) => userId === user.uid);
+      return user?.name;
+    }
+  };
+
   // 規格の表示
-  const dispStd = (
+  const displayStd = (
     fabricWidth: number,
     fabricLength: number,
     fabricWeight: number | null
@@ -93,16 +109,17 @@ const Products = () => {
             <Thead>
               <Tr>
                 <Th></Th>
+                <Th>担当</Th>
                 <Th>生地品番</Th>
                 <Th>色</Th>
                 <Th>品名</Th>
                 <Th>単価</Th>
-                <Th>徳島在庫</Th>
-
-                <Th>生機仕掛</Th>
-                <Th>生機在庫</Th>
+                <Th>キバタ仕掛</Th>
+                <Th>キバタ在庫</Th>
                 <Th>生地仕掛</Th>
                 <Th>外部在庫</Th>
+                <Th>入荷待ち</Th>
+                <Th>徳島在庫</Th>
                 <Th>組織名</Th>
                 <Th>混率</Th>
                 <Th>規格</Th>
@@ -116,28 +133,34 @@ const Products = () => {
                   <Td>
                     <Flex alignItems="center" gap={3}>
                       <Link href={`/products/${product.id}`}>
-                        <Button size="sm">詳細</Button>
+                        <Button size="xs">詳細</Button>
                       </Link>
                       <OrderAreaModal product={product} />
                     </Flex>
                   </Td>
+                  <Td>{displayName(product.staff)}</Td>
                   <Td>{product.productNumber}</Td>
 
                   <Td>{product?.colorName}</Td>
                   <Td>{product.productName}</Td>
                   <Td isNumeric>{product.price}円</Td>
-                  <Td isNumeric>0m</Td>
                   <Td isNumeric>{product?.wipGrayFabricQuantity || 0}m</Td>
                   <Td isNumeric>{product?.stockGrayFabricQuantity || 0}m</Td>
                   <Td isNumeric>{product?.wipFabricDyeingQuantity || 0}m</Td>
                   <Td isNumeric>{product?.stockFabricDyeingQuantity || 0}m</Td>
+                  <Td isNumeric>{product?.shippingQuantity || 0}m</Td>
+                  <Td isNumeric>{product?.stockTokushimaQuantity || 0}m</Td>
                   <Td>{product.materialName}</Td>
                   <Td>
-                    <Flex gap={1}>{dispMixed(product.materials)}</Flex>
+                    <Flex gap={1}>{displayMixed(product.materials)}</Flex>
                   </Td>
                   <Td>
                     <Flex>
-                      {dispStd(product.fabricWidth, product.fabricLength, null)}
+                      {displayStd(
+                        product.fabricWidth,
+                        product.fabricLength,
+                        null
+                      )}
                     </Flex>
                   </Td>
 
