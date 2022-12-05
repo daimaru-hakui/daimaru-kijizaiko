@@ -12,13 +12,11 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 2, title: "登録", link: "/products/new" },
   ];
   const menuOrder = [
-    { id: 1, title: "生機仕掛履歴", link: "/history/gray-fabrics" },
-    { id: 2, title: "生地仕掛履歴", link: "/history/fabric-dyeing" },
+    { id: 1, title: "キバタ仕掛状況", link: "/history/gray-fabrics" },
+    { id: 2, title: "生地仕掛状況", link: "/history/fabric-dyeing" },
+    { id: 3, title: "購入状況", link: "/history/fabric-shipment" },
   ];
-  const menuMaker = [
-    { id: 1, title: "一覧", link: "/suppliers" },
-    { id: 2, title: "登録", link: "/suppliers/new" },
-  ];
+
   return (
     <>
       <List my={3} spacing={3}>
@@ -29,11 +27,11 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       <Divider />
 
       <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
-        入出庫
+        受発注状況
       </Box>
       <List my={3} ml={3} spacing={3} fontSize="sm">
-        {menuOrder.map((m) => (
-          <ListItem key={m.id}>
+        {menuOrder.map((m, i) => (
+          <ListItem key={i}>
             <Link href={m.link} onClick={() => onClose()}>
               {m.title}
             </Link>
@@ -46,8 +44,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         生地
       </Box>
       <List my={3} ml={3} spacing={3} fontSize="sm">
-        {menuKiji.map((m) => (
-          <ListItem key={m.id}>
+        {menuKiji.map((m, i) => (
+          <ListItem key={i}>
             <Link href={m.link} onClick={() => onClose()}>
               {m.title}
             </Link>
@@ -55,19 +53,6 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         ))}
       </List>
       <Divider />
-
-      <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
-        仕入先
-      </Box>
-      <List mt={3} ml={3} spacing={3} fontSize="sm">
-        {menuMaker.map((m) => (
-          <ListItem key={m.id}>
-            <Link href={m.link} onClick={() => onClose()}>
-              {m.title}
-            </Link>
-          </ListItem>
-        ))}
-      </List>
     </>
   );
 };

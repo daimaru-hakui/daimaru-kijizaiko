@@ -32,15 +32,15 @@ const HistoryGrayFabrics = () => {
         <Tabs>
           <TabList>
             <Tab>仕掛中</Tab>
-            <Tab>履歴</Tab>
+            <Tab>仕上り済み</Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel>
               <HistoryTable
                 historys={historys}
-                title={"生機仕掛一覧"}
-                status={0}
+                title={"キバタ仕掛一覧"}
+                status={1}
                 orderType={1}
               />
             </TabPanel>
@@ -48,7 +48,7 @@ const HistoryGrayFabrics = () => {
               <HistoryTable
                 historys={historys}
                 title={"生機発注履歴"}
-                status={1}
+                status={2}
                 orderType={1}
               />
             </TabPanel>

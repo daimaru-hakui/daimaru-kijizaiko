@@ -10,9 +10,10 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { db } from "../../../firebase";
+import { db } from "../../../../firebase";
 
 const SupplierNew = () => {
   const [items, setItems] = useState<any>({});
@@ -54,9 +55,14 @@ const SupplierNew = () => {
         rounded="md"
         boxShadow="md"
       >
-        <Box as="h2" fontSize="2xl">
-          仕入先登録
-        </Box>
+        <Flex justifyContent="space-between">
+          <Box as="h2" fontSize="2xl">
+            仕入先登録
+          </Box>
+          <Link href="/settings/suppliers/">
+            <Button>戻る</Button>
+          </Link>
+        </Flex>
         <Stack spacing={6} mt={6}>
           <Flex gap={6} flexDirection={{ base: "column" }}>
             <Box w="100%" flex={2}>

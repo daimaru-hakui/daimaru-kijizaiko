@@ -87,7 +87,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       : false;
   };
 
-  //////////// 生機発注 関数//////////////
+  //////////// キバタ発注 関数//////////////
   const onClickOrderGrayfabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -101,12 +101,12 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           throw "product document does not exist!";
         }
 
-        // 現在の生機仕掛数量
+        // 現在のキバタ仕掛数量
         const oldQuantity = productDocSnap.data().wipGrayFabricQuantity || 0;
-        //　生機仕掛数量　＋　入力値
+        //　キバタ仕掛数量　＋　入力値
         const newQuantity = oldQuantity + Math.abs(items?.quantity);
 
-        // 生機仕掛数量を更新
+        // キバタ仕掛数量を更新
         transaction.update(productDocRef, {
           wipGrayFabricQuantity: newQuantity,
         });
@@ -135,7 +135,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
-  //////////// 生地発注 関数//////////////
+  //////////// 染め依頼 関数//////////////
   const onClickOrderFabricDyeing = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -155,14 +155,14 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         const newWipFabricDyeingQuantity =
           wipFabricDyeingQuantity + Math.abs(items?.quantity);
 
-        // 現在の生機仕掛在庫
+        // 現在のキバタ仕掛在庫
         const stockGrayFabricQuantity =
           productDocSnap.data().stockGrayFabricQuantity || 0;
-        // 現在の生機仕掛在庫　‐　入力値
+        // 現在のキバタ仕掛在庫　‐　入力値
         const newStockGrayFabricQuantity =
           stockGrayFabricQuantity - Math.abs(items?.quantity);
 
-        // 生機仕掛数量を更新  ランニング在庫の場合は仕掛在庫の変更無し
+        // キバタ仕掛数量を更新  ランニング在庫の場合は仕掛在庫の変更無し
         transaction.update(productDocRef, {
           wipFabricDyeingQuantity: newWipFabricDyeingQuantity,
           stockGrayFabricQuantity:
@@ -181,7 +181,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          status: 0,
+          status: 1,
           stockPlaceType: items.stockPlaceType,
           createdAt: serverTimestamp(),
           orderedAt: items.orderedAt || todayDate(),
@@ -196,7 +196,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
-  // 生地発注
+  // 購入伝票
   const onClickOrderfabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -209,12 +209,18 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           throw "product document does not exist!";
         }
 
+        // 現在の生地発送数量
+        let shippingQuantity = productDocSnap.data().shippingQuantity || 0;
+        //　現在の生地発送数量　＋　入力値
+        shippingQuantity += Math.abs(items?.quantity);
+
         // 現在の生地在庫数量
         let stockFabricDyeingQuantity =
           productDocSnap.data().stockFabricDyeingQuantity || 0;
 
         // 生地数量を更新  ランニング在庫の場合は生地在庫の変更無し
         transaction.update(productDocRef, {
+          shippingQuantity,
           stockFabricDyeingQuantity:
             items.stockPlaceType === 1
               ? (stockFabricDyeingQuantity -= Math.abs(items?.quantity))
@@ -222,7 +228,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         });
 
         // 履歴を追加
-        const historyDocRef = collection(db, "historyFabricShipment");
+        const historyDocRef = collection(db, "historyPurchasingSlips");
         await addDoc(historyDocRef, {
           productId,
           productNumber: product?.productNumber,
@@ -231,7 +237,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          status: 0,
+          status: 1,
           stockPlaceType: items.stockPlaceType,
           createdAt: serverTimestamp(),
           orderedAt: items.orderedAt || todayDate(),
@@ -252,13 +258,12 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         {orderType === 2 && (
           <RadioGroup
             mt={3}
-            defaultValue={1}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
             value={items.stockPlaceType}
           >
-            <Stack direction={{ base: "column", md: "row" }}>
-              <Radio value={1}>生機在庫から使用</Radio>
-              <Radio value={2}>ランニング生機から使用</Radio>
+            <Stack direction="column">
+              <Radio value={1}>キバタ在庫から加工</Radio>
+              <Radio value={2}>メーカーの定番キバタから加工</Radio>
             </Stack>
           </RadioGroup>
         )}
@@ -269,9 +274,19 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
             value={items.stockPlaceType}
           >
-            <Stack direction={{ base: "column", md: "row" }}>
-              <Radio value={1}>生地在庫から出荷</Radio>
-              <Radio value={2}>ランニング生地から出荷</Radio>
+            <Stack direction="column">
+              <Radio value={1}>
+                外部在庫から購入
+                <Box as="span" fontSize="sm">
+                  （別染めなどでメーカーに抱えてもらっている在庫）
+                </Box>
+              </Radio>
+              <Radio value={2}>
+                生地を購入
+                <Box as="span" fontSize="sm">
+                  （メーカーの定番在庫）
+                </Box>
+              </Radio>
             </Stack>
           </RadioGroup>
         )}
@@ -293,7 +308,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               mt={1}
               type="date"
               name="scheduledAt"
-              value={items.scheduledAt}
+              value={items.scheduledAt || todayDate()}
               onChange={handleInputChange}
             />
           </Box>
@@ -329,6 +344,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
+            disabled={items.quantity === 0}
             onClick={onClickOrderGrayfabric}
           >
             登録

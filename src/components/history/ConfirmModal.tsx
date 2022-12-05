@@ -43,7 +43,7 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
   // 初期値をitemsに代入
   useEffect(() => {
     setItems({
-      ...items,
+      ...history,
       finishedAt: history.scheduledAt,
       quantity: history.quantity,
       price: history.price,
@@ -74,8 +74,8 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
-  // 生機仕掛⇒在庫へ
-  const onClickWipToStockGrayfabric = async (history: any) => {
+  // 確定処理　生機仕掛⇒在庫へ
+  const moveWipToStockGrayfabric = async (history: any) => {
     const result = window.confirm("仕上り済みに変更して宜しいでしょうか");
     if (!result) return;
     try {
@@ -112,7 +112,7 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
 
         // statusを変更
         transaction.update(historyDocRef, {
-          status: 1,
+          status: 2,
           finishedAt: items.finishedAt,
           quantity: items.quantity,
           price: items.price,
@@ -124,8 +124,8 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
     }
   };
 
-  // 生地仕掛⇒在庫へ
-  const onClickWipToStockFabricDyeing = async (history: any) => {
+  //  確定処理　生地仕掛⇒外部在庫へ
+  const moveWipToStockFabricDyeing = async (history: any) => {
     const result = window.confirm("仕上り済みに変更して宜しいでしょうか");
     if (!result) return;
     try {
@@ -147,14 +147,14 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
         // 生地仕掛数量
         const oldWipFabricDyeingQuantity =
           productDocSnap.data().wipFabricDyeingQuantity || 0;
-        // 生機仕掛数量 - 確定数量
+        // 生地仕掛数量 - 確定数量
         const newWipFabricDyeingQuantity =
           oldWipFabricDyeingQuantity - history.quantity || 0;
         //　生地在庫数量
         const oldStockFabricDyeingQuantity =
           productDocSnap.data().stockGrayFabricQuantity || 0;
 
-        // 生機仕掛数量と生機在庫数量を更新
+        // 生地仕掛数量と生地在庫数量を更新
         transaction.update(productDocRef, {
           wipFabricDyeingQuantity: newWipFabricDyeingQuantity,
           stockFabricDyeingQuantity:
@@ -163,7 +163,7 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
 
         // statusを変更
         transaction.update(historyDocRef, {
-          status: 1,
+          status: 2,
           finishedAt: items.finishedAt,
           quantity: items.quantity,
           price: items.price,
@@ -175,6 +175,60 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
     }
   };
 
+  //  確定処理　入荷待ちから徳島在庫
+  const moveOutsideToTokushima = async (history: any) => {
+    const result = window.confirm("入荷済みに変更して宜しいでしょうか");
+    if (!result) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        // 更新前の値を取得
+        const productDocRef = doc(db, "products", `${history.productId}`);
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) {
+          throw "product document does not exist!";
+        }
+
+        // 入荷待ちのデータベースを取得
+        const historyDocRef = doc(
+          db,
+          "historyPurchasingSlips",
+          `${history.id}`
+        );
+        const historyDocSnap = await transaction.get(historyDocRef);
+        if (!historyDocSnap.exists()) {
+          throw "history document does not exist!";
+        }
+
+        // 入荷待ち数量
+        let shippingQuantity = productDocSnap.data().shippingQuantity || 0;
+        // 入荷待ち数量 - 確定数量
+        shippingQuantity -= history.quantity || 0;
+
+        //　徳島在庫数量
+        const stockTokushimaQuantity =
+          productDocSnap.data().stockTokushimaQuantity || 0;
+
+        // 生機仕掛数量と生機在庫数量を更新
+        transaction.update(productDocRef, {
+          shippingQuantity,
+          stockTokushimaQuantity: stockTokushimaQuantity + items.quantity,
+        });
+
+        // statusを変更
+        transaction.update(historyDocRef, {
+          status: 2,
+          finishedAt: items.finishedAt,
+          quantity: items.quantity,
+          price: items.price,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  // 入力をリセット
   const onReset = () => {
     setItems({
       ...items,
@@ -186,7 +240,12 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
 
   return (
     <>
-      <Button size="sm" cursor="pointer" onClick={onOpen}>
+      <Button
+        colorScheme="facebook"
+        size="xs"
+        cursor="pointer"
+        onClick={onOpen}
+      >
         確定する
       </Button>
 
@@ -270,7 +329,7 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
                 colorScheme="blue"
                 disabled={!items.finishedAt}
                 onClick={() => {
-                  onClickWipToStockGrayfabric(history);
+                  moveWipToStockGrayfabric(history);
                   onClose();
                 }}
               >
@@ -282,7 +341,19 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
                 colorScheme="blue"
                 disabled={!items.finishedAt}
                 onClick={() => {
-                  onClickWipToStockFabricDyeing(history);
+                  moveWipToStockFabricDyeing(history);
+                  onClose();
+                }}
+              >
+                確定
+              </Button>
+            )}
+            {orderType === 3 && (
+              <Button
+                colorScheme="blue"
+                disabled={!items.finishedAt}
+                onClick={() => {
+                  moveOutsideToTokushima(history);
                   onClose();
                 }}
               >
