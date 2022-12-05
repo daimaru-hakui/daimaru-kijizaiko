@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Container,
   Flex,
   IconButton,
@@ -13,7 +12,6 @@ import {
 import { MdOutlineSettings } from "react-icons/md";
 import { useRouter } from "next/router";
 import React, { useLayoutEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { auth } from "../../firebase";
 import { currentUserState, usersState } from "../../store";
@@ -32,7 +30,7 @@ const Header = () => {
   }, [currentUser, router]);
 
   // 担当者名の表示
-  const dispStaff = (id: string) => {
+  const displayStaff = (id: string) => {
     const user = users?.find(
       (user: { id: string; name: string }) => id === user.id
     );
@@ -66,10 +64,14 @@ const Header = () => {
       <Container maxW="100%">
         <Flex alignItems="center" justifyContent="space-between">
           <MenuDrawerButton />
-          <Link href="/">生地在庫WEB</Link>
+          <Link href="/">
+            <Box fontSize="xl" fontWeight="700">
+              生地在庫WEB
+            </Box>
+          </Link>
           <Flex alignItems="center" gap={3}>
             <Box>
-              <Text fontSize="sm">{dispStaff(currentUser)}</Text>
+              <Text fontSize="sm">{displayStaff(currentUser)}</Text>
             </Box>
             <Menu>
               <MenuButton

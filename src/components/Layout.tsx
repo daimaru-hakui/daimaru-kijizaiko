@@ -12,7 +12,13 @@ type Props = {
 const Layout = ({ children }: Props) => {
   const router = useRouter();
   return (
-    <Box bg="#f4f4f4" minH="100vh" w="100%">
+    <Box
+      fontWeight="400"
+      letterSpacing="wide"
+      bg="#f4f4f4"
+      minH="100vh"
+      w="100%"
+    >
       <Loading />
       {router.pathname !== "/login" && <Header />}
       <Flex>
