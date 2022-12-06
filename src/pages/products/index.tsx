@@ -83,6 +83,10 @@ const Products = () => {
     );
   };
 
+  const quantityBold = (quantity: number) => {
+    return quantity > 0 ? "bold" : "normal";
+  };
+
   // 削除
   const deleteProduct = async (id: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -128,21 +132,53 @@ const Products = () => {
                       <Link href={`/products/${product.id}`}>
                         <Button size="xs">詳細</Button>
                       </Link>
-                      <OrderAreaModal product={product} size="xs" />
+                      <OrderAreaModal product={product} buttonSize="xs" />
                     </Flex>
                   </Td>
                   <Td>{displayName(product.staff)}</Td>
                   <Td>{product.productNumber}</Td>
 
                   <Td>{product?.colorName}</Td>
-                  <Td>{product.productName}</Td>
+                  <Td>{product?.productName}</Td>
                   <Td isNumeric>{product.price}円</Td>
-                  <Td isNumeric>{product?.wipGrayFabricQuantity || 0}m</Td>
-                  <Td isNumeric>{product?.stockGrayFabricQuantity || 0}m</Td>
-                  <Td isNumeric>{product?.wipFabricDyeingQuantity || 0}m</Td>
-                  <Td isNumeric>{product?.stockFabricDyeingQuantity || 0}m</Td>
-                  <Td isNumeric>{product?.shippingQuantity || 0}m</Td>
-                  <Td isNumeric>{product?.stockTokushimaQuantity || 0}m</Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(product?.wipGrayFabricQuantity)}
+                  >
+                    {product?.wipGrayFabricQuantity || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(product?.stockGrayFabricQuantity)}
+                  >
+                    {product?.stockGrayFabricQuantity || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(product?.wipFabricDyeingQuantity)}
+                  >
+                    {product?.wipFabricDyeingQuantity || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(
+                      product?.stockFabricDyeingQuantity
+                    )}
+                  >
+                    {product?.stockFabricDyeingQuantity || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(product?.shippingQuantity)}
+                  >
+                    {product?.shippingQuantity || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontWeight={quantityBold(product?.stockTokushimaQuantity)}
+                  >
+                    {product?.stockTokushimaQuantity || 0}m
+                  </Td>
                   <Td>{product.materialName}</Td>
                   <Td>
                     <Flex gap={1}>{displayMixed(product.materials)}</Flex>

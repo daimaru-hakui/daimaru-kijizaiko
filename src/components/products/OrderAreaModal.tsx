@@ -28,14 +28,14 @@ import OrderInputArea from "./OrderInputArea";
 
 type Props = {
   product: ProductType;
-  size: string;
+  buttonSize: string;
 };
 
-const OrderModal: NextPage<Props> = ({ product, size }) => {
+const OrderModal: NextPage<Props> = ({ product, buttonSize }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Button colorScheme="facebook" size={size} onClick={onOpen}>
+      <Button colorScheme="facebook" size={buttonSize} onClick={onOpen}>
         発注
       </Button>
 
