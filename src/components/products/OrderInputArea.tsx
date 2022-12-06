@@ -121,7 +121,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          status: 0,
+          status: 1,
           createdAt: serverTimestamp(),
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt,

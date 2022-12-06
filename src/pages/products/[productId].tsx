@@ -146,7 +146,7 @@ const ProductsId = () => {
               </Box>
               <Box w="100%" minW="120px" flex="1">
                 <Text fontWeight="bold">色</Text>
-                <Box>{product?.color}</Box>
+                <Box>{product?.colorName}</Box>
               </Box>
               <Box w="100%">
                 <Text fontWeight="bold">品名</Text>
@@ -165,7 +165,7 @@ const ProductsId = () => {
           </Flex>
 
           <Box flex={1} w="100%">
-            <Text>備考（使用製品品番）</Text>
+            <Text fontWeight="bold">備考（使用製品品番）</Text>
             <Textarea mt={1} name="noteProduct" value={product?.noteProduct} />
           </Box>
 
@@ -180,12 +180,12 @@ const ProductsId = () => {
           >
             <Stack spacing={6} flex={1} w="100%">
               <Box w="100%">
-                <Text>組織名</Text>
+                <Text fontWeight="bold">組織名</Text>
                 {product?.materialName}
               </Box>
               <Flex gap={6}>
                 <Box w="100%">
-                  <Text>規格</Text>
+                  <Text fontWeight="bold">規格</Text>
                   <Flex>
                     {dispStd(
                       product?.fabricWidth,
@@ -198,7 +198,7 @@ const ProductsId = () => {
             </Stack>
             <Flex flex={1} gap={6} w="100%">
               <Box w="100%">
-                <Text>混率</Text>
+                <Text fontWeight="bold">混率</Text>
                 {product?.materials && (
                   <Box
                     mt={1}
@@ -217,7 +217,7 @@ const ProductsId = () => {
           </Flex>
 
           <Box w="100%">
-            <Text>機能性</Text>
+            <Text fontWeight="bold">機能性</Text>
             <CheckboxGroup colorScheme="green">
               <Flex m={1} wrap="wrap" gap={3}>
                 {product?.features.map((f: string, index: number) => (
@@ -228,17 +228,17 @@ const ProductsId = () => {
           </Box>
 
           <Box w="100%">
-            <Text>画像</Text>
+            <Text fontWeight="bold">画像</Text>
           </Box>
           <Box flex={1} w="100%">
             <Box flex={1} w="100%">
-              <Text>備考（生地の性質など）</Text>
+              <Text fontWeight="bold">備考（生地の性質など）</Text>
               <Textarea mt={1} name="noteProduct" value={product?.noteFabric} />
             </Box>
           </Box>
           <Divider />
           <Box flex={1} w="100%">
-            <Text>備考（その他）</Text>
+            <Text fontWeight="bold">備考（その他）</Text>
             <Textarea mt={1} name="noteProduct" value={product?.noteEtc} />
           </Box>
         </Stack>

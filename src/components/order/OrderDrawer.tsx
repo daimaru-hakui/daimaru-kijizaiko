@@ -10,12 +10,10 @@ import {
   DrawerOverlay,
   Flex,
   Input,
-  Radio,
-  RadioGroup,
-  Stack,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
+import { NextPage } from "next";
 
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -23,7 +21,7 @@ import { productsState } from "../../../store";
 import { ProductType } from "../../../types/productType";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 
-const OrderDrawer = () => {
+const OrderDrawer: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const products = useRecoilValue(productsState);
   const [filterPoduct, setFilterProduct] = useState({} as ProductType);
@@ -85,7 +83,7 @@ const OrderDrawer = () => {
                 リセット
               </Button>
               {filterPoduct ? (
-                <OrderAreaModal product={filterPoduct} size="md" />
+                <OrderAreaModal product={filterPoduct} buttonSize="md" />
               ) : (
                 <Button disabled={true}>発注</Button>
               )}
