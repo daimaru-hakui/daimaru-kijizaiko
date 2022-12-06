@@ -259,6 +259,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <RadioGroup
             mt={3}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
+            defaultValue={1}
             value={items.stockPlaceType}
           >
             <Stack direction="column">

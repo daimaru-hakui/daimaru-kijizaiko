@@ -23,17 +23,19 @@ import { NextPage } from "next";
 import React from "react";
 import { ProductType } from "../../../types/productType";
 import DisplayStock from "../order/DisplayStock";
+import OrderDrawer from "../order/OrderDrawer";
 import OrderInputArea from "./OrderInputArea";
 
 type Props = {
   product: ProductType;
+  size: string;
 };
 
-const OrderModal: NextPage<Props> = ({ product }) => {
+const OrderModal: NextPage<Props> = ({ product, size }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Button colorScheme="facebook" size="xs" onClick={onOpen}>
+      <Button colorScheme="facebook" size={size} onClick={onOpen}>
         発注
       </Button>
 

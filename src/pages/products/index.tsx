@@ -12,14 +12,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
@@ -135,7 +128,7 @@ const Products = () => {
                       <Link href={`/products/${product.id}`}>
                         <Button size="xs">詳細</Button>
                       </Link>
-                      <OrderAreaModal product={product} />
+                      <OrderAreaModal product={product} size="xs" />
                     </Flex>
                   </Td>
                   <Td>{displayName(product.staff)}</Td>
