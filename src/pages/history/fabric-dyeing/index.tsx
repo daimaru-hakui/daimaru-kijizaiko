@@ -32,7 +32,7 @@ const HistoryFabricDyeings = () => {
         <Tabs>
           <TabList>
             <Tab>仕掛中</Tab>
-            <Tab>仕上り済み</Tab>
+            <Tab>履歴</Tab>
           </TabList>
 
           <TabPanels>

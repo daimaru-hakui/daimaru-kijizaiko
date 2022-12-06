@@ -32,7 +32,7 @@ const FabricShipment = () => {
         <Tabs>
           <TabList>
             <Tab>未入荷</Tab>
-            <Tab>入荷済み履歴</Tab>
+            <Tab>履歴</Tab>
           </TabList>
 
           <TabPanels>
@@ -47,7 +47,7 @@ const FabricShipment = () => {
             <TabPanel>
               <HistoryTable
                 historys={historys}
-                title={"入荷済み履歴"}
+                title={"購入伝票履歴"}
                 status={2}
                 orderType={3}
               />
