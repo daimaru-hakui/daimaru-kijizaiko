@@ -52,7 +52,7 @@ const OrderDrawer: NextPage = () => {
   return (
     <>
       <Box cursor="pointer" onClick={onOpen}>
-        発注
+        生地発注
       </Box>
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
