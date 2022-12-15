@@ -22,8 +22,8 @@ import {
 import { NextPage } from "next";
 import React from "react";
 import { ProductType } from "../../../types/productType";
-import DisplayStock from "../order/DisplayStock";
-import OrderDrawer from "../order/OrderDrawer";
+import DisplayStock from "./DisplayStock";
+import OrderDrawer from "./OrderDrawer";
 import OrderInputArea from "./OrderInputArea";
 
 type Props = {
@@ -31,7 +31,7 @@ type Props = {
   buttonSize: string;
 };
 
-const OrderModal: NextPage<Props> = ({ product, buttonSize }) => {
+const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -115,4 +115,4 @@ const OrderModal: NextPage<Props> = ({ product, buttonSize }) => {
   );
 };
 
-export default OrderModal;
+export default OrderAreaModal;

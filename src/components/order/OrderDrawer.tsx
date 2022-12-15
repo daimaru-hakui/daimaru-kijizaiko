@@ -19,7 +19,7 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../store";
 import { ProductType } from "../../../types/productType";
-import OrderAreaModal from "../../components/products/OrderAreaModal";
+import OrderAreaModal from "./OrderAreaModal";
 
 const OrderDrawer: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
