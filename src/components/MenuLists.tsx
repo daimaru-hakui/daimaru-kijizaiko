@@ -18,7 +18,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menu2 = [
     { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
-    { id: 2, title: "キバタ仕掛状況", link: "/history/gray-fabrics" },
+    { id: 2, title: "キバタ仕掛状況", link: "/gray-fabrics/historys" },
     { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
   const menu3 = [{ id: 1, title: "一覧", link: "/cutting-report" }];

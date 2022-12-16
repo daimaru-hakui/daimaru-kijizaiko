@@ -63,6 +63,8 @@ const GrayFabricsNew = () => {
         supplier: items.supplier || "",
         price: Number(items.price) || 0,
         comment: items.comment || "",
+        wip: 0,
+        stock: 0,
         createUser: currentUser,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

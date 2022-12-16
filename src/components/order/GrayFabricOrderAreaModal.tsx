@@ -27,6 +27,7 @@ import {
   doc,
   runTransaction,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useState } from "react";
@@ -66,24 +67,31 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const orderGrayFabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    const grayFabricOrderNumberRef = doc(
+
+    const orderNumberDocRef = doc(
       db,
       "serialNumbers",
       "grayFabricOrderNumbers"
     );
+    const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
     const orderHistoryRef = collection(db, "grayFabricOrderHistorys");
+
     try {
       await runTransaction(db, async (transaction) => {
-        const grayFabricOrderNumberDoc = await transaction.get(
-          grayFabricOrderNumberRef
-        );
-        if (!grayFabricOrderNumberDoc.exists()) {
-          throw "Document does not exist!";
-        }
-        const newSerialNumber =
-          grayFabricOrderNumberDoc.data().serialNumber + 1;
-        transaction.update(grayFabricOrderNumberRef, {
+        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
+        if (!orderNumberDocSnap.exists()) throw "Document does not exist!";
+
+        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
+        if (!grayFabricDocSnap.exists()) throw "Document does not exist!";
+
+        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
+        });
+
+        const newWip = grayFabricDocSnap.data()?.wip + items.quantity || 0;
+        transaction.update(grayFabricDocRef, {
+          wip: newWip,
         });
 
         await addDoc(orderHistoryRef, {

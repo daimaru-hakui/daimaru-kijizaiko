@@ -5,4 +5,6 @@ export type GrayFabricType = {
   productName: string;
   price: number;
   comment: string;
+  wip: number;
+  stock: number;
 };

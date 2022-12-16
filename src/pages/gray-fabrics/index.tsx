@@ -67,8 +67,20 @@ const GrayFabrics = () => {
                   <Td>{item.productNumber}</Td>
                   <Td>{item.productName}</Td>
                   <Td isNumeric>{item.price}</Td>
-                  <Td isNumeric>0m</Td>
-                  <Td isNumeric>0m</Td>
+                  <Td
+                    isNumeric
+                    fontSize="md"
+                    fontWeight={item.wip > 0 ? "bold" : "normal"}
+                  >
+                    {item.wip || 0}m
+                  </Td>
+                  <Td
+                    isNumeric
+                    fontSize="md"
+                    fontWeight={item.stock > 0 ? "bold" : "normal"}
+                  >
+                    {item.stock || 0}m
+                  </Td>
                   <Td></Td>
                 </Tr>
               ))}
