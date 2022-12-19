@@ -19,6 +19,11 @@ export const productsState = atom<any>({
   default: [],
 });
 
+export const grayFabricsState = atom<any>({
+  key: "grayFabricsState",
+  default: [],
+});
+
 export const suppliersState = atom<any>({
   key: "suppliersState",
   default: [],

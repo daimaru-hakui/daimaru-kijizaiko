@@ -16,6 +16,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import {
   colorsState,
   currentUserState,
+  grayFabricsState,
   materialNamesState,
   productsState,
   suppliersState,
@@ -26,6 +27,7 @@ export default function Home() {
   const [user] = useAuthState(auth);
   const [users, setUsers] = useRecoilState(usersState);
   const [products, setProducts] = useRecoilState(productsState);
+  const [grayFabrics, setGrayFabrics] = useRecoilState(grayFabricsState);
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
   const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
   const [colors, setColors] = useRecoilState(colorsState);
@@ -79,6 +81,26 @@ export default function Home() {
     };
     getProducts();
   }, [setProducts]);
+
+  // キバタ情報;
+  useEffect(() => {
+    const getGrayfabrics = async () => {
+      const q = query(
+        collection(db, "grayFabrics"),
+        orderBy("productNumber", "asc")
+      );
+      try {
+        onSnapshot(q, (querySnap) =>
+          setGrayFabrics(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getGrayfabrics();
+  }, [setGrayFabrics]);
 
   // suppliers情報;
   useEffect(() => {

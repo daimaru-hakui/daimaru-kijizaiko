@@ -11,13 +11,15 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: <OrderDrawer />, link: "" },
+    { id: 3, title: "生地仕掛状況", link: "/history/fabric-dyeing" },
+    { id: 4, title: "購入状況", link: "/history/fabric-shipment" },
     // { id: 3, title: "裁断報告書", link: "/cutting-report" },
-    { id: 4, title: "マスター登録", link: "/products/new" },
+    { id: 5, title: "マスター登録", link: "/products/new" },
   ];
   const menu2 = [
-    { id: 1, title: "キバタ仕掛状況", link: "/history/gray-fabrics" },
-    { id: 2, title: "生地仕掛状況", link: "/history/fabric-dyeing" },
-    { id: 3, title: "購入状況", link: "/history/fabric-shipment" },
+    { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
+    { id: 2, title: "キバタ仕掛状況", link: "/gray-fabrics/historys" },
+    { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
   const menu3 = [{ id: 1, title: "一覧", link: "/cutting-report" }];
 
@@ -52,7 +54,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       <Divider />
 
       <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
-        受発注状況
+        キバタ
       </Box>
       <List my={3} ml={3} spacing={3} fontSize="sm">
         {menu2.map((m, i) => (
