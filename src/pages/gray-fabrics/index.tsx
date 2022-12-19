@@ -52,7 +52,7 @@ const GrayFabrics = () => {
                 <Th></Th>
                 <Th>品番</Th>
                 <Th>品名</Th>
-                <Th w="70px">単価</Th>
+                {/* <Th w="70px">単価</Th> */}
                 <Th w="100px">キバタ仕掛</Th>
                 <Th w="100px">キバタ在庫</Th>
                 <Th>削除</Th>
@@ -66,7 +66,7 @@ const GrayFabrics = () => {
                   </Td>
                   <Td>{item.productNumber}</Td>
                   <Td>{item.productName}</Td>
-                  <Td isNumeric>{item.price}</Td>
+                  {/* <Td isNumeric>{item.price}</Td> */}
                   <Td
                     isNumeric
                     fontSize="md"

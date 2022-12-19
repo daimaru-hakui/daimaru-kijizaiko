@@ -305,7 +305,7 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
                 <Td>{history?.quantity}m</Td>
                 <Td>{history?.price}円</Td>
                 <Td>{history?.quantity * history?.price}円</Td>
-                <Td>{history?.comment}</Td>
+                <Td textAlign="center">{history?.comment}</Td>
 
                 <Td>
                   <Flex gap={3}>

@@ -139,7 +139,7 @@ const GrayFabricsNew = () => {
                 onChange={handleInputChange}
               />
             </Box>
-            <Box flex="1">
+            {/* <Box flex="1">
               <Text fontWeight="bold">価格（円）</Text>
               <NumberInput
                 mt={1}
@@ -155,7 +155,7 @@ const GrayFabricsNew = () => {
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
-            </Box>
+            </Box> */}
           </Flex>
           <Box>
             <Text fontWeight="bold">コメント</Text>

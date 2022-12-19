@@ -95,6 +95,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
         });
 
         await addDoc(orderHistoryRef, {
+          grayFabricsId: grayFabricDocSnap?.id,
           serialNumber: newSerialNumber,
           productNumber: grayFabric?.productNumber,
           productName: grayFabric?.productName,
@@ -109,6 +110,8 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
       });
     } catch (e) {
       console.error(e);
+    } finally {
+      onClose();
     }
   };
 
