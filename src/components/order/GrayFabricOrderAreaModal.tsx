@@ -34,7 +34,7 @@ import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
-import { currentUserState } from "../../../store";
+import { currentUserState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 
 type Props = {
@@ -44,6 +44,7 @@ type Props = {
 const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
+  const suppliers = useRecoilValue(suppliersState);
   const [items, setItems] = useState({
     orderedAt: "",
     scheduledAt: "",
@@ -62,6 +63,13 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const handleNumberChange = (e: string, name: string) => {
     const value = e;
     setItems({ ...items, [name]: Number(value) });
+  };
+
+  const getSupplierName = (supplierId: string) => {
+    const supplierObj = suppliers.find(
+      (supplier: { id: string }) => supplier.id === supplierId
+    );
+    return supplierObj.name;
   };
 
   const orderGrayFabric = async () => {
@@ -104,7 +112,8 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           comment: items.comment,
-          author: currentUser,
+          createUser: currentUser,
+          supplier: getSupplierName(grayFabric?.supplier),
           createdAt: serverTimestamp(),
         });
       });
@@ -140,14 +149,14 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     {grayFabric?.productName}
                   </Flex>
                 </Flex>
-                <Flex mt={2}>
+                {/* <Flex mt={2}>
                   <Text mr={1} fontWeight="bold">
                     価格
                   </Text>
                   <Flex>
                     <Text mr={3}>{grayFabric?.price}円</Text>
                   </Flex>
-                </Flex>
+                </Flex> */}
               </Box>
               <Flex
                 gap={3}

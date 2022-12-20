@@ -78,7 +78,7 @@ const OrderHistorys = () => {
   }, [setConfirmHistorys]);
 
   // 担当者の表示
-  const displayName = (userId: string) => {
+  const getCreateUserName = (userId: string) => {
     if (userId === "R&D") {
       return "R&D";
     } else {
@@ -87,7 +87,7 @@ const OrderHistorys = () => {
     }
   };
 
-  const displaySerialNumber = (serialNumber: number) => {
+  const getSerialNumber = (serialNumber: number) => {
     const str = "0000000" + String(serialNumber);
     return str.slice(-7);
   };
@@ -117,6 +117,7 @@ const OrderHistorys = () => {
                         <Th>担当者</Th>
                         <Th>品番</Th>
                         <Th>品名</Th>
+                        <Th>仕入先</Th>
                         <Th>数量</Th>
                         {/* <Th>単価</Th>
                         <Th>金額</Th> */}
@@ -129,12 +130,13 @@ const OrderHistorys = () => {
                           <Td>
                             <ConfirmGrayFabricModal history={history} />
                           </Td>
-                          <Td>{displaySerialNumber(history.serialNumber)}</Td>
+                          <Td>{getSerialNumber(history.serialNumber)}</Td>
                           <Td>{history.orderedAt}</Td>
                           <Td>{history.scheduledAt}</Td>
-                          <Td>{displayName(history.author)}</Td>
+                          <Td>{getCreateUserName(history.createUser)}</Td>
                           <Td>{history.productNumber}</Td>
                           <Td>{history.productName}</Td>
+                          <Td>{history.supplier}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
                           {/* <Td isNumeric>{history?.price}円</Td>
                           <Td isNumeric>
@@ -142,12 +144,12 @@ const OrderHistorys = () => {
                           </Td> */}
                           <Td w="100%">
                             <Flex gap={3}>
-                              {history?.comment.slice(0, 20) +
-                                (history.comment.length >= 1 ? "..." : "")}
                               <CommentModal
                                 history={history}
                                 collectionName="grayFabricOrderHistorys"
                               />
+                              {history?.comment.slice(0, 20) +
+                                (history.comment.length >= 1 ? "..." : "")}
                             </Flex>
                           </Td>
                         </Tr>
@@ -174,6 +176,7 @@ const OrderHistorys = () => {
                         <Th>担当者</Th>
                         <Th>品番</Th>
                         <Th>品名</Th>
+                        <Th>仕入先</Th>
                         <Th>数量</Th>
                         {/* <Th>単価</Th>
                         <Th>金額</Th> */}
@@ -184,12 +187,13 @@ const OrderHistorys = () => {
                     <Tbody>
                       {confirmHistorys?.map((history: any) => (
                         <Tr key={history.id}>
-                          <Td>{displaySerialNumber(history.serialNumber)}</Td>
+                          <Td>{getSerialNumber(history.serialNumber)}</Td>
                           <Td>{history.orderedAt}</Td>
                           <Td>{history.fixedAt}</Td>
-                          <Td>{displayName(history.author)}</Td>
+                          <Td>{getCreateUserName(history.createUser)}</Td>
                           <Td>{history.productNumber}</Td>
                           <Td>{history.productName}</Td>
+                          <Td>{history.supplier}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
                           {/* <Td isNumeric>{history?.price}円</Td>
                           <Td isNumeric>
