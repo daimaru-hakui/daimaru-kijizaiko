@@ -72,7 +72,7 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
     });
   };
 
-  const ConfirmProcessing = async () => {
+  const confirmProcessing = async () => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
@@ -83,7 +83,7 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "Document does not exist!";
+        if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
@@ -100,12 +100,13 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           comment: items.comment,
-          updater: currentUser,
+          updateUser: currentUser,
           updatedAt: serverTimestamp(),
         });
 
         await addDoc(confirmHistoryRef, {
           serialNumber: history.serialNumber,
+          grayFabricsId: history.grayFabricsId,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || todayDate(),
           createUser: currentUser,
@@ -180,8 +181,8 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                         name="quantity"
                         defaultValue={0}
                         min={0}
-                        max={10000}
-                        value={items.quantity === 0 ? "" : items.quantity}
+                        max={100000}
+                        value={items.quantity}
                         onChange={(e) => handleNumberChange(e, "quantity")}
                       >
                         <NumberInputField textAlign="right" />
@@ -297,7 +298,7 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                   colorScheme="facebook"
                   disabled={items.remainingOrder >= 0 ? false : true}
                   onClick={() => {
-                    ConfirmProcessing();
+                    confirmProcessing();
                   }}
                 >
                   確定

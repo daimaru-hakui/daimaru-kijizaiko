@@ -192,7 +192,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     name="quantity"
                     defaultValue={0}
                     min={0}
-                    max={10000}
+                    max={100000}
                     value={items.quantity === 0 ? "" : items.quantity}
                     onChange={(e) => handleNumberChange(e, "quantity")}
                   >

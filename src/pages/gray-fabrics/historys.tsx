@@ -15,20 +15,25 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { async } from "@firebase/util";
 import {
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
+  runTransaction,
   where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FaRegCommentDots } from "react-icons/fa";
+import { FaRegCommentDots, FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { grayFabricsState, usersState } from "../../../store";
 import CommentModal from "../../components/history/CommentModal";
-import ConfirmGrayFabricModal from "../../components/history/GrayFabricConfirmModal";
+import ConfirmGrayFabricModal from "../../components/history/GrayFabricHistoryConfirmModal";
+import GrayFabricHistoryEditModal from "../../components/history/GrayFabricHistoryEditModal";
 
 const OrderHistorys = () => {
   const [orderHistorys, setOrderHistorys] = useState<any>();
@@ -77,19 +82,39 @@ const OrderHistorys = () => {
     getStockHistory();
   }, [setConfirmHistorys]);
 
-  // 担当者の表示
   const getCreateUserName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
-      return user?.name;
-    }
+    const user = users.find((user: { uid: string }) => userId === user.uid);
+    return user?.name || "";
   };
 
   const getSerialNumber = (serialNumber: number) => {
     const str = "0000000" + String(serialNumber);
     return str.slice(-7);
+  };
+
+  const deleteGrayFabricOrder = async (history: any) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
+    const orderHistoryRef = doc(db, "grayFabricOrderHistorys", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
+        if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
+
+        const newWip = grayFabricDocSnap.data()?.wip - history.quantity;
+        transaction.update(grayFabricDocRef, {
+          wip: newWip,
+        });
+
+        await deleteDoc(orderHistoryRef);
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
   };
 
   return (
@@ -122,6 +147,7 @@ const OrderHistorys = () => {
                         {/* <Th>単価</Th>
                         <Th>金額</Th> */}
                         <Th>コメント</Th>
+                        <Th>編集/削除</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -150,6 +176,18 @@ const OrderHistorys = () => {
                               />
                               {history?.comment.slice(0, 20) +
                                 (history.comment.length >= 1 ? "..." : "")}
+                            </Flex>
+                          </Td>
+                          <Td>
+                            <Flex alignItems="center" gap={3}>
+                              <GrayFabricHistoryEditModal
+                                history={history}
+                                type="order"
+                              />
+                              <FaTrashAlt
+                                cursor="pointer"
+                                onClick={() => deleteGrayFabricOrder(history)}
+                              />
                             </Flex>
                           </Td>
                         </Tr>
@@ -181,7 +219,7 @@ const OrderHistorys = () => {
                         {/* <Th>単価</Th>
                         <Th>金額</Th> */}
                         <Th>コメント</Th>
-                        <Th></Th>
+                        <Th>編集</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -202,15 +240,20 @@ const OrderHistorys = () => {
 
                           <Td w="100%">
                             <Flex gap={3}>
-                              {history?.comment.slice(0, 20) +
-                                (history.comment.length >= 1 ? "..." : "")}
                               <CommentModal
                                 history={history}
                                 collectionName="grayFabricConfirmHistorys"
                               />
+                              {history?.comment.slice(0, 20) +
+                                (history.comment.length >= 1 ? "..." : "")}
                             </Flex>
                           </Td>
-                          <Td></Td>
+                          <Td>
+                            <GrayFabricHistoryEditModal
+                              history={history}
+                              type="confirm"
+                            />
+                          </Td>
                         </Tr>
                       ))}
                     </Tbody>
