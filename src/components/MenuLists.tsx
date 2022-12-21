@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Divider, List, ListItem, useDisclosure } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
-import OrderDrawer from "./order/OrderDrawer";
+import OrderDrawer from "./products/OrderDrawer";
 
 type Props = {
   onClose: Function;
@@ -18,7 +18,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menu2 = [
     { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
-    { id: 2, title: "キバタ仕掛状況", link: "/gray-fabrics/historys" },
+    { id: 2, title: "キバタ仕掛状況", link: "/history/gray-fabric" },
     { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
   const menu3 = [{ id: 1, title: "一覧", link: "/cutting-report" }];

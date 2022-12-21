@@ -23,7 +23,6 @@ import { NextPage } from "next";
 import React from "react";
 import { ProductType } from "../../../types/productType";
 import DisplayStock from "./DisplayStock";
-import OrderDrawer from "./OrderDrawer";
 import OrderInputArea from "./OrderInputArea";
 
 type Props = {
@@ -51,9 +50,6 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
               <Tabs variant="unstyled">
                 <TabList>
                   <Tab _selected={{ color: "white", bg: "blue.500" }}>
-                    キバタ発注
-                  </Tab>
-                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
                     染め依頼
                   </Tab>
                   <Tab _selected={{ color: "white", bg: "blue.500" }}>
@@ -67,6 +63,7 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
                     </Text>
                     <Flex>
                       <Text mr={3}>{product?.productNumber}</Text>
+                      <Text mr={3}>{product?.colorName}</Text>
                       {product?.productName}
                     </Flex>
                   </Flex>
@@ -83,21 +80,14 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
                   <TabPanel>
                     <OrderInputArea
                       product={product}
-                      orderType={1}
+                      orderType={"dyeing"}
                       onClose={onClose}
                     />
                   </TabPanel>
                   <TabPanel>
                     <OrderInputArea
                       product={product}
-                      orderType={2}
-                      onClose={onClose}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <OrderInputArea
-                      product={product}
-                      orderType={3}
+                      orderType={"purchase"}
                       onClose={onClose}
                     />
                   </TabPanel>

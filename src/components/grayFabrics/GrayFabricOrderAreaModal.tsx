@@ -82,7 +82,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
       "grayFabricOrderNumbers"
     );
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
-    const orderHistoryRef = collection(db, "grayFabricOrderHistorys");
+    const orderHistoryRef = collection(db, "historyGrayFabricOrders");
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -97,9 +97,10 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
           serialNumber: newSerialNumber,
         });
 
-        const newWip = grayFabricDocSnap.data()?.wip + items.quantity || 0;
+        const newWipGrayFabric =
+          grayFabricDocSnap.data()?.wip + items.quantity || 0;
         transaction.update(grayFabricDocRef, {
-          wip: newWip,
+          wip: newWipGrayFabric,
         });
 
         await addDoc(orderHistoryRef, {
@@ -192,7 +193,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     name="quantity"
                     defaultValue={0}
                     min={0}
-                    max={10000}
+                    max={100000}
                     value={items.quantity === 0 ? "" : items.quantity}
                     onChange={(e) => handleNumberChange(e, "quantity")}
                   >

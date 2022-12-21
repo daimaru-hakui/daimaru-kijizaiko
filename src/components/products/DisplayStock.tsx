@@ -12,26 +12,6 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
     <Container maxW="600px" p={0}>
       <Flex gap={3} justifyContent="space-between">
         <Flex w="100%" gap={3} flexDirection="column">
-          <Box w="100%" p={2} textAlign="center" bg="#de7454" boxShadow="md">
-            <Text fontSize="sm">キバタ仕掛</Text>
-            <Box>
-              <Box as="span" fontSize="2xl">
-                {product?.wipGrayFabricQuantity || 0}
-              </Box>
-              m
-            </Box>
-          </Box>
-          <Box w="100%" p={2} textAlign="center" bg="#5485de" boxShadow="md">
-            <Text fontSize="sm">キバタ在庫</Text>
-            <Box>
-              <Box as="span" fontSize="2xl">
-                {product?.stockGrayFabricQuantity || 0}
-              </Box>
-              m
-            </Box>
-          </Box>
-        </Flex>
-        <Flex w="100%" gap={3} flexDirection="column">
           <Box w="100%" p={2} textAlign="center" bg="#f3c150" boxShadow="md">
             <Text fontSize="sm">生地仕掛</Text>
             <Box>

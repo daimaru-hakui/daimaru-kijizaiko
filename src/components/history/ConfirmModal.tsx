@@ -27,10 +27,9 @@ import { db } from "../../../firebase";
 
 type Props = {
   history: any;
-  orderType: number;
 };
 
-const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
+const ConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState({
     finishedAt: "",
@@ -324,42 +323,17 @@ const ConfirmModal: NextPage<Props> = ({ history, orderType }) => {
             >
               閉じる
             </Button>
-            {orderType === 1 && (
-              <Button
-                colorScheme="blue"
-                disabled={!items.finishedAt}
-                onClick={() => {
-                  moveWipToStockGrayfabric(history);
-                  onClose();
-                }}
-              >
-                確定
-              </Button>
-            )}
-            {orderType === 2 && (
-              <Button
-                colorScheme="blue"
-                disabled={!items.finishedAt}
-                onClick={() => {
-                  moveWipToStockFabricDyeing(history);
-                  onClose();
-                }}
-              >
-                確定
-              </Button>
-            )}
-            {orderType === 3 && (
-              <Button
-                colorScheme="blue"
-                disabled={!items.finishedAt}
-                onClick={() => {
-                  moveOutsideToTokushima(history);
-                  onClose();
-                }}
-              >
-                確定
-              </Button>
-            )}
+
+            <Button
+              colorScheme="blue"
+              disabled={!items.finishedAt}
+              onClick={() => {
+                moveWipToStockGrayfabric(history);
+                onClose();
+              }}
+            >
+              確定
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

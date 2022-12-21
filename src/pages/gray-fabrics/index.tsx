@@ -19,8 +19,8 @@ import { grayFabricsState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/history/CommentModal";
-import GrayFabricOrderAreaModal from "../../components/order/GrayFabricOrderAreaModal";
-import OrderAreaModal from "../../components/order/OrderAreaModal";
+import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
+import OrderAreaModal from "../../components/products/OrderAreaModal";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);

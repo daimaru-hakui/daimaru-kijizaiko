@@ -30,19 +30,20 @@ import { ProductType } from "../../../types/productType";
 
 type Props = {
   product: ProductType;
-  orderType: number;
+  orderType: string;
   onClose: Function;
 };
 
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   const currentUser = useRecoilValue(currentUserState);
   const productId = product?.id;
+  const grayFabricsId = product?.grayFabricsId || "GbFDtT3kqgfWGhpgOsGx";
   const [items, setItems] = useState({
     quantity: 0,
     orderedAt: "",
     scheduledAt: "",
     comment: "",
-    stockPlaceType: 1,
+    stockPlaceType: 2,
   });
 
   // 今日の日付を取得
@@ -72,14 +73,6 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
-  const stockLimit1 = () => {
-    const stockGrayFabricQuantity = product?.stockGrayFabricQuantity || 0;
-    return items.stockPlaceType === 1 &&
-      stockGrayFabricQuantity < items.quantity
-      ? true
-      : false;
-  };
-
   const stockLimit2 = () => {
     const stockQuantity = product.stockFabricDyeingQuantity || 0;
     return items.stockPlaceType === 1 && stockQuantity < items.quantity
@@ -87,33 +80,53 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       : false;
   };
 
-  //////////// キバタ発注 関数//////////////
-  const onClickOrderGrayfabric = async () => {
+  //////////// 染めOrder依頼 関数//////////////
+  const orderFabricDyeingFromGrayFabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
+
+    const orderNumberDocRef = doc(
+      db,
+      "serialNumbers",
+      "fabricDyeingOrderNumbers"
+    );
+    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
+    const productDocRef = doc(db, "products", `${productId}`);
+    const historyDocRef = collection(db, "historyFabricDyeingOrders");
+
     try {
       await runTransaction(db, async (transaction) => {
-        // 更新前の値を取得
-        const productDocRef = doc(db, "products", `${productId}`);
+        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
+        if (!orderNumberDocSnap.exists())
+          throw "serialNumbers document does not exist!";
+
+        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
+        if (!grayFabricDocSnap.exists())
+          throw "grayFabric document does not exist!";
+
         const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
-
-        // 現在のキバタ仕掛数量
-        const oldQuantity = productDocSnap.data().wipGrayFabricQuantity || 0;
-        //　キバタ仕掛数量　＋　入力値
-        const newQuantity = oldQuantity + Math.abs(items?.quantity);
-
-        // キバタ仕掛数量を更新
-        transaction.update(productDocRef, {
-          wipGrayFabricQuantity: newQuantity,
+        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        transaction.update(orderNumberDocRef, {
+          serialNumber: newSerialNumber,
         });
 
-        // 履歴を追加
-        const historyDocRef = collection(db, "historyGrayFabrics");
+        const wipProduct = productDocSnap.data().wip || 0;
+        const newWipProduct = wipProduct + items?.quantity;
+        transaction.update(productDocRef, {
+          wip: newWipProduct,
+        });
+
+        const stockGrayFabric = grayFabricDocSnap.data().stock || 0;
+        const newStockGrayFabric = stockGrayFabric - items?.quantity;
+        transaction.update(grayFabricDocRef, {
+          stock: newStockGrayFabric,
+        });
+
         await addDoc(historyDocRef, {
+          serialNumber: newSerialNumber,
+          grayFabricsId: grayFabricDocSnap.id,
           productId,
           productNumber: product?.productNumber,
           productName: product?.productName,
@@ -121,72 +134,13 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          status: 1,
-          createdAt: serverTimestamp(),
+          supplier: product.supplier,
           orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt,
-          staff: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      onClose();
-    }
-  };
-
-  //////////// 染め依頼 関数//////////////
-  const onClickOrderFabricDyeing = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    try {
-      await runTransaction(db, async (transaction) => {
-        // 更新前の値を取得
-        const productDocRef = doc(db, "products", `${productId}`);
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
-
-        // 現在の染色仕掛数量
-        const wipFabricDyeingQuantity =
-          productDocSnap.data().wipFabricDyeingQuantity || 0;
-        //　現在の染色仕掛数量　＋　入力値
-        const newWipFabricDyeingQuantity =
-          wipFabricDyeingQuantity + Math.abs(items?.quantity);
-
-        // 現在のキバタ仕掛在庫
-        const stockGrayFabricQuantity =
-          productDocSnap.data().stockGrayFabricQuantity || 0;
-        // 現在のキバタ仕掛在庫　‐　入力値
-        const newStockGrayFabricQuantity =
-          stockGrayFabricQuantity - Math.abs(items?.quantity);
-
-        // キバタ仕掛数量を更新  ランニング在庫の場合は仕掛在庫の変更無し
-        transaction.update(productDocRef, {
-          wipFabricDyeingQuantity: newWipFabricDyeingQuantity,
-          stockGrayFabricQuantity:
-            items.stockPlaceType === 1
-              ? newStockGrayFabricQuantity
-              : stockGrayFabricQuantity,
-        });
-
-        // 履歴を追加
-        const historyDocRef = collection(db, "historyFabricDyeings");
-        await addDoc(historyDocRef, {
-          productId,
-          productNumber: product?.productNumber,
-          productName: product?.productName,
-          colorName: product?.colorName,
-          quantity: items?.quantity,
-          price: product?.price,
-          comment: items.comment,
-          status: 1,
-          stockPlaceType: items.stockPlaceType,
+          scheduledAt: items.scheduledAt || todayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
           createdAt: serverTimestamp(),
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt,
-          staff: currentUser,
+          updatedAt: serverTimestamp(),
         });
       });
     } catch (err) {
@@ -255,11 +209,11 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   return (
     <Box>
       <Stack spacing={6}>
-        {orderType === 2 && (
+        {orderType === "dyeing" && (
           <RadioGroup
             mt={3}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
-            defaultValue={1}
+            defaultValue={2}
             value={items.stockPlaceType}
           >
             <Stack direction="column">
@@ -269,7 +223,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           </RadioGroup>
         )}
 
-        {orderType === 3 && (
+        {orderType === "purchase" && (
           <RadioGroup
             mt={3}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
@@ -341,31 +295,21 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             onChange={handleInputChange}
           />
         </Box>
-        {orderType === 1 && (
+        {orderType === "dyeing" && (
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={items.quantity === 0}
-            onClick={onClickOrderGrayfabric}
+            // disabled={stockLimit1()}
+            onClick={orderFabricDyeingFromGrayFabric}
           >
             登録
           </Button>
         )}
-        {orderType === 2 && (
+        {orderType === "purchase" && (
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={stockLimit1()}
-            onClick={onClickOrderFabricDyeing}
-          >
-            登録
-          </Button>
-        )}
-        {orderType === 3 && (
-          <Button
-            size="md"
-            colorScheme="facebook"
-            disabled={stockLimit2()}
+            // disabled={stockLimit2()}
             onClick={onClickOrderfabric}
           >
             登録

@@ -37,7 +37,7 @@ type Props = {
   history: any;
 };
 
-const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
+const HistoryConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const grayFabricsId = history.grayFabricsId;
   const currentUser = useRecoilValue(currentUserState);
@@ -72,18 +72,19 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
     });
   };
 
-  const ConfirmProcessing = async () => {
+  // キバタ確定処理
+  const confirmProcessing = async () => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
-    const orderHistoryRef = doc(db, "grayFabricOrderHistorys", history.id);
-    const confirmHistoryRef = collection(db, "grayFabricConfirmHistorys");
+    const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
+    const confirmHistoryRef = collection(db, "historyGrayFabricConfirms");
 
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "Document does not exist!";
+        if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
@@ -100,12 +101,13 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           comment: items.comment,
-          updater: currentUser,
+          updateUser: currentUser,
           updatedAt: serverTimestamp(),
         });
 
         await addDoc(confirmHistoryRef, {
           serialNumber: history.serialNumber,
+          grayFabricsId: history.grayFabricsId,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || todayDate(),
           createUser: currentUser,
@@ -116,6 +118,64 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
           quantity: items.quantity,
           comment: items.comment,
           createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      onClose();
+    }
+  };
+
+  // 染色確定処理
+  const confirmProcessingFabricDyeing = async () => {
+    const result = window.confirm("確定して宜しいでしょうか");
+    if (!result) return;
+
+    const productDocRef = doc(db, "products", history.productId);
+    const orderHistoryRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const confirmHistoryRef = collection(db, "historyFabricDyeingConfirms");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "Document does not exist!!";
+
+        const newWip =
+          productDocSnap.data()?.wip -
+            history.quantity +
+            items.remainingOrder || 0;
+        const newStock =
+          productDocSnap.data()?.externalStock + items.quantity || 0;
+        transaction.update(productDocRef, {
+          wip: newWip,
+          externalStock: newStock,
+        });
+
+        transaction.update(orderHistoryRef, {
+          quantity: items.remainingOrder,
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt || todayDate(),
+          comment: items.comment,
+          updateUser: currentUser,
+          updatedAt: serverTimestamp(),
+        });
+
+        await addDoc(confirmHistoryRef, {
+          serialNumber: history.serialNumber,
+          grayFabricsId: history.grayFabricsId,
+          orderedAt: items.orderedAt || history.orderedAt,
+          fixedAt: items.fixedAt || todayDate(),
+          createUser: currentUser,
+          productNumber: history.productNumber,
+          productName: history.productName,
+          //   price: history.price,
+          supplier: history.supplier,
+          quantity: items.quantity,
+          comment: items.comment,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
       });
     } catch (e) {
@@ -180,8 +240,8 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                         name="quantity"
                         defaultValue={0}
                         min={0}
-                        max={10000}
-                        value={items.quantity === 0 ? "" : items.quantity}
+                        max={100000}
+                        value={items.quantity}
                         onChange={(e) => handleNumberChange(e, "quantity")}
                       >
                         <NumberInputField textAlign="right" />
@@ -239,23 +299,23 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                 )}
               </Box>
               {/* <Box w="100%">
-                <Text>金額</Text>
-                <NumberInput
-                  mt={1}
-                  name="price"
-                  defaultValue={0}
-                  min={0}
-                  max={10000}
-                  value={items.price === 0 ? "" : items.price}
-                  onChange={(e) => handleNumberChange(e, "price")}
-                >
-                  <NumberInputField textAlign="right" />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </Box> */}
+                  <Text>金額</Text>
+                  <NumberInput
+                    mt={1}
+                    name="price"
+                    defaultValue={0}
+                    min={0}
+                    max={10000}
+                    value={items.price === 0 ? "" : items.price}
+                    onChange={(e) => handleNumberChange(e, "price")}
+                  >
+                    <NumberInputField textAlign="right" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </Box> */}
             </Stack>
           </ModalBody>
 
@@ -297,7 +357,7 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                   colorScheme="facebook"
                   disabled={items.remainingOrder >= 0 ? false : true}
                   onClick={() => {
-                    ConfirmProcessing();
+                    confirmProcessingFabricDyeing();
                   }}
                 >
                   確定
@@ -311,4 +371,4 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
   );
 };
 
-export default GrayFabricConfirmModal;
+export default HistoryConfirmModal;
