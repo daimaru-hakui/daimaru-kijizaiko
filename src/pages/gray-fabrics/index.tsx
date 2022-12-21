@@ -20,7 +20,6 @@ import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/history/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
-import OrderAreaModal from "../../components/products/OrderAreaModal";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
@@ -67,7 +66,6 @@ const GrayFabrics = () => {
                 <Th>品番</Th>
                 <Th>品名</Th>
                 <Th>仕入先</Th>
-                {/* <Th w="70px">単価</Th> */}
                 <Th w="100px">キバタ仕掛</Th>
                 <Th w="100px">キバタ在庫</Th>
                 <Th>コメント</Th>
@@ -83,7 +81,6 @@ const GrayFabrics = () => {
                   <Td>{item.productNumber}</Td>
                   <Td>{item.productName}</Td>
                   <Td>{getSupplierName(item.supplier)}</Td>
-                  {/* <Td isNumeric>{item.price}</Td> */}
                   <Td
                     isNumeric
                     fontSize="md"

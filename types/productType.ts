@@ -19,10 +19,8 @@ export type ProductType = {
   noteFabric: string;
   noteEtc: string;
   wip: number;
-
-  wipFabricDyeingQuantity: number;
-  stockFabricDyeingQuantity: number;
+  stockExternal: number;
   shippingQuantity: number;
-  stockTokushimaQuantity: number;
+  stockTokushima: number;
   grayFabricsId: string;
 };

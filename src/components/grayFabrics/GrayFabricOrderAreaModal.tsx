@@ -150,14 +150,6 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     {grayFabric?.productName}
                   </Flex>
                 </Flex>
-                {/* <Flex mt={2}>
-                  <Text mr={1} fontWeight="bold">
-                    価格
-                  </Text>
-                  <Flex>
-                    <Text mr={3}>{grayFabric?.price}円</Text>
-                  </Flex>
-                </Flex> */}
               </Box>
               <Flex
                 gap={3}

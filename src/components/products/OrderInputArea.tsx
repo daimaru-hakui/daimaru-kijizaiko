@@ -74,7 +74,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   };
 
   const stockLimit2 = () => {
-    const stockQuantity = product.stockFabricDyeingQuantity || 0;
+    const stockQuantity = product.stockExternal || 0;
     return items.stockPlaceType === 1 && stockQuantity < items.quantity
       ? true
       : false;
@@ -126,6 +126,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
+          stockPlaceType: items.stockPlaceType,
           grayFabricsId: grayFabricDocSnap.id,
           productId,
           productNumber: product?.productNumber,
@@ -150,8 +151,79 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
+  //////////// 染めOrder依頼 関数//////////////
+  const orderFabricDyeing = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+
+    const orderNumberDocRef = doc(
+      db,
+      "serialNumbers",
+      "fabricDyeingOrderNumbers"
+    );
+    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
+    const productDocRef = doc(db, "products", `${productId}`);
+    const historyDocRef = collection(db, "historyFabricDyeingOrders");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
+        if (!orderNumberDocSnap.exists())
+          throw "serialNumbers document does not exist!";
+
+        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
+        if (!grayFabricDocSnap.exists())
+          throw "grayFabric document does not exist!";
+
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        transaction.update(orderNumberDocRef, {
+          serialNumber: newSerialNumber,
+        });
+
+        const wipProduct = productDocSnap.data().wip || 0;
+        const newWipProduct = wipProduct + items?.quantity;
+        transaction.update(productDocRef, {
+          wip: newWipProduct,
+        });
+
+        // const stockGrayFabric = grayFabricDocSnap.data().stock || 0;
+        // const newStockGrayFabric = stockGrayFabric - items?.quantity;
+        // transaction.update(grayFabricDocRef, {
+        //   stock: newStockGrayFabric,
+        // });
+
+        await addDoc(historyDocRef, {
+          serialNumber: newSerialNumber,
+          stockPlaceType: items.stockPlaceType,
+          // grayFabricsId: grayFabricDocSnap.id,
+          productId,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: product?.price,
+          comment: items.comment,
+          supplier: product.supplier,
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt || todayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      onClose();
+    }
+  };
+
   // 購入伝票
-  const onClickOrderfabric = async () => {
+  const orderPurchase = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     try {
@@ -300,7 +372,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             size="md"
             colorScheme="facebook"
             // disabled={stockLimit1()}
-            onClick={orderFabricDyeingFromGrayFabric}
+            onClick={() => {
+              items.stockPlaceType === 1 && orderFabricDyeingFromGrayFabric();
+              items.stockPlaceType === 2 && orderFabricDyeing();
+            }}
           >
             登録
           </Button>
@@ -310,7 +385,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             size="md"
             colorScheme="facebook"
             // disabled={stockLimit2()}
-            onClick={onClickOrderfabric}
+            // onClick={onClickOrderfabric}
           >
             登録
           </Button>

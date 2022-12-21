@@ -15,13 +15,19 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
-import { loadingState, suppliersState, usersState } from "../../../store";
+import {
+  grayFabricsState,
+  loadingState,
+  suppliersState,
+  usersState,
+} from "../../../store";
 
 const ProductsId = () => {
   const router = useRouter();
   const productId = router.query.productId;
   const [product, setProduct] = useState<any>();
   const suppliers = useRecoilValue(suppliersState);
+  const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
 
   useEffect(() => {
@@ -51,6 +57,13 @@ const ProductsId = () => {
       (supplier: { id: string; name: string }) => id === supplier.id
     );
     return supplier?.name;
+  };
+
+  const getGrayFabricName = (id: string) => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => id === grayFabric.id
+    );
+    return `${grayFabric?.productNumber} ${grayFabric?.productName}`;
   };
 
   const dispMixed = (materials: any) => {
@@ -163,6 +176,13 @@ const ProductsId = () => {
               </Box>
             </Flex>
           </Flex>
+
+          {product?.grayFabricsId && (
+            <Box flex={1} w="100%">
+              <Text fontWeight="bold">使用キバタ</Text>
+              <Box mt={1}>{getGrayFabricName(product?.grayFabricsId)}</Box>
+            </Box>
+          )}
 
           <Box flex={1} w="100%">
             <Text fontWeight="bold">備考（使用製品品番）</Text>
