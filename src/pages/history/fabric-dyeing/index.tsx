@@ -2,20 +2,23 @@ import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { db } from "../../../../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import HistoryTable from "../../../components/history/HistoryTable";
+import HistoryTable from "../../../components/history/OrderHistoryTable";
+import OrderHistoryTable from "../../../components/history/OrderHistoryTable";
+import ConfirmHistoryTable from "../../../components/history/ConfirmHistoryTable";
 
 const HistoryFabricDyeings = () => {
-  const [historys, setHistorys] = useState<any>();
+  const [historyOrders, setHistoryOrders] = useState<any>();
+  const [historyConfirms, setHistoryConfirms] = useState<any>();
 
   useEffect(() => {
-    const getHistory = async () => {
+    const getHistoryOrders = async () => {
       const q = query(
-        collection(db, "historyFabricDyeings"),
+        collection(db, "historyFabricDyeingOrders"),
         orderBy("createdAt", "desc")
       );
       try {
         onSnapshot(q, (querySnap) =>
-          setHistorys(
+          setHistoryOrders(
             querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
           )
         );
@@ -23,7 +26,26 @@ const HistoryFabricDyeings = () => {
         console.log(err);
       }
     };
-    getHistory();
+    getHistoryOrders();
+  }, []);
+
+  useEffect(() => {
+    const getHistoryConfirms = async () => {
+      const q = query(
+        collection(db, "historyFabricDyeingConfirms"),
+        orderBy("createdAt", "desc")
+      );
+      try {
+        onSnapshot(q, (querySnap) =>
+          setHistoryConfirms(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getHistoryConfirms();
   }, []);
 
   return (
@@ -37,19 +59,15 @@ const HistoryFabricDyeings = () => {
 
           <TabPanels>
             <TabPanel>
-              <HistoryTable
-                historys={historys}
+              <OrderHistoryTable
+                historys={historyOrders}
                 title={"生地仕掛一覧"}
-                status={1}
-                orderType={2}
               />
             </TabPanel>
             <TabPanel>
-              <HistoryTable
-                historys={historys}
+              <ConfirmHistoryTable
+                historys={historyConfirms}
                 title={"生地発注履歴"}
-                status={2}
-                orderType={2}
               />
             </TabPanel>
           </TabPanels>

@@ -64,7 +64,7 @@ const GrayFabricHistoryEditModal: NextPage<Props> = ({ history, type }) => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
-    const historyDocRef = doc(db, "grayFabricOrderHistorys", history.id);
+    const historyDocRef = doc(db, "historyGrayFabricOrders", history.id);
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
@@ -99,7 +99,7 @@ const GrayFabricHistoryEditModal: NextPage<Props> = ({ history, type }) => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
-    const historyDocRef = doc(db, "grayFabricConfirmHistorys", history.id);
+    const historyDocRef = doc(db, "historyGrayFabricOrders", history.id);
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);

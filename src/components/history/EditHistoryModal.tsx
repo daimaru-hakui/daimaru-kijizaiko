@@ -28,10 +28,9 @@ import { db } from "../../../firebase";
 
 type Props = {
   history: any;
-  orderType: number;
 };
 
-export const EditHistoryModal: NextPage<Props> = ({ history, orderType }) => {
+export const EditHistoryModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [reset, setReset] = useState<Props>();
   const [items, setItems] = useState({
@@ -277,11 +276,6 @@ export const EditHistoryModal: NextPage<Props> = ({ history, orderType }) => {
             <Button
               colorScheme="blue"
               onClick={() => {
-                if (orderType === 1) {
-                  editHistoryGrayFabric(history.status);
-                } else if (orderType === 2) {
-                  editHistoryFabricDyeings(history.status);
-                }
                 onClose();
               }}
             >

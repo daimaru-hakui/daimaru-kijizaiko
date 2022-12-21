@@ -16,36 +16,32 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
+import { getSerialNumber } from "../../../functions";
 import { usersState } from "../../../store";
 import ConfirmModal from "./ConfirmModal";
 import { EditHistoryModal } from "./EditHistoryModal";
+import HistoryConfirmModal from "./HistoryConfirmModal";
+import FabricDyeingConfirmModal from "./HistoryConfirmModal";
 // import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
 
 type Props = {
   historys: any;
   title: string;
-  status: number;
-  orderType: number;
 };
 
-const HistoryGrayFabricTable: NextPage<Props> = ({
-  historys,
-  title,
-  status,
-  orderType,
-}) => {
+const ConfirmHistoryTable: NextPage<Props> = ({ historys, title }) => {
   const [filterHistorys, setFilterHistorys] = useState<any>();
   const users = useRecoilValue(usersState);
 
   useEffect(() => {
     const newHistorys = historys?.filter(
-      (history: { status: number }) => history.status === status
+      (history: { quantity: number }) => history.quantity > 0
     );
     setFilterHistorys(newHistorys);
-  }, [historys, status]);
+  }, [historys]);
 
   // 担当者の表示
-  const displayName = (userId: string) => {
+  const getCreateUserName = (userId: string) => {
     if (userId === "R&D") {
       return "R&D";
     } else {
@@ -109,21 +105,6 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
         let stockGrayFabricQuantity =
           productDocSnap.data().stockGrayFabricQuantity || 0;
 
-        switch (status) {
-          // 仕掛中から削除
-          case 1:
-            wipGrayFabricQuantity -= Math.abs(history.quantity);
-            break;
-          // 在庫から削除
-          case 2:
-            if (stockGrayFabricQuantity < history.quantity) {
-              window.alert("削除する数量が生機在庫を上回っています。");
-              throw "削除する数量が生機在庫を上回っています。";
-            }
-            stockGrayFabricQuantity -= Math.abs(history.quantity);
-            break;
-        }
-
         // 履歴データを削除
         transaction.delete(historyDocRef);
         // 生機数量を更新
@@ -165,21 +146,6 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
         //　生機在庫
         let stockGrayFabricQuantity =
           productDocSnap.data().stockGrayFabricQuantity || 0;
-
-        switch (status) {
-          // 仕掛中から削除
-          case 1:
-            wipGrayFabricQuantity -= Math.abs(history.quantity);
-            break;
-          // 在庫から削除
-          case 2:
-            if (stockGrayFabricQuantity < history.quantity) {
-              window.alert("削除する数量が生機在庫を上回っています。");
-              throw "削除する数量が生機在庫を上回っています。";
-            }
-            stockGrayFabricQuantity -= Math.abs(history.quantity);
-            break;
-        }
 
         // 履歴データを削除
         transaction.delete(historyDocRef);
@@ -227,26 +193,6 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
         let stockFabricDyeingQuantity =
           productDocSnap.data().stockFabricDyeingQuantity || 0;
 
-        switch (status) {
-          // 仕掛中から削除
-          case 1:
-            if (history.stockPlaceType === 1) {
-              // 生機在庫から染色している場合
-              stockGrayFabricQuantity += history.quantity;
-              wipFabricDyeingQuantity -= history.quantity;
-            } else {
-              // ランニング在庫から染色している場合
-              wipFabricDyeingQuantity -= history.quantity;
-            }
-            break;
-
-          // 在庫から削除
-          case 2:
-            stockFabricDyeingQuantity -= history.quantity;
-            wipFabricDyeingQuantity += history.quantity;
-            break;
-        }
-
         // 履歴データを削除
         transaction.delete(historyDocRef);
         // 染色数量を更新
@@ -271,9 +217,10 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
-              {status === 1 && <Th>確定</Th>}
+              <Th>確定</Th>
+              <Th>発注NO.</Th>
               <Th>発注日</Th>
-              {status === 1 ? <Th>仕上予定日</Th> : <Th>仕上日</Th>}
+              <Th>仕上予定日</Th>
               <Th>担当者</Th>
               <Th>生地品番</Th>
               <Th>色</Th>
@@ -282,77 +229,35 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
               <Th>単価</Th>
               <Th>金額</Th>
               <Th>コメント</Th>
-              <Th></Th>
+              <Th>編集/削除</Th>
             </Tr>
           </Thead>
           <Tbody>
             {filterHistorys?.map((history: any) => (
               <Tr key={history.id}>
-                {status === 1 && (
-                  <Td>
-                    <ConfirmModal history={history} orderType={orderType} />
-                  </Td>
-                )}
-
-                <Td>{history?.orderedAt}</Td>
                 <Td>
-                  {status === 1 ? history?.scheduledAt : history?.finishedAt}
+                  <HistoryConfirmModal history={history} />
                 </Td>
-                <Td>{displayName(history.staff)}</Td>
+                <Td>{getSerialNumber(history?.serialNumber)}</Td>
+                <Td>{history?.orderedAt}</Td>
+                <Td>{history?.scheduledAt}</Td>
+                <Td>{getCreateUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 <Td>{history.colorName}</Td>
                 <Td>{history.productName}</Td>
                 <Td>{history?.quantity}m</Td>
                 <Td>{history?.price}円</Td>
                 <Td>{history?.quantity * history?.price}円</Td>
-                <Td textAlign="center">{history?.comment}</Td>
-
+                <Td w="100%" textAlign="center">
+                  {history?.comment}
+                </Td>
                 <Td>
                   <Flex gap={3}>
-                    {orderType === 1 && (
-                      <>
-                        {status === 1 ? (
-                          <>
-                            <EditHistoryModal
-                              history={history}
-                              orderType={orderType}
-                            />
-                            <FaTrashAlt
-                              cursor="pointer"
-                              onClick={() => deleteHistoryGrayFabric(history)}
-                            />
-                          </>
-                        ) : (
-                          <EditHistoryModal
-                            history={history}
-                            orderType={orderType}
-                          />
-                        )}
-                      </>
-                    )}
-                    {orderType === 2 && (
-                      <>
-                        {status === 1 ? (
-                          <>
-                            <EditHistoryModal
-                              history={history}
-                              orderType={orderType}
-                            />
-                            <FaTrashAlt
-                              cursor="pointer"
-                              onClick={() => deleteHistoryFabricDyeing(history)}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <EditHistoryModal
-                              history={history}
-                              orderType={orderType}
-                            />
-                          </>
-                        )}
-                      </>
-                    )}
+                    <EditHistoryModal history={history} />
+                    <FaTrashAlt
+                      cursor="pointer"
+                      onClick={() => deleteHistoryGrayFabric(history)}
+                    />
                   </Flex>
                 </Td>
               </Tr>
@@ -366,4 +271,4 @@ const HistoryGrayFabricTable: NextPage<Props> = ({
   );
 };
 
-export default HistoryGrayFabricTable;
+export default ConfirmHistoryTable;

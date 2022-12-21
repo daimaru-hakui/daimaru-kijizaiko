@@ -23,7 +23,7 @@ import {
   usersState,
 } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
-import OrderAreaModal from "../../components/order/OrderAreaModal";
+import OrderAreaModal from "../../components/products/OrderAreaModal";
 import { ProductType } from "../../../types/productType";
 
 const Products = () => {
@@ -111,7 +111,6 @@ const Products = () => {
                 <Th>色</Th>
                 <Th>品名</Th>
                 <Th>単価</Th>
-
                 <Th>生地仕掛</Th>
                 <Th>外部在庫</Th>
                 <Th>入荷待ち</Th>
@@ -141,11 +140,8 @@ const Products = () => {
                   <Td>{product?.productName}</Td>
                   <Td isNumeric>{product.price}円</Td>
 
-                  <Td
-                    isNumeric
-                    fontWeight={quantityBold(product?.wipFabricDyeingQuantity)}
-                  >
-                    {product?.wipFabricDyeingQuantity || 0}m
+                  <Td isNumeric fontWeight={quantityBold(product?.wip)}>
+                    {product?.wip || 0}m
                   </Td>
                   <Td
                     isNumeric

@@ -15,7 +15,6 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { async } from "@firebase/util";
 import {
   collection,
   deleteDoc,
@@ -29,13 +28,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { FaRegCommentDots, FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
-import { grayFabricsState, usersState } from "../../../store";
-import CommentModal from "../../components/history/CommentModal";
-import ConfirmGrayFabricModal from "../../components/history/GrayFabricHistoryConfirmModal";
-import GrayFabricHistoryEditModal from "../../components/history/GrayFabricHistoryEditModal";
+import { db } from "../../../../firebase";
+import { grayFabricsState, usersState } from "../../../../store";
+import CommentModal from "../../../components/history/CommentModal";
+import ConfirmGrayFabricModal from "../../../components/history/GrayFabricHistoryConfirmModal";
+import GrayFabricHistoryEditModal from "../../../components/history/GrayFabricHistoryEditModal";
 
-const OrderHistorys = () => {
+const GrayFabricHistorys = () => {
   const [orderHistorys, setOrderHistorys] = useState<any>();
   const [confirmHistorys, setConfirmHistorys] = useState<any>();
   const users = useRecoilValue(usersState);
@@ -44,7 +43,7 @@ const OrderHistorys = () => {
   useEffect(() => {
     const getWipHistory = async () => {
       const q = query(
-        collection(db, "grayFabricOrderHistorys"),
+        collection(db, "historyGrayFabricOrders"),
         where("quantity", ">", 0)
       );
       try {
@@ -66,7 +65,7 @@ const OrderHistorys = () => {
   useEffect(() => {
     const getStockHistory = async () => {
       const q = query(
-        collection(db, "grayFabricConfirmHistorys"),
+        collection(db, "historyGrayFabricConfirms"),
         orderBy("fixedAt", "desc")
       );
       try {
@@ -97,7 +96,7 @@ const OrderHistorys = () => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
-    const orderHistoryRef = doc(db, "grayFabricOrderHistorys", history.id);
+    const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -172,7 +171,7 @@ const OrderHistorys = () => {
                             <Flex gap={3}>
                               <CommentModal
                                 history={history}
-                                collectionName="grayFabricOrderHistorys"
+                                collectionName="historyGrayFabricOrders"
                               />
                               {history?.comment.slice(0, 20) +
                                 (history.comment.length >= 1 ? "..." : "")}
@@ -270,4 +269,4 @@ const OrderHistorys = () => {
   );
 };
 
-export default OrderHistorys;
+export default GrayFabricHistorys;
