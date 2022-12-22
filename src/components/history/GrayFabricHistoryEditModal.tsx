@@ -63,7 +63,7 @@ const GrayFabricHistoryEditModal: NextPage<Props> = ({ history, type }) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
-    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const historyDocRef = doc(db, "historyGrayFabricOrders", history.id);
     try {
       await runTransaction(db, async (transaction) => {
@@ -98,15 +98,16 @@ const GrayFabricHistoryEditModal: NextPage<Props> = ({ history, type }) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
-    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
-    const historyDocRef = doc(db, "historyGrayFabricOrders", history.id);
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
+    const historyDocRef = doc(db, "historyGrayFabricConfirms", history.id);
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
+        if (!grayFabricDocSnap.exists())
+          throw "grayFabricDocSnap does not exist!!";
 
         const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) throw "Document does not exist!!";
+        if (!historyDocSnap.exists()) throw "historyDocSnap does not exist!";
 
         const newStock =
           grayFabricDocSnap.data()?.stock - history.quantity + items.quantity ||
@@ -217,24 +218,6 @@ const GrayFabricHistoryEditModal: NextPage<Props> = ({ history, type }) => {
                   </Box>
                 </>
               </Box>
-              {/* <Box w="100%">
-                <Text>金額</Text>
-                <NumberInput
-                  mt={1}
-                  name="price"
-                  defaultValue={0}
-                  min={0}
-                  max={10000}
-                  value={items.price === 0 ? "" : items.price}
-                  onChange={(e) => handleNumberChange(e, "price")}
-                >
-                  <NumberInputField textAlign="right" />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </Box> */}
             </Stack>
           </ModalBody>
 

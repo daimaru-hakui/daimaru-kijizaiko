@@ -122,6 +122,7 @@ const ProductInputArea: NextPage<Props> = ({
       .map((item) => <Text key={item}>{item}</Text>);
   };
 
+  // 生地登録
   const addProduct = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;

@@ -49,27 +49,27 @@ const GrayFabricInputArea: NextPage<Props> = ({
     setItems({ ...items, [name]: value });
   };
 
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
-  const handleRadioChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
+  // 登録済みを登録できなくする
   const isRegistered = (
+    prevProductNumber: string = "",
     currentProductNumber: string,
-    prevProductNumber: string = ""
+    currentSupplierId: string
   ) => {
-    const result = grayFabrics.filter(
+    let result = grayFabrics.filter(
       (grayFabric: GrayFabricType) =>
         grayFabric.productNumber === currentProductNumber &&
-        currentProductNumber !== prevProductNumber
+        grayFabric.supplierId === currentSupplierId
     );
+    if (btnTitle === "更新") {
+      result = result?.filter(
+        (grayFabric: GrayFabricType) =>
+          prevProductNumber !== currentProductNumber
+      );
+      return result.length >= 1 ? true : false;
+    }
     return result.length >= 1 ? true : false;
   };
+
   return (
     <Stack spacing={6} mt={6}>
       <Flex gap={6}>
@@ -89,7 +89,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
             mt={1}
             placeholder="メーカーを選択してください"
             value={items.supplierId}
-            onChange={(e) => handleSelectchange(e, "supplier")}
+            onChange={(e) => handleSelectchange(e, "supplierId")}
           >
             {suppliers?.map((supplier: { id: string; name: string }) => (
               <option key={supplier.id} value={supplier.id}>
@@ -104,7 +104,11 @@ const GrayFabricInputArea: NextPage<Props> = ({
         fontWeight="bold"
         color="red"
         display={
-          isRegistered(items.productNumber, grayFabric?.productNumber)
+          isRegistered(
+            grayFabric?.productNumber,
+            items.productNumber,
+            items.supplierId
+          )
             ? "block"
             : "none"
         }
@@ -164,7 +168,11 @@ const GrayFabricInputArea: NextPage<Props> = ({
         disabled={
           !items.supplierId ||
           !items.productNumber ||
-          isRegistered(items.productNumber, grayFabric?.productNumber)
+          isRegistered(
+            grayFabric?.productNumber,
+            items.productNumber,
+            items.supplierId
+          )
         }
         onClick={() => onClick()}
       >

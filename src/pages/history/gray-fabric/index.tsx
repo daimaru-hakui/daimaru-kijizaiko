@@ -31,7 +31,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { grayFabricsState, usersState } from "../../../../store";
 import CommentModal from "../../../components/history/CommentModal";
-import ConfirmGrayFabricModal from "../../../components/history/GrayFabricHistoryConfirmModal";
+import GrayFabricHistoryConfirmModal from "../../../components/history/GrayFabricHistoryConfirmModal";
 import GrayFabricHistoryEditModal from "../../../components/history/GrayFabricHistoryEditModal";
 
 const GrayFabricHistorys = () => {
@@ -91,6 +91,7 @@ const GrayFabricHistorys = () => {
     return str.slice(-7);
   };
 
+  // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
@@ -143,8 +144,6 @@ const GrayFabricHistorys = () => {
                         <Th>品名</Th>
                         <Th>仕入先</Th>
                         <Th>数量</Th>
-                        {/* <Th>単価</Th>
-                        <Th>金額</Th> */}
                         <Th>コメント</Th>
                         <Th>編集/削除</Th>
                       </Tr>
@@ -153,7 +152,7 @@ const GrayFabricHistorys = () => {
                       {orderHistorys?.map((history: any) => (
                         <Tr key={history.id}>
                           <Td>
-                            <ConfirmGrayFabricModal history={history} />
+                            <GrayFabricHistoryConfirmModal history={history} />
                           </Td>
                           <Td>{getSerialNumber(history.serialNumber)}</Td>
                           <Td>{history.orderedAt}</Td>
@@ -161,12 +160,8 @@ const GrayFabricHistorys = () => {
                           <Td>{getCreateUserName(history.createUser)}</Td>
                           <Td>{history.productNumber}</Td>
                           <Td>{history.productName}</Td>
-                          <Td>{history.supplier}</Td>
+                          <Td>{history.supplierId}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
-                          {/* <Td isNumeric>{history?.price}円</Td>
-                          <Td isNumeric>
-                            {history?.quantity * history?.price}円
-                          </Td> */}
                           <Td w="100%">
                             <Flex gap={3}>
                               <CommentModal
@@ -215,8 +210,6 @@ const GrayFabricHistorys = () => {
                         <Th>品名</Th>
                         <Th>仕入先</Th>
                         <Th>数量</Th>
-                        {/* <Th>単価</Th>
-                        <Th>金額</Th> */}
                         <Th>コメント</Th>
                         <Th>編集</Th>
                       </Tr>
@@ -232,11 +225,6 @@ const GrayFabricHistorys = () => {
                           <Td>{history.productName}</Td>
                           <Td>{history.supplier}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
-                          {/* <Td isNumeric>{history?.price}円</Td>
-                          <Td isNumeric>
-                            {history?.quantity * history?.price}円
-                          </Td> */}
-
                           <Td w="100%">
                             <Flex gap={3}>
                               <CommentModal

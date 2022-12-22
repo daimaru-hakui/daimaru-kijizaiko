@@ -72,6 +72,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     return supplierObj.name;
   };
 
+  // キバタ仕掛発注
   const orderGrayFabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -104,8 +105,8 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
         });
 
         await addDoc(orderHistoryRef, {
-          grayFabricsId: grayFabricDocSnap?.id,
           serialNumber: newSerialNumber,
+          grayFabricId: grayFabricDocSnap?.id,
           productNumber: grayFabric?.productNumber,
           productName: grayFabric?.productName,
           price: grayFabric?.price,
