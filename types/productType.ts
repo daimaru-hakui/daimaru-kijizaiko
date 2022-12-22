@@ -20,7 +20,7 @@ export type ProductType = {
   noteFabric: string;
   noteEtc: string;
   wip: number;
-  stockExternal: number;
+  externalStock: number;
   shippingQuantity: number;
-  stockTokushima: number;
+  tokushimaStock: number;
 };
