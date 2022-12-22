@@ -16,7 +16,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">生地仕掛</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.wipFabricDyeingQuantity || 0}
+                {product?.wip || 0}
               </Box>
               m
             </Box>
@@ -25,7 +25,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">外部在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.stockFabricDyeingQuantity || 0}
+                {product?.externalStock || 0}
               </Box>
               m
             </Box>
@@ -45,7 +45,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">徳島在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.stockTokushimaQuantity || 0}
+                {product?.tokushimaStock || 0}
               </Box>
               m
             </Box>

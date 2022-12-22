@@ -145,9 +145,9 @@ const Products = () => {
                   </Td>
                   <Td
                     isNumeric
-                    fontWeight={quantityBold(product?.stockExternal)}
+                    fontWeight={quantityBold(product?.externalStock)}
                   >
-                    {product?.stockExternal || 0}m
+                    {product?.externalStock || 0}m
                   </Td>
                   <Td
                     isNumeric
@@ -157,9 +157,9 @@ const Products = () => {
                   </Td>
                   <Td
                     isNumeric
-                    fontWeight={quantityBold(product?.stockTokushima)}
+                    fontWeight={quantityBold(product?.tokushimaStock)}
                   >
-                    {product?.stockTokushima || 0}m
+                    {product?.tokushimaStock || 0}m
                   </Td>
                   <Td>{product.materialName}</Td>
                   <Td>

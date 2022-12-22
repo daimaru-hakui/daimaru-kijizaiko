@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import HistoryTable from "../../../components/history/OrderHistoryTable";
+import OrderHistoryTable from "../../../components/history/OrderHistoryTable";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import ConfirmHistoryTable from "../../../components/history/ConfirmHistoryTable";
 
 const FabricShipment = () => {
   const [historys, setHistorys] = useState<any>();
@@ -37,19 +38,12 @@ const FabricShipment = () => {
 
           <TabPanels>
             <TabPanel>
-              <HistoryTable
-                historys={historys}
-                title={"購入伝票一覧"}
-                status={1}
-                orderType={3}
-              />
+              <OrderHistoryTable histories={historys} title={"購入伝票一覧"} />
             </TabPanel>
             <TabPanel>
-              <HistoryTable
-                historys={historys}
+              <ConfirmHistoryTable
+                histories={historys}
                 title={"購入伝票履歴"}
-                status={2}
-                orderType={3}
               />
             </TabPanel>
           </TabPanels>
