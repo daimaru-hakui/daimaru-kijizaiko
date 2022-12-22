@@ -39,7 +39,6 @@ type Props = {
 
 const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const grayFabricsId = history.grayFabricsId;
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState<any>({});
   const [status, setStatus] = useState(1);
@@ -72,11 +71,11 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
     });
   };
 
+  // 確定処理　キバタ仕掛⇒キバタ在庫
   const confirmProcessing = async () => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
-
-    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
     const confirmHistoryRef = collection(db, "historyGrayFabricConfirms");
 
@@ -106,14 +105,13 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
 
         await addDoc(confirmHistoryRef, {
           serialNumber: history.serialNumber,
-          grayFabricsId: history.grayFabricsId,
+          grayFabricId: history.grayFabricId,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || todayDate(),
           createUser: currentUser,
           productNumber: history.productNumber,
           productName: history.productName,
-          //   price: history.price,
-          supplier: history.supplier,
+          supplierId: history.supplierId,
           quantity: items.quantity,
           comment: items.comment,
           createdAt: serverTimestamp(),
@@ -239,24 +237,6 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
                   </>
                 )}
               </Box>
-              {/* <Box w="100%">
-                <Text>金額</Text>
-                <NumberInput
-                  mt={1}
-                  name="price"
-                  defaultValue={0}
-                  min={0}
-                  max={10000}
-                  value={items.price === 0 ? "" : items.price}
-                  onChange={(e) => handleNumberChange(e, "price")}
-                >
-                  <NumberInputField textAlign="right" />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </Box> */}
             </Stack>
           </ModalBody>
 
