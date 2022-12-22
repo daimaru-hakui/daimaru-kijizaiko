@@ -28,6 +28,7 @@ import { features } from "../../../datalist";
 import { db } from "../../../firebase";
 import {
   colorsState,
+  grayFabricsState,
   loadingState,
   materialNamesState,
   productsState,
@@ -53,6 +54,7 @@ const ProductInputArea: NextPage<Props> = ({
 }) => {
   const router = useRouter();
   const productId = router.query.productId;
+  const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
   const products = useRecoilValue(productsState);
@@ -146,6 +148,7 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
+        grayFabricsId: items.grayFabricsId || "",
       });
     } catch (err) {
       console.log(err);
@@ -181,6 +184,7 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
+        grayFabricsId: items.grayFabricsId || "",
       });
     } catch (err) {
       console.log(err);
@@ -381,6 +385,29 @@ const ProductInputArea: NextPage<Props> = ({
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
+            </Box>
+          </Flex>
+          <Flex gap={6}>
+            <Box w="100%">
+              <Text fontWeight="bold">キバタ登録</Text>
+              <Select
+                mt={1}
+                placeholder="キバタを選択してください"
+                value={items.grayFabricsId}
+                onChange={(e) => handleSelectchange(e, "grayFabricsId")}
+              >
+                {grayFabrics?.map(
+                  (grayFabric: {
+                    id: string;
+                    productNumber: string;
+                    productName: string;
+                  }) => (
+                    <option key={grayFabric.id} value={grayFabric.id}>
+                      {grayFabric.productNumber} {grayFabric.productName}
+                    </option>
+                  )
+                )}
+              </Select>
             </Box>
           </Flex>
           <Box flex={1} w="100%">

@@ -149,23 +149,6 @@ const GrayFabricInputArea: NextPage<Props> = ({
             onChange={handleInputChange}
           />
         </Box>
-        {/* <Box flex="1">
-    <Text fontWeight="bold">価格（円）</Text>
-    <NumberInput
-      mt={1}
-      defaultValue={0}
-      min={0}
-      max={100000}
-      value={items.price}
-      onChange={(e) => handleNumberChange(e, "price")}
-    >
-      <NumberInputField textAlign="right" />
-      <NumberInputStepper>
-        <NumberIncrementStepper />
-        <NumberDecrementStepper />
-      </NumberInputStepper>
-    </NumberInput>
-  </Box> */}
       </Flex>
       <Box>
         <Text fontWeight="bold">コメント</Text>
