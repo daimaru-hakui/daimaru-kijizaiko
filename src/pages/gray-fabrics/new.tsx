@@ -23,7 +23,7 @@ const GrayFabricsNew = () => {
       await addDoc(grayFabricsCollectionRef, {
         productName: items.productName || "",
         productNumber: items.productNumber || "",
-        supplier: items.supplier || "",
+        supplierId: items.supplierId || "",
         price: Number(items.price) || 0,
         comment: items.comment || "",
         wip: 0,
