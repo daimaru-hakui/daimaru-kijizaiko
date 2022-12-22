@@ -88,7 +88,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
           <Select
             mt={1}
             placeholder="メーカーを選択してください"
-            value={items.supplier}
+            value={items.supplierId}
             onChange={(e) => handleSelectchange(e, "supplier")}
           >
             {suppliers?.map((supplier: { id: string; name: string }) => (
@@ -162,7 +162,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
       <Button
         colorScheme="facebook"
         disabled={
-          !items.supplier ||
+          !items.supplierId ||
           !items.productNumber ||
           isRegistered(items.productNumber, grayFabric?.productNumber)
         }

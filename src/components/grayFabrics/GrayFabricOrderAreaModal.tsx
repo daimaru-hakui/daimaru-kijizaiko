@@ -114,7 +114,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
           scheduledAt: items.scheduledAt || todayDate(),
           comment: items.comment,
           createUser: currentUser,
-          supplier: getSupplierName(grayFabric?.supplier),
+          supplierId: getSupplierName(grayFabric?.supplierId),
           createdAt: serverTimestamp(),
         });
       });

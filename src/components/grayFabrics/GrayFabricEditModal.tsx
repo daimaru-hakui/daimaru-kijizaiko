@@ -48,7 +48,7 @@ const GrayFabricEditModal: NextPage<Props> = ({ grayFabric }) => {
       await updateDoc(grayFabricsDocnRef, {
         productName: items.productName || "",
         productNumber: items.productNumber || "",
-        supplier: items.supplier || "",
+        supplierId: items.supplierId || "",
         price: Number(items.price) || 0,
         comment: items.comment || "",
         wip: 0,
