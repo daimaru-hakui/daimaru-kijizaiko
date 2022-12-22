@@ -68,7 +68,10 @@ export default function Home() {
   // products情報;
   useEffect(() => {
     const getProducts = async () => {
-      const q = query(collection(db, "products"), orderBy("supplier", "asc"));
+      const q = query(
+        collection(db, "products"),
+        orderBy("productNumber", "asc")
+      );
       try {
         onSnapshot(q, (querySnap) =>
           setProducts(

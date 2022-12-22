@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import OrderHistoryTable from "../../../components/history/OrderHistoryTable";
+import OrderHistoryTable from "../../../components/history/HistoryOrderTable";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../../../../firebase";
-import ConfirmHistoryTable from "../../../components/history/ConfirmHistoryTable";
+import ConfirmHistoryTable from "../../../components/history/HistoryConfirmTable";
 
 const FabricShipment = () => {
   const [historys, setHistorys] = useState<any>();

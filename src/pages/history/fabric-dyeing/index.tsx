@@ -2,9 +2,8 @@ import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { db } from "../../../../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import HistoryTable from "../../../components/history/OrderHistoryTable";
-import OrderHistoryTable from "../../../components/history/OrderHistoryTable";
-import ConfirmHistoryTable from "../../../components/history/ConfirmHistoryTable";
+import HistoryOrderTable from "../../../components/history/HistoryOrderTable";
+import HistoryConfirmTable from "../../../components/history/HistoryConfirmTable";
 
 const HistoryFabricDyeings = () => {
   const [historyOrders, setHistoryOrders] = useState<any>();
@@ -59,13 +58,13 @@ const HistoryFabricDyeings = () => {
 
           <TabPanels>
             <TabPanel>
-              <OrderHistoryTable
+              <HistoryOrderTable
                 histories={historyOrders}
                 title={"生地仕掛一覧"}
               />
             </TabPanel>
             <TabPanel>
-              <ConfirmHistoryTable
+              <HistoryConfirmTable
                 histories={historyConfirms}
                 title={"生地発注履歴"}
               />

@@ -25,7 +25,11 @@ import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState } from "../../../store";
+import {
+  currentUserState,
+  grayFabricsState,
+  suppliersState,
+} from "../../../store";
 import { ProductType } from "../../../types/productType";
 
 type Props = {
@@ -37,13 +41,16 @@ type Props = {
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   const currentUser = useRecoilValue(currentUserState);
   const productId = product?.id;
-  const grayFabricsId = product?.grayFabricId || "";
+  const grayFabrics = useRecoilValue(grayFabricsState);
+  const grayFabricId = product?.grayFabricId || "";
+  const suppliers = useRecoilValue(suppliersState);
   const [items, setItems] = useState({
     quantity: 0,
     orderedAt: "",
     scheduledAt: "",
     comment: "",
     stockType: "ranning",
+    price: 0,
   });
 
   // 今日の日付を取得
@@ -73,15 +80,23 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     setItems({ ...items, [name]: value });
   };
 
-  // const stockLimit2 = () => {
-  //   const stockQuantity = product.stockExternal || 0;
-  //   return items.stockType === 1 && stockQuantity < items.quantity
-  //     ? true
-  //     : false;
-  // };
+  const getSupplierName = (supplierId: string) => {
+    const supplierObj = suppliers.find(
+      (supplier: { id: string }) => supplier.id === supplierId
+    );
+    return supplierObj.name;
+  };
 
-  //////////// 染めOrder依頼 関数//////////////
-  const orderFabricDyeingFromGrayFabric = async () => {
+  const isLimit = () => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
+    );
+    const stock = grayFabric?.stock || 0;
+    return items.stockType === "stock" && stock < items.quantity ? true : false;
+  };
+
+  //////////// キバタ在庫から染めOrder依頼 関数//////////////
+  const orderFabricDyeingFromStock = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
 
@@ -90,22 +105,20 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       "serialNumbers",
       "fabricDyeingOrderNumbers"
     );
-    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
-    const productDocRef = doc(db, "products", `${productId}`);
+    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricId);
+    const productDocRef = doc(db, "products", productId);
     const historyDocRef = collection(db, "historyFabricDyeingOrders");
 
     try {
       await runTransaction(db, async (transaction) => {
         const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists())
-          throw "serialNumbers document does not exist!";
+        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
 
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists())
-          throw "grayFabric document does not exist!";
+        if (!grayFabricDocSnap.exists()) throw "grayFabric does not exist!";
 
         const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
+        if (!productDocSnap.exists()) throw "product does not exist!";
 
         const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {
@@ -128,14 +141,15 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           serialNumber: newSerialNumber,
           stockType: items.stockType,
           grayFabricId: grayFabricDocSnap.id,
-          productsId: product?.id,
+          productId: product?.id,
           productNumber: product?.productNumber,
           productName: product?.productName,
           colorName: product?.colorName,
           quantity: items?.quantity,
-          price: product?.price,
+          price: items.price || product.price,
           comment: items.comment,
           supplierId: product.supplierId,
+          supplierName: getSupplierName(product?.supplierId),
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           createUser: currentUser,
@@ -151,8 +165,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
-  //////////// 染めOrder依頼 関数//////////////
-  const orderFabricDyeing = async () => {
+  //////////// ランニングキバタから染色Order依頼 関数//////////////
+  const orderFabricDyeingRanning = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
 
@@ -161,19 +175,13 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       "serialNumbers",
       "fabricDyeingOrderNumbers"
     );
-    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricsId);
-    const productDocRef = doc(db, "products", `${productId}`);
+    const productDocRef = doc(db, "products", productId);
     const historyDocRef = collection(db, "historyFabricDyeingOrders");
 
     try {
       await runTransaction(db, async (transaction) => {
         const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists())
-          throw "serialNumbers document does not exist!";
-
-        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists())
-          throw "grayFabric document does not exist!";
+        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
 
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
@@ -189,86 +197,25 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           wip: newWipProduct,
         });
 
-        // const stockGrayFabric = grayFabricDocSnap.data().stock || 0;
-        // const newStockGrayFabric = stockGrayFabric - items?.quantity;
-        // transaction.update(grayFabricDocRef, {
-        //   stock: newStockGrayFabric,
-        // });
-
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
           stockType: items.stockType,
-          // grayFabricsId: grayFabricDocSnap.id,
-          productId,
+          grayFabricId: "",
+          productId: product?.id,
           productNumber: product?.productNumber,
           productName: product?.productName,
           colorName: product?.colorName,
           quantity: items?.quantity,
-          price: product?.price,
+          price: items.price || product.price,
           comment: items.comment,
           supplierId: product.supplierId,
+          supplierName: getSupplierName(product?.supplierId),
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           createUser: currentUser,
           updateUser: currentUser,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      onClose();
-    }
-  };
-
-  // 購入伝票
-  const orderPurchase = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    try {
-      await runTransaction(db, async (transaction) => {
-        // 更新前の値を取得
-        const productDocRef = doc(db, "products", `${productId}`);
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
-
-        // 現在の生地発送数量
-        let shippingQuantity = productDocSnap.data().shippingQuantity || 0;
-        //　現在の生地発送数量　＋　入力値
-        shippingQuantity += Math.abs(items?.quantity);
-
-        // 現在の生地在庫数量
-        let stockFabricDyeingQuantity =
-          productDocSnap.data().stockFabricDyeingQuantity || 0;
-
-        // 生地数量を更新  ランニング在庫の場合は生地在庫の変更無し
-        transaction.update(productDocRef, {
-          shippingQuantity,
-          stockFabricDyeingQuantity:
-            items.stockType === "stock"
-              ? (stockFabricDyeingQuantity -= Math.abs(items?.quantity))
-              : stockFabricDyeingQuantity,
-        });
-
-        // 履歴を追加
-        const historyDocRef = collection(db, "historyPurchasingSlips");
-        await addDoc(historyDocRef, {
-          productId,
-          productNumber: product?.productNumber,
-          productName: product?.productName,
-          colorName: product?.colorName,
-          quantity: items?.quantity,
-          price: product?.price,
-          comment: items.comment,
-          status: 1,
-          stockType: items.stockType,
-          createdAt: serverTimestamp(),
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt,
-          staff: currentUser,
         });
       });
     } catch (err) {
@@ -289,10 +236,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             value={items.stockType}
           >
             <Stack direction="column">
+              <Radio value="ranning">メーカーの定番キバタから加工</Radio>
               {product.grayFabricId && (
                 <Radio value="stock">キバタ在庫から加工</Radio>
               )}
-              <Radio value="ranning">メーカーの定番キバタから加工</Radio>
             </Stack>
           </RadioGroup>
         )}
@@ -332,7 +279,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             />
           </Box>
           <Box w="100%">
-            <Box>予定日</Box>
+            <Box>入荷予定日</Box>
             <Input
               mt={1}
               type="date"
@@ -341,16 +288,37 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               onChange={handleInputChange}
             />
           </Box>
+        </Flex>
+        <Flex gap={3} w="100%" flexDirection={{ base: "column", md: "row" }}>
+          <Box w="100%">
+            <Text>価格（円）</Text>
+            <NumberInput
+              mt={1}
+              w="100%"
+              name="price"
+              defaultValue={0}
+              min={0}
+              max={10000}
+              value={items.price || product.price}
+              onChange={(e) => handleNumberChange(e, "price")}
+            >
+              <NumberInputField textAlign="right" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
           <Box w="100%">
             <Text>数量（m）</Text>
             <NumberInput
               mt={1}
               w="100%"
-              name="quantity"
+              name="price"
               defaultValue={0}
               min={0}
               max={10000}
-              value={items.quantity === 0 ? "" : items.quantity}
+              value={items.quantity}
               onChange={(e) => handleNumberChange(e, "quantity")}
             >
               <NumberInputField textAlign="right" />
@@ -373,10 +341,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            // disabled={stockLimit1()}
+            disabled={!items.quantity || isLimit()}
             onClick={() => {
-              items.stockType === "stock" && orderFabricDyeingFromGrayFabric();
-              items.stockType === "ranning" && orderFabricDyeing();
+              items.stockType === "stock" && orderFabricDyeingFromStock();
+              items.stockType === "ranning" && orderFabricDyeingRanning();
             }}
           >
             登録

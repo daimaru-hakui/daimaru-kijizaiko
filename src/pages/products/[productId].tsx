@@ -177,10 +177,10 @@ const ProductsId = () => {
             </Flex>
           </Flex>
 
-          {product?.grayFabricsId && (
+          {product?.grayFabricId && (
             <Box flex={1} w="100%">
               <Text fontWeight="bold">使用キバタ</Text>
-              <Box mt={1}>{getGrayFabricName(product?.grayFabricsId)}</Box>
+              <Box mt={1}>{getGrayFabricName(product?.grayFabricId)}</Box>
             </Box>
           )}
 
