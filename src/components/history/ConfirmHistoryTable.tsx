@@ -25,20 +25,20 @@ import FabricDyeingConfirmModal from "./HistoryConfirmModal";
 // import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
 
 type Props = {
-  historys: any;
+  histories: any;
   title: string;
 };
 
-const ConfirmHistoryTable: NextPage<Props> = ({ historys, title }) => {
-  const [filterHistorys, setFilterHistorys] = useState<any>();
+const ConfirmHistoryTable: NextPage<Props> = ({ histories, title }) => {
+  const [filterHistories, setFilterHistories] = useState<any>();
   const users = useRecoilValue(usersState);
 
   useEffect(() => {
-    const newHistorys = historys?.filter(
+    const newHistorys = histories?.filter(
       (history: { quantity: number }) => history.quantity > 0
     );
-    setFilterHistorys(newHistorys);
-  }, [historys]);
+    setFilterHistories(newHistorys);
+  }, [histories]);
 
   // 担当者の表示
   const getCreateUserName = (userId: string) => {
@@ -213,7 +213,7 @@ const ConfirmHistoryTable: NextPage<Props> = ({ historys, title }) => {
       <Box as="h2" fontSize="2xl">
         {title}
       </Box>
-      {filterHistorys?.length > 0 ? (
+      {filterHistories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -233,7 +233,7 @@ const ConfirmHistoryTable: NextPage<Props> = ({ historys, title }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistorys?.map((history: any) => (
+            {filterHistories?.map((history: any) => (
               <Tr key={history.id}>
                 <Td>
                   <HistoryConfirmModal history={history} />

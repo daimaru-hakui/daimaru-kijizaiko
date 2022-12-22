@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Table,
   TableContainer,
@@ -38,17 +37,19 @@ const GrayFabrics = () => {
   }, [grayFabrics]);
 
   const getSupplierName = (supplierId: string) => {
-    const supplierObj = suppliers.find(
+    const supplier = suppliers.find(
       (supplier: { id: string }) => supplier.id === supplierId
     );
-    return supplierObj.name;
+    return supplier?.name;
   };
 
   const deleteGrayFabric = async (id: string) => {
     let result = window.confirm("削除して宜しいでしょうか。");
     if (!result) return;
+
     result = window.confirm("本当に削除して宜しいでしょうか。");
     if (!result) return;
+
     const docRef = doc(db, "grayFabrics", id);
     await deleteDoc(docRef);
   };
@@ -80,7 +81,7 @@ const GrayFabrics = () => {
                   </Td>
                   <Td>{item.productNumber}</Td>
                   <Td>{item.productName}</Td>
-                  <Td>{getSupplierName(item.supplier)}</Td>
+                  <Td>{getSupplierName(item.supplierId)}</Td>
                   <Td
                     isNumeric
                     fontSize="md"

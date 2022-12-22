@@ -37,13 +37,13 @@ type Props = {
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   const currentUser = useRecoilValue(currentUserState);
   const productId = product?.id;
-  const grayFabricsId = product?.grayFabricsId || "GbFDtT3kqgfWGhpgOsGx";
+  const grayFabricsId = product?.grayFabricId || "";
   const [items, setItems] = useState({
     quantity: 0,
     orderedAt: "",
     scheduledAt: "",
     comment: "",
-    stockPlaceType: 2,
+    stockType: "ranning",
   });
 
   // 今日の日付を取得
@@ -70,15 +70,15 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
   const handleRadioChange = (e: string, name: string) => {
     const value = e;
-    setItems({ ...items, [name]: Number(value) });
+    setItems({ ...items, [name]: value });
   };
 
-  const stockLimit2 = () => {
-    const stockQuantity = product.stockExternal || 0;
-    return items.stockPlaceType === 1 && stockQuantity < items.quantity
-      ? true
-      : false;
-  };
+  // const stockLimit2 = () => {
+  //   const stockQuantity = product.stockExternal || 0;
+  //   return items.stockType === 1 && stockQuantity < items.quantity
+  //     ? true
+  //     : false;
+  // };
 
   //////////// 染めOrder依頼 関数//////////////
   const orderFabricDyeingFromGrayFabric = async () => {
@@ -112,30 +112,30 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           serialNumber: newSerialNumber,
         });
 
-        const wipProduct = productDocSnap.data().wip || 0;
-        const newWipProduct = wipProduct + items?.quantity;
-        transaction.update(productDocRef, {
-          wip: newWipProduct,
-        });
-
         const stockGrayFabric = grayFabricDocSnap.data().stock || 0;
         const newStockGrayFabric = stockGrayFabric - items?.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStockGrayFabric,
         });
 
+        const wipProduct = productDocSnap.data().wip || 0;
+        const newWipProduct = wipProduct + items?.quantity;
+        transaction.update(productDocRef, {
+          wip: newWipProduct,
+        });
+
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
-          stockPlaceType: items.stockPlaceType,
-          grayFabricsId: grayFabricDocSnap.id,
-          productId,
+          stockType: items.stockType,
+          grayFabricId: grayFabricDocSnap.id,
+          productsId: product?.id,
           productNumber: product?.productNumber,
           productName: product?.productName,
           colorName: product?.colorName,
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          supplier: product.supplier,
+          supplierId: product.supplierId,
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           createUser: currentUser,
@@ -197,7 +197,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
-          stockPlaceType: items.stockPlaceType,
+          stockType: items.stockType,
           // grayFabricsId: grayFabricDocSnap.id,
           productId,
           productNumber: product?.productNumber,
@@ -206,7 +206,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           quantity: items?.quantity,
           price: product?.price,
           comment: items.comment,
-          supplier: product.supplier,
+          supplierId: product.supplierId,
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           createUser: currentUser,
@@ -248,7 +248,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         transaction.update(productDocRef, {
           shippingQuantity,
           stockFabricDyeingQuantity:
-            items.stockPlaceType === 1
+            items.stockType === "stock"
               ? (stockFabricDyeingQuantity -= Math.abs(items?.quantity))
               : stockFabricDyeingQuantity,
         });
@@ -264,7 +264,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           price: product?.price,
           comment: items.comment,
           status: 1,
-          stockPlaceType: items.stockPlaceType,
+          stockType: items.stockType,
           createdAt: serverTimestamp(),
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt,
@@ -284,13 +284,15 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         {orderType === "dyeing" && (
           <RadioGroup
             mt={3}
-            onChange={(e) => handleRadioChange(e, "stockPlaceType")}
-            defaultValue={2}
-            value={items.stockPlaceType}
+            onChange={(e) => handleRadioChange(e, "stockType")}
+            defaultValue="ranning"
+            value={items.stockType}
           >
             <Stack direction="column">
-              <Radio value={1}>キバタ在庫から加工</Radio>
-              <Radio value={2}>メーカーの定番キバタから加工</Radio>
+              {product.grayFabricId && (
+                <Radio value="stock">キバタ在庫から加工</Radio>
+              )}
+              <Radio value="ranning">メーカーの定番キバタから加工</Radio>
             </Stack>
           </RadioGroup>
         )}
@@ -299,16 +301,16 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <RadioGroup
             mt={3}
             onChange={(e) => handleRadioChange(e, "stockPlaceType")}
-            value={items.stockPlaceType}
+            value={items.stockType}
           >
             <Stack direction="column">
-              <Radio value={1}>
+              <Radio value="stock">
                 外部在庫から購入
                 <Box as="span" fontSize="sm">
                   （別染めなどでメーカーに抱えてもらっている在庫）
                 </Box>
               </Radio>
-              <Radio value={2}>
+              <Radio value="ranning">
                 生地を購入
                 <Box as="span" fontSize="sm">
                   （メーカーの定番在庫）
@@ -373,8 +375,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
             colorScheme="facebook"
             // disabled={stockLimit1()}
             onClick={() => {
-              items.stockPlaceType === 1 && orderFabricDyeingFromGrayFabric();
-              items.stockPlaceType === 2 && orderFabricDyeing();
+              items.stockType === "stock" && orderFabricDyeingFromGrayFabric();
+              items.stockType === "ranning" && orderFabricDyeing();
             }}
           >
             登録
