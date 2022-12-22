@@ -1,6 +1,6 @@
 export type GrayFabricType = {
   id: string;
-  supplier: string;
+  supplierId: string;
   productNumber: string;
   productName: string;
   price: number;

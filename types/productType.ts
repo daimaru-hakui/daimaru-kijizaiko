@@ -2,7 +2,8 @@ export type ProductType = {
   id: string;
   productType: number;
   staff: string;
-  supplier: string;
+  supplierId: string;
+  grayFabricId: string;
   productNumber: string;
   productNum: string;
   productName: string;
@@ -22,5 +23,4 @@ export type ProductType = {
   stockExternal: number;
   shippingQuantity: number;
   stockTokushima: number;
-  grayFabricsId: string;
 };

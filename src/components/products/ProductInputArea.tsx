@@ -102,7 +102,7 @@ const ProductInputArea: NextPage<Props> = ({
     }
   };
 
-  const dispMixed = (materials: any) => {
+  const getMixed = (materials: any) => {
     let array = [];
     const t = materials.t ? `ポリエステル${materials.t}% ` : "";
     const c = materials.c ? `綿${materials.c}% ` : "";
@@ -131,7 +131,8 @@ const ProductInputArea: NextPage<Props> = ({
       await addDoc(docRef, {
         productType: items.productType || 1,
         staff: items.productType === 2 ? items.staff : "R&D",
-        supplier: items.supplier || "",
+        supplierId: items.supplierId || "",
+        grayFabricId: items.grayFabricId || "",
         productNumber:
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
@@ -148,7 +149,6 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
-        grayFabricsId: items.grayFabricsId || "",
       });
     } catch (err) {
       console.log(err);
@@ -511,7 +511,7 @@ const ProductInputArea: NextPage<Props> = ({
                     borderColor="gray.100"
                   >
                     <Stack spacing={3} w="100%">
-                      {dispMixed(items.materials)}
+                      {getMixed(items.materials)}
                     </Stack>
                   </Box>
                 )}
