@@ -22,6 +22,10 @@ const ProductsNew = () => {
     noteProduct: "",
     noteFabric: "",
     noteEtc: "",
+    wip: 0,
+    externalStock: 0,
+    shippingQuantity: 0,
+    tokushimaStock: 0,
   });
 
   return (

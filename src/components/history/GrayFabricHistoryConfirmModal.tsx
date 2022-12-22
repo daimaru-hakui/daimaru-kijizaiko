@@ -31,7 +31,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
-import { currentUserState } from "../../../store";
+import { currentUserState, suppliersState } from "../../../store";
 
 type Props = {
   history: any;
@@ -40,6 +40,7 @@ type Props = {
 const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
+  const suppliers = useRecoilValue(suppliersState);
   const [items, setItems] = useState<any>({});
   const [status, setStatus] = useState(1);
 
@@ -58,6 +59,13 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
   const handleNumberChange = (e: string, name: string) => {
     const value = e;
     setItems({ ...items, [name]: Number(value) });
+  };
+
+  const getSupplierName = (supplierId: string) => {
+    const supplierObj = suppliers.find(
+      (supplier: { id: string }) => supplier.id === supplierId
+    );
+    return supplierObj.name;
   };
 
   const inputReset = () => {
@@ -112,6 +120,7 @@ const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
           productNumber: history.productNumber,
           productName: history.productName,
           supplierId: history.supplierId,
+          supplierName: getSupplierName(history?.supplierId),
           quantity: items.quantity,
           comment: items.comment,
           createdAt: serverTimestamp(),

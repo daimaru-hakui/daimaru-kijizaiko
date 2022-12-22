@@ -168,7 +168,7 @@ const ProductInputArea: NextPage<Props> = ({
       await updateDoc(docRef, {
         productType: items.productType || 1,
         staff: items.productType === 2 ? items.staff : "R&D",
-        supplier: items.supplier || "",
+        supplierId: items.supplierId || "",
         productNumber:
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
@@ -185,7 +185,7 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
-        grayFabricsId: items.grayFabricsId || "",
+        grayFabricId: items.grayFabricId || "",
       });
     } catch (err) {
       console.log(err);
@@ -394,8 +394,8 @@ const ProductInputArea: NextPage<Props> = ({
               <Select
                 mt={1}
                 placeholder="キバタを選択してください"
-                value={items.grayFabricsId}
-                onChange={(e) => handleSelectchange(e, "grayFabricsId")}
+                value={items.grayFabricId}
+                onChange={(e) => handleSelectchange(e, "grayFabricId")}
               >
                 {grayFabrics?.map(
                   (grayFabric: {

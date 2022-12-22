@@ -10,18 +10,15 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { getSerialNumber } from "../../../functions";
 import { usersState } from "../../../store";
-import ConfirmModal from "./ConfirmModal";
-import { EditHistoryModal } from "./EditHistoryModal";
-import HistoryConfirmModal from "./HistoryConfirmModal";
-import FabricDyeingConfirmModal from "./HistoryConfirmModal";
+import { HistoryEditModal } from "./HistoryEditModal";
+import CommentModal from "./CommentModal";
 // import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
 
 type Props = {
@@ -29,7 +26,7 @@ type Props = {
   title: string;
 };
 
-const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
+const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
   const [filterHistories, setFilterHistories] = useState<any>();
   const users = useRecoilValue(usersState);
 
@@ -75,90 +72,6 @@ const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
     let minutes = String(date.getMinutes());
     minutes = ("0" + minutes).slice(-2);
     return `${year}-${month}-${day}-${hour}-${minutes}`;
-  };
-
-  // 生機履歴を削除
-  const deleteHistoryGrayFabric = async (history: any) => {
-    const result = window.confirm("削除して宜しいでしょうか");
-    if (!result) return;
-    try {
-      await runTransaction(db, async (transaction) => {
-        // 履歴のデータベースを取得
-        const historyDocRef = doc(db, "historyGrayFabrics", `${history.id}`);
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) {
-          throw "history document does not exist!";
-        }
-
-        // 生地のデータベースを取得
-        const productDocRef = doc(db, "products", `${history.productId}`);
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
-
-        //　生機仕掛
-        let wipGrayFabricQuantity =
-          productDocSnap.data().wipGrayFabricQuantity || 0;
-
-        //　生機在庫
-        let stockGrayFabricQuantity =
-          productDocSnap.data().stockGrayFabricQuantity || 0;
-
-        // 履歴データを削除
-        transaction.delete(historyDocRef);
-        // 生機数量を更新
-        transaction.update(productDocRef, {
-          wipGrayFabricQuantity,
-          stockGrayFabricQuantity,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  // 生機履歴を削除
-  const cancelHistoryGrayFabric = async (history: any) => {
-    const result = window.confirm("削除して宜しいでしょうか");
-    if (!result) return;
-    try {
-      await runTransaction(db, async (transaction) => {
-        // 履歴のデータベースを取得
-        const historyDocRef = doc(db, "historyGrayFabrics", `${history.id}`);
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) {
-          throw "history document does not exist!";
-        }
-
-        // 生地のデータベースを取得
-        const productDocRef = doc(db, "products", `${history.productId}`);
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
-
-        //　生機仕掛
-        let wipGrayFabricQuantity =
-          productDocSnap.data().wipGrayFabricQuantity || 0;
-
-        //　生機在庫
-        let stockGrayFabricQuantity =
-          productDocSnap.data().stockGrayFabricQuantity || 0;
-
-        // 履歴データを削除
-        transaction.delete(historyDocRef);
-        // 生機数量を更新
-        transaction.update(productDocRef, {
-          wipGrayFabricQuantity,
-          stockGrayFabricQuantity,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
   };
 
   // 染色履歴を削除
@@ -217,10 +130,9 @@ const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
-              <Th>確定</Th>
               <Th>発注NO.</Th>
               <Th>発注日</Th>
-              <Th>仕上予定日</Th>
+              <Th>仕上日</Th>
               <Th>担当者</Th>
               <Th>生地品番</Th>
               <Th>色</Th>
@@ -229,18 +141,15 @@ const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
               <Th>単価</Th>
               <Th>金額</Th>
               <Th>コメント</Th>
-              <Th>編集/削除</Th>
+              <Th>編集</Th>
             </Tr>
           </Thead>
           <Tbody>
             {filterHistories?.map((history: any) => (
               <Tr key={history.id}>
-                <Td>
-                  <HistoryConfirmModal history={history} />
-                </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
-                <Td>{history?.scheduledAt}</Td>
+                <Td>{history?.fixedAt}</Td>
                 <Td>{getCreateUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 <Td>{history.colorName}</Td>
@@ -249,15 +158,18 @@ const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
                 <Td>{history?.price}円</Td>
                 <Td>{history?.quantity * history?.price}円</Td>
                 <Td w="100%" textAlign="center">
-                  {history?.comment}
+                  <Flex gap={3}>
+                    <CommentModal
+                      history={history}
+                      collectionName="historyFabricDyeingConfirms"
+                    />
+                    {history?.comment.slice(0, 20) +
+                      (history.comment.length >= 1 ? "..." : "")}
+                  </Flex>
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    <EditHistoryModal history={history} />
-                    <FaTrashAlt
-                      cursor="pointer"
-                      onClick={() => deleteHistoryGrayFabric(history)}
-                    />
+                    <HistoryEditModal history={history} type="confirm" />
                   </Flex>
                 </Td>
               </Tr>
@@ -271,4 +183,4 @@ const OrderHistoryTable: NextPage<Props> = ({ histories, title }) => {
   );
 };
 
-export default OrderHistoryTable;
+export default HistoryConfirmTable;

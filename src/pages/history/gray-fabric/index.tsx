@@ -96,7 +96,7 @@ const GrayFabricHistorys = () => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
-    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricsId);
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
 
     try {
@@ -160,7 +160,7 @@ const GrayFabricHistorys = () => {
                           <Td>{getCreateUserName(history.createUser)}</Td>
                           <Td>{history.productNumber}</Td>
                           <Td>{history.productName}</Td>
-                          <Td>{history.supplierId}</Td>
+                          <Td>{history.supplierName}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
                           <Td w="100%">
                             <Flex gap={3}>
@@ -223,13 +223,13 @@ const GrayFabricHistorys = () => {
                           <Td>{getCreateUserName(history.createUser)}</Td>
                           <Td>{history.productNumber}</Td>
                           <Td>{history.productName}</Td>
-                          <Td>{history.supplier}</Td>
+                          <Td>{history.supplierName}</Td>
                           <Td isNumeric>{history?.quantity}m</Td>
                           <Td w="100%">
                             <Flex gap={3}>
                               <CommentModal
                                 history={history}
-                                collectionName="grayFabricConfirmHistorys"
+                                collectionName="historyGrayFabricConfirms"
                               />
                               {history?.comment.slice(0, 20) +
                                 (history.comment.length >= 1 ? "..." : "")}
