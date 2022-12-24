@@ -99,7 +99,8 @@ const GrayFabrics = () => {
                   <Td w="100%">
                     <Flex gap={3}>
                       <CommentModal
-                        history={item}
+                        id={item.id}
+                        comment={item.comment}
                         collectionName="grayFabrics"
                       />
                       {item?.comment.slice(0, 10) +

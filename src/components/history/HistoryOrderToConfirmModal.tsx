@@ -19,33 +19,30 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import {
-  addDoc,
-  collection,
-  doc,
-  runTransaction,
-  serverTimestamp,
-} from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
-import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
   history: HistoryType;
+  items: HistoryType;
+  setItems: Function;
+  onClick: Function;
 };
 
-const HistoryConfirmModal: NextPage<Props> = ({ history }) => {
+const HistoryConfirmModal: NextPage<Props> = ({
+  history,
+  items,
+  setItems,
+  onClick,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser = useRecoilValue(currentUserState);
-  const [items, setItems] = useState<any>({});
   const [status, setStatus] = useState(1);
 
   useEffect(() => {
     setItems({ ...history });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 
   const handleInputChange = (
@@ -70,66 +67,6 @@ const HistoryConfirmModal: NextPage<Props> = ({ history }) => {
       ...items,
       remainingOrder: history.quantity - items.quantity,
     });
-  };
-
-  // 染色確定処理
-  const confirmProcessingFabricDyeing = async () => {
-    const result = window.confirm("確定して宜しいでしょうか");
-    if (!result) return;
-
-    const productDocRef = doc(db, "products", history.productId);
-    const orderHistoryRef = doc(db, "historyFabricDyeingOrders", history.id);
-    const confirmHistoryRef = collection(db, "historyFabricDyeingConfirms");
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product does not exist!!";
-
-        const newWip =
-          productDocSnap.data()?.wip -
-            history.quantity +
-            items.remainingOrder || 0;
-        const newStock =
-          productDocSnap.data()?.externalStock + items.quantity || 0;
-        transaction.update(productDocRef, {
-          wip: newWip,
-          externalStock: newStock,
-        });
-
-        transaction.update(orderHistoryRef, {
-          quantity: items.remainingOrder,
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
-          comment: items.comment,
-          updateUser: currentUser,
-          updatedAt: serverTimestamp(),
-        });
-
-        await addDoc(confirmHistoryRef, {
-          serialNumber: history.serialNumber,
-          grayFabricId: history.grayFabricId,
-          productId: history.productId,
-          productNumber: history.productNumber,
-          productName: history.productName,
-          colorName: history.colorName,
-          supplierId: history.supplierId,
-          supplierName: history.supplierName,
-          price: history.price,
-          quantity: items.quantity,
-          comment: items.comment,
-          orderedAt: items.orderedAt || history.orderedAt,
-          fixedAt: items.fixedAt || todayDate(),
-          createUser: currentUser,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      onClose();
-    }
   };
 
   return (
@@ -286,7 +223,8 @@ const HistoryConfirmModal: NextPage<Props> = ({ history }) => {
                   colorScheme="facebook"
                   disabled={items.remainingOrder >= 0 ? false : true}
                   onClick={() => {
-                    confirmProcessingFabricDyeing();
+                    onClick(history);
+                    onClose();
                   }}
                 >
                   確定

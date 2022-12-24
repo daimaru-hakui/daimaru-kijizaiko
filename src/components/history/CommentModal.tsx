@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Flex,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,28 +15,26 @@ import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import { db } from "../../../firebase";
-import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: HistoryType;
+  id: string;
+  comment: string;
   collectionName: string;
 };
 
-const CommentModal: NextPage<Props> = ({ history, collectionName }) => {
+const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [comment, setComment] = useState("");
-  const [reset, setReset] = useState("");
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
-    setComment(history.comment);
-    setReset(history.comment);
-  }, [history]);
+    setNewComment(comment);
+  }, [comment]);
 
   const updateComment = async (collectionName: string, docId: string) => {
     const commentRef = doc(db, collectionName, docId);
     try {
       await updateDoc(commentRef, {
-        comment: comment,
+        comment: newComment,
       });
     } catch (err) {
       console.log(err);
@@ -49,19 +45,17 @@ const CommentModal: NextPage<Props> = ({ history, collectionName }) => {
 
   return (
     <>
-      {/* <Flex justifyContent="center"> */}
       <FaRegCommentDots
-        opacity={history.comment === "" ? "0.2" : "1"}
+        opacity={comment === "" ? "0.2" : "1"}
         cursor="pointer"
         fontSize="20px"
         onClick={onOpen}
       />
-      {/* </Flex> */}
 
       <Modal
         isOpen={isOpen}
         onClose={() => {
-          setComment(reset);
+          setNewComment(comment);
           onClose();
         }}
       >
@@ -72,10 +66,10 @@ const CommentModal: NextPage<Props> = ({ history, collectionName }) => {
           <ModalBody>
             <Textarea
               h="400px"
-              value={comment}
+              value={newComment}
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-              ) => setComment(e.target.value)}
+              ) => setNewComment(e.target.value)}
             />
           </ModalBody>
 
@@ -83,7 +77,7 @@ const CommentModal: NextPage<Props> = ({ history, collectionName }) => {
             <Button
               mr={3}
               onClick={() => {
-                setComment(reset);
+                setNewComment(comment);
                 onClose();
               }}
             >
@@ -91,8 +85,8 @@ const CommentModal: NextPage<Props> = ({ history, collectionName }) => {
             </Button>
             <Button
               colorScheme="blue"
-              disabled={history.comment === comment}
-              onClick={() => updateComment(collectionName, history.id)}
+              disabled={newComment === comment}
+              onClick={() => updateComment(collectionName, id)}
             >
               更新
             </Button>

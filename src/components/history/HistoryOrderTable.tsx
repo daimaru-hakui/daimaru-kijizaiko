@@ -9,17 +9,23 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { getSerialNumber } from "../../../functions";
+import { getSerialNumber, todayDate } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 
 import { HistoryEditModal } from "./HistoryEditModal";
-import HistoryConfirmModal from "./HistoryOrderToConfirmModal";
+import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "./CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 
@@ -216,6 +222,64 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
+  const confirmProcessingFabricDyeing = async (history: HistoryType) => {
+    const result = window.confirm("確定して宜しいでしょうか");
+    if (!result) return;
+
+    const productDocRef = doc(db, "products", history.productId);
+    const orderHistoryRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const confirmHistoryRef = collection(db, "historyFabricDyeingConfirms");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product does not exist!!";
+
+        const newWip =
+          productDocSnap.data()?.wip -
+            history.quantity +
+            items.remainingOrder || 0;
+        const newStock =
+          productDocSnap.data()?.externalStock + items.quantity || 0;
+        transaction.update(productDocRef, {
+          wip: newWip,
+          externalStock: newStock,
+        });
+
+        transaction.update(orderHistoryRef, {
+          quantity: items.remainingOrder,
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt || todayDate(),
+          comment: items.comment,
+          updateUser: currentUser,
+          updatedAt: serverTimestamp(),
+        });
+
+        await addDoc(confirmHistoryRef, {
+          serialNumber: history.serialNumber,
+          grayFabricId: history.grayFabricId,
+          productId: history.productId,
+          productNumber: history.productNumber,
+          productName: history.productName,
+          colorName: history.colorName,
+          supplierId: history.supplierId,
+          supplierName: history.supplierName,
+          price: history.price,
+          quantity: items.quantity,
+          comment: items.comment,
+          orderedAt: items.orderedAt || history.orderedAt,
+          fixedAt: items.fixedAt || todayDate(),
+          createUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
+
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
@@ -230,7 +294,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
               <Th>発注日</Th>
               <Th>仕上予定日</Th>
               <Th>担当者</Th>
-              <Th>生地品番</Th>
+              <Th>品番</Th>
               <Th>色</Th>
               <Th>品名</Th>
               <Th>数量</Th>
@@ -244,22 +308,32 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
             {filterHistories?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
-                  <HistoryConfirmModal history={history} />
+                  <HistoryOrderToConfirmModal
+                    history={history}
+                    items={items}
+                    setItems={setItems}
+                    onClick={confirmProcessingFabricDyeing}
+                  />
                 </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
                 <Td>{history?.scheduledAt}</Td>
                 <Td>{getCreateUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
-                <Td>{history.colorName}</Td>
+                {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
                 <Td>{history?.quantity}m</Td>
-                <Td>{history?.price}円</Td>
-                <Td>{history?.quantity * history?.price}円</Td>
+                {history.price && (
+                  <>
+                    <Td>{history?.price}円</Td>
+                    <Td>{history?.quantity * history?.price}円</Td>
+                  </>
+                )}
                 <Td w="100%" textAlign="center">
                   <Flex gap={3}>
                     <CommentModal
-                      history={history}
+                      id={history.id}
+                      comment={history.comment}
                       collectionName="historyFabricDyeingOrders"
                     />
                     {history?.comment.slice(0, 20) +
