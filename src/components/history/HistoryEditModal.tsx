@@ -20,41 +20,32 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
-import { currentUserState } from "../../../store";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: any;
+  history: HistoryType;
   type: string;
+  onClick: Function;
+  items: any;
+  setItems: Function;
 };
 
-export const HistoryEditModal: NextPage<Props> = ({ history, type }) => {
+export const HistoryEditModal: NextPage<Props> = ({
+  history,
+  type,
+  onClick,
+  items,
+  setItems,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser = useRecoilValue(currentUserState);
-  const [reset, setReset] = useState<Props>();
-  const [items, setItems] = useState({
-    scheduledAt: "",
-    stockPlaceType: 1,
-    quantity: 0,
-    price: 0,
-    comment: "",
-    fixedAt: "",
-  });
+  const [reset, setReset] = useState({} as HistoryType);
 
   // 初期値をitemsに代入
   useEffect(() => {
-    setItems({
-      ...history,
-      finishedAt: history.scheduledAt,
-      quantity: history.quantity,
-      price: history.price,
-      comment: history.comment,
-    });
+    setItems({ ...history });
     setReset({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
@@ -70,115 +61,6 @@ export const HistoryEditModal: NextPage<Props> = ({ history, type }) => {
   const handleNumberChange = (e: string, name: string) => {
     const value = e;
     setItems({ ...items, [name]: Number(value) });
-  };
-
-  //　生地オーダー編集（キバタ在庫）
-  const updateHistoryFabricDyeingOrdersStock = async (history: any) => {
-    const grayFabricRef = doc(db, "grayFabrics", history.grayFabricId);
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
-    console.log("stock");
-    try {
-      await runTransaction(db, async (transaction) => {
-        const grayFabricDocSnap = await transaction.get(grayFabricRef);
-        if (!grayFabricDocSnap.exists())
-          throw "grayFabricDocSnap does not exist!";
-
-        const productDocSnap = await transaction.get(productRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        const stock = grayFabricDocSnap.data().stock || 0;
-        const newStock = stock + history.quantity - items.quantity;
-        transaction.update(grayFabricRef, {
-          stock: newStock,
-        });
-
-        const wip = productDocSnap.data().wip || 0;
-        const newWip = wip - history.quantity + items.quantity;
-        transaction.update(productRef, {
-          wip: newWip,
-        });
-
-        transaction.update(historyRef, {
-          quantity: items.quantity,
-          price: items.price,
-          scheduledAt: items.scheduledAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  //　生地オーダー編集（ランニング在庫）
-  const updateHistoryFabricDyeingOrdersRanning = async (history: any) => {
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        const wip = productDocSnap.data().wip || 0;
-        const newWip = wip - history.quantity + items.quantity;
-        transaction.update(productRef, {
-          wip: newWip,
-        });
-
-        transaction.update(historyRef, {
-          quantity: items.quantity,
-          price: items.price,
-          scheduledAt: items.scheduledAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  const updateHistoryFabricDyeingConfirms = async (history: any) => {
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingConfirms", history.id);
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        const stock = productDocSnap.data().externalStock || 0;
-        const newStock = stock - history.quantity + items.quantity;
-        transaction.update(productRef, {
-          externalStock: newStock,
-        });
-
-        transaction.update(historyRef, {
-          quantity: items.quantity,
-          price: items.price,
-          fixedAt: items.fixedAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
   };
 
   // 入力をリセット
@@ -244,6 +126,16 @@ export const HistoryEditModal: NextPage<Props> = ({ history, type }) => {
                   </NumberInputStepper>
                 </NumberInput>
               </Box>
+              <Box w="100%">
+                <Text>発注日</Text>
+                <Input
+                  type="date"
+                  mt={1}
+                  name="orderedAt"
+                  value={items.orderedAt}
+                  onChange={handleInputChange}
+                />
+              </Box>
               {type === "order" && (
                 <Box w="100%">
                   <Text>仕上予定日</Text>
@@ -291,32 +183,16 @@ export const HistoryEditModal: NextPage<Props> = ({ history, type }) => {
             >
               閉じる
             </Button>
-            {type === "order" && (
-              <Button
-                colorScheme="blue"
-                onClick={() => {
-                  history.stockType === "stock" &&
-                    updateHistoryFabricDyeingOrdersStock(history);
-                  history.stockType === "ranning" &&
-                    updateHistoryFabricDyeingOrdersRanning(history);
-                  onClose();
-                }}
-              >
-                更新
-              </Button>
-            )}
 
-            {type === "confirm" && (
-              <Button
-                colorScheme="blue"
-                onClick={() => {
-                  updateHistoryFabricDyeingConfirms(history);
-                  onClose();
-                }}
-              >
-                更新
-              </Button>
-            )}
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                onClick(history);
+                onClose();
+              }}
+            >
+              更新
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

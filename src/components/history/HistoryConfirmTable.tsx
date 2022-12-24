@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Table,
   TableContainer,
@@ -16,19 +15,28 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { getSerialNumber } from "../../../functions";
-import { usersState } from "../../../store";
+import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import CommentModal from "./CommentModal";
-// import EditWipGrayFAbricModal from "./EditWipGrayFabricModal";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  histories: any;
+  histories: HistoryType[];
   title: string;
 };
 
 const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
-  const [filterHistories, setFilterHistories] = useState<any>();
+  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
+  const currentUser = useRecoilValue(currentUserState);
+  const [items, setItems] = useState({
+    scheduledAt: "",
+    stockPlaceType: 1,
+    quantity: 0,
+    price: 0,
+    comment: "",
+    fixedAt: "",
+  });
 
   useEffect(() => {
     const newHistorys = histories?.filter(
@@ -47,18 +55,6 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
-  // status 表示
-  const statusDisp = (num: number) => {
-    switch (num) {
-      case 1:
-        return "仕掛中";
-      case 2:
-        return "仕上済み";
-      default:
-        break;
-    }
-  };
-
   // 日付を取得
   const convertTimestampToDate = (timestamp: Date) => {
     const date = new Date(timestamp);
@@ -74,45 +70,30 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
     return `${year}-${month}-${day}-${hour}-${minutes}`;
   };
 
-  // 染色履歴を削除
-  const deleteHistoryFabricDyeing = async (history: any) => {
-    const result = window.confirm("削除して宜しいでしょうか");
-    if (!result) return;
+  const updateHistoryFabricDyeingConfirm = async (history: HistoryType) => {
+    const productRef = doc(db, "products", history.productId);
+    const historyRef = doc(db, "historyFabricDyeingConfirms", history.id);
+
     try {
       await runTransaction(db, async (transaction) => {
-        // 履歴のデータベースを取得
-        const historyDocRef = doc(db, "historyFabricDyeings", `${history.id}`);
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) {
-          throw "history document does not exist!";
-        }
+        const productDocSnap = await transaction.get(productRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        // 生地のデータベースを取得
-        const productDocRef = doc(db, "products", `${history.productId}`);
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) {
-          throw "product document does not exist!";
-        }
+        const historyDocSnap = await transaction.get(historyRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        //　生機在庫
-        let stockGrayFabricQuantity =
-          productDocSnap.data().stockGrayFabricQuantity || 0;
+        const stock = productDocSnap.data().externalStock || 0;
+        const newStock = stock - history.quantity + items.quantity;
+        transaction.update(productRef, {
+          externalStock: newStock,
+        });
 
-        //　生地仕掛
-        let wipFabricDyeingQuantity =
-          productDocSnap.data().wipFabricDyeingQuantity || 0;
-
-        //  生地在庫
-        let stockFabricDyeingQuantity =
-          productDocSnap.data().stockFabricDyeingQuantity || 0;
-
-        // 履歴データを削除
-        transaction.delete(historyDocRef);
-        // 染色数量を更新
-        transaction.update(productDocRef, {
-          stockGrayFabricQuantity,
-          wipFabricDyeingQuantity,
-          stockFabricDyeingQuantity,
+        transaction.update(historyRef, {
+          quantity: items.quantity,
+          price: items.price,
+          fixedAt: items.fixedAt,
+          comment: items.comment,
+          updateUser: currentUser,
         });
       });
     } catch (err) {
@@ -145,7 +126,7 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistories?.map((history: any) => (
+            {filterHistories?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
@@ -169,7 +150,13 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    <HistoryEditModal history={history} type="confirm" />
+                    <HistoryEditModal
+                      history={history}
+                      type="confirm"
+                      items={items}
+                      setItems={setItems}
+                      onClick={updateHistoryFabricDyeingConfirm}
+                    />
                   </Flex>
                 </Td>
               </Tr>

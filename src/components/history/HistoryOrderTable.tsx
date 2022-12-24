@@ -9,27 +9,30 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { getSerialNumber } from "../../../functions";
-import { usersState } from "../../../store";
+import { currentUserState, usersState } from "../../../store";
 
 import { HistoryEditModal } from "./HistoryEditModal";
-import HistoryConfirmModal from "./HistoryConfirmModal";
+import HistoryConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "./CommentModal";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  histories: any;
+  histories: HistoryType[];
   title: string;
 };
 
 const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   const [filterHistories, setFilterHistories] = useState<any>();
+  const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
+  const [items, setItems] = useState({} as HistoryType);
 
   useEffect(() => {
     const newHistorys = histories?.filter(
@@ -104,7 +107,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
   // 染色Orderを削除 type ranning
-  const deleteFabricDyeingOrderRanning = async (history: any) => {
+  const deleteFabricDyeingOrderRanning = async (history: HistoryType) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -126,6 +129,86 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
         });
 
         transaction.delete(historyDocRef);
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  const updateHistoryFabricDyeingOrderStock = async (history: HistoryType) => {
+    const grayFabricRef = doc(db, "grayFabrics", history.grayFabricId);
+    const productRef = doc(db, "products", history.productId);
+    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const grayFabricDocSnap = await transaction.get(grayFabricRef);
+        if (!grayFabricDocSnap.exists())
+          throw "grayFabricDocSnap does not exist!";
+
+        const productDocSnap = await transaction.get(productRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        const stock = grayFabricDocSnap.data().stock || 0;
+        const newStock = stock + history.quantity - items.quantity;
+        transaction.update(grayFabricRef, {
+          stock: newStock,
+        });
+
+        const wip = productDocSnap.data().wip || 0;
+        const newWip = wip - history.quantity + items.quantity;
+        transaction.update(productRef, {
+          wip: newWip,
+        });
+
+        transaction.update(historyRef, {
+          quantity: items.quantity,
+          price: items.price,
+          orderedAt: items.orderedAt,
+          scheduledAt: items.scheduledAt,
+          comment: items.comment,
+          updateUser: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  //　生地オーダー編集（ランニング在庫）
+  const updateHistoryFabricDyeingOrderRanning = async (
+    history: HistoryType
+  ) => {
+    const productRef = doc(db, "products", history.productId);
+    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        const wip = productDocSnap.data().wip || 0;
+        const newWip = wip - history.quantity + items.quantity;
+        transaction.update(productRef, {
+          wip: newWip,
+        });
+
+        transaction.update(historyRef, {
+          quantity: items.quantity,
+          price: items.price,
+          orderedAt: items.orderedAt,
+          scheduledAt: items.scheduledAt,
+          comment: items.comment,
+          updateUser: currentUser,
+        });
       });
     } catch (err) {
       console.log(err);
@@ -158,7 +241,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistories?.map((history: any) => (
+            {filterHistories?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
                   <HistoryConfirmModal history={history} />
@@ -185,16 +268,38 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    <HistoryEditModal history={history} type="order" />
-                    <FaTrashAlt
-                      cursor="pointer"
-                      onClick={() => {
-                        history.stockType === "stock" &&
-                          deleteFabricDyeingOrderStock(history);
-                        history.stockType === "ranning" &&
-                          deleteFabricDyeingOrderRanning(history);
-                      }}
-                    />
+                    {history.stockType === "stock" && (
+                      <>
+                        <HistoryEditModal
+                          history={history}
+                          type="order"
+                          items={items}
+                          setItems={setItems}
+                          onClick={updateHistoryFabricDyeingOrderStock}
+                        />
+                        <FaTrashAlt
+                          cursor="pointer"
+                          onClick={() => deleteFabricDyeingOrderStock(history)}
+                        />
+                      </>
+                    )}
+                    {history.stockType === "ranning" && (
+                      <>
+                        <HistoryEditModal
+                          history={history}
+                          type="order"
+                          items={items}
+                          setItems={setItems}
+                          onClick={updateHistoryFabricDyeingOrderRanning}
+                        />
+                        <FaTrashAlt
+                          cursor="pointer"
+                          onClick={() =>
+                            deleteFabricDyeingOrderRanning(history)
+                          }
+                        />
+                      </>
+                    )}
                   </Flex>
                 </Td>
               </Tr>

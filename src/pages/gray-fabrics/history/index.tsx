@@ -26,17 +26,18 @@ import {
   where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FaRegCommentDots, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { grayFabricsState, usersState } from "../../../../store";
+import { usersState } from "../../../../store";
+import { HistoryType } from "../../../../types/HistoryType";
 import CommentModal from "../../../components/history/CommentModal";
 import GrayFabricHistoryConfirmModal from "../../../components/history/GrayFabricHistoryConfirmModal";
 import GrayFabricHistoryEditModal from "../../../components/history/GrayFabricHistoryEditModal";
 
 const GrayFabricHistorys = () => {
   const [orderHistorys, setOrderHistorys] = useState<any>();
-  const [confirmHistorys, setConfirmHistorys] = useState<any>();
+  const [confirmHistorys, setConfirmHistorys] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
 
   // キバタ発注履歴;
@@ -71,7 +72,9 @@ const GrayFabricHistorys = () => {
       try {
         onSnapshot(q, (querySnap) =>
           setConfirmHistorys(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+            )
           )
         );
       } catch (err) {

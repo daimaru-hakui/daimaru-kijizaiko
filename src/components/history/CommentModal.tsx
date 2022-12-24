@@ -17,12 +17,10 @@ import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import { db } from "../../../firebase";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: {
-    comment: string;
-    id: string;
-  };
+  history: HistoryType;
   collectionName: string;
 };
 

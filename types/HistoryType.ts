@@ -1,0 +1,23 @@
+export type HistoryType = {
+  id: string;
+  serialNumber: number;
+  grayFabricId: string;
+  supplierId: string;
+  supplierName: string;
+  stockType: string;
+  productId: string;
+  productNumber: string;
+  productName: string;
+  colorName: string;
+  price: number;
+  quantity: number;
+  remainingOrder: number;
+  comment: string;
+  orderedAt: string;
+  scheduledAt: string;
+  fixedAt: string;
+  createUser: string;
+  updateUser: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
