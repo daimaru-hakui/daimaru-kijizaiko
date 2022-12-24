@@ -36,17 +36,15 @@ type Props = {
 export const HistoryEditModal: NextPage<Props> = ({
   history,
   type,
-  onClick,
   items,
   setItems,
+  onClick,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [reset, setReset] = useState({} as HistoryType);
 
   // 初期値をitemsに代入
   useEffect(() => {
     setItems({ ...history });
-    setReset({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
 
@@ -63,19 +61,21 @@ export const HistoryEditModal: NextPage<Props> = ({
     setItems({ ...items, [name]: Number(value) });
   };
 
-  // 入力をリセット
-  const onReset = () => {
-    setItems({
-      ...items,
-      ...reset,
-    });
+  const inputReset = () => {
+    setItems({ ...history });
   };
 
   return (
     <>
       <FaEdit cursor="pointer" onClick={onOpen} />
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          inputReset();
+          onClose();
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>編集</ModalHeader>
@@ -86,7 +86,7 @@ export const HistoryEditModal: NextPage<Props> = ({
                 <Box>品番</Box>
                 <Flex gap={1}>
                   <Box>{history.productNumber}</Box>
-                  <Box>{history.colorName}</Box>
+                  {history.colorName && <Box>{history.colorName}</Box>}
                   <Box>{history.productName}</Box>
                 </Flex>
               </Box>
@@ -108,24 +108,26 @@ export const HistoryEditModal: NextPage<Props> = ({
                   </NumberInputStepper>
                 </NumberInput>
               </Box>
-              <Box w="100%">
-                <Text>金額（円）</Text>
-                <NumberInput
-                  mt={1}
-                  name="price"
-                  defaultValue={0}
-                  min={0}
-                  max={10000}
-                  value={items.price === 0 ? "" : items.price}
-                  onChange={(e) => handleNumberChange(e, "price")}
-                >
-                  <NumberInputField textAlign="right" />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </Box>
+              {items.price && (
+                <Box w="100%">
+                  <Text>金額（円）</Text>
+                  <NumberInput
+                    mt={1}
+                    name="price"
+                    defaultValue={0}
+                    min={0}
+                    max={10000}
+                    value={items.price === 0 ? "" : items.price}
+                    onChange={(e) => handleNumberChange(e, "price")}
+                  >
+                    <NumberInputField textAlign="right" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </Box>
+              )}
               <Box w="100%">
                 <Text>発注日</Text>
                 <Input
@@ -177,7 +179,7 @@ export const HistoryEditModal: NextPage<Props> = ({
               variant="ghost"
               mr={3}
               onClick={() => {
-                onReset();
+                inputReset();
                 onClose();
               }}
             >

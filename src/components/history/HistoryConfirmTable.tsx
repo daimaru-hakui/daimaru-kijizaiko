@@ -141,7 +141,8 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
                 <Td w="100%" textAlign="center">
                   <Flex gap={3}>
                     <CommentModal
-                      history={history}
+                      id={history.id}
+                      comment={history.comment}
                       collectionName="historyFabricDyeingConfirms"
                     />
                     {history?.comment.slice(0, 20) +
