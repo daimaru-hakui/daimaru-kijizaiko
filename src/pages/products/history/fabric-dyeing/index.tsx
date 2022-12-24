@@ -1,13 +1,14 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { db } from "../../../../firebase";
+import { db } from "../../../../../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import HistoryOrderTable from "../../../components/history/HistoryOrderTable";
-import HistoryConfirmTable from "../../../components/history/HistoryConfirmTable";
+import HistoryOrderTable from "../../../../components/history/HistoryOrderTable";
+import HistoryConfirmTable from "../../../../components/history/HistoryConfirmTable";
+import { HistoryType } from "../../../../../types/HistoryType";
 
 const HistoryFabricDyeings = () => {
-  const [historyOrders, setHistoryOrders] = useState<any>();
-  const [historyConfirms, setHistoryConfirms] = useState<any>();
+  const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
+  const [historyConfirms, setHistoryConfirms] = useState([] as HistoryType[]);
 
   useEffect(() => {
     const getHistoryOrders = async () => {
@@ -18,7 +19,9 @@ const HistoryFabricDyeings = () => {
       try {
         onSnapshot(q, (querySnap) =>
           setHistoryOrders(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+            )
           )
         );
       } catch (err) {
@@ -37,7 +40,9 @@ const HistoryFabricDyeings = () => {
       try {
         onSnapshot(q, (querySnap) =>
           setHistoryConfirms(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+            )
           )
         );
       } catch (err) {

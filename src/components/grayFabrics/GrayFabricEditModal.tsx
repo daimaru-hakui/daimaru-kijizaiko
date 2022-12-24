@@ -26,7 +26,7 @@ type Props = {
 
 const GrayFabricEditModal: NextPage<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState<any>({});
+  const [items, setItems] = useState({} as GrayFabricType);
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const router = useRouter();

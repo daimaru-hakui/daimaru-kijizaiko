@@ -32,16 +32,17 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
 import { currentUserState, suppliersState } from "../../../store";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: any;
+  history: HistoryType;
 };
 
 const GrayFabricConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
   const suppliers = useRecoilValue(suppliersState);
-  const [items, setItems] = useState<any>({});
+  const [items, setItems] = useState({} as HistoryType);
   const [status, setStatus] = useState(1);
 
   useEffect(() => {

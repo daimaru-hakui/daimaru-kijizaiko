@@ -32,9 +32,10 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
 import { currentUserState } from "../../../store";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: any;
+  history: HistoryType;
 };
 
 const HistoryConfirmModal: NextPage<Props> = ({ history }) => {

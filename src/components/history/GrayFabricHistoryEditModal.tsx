@@ -27,9 +27,10 @@ import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
-  history: any;
+  history: HistoryType;
   type: string;
 };
 
