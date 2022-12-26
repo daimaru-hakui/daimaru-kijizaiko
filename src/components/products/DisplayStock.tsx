@@ -70,7 +70,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">入荷待ち</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.shippingQuantity || 0}
+                {product?.arrivingQuantity || 0}
               </Box>
               m
             </Box>

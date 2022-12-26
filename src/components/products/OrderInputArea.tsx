@@ -10,6 +10,7 @@ import {
   NumberInputStepper,
   Radio,
   RadioGroup,
+  Select,
   Stack,
   Text,
   Textarea,
@@ -22,14 +23,16 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import {
   currentUserState,
   grayFabricsState,
+  stockPlacesState,
   suppliersState,
 } from "../../../store";
+import { HistoryType } from "../../../types/HistoryType";
 import { ProductType } from "../../../types/productType";
 
 type Props = {
@@ -44,14 +47,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricId = product?.grayFabricId || "";
   const suppliers = useRecoilValue(suppliersState);
-  const [items, setItems] = useState({
-    quantity: 0,
-    orderedAt: "",
-    scheduledAt: "",
-    comment: "",
-    stockType: "ranning",
-    price: 0,
-  });
+  const stockPlaces = useRecoilValue(stockPlacesState);
+  const [items, setItems] = useState({} as HistoryType);
 
   // 今日の日付を取得
   const todayDate = () => {
@@ -80,6 +77,14 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     setItems({ ...items, [name]: value });
   };
 
+  const handleSelectchange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    name: string
+  ) => {
+    const value = e.target.value;
+    setItems({ ...items, [name]: value });
+  };
+
   const getSupplierName = (supplierId: string) => {
     const supplierObj = suppliers.find(
       (supplier: { id: string }) => supplier.id === supplierId
@@ -87,11 +92,16 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     return supplierObj.name;
   };
 
-  const isLimit = () => {
+  const isLimitDyeing = () => {
     const grayFabric = grayFabrics.find(
       (grayFabric: { id: string }) => grayFabric.id === grayFabricId
     );
     const stock = grayFabric?.stock || 0;
+    return items.stockType === "stock" && stock < items.quantity ? true : false;
+  };
+
+  const isLimitPurchase = () => {
+    const stock = product?.externalStock || 0;
     return items.stockType === "stock" && stock < items.quantity ? true : false;
   };
 
@@ -140,6 +150,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
           stockType: items.stockType,
+          orderType: orderType,
           grayFabricId: grayFabricDocSnap.id,
           productId: product?.id,
           productNumber: product?.productNumber,
@@ -161,7 +172,6 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      onClose();
     }
   };
 
@@ -200,6 +210,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
           stockType: items.stockType,
+          orderType: orderType,
           grayFabricId: "",
           productId: product?.id,
           productNumber: product?.productNumber,
@@ -221,7 +232,71 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      onClose();
+    }
+  };
+
+  const orderFabricPurchase = async (stockType: string) => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    const orderNumberDocRef = doc(
+      db,
+      "serialNumbers",
+      "fabricPurchaseOrderNumbers"
+    );
+    const productDocRef = doc(db, "products", productId);
+    const historyDocRef = collection(db, "historyFabricPurchaseOrders");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
+        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
+
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        transaction.update(orderNumberDocRef, {
+          serialNumber: newSerialNumber,
+        });
+
+        if (stockType === "stock") {
+          const externalStock = productDocSnap.data().externalStock || 0;
+          const newEternalStock = externalStock - items.quantity;
+          transaction.update(productDocRef, {
+            externalStock: newEternalStock,
+          });
+        }
+
+        const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+        const newArrivingQuantity = arrivingQuantity + items.quantity;
+        transaction.update(productDocRef, {
+          arrivingQuantity: newArrivingQuantity,
+        });
+
+        await addDoc(historyDocRef, {
+          serialNumber: newSerialNumber,
+          stockType: items.stockType,
+          orderType: orderType,
+          grayFabricId: "",
+          productId: product?.id,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: items?.quantity,
+          price: items.price || product.price,
+          comment: items.comment,
+          supplierId: product.supplierId,
+          supplierName: product.supplierName,
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt || todayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -245,26 +320,43 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         )}
 
         {orderType === "purchase" && (
-          <RadioGroup
-            mt={3}
-            onChange={(e) => handleRadioChange(e, "stockPlaceType")}
-            value={items.stockType}
-          >
-            <Stack direction="column">
-              <Radio value="stock">
-                外部在庫から購入
-                <Box as="span" fontSize="sm">
-                  （別染めなどでメーカーに抱えてもらっている在庫）
-                </Box>
-              </Radio>
-              <Radio value="ranning">
-                生地を購入
-                <Box as="span" fontSize="sm">
-                  （メーカーの定番在庫）
-                </Box>
-              </Radio>
-            </Stack>
-          </RadioGroup>
+          <>
+            <RadioGroup
+              mt={3}
+              onChange={(e) => handleRadioChange(e, "stockType")}
+              value={items.stockType}
+            >
+              <Stack direction="column">
+                <Radio value="ranning">
+                  生地を購入
+                  <Box as="span" fontSize="sm">
+                    （メーカーの定番在庫）
+                  </Box>
+                </Radio>
+                <Radio value="stock">
+                  外部在庫から購入
+                  <Box as="span" fontSize="sm">
+                    （別染めなどでメーカーに抱えてもらっている在庫）
+                  </Box>
+                </Radio>
+              </Stack>
+            </RadioGroup>
+            <Box w="100%">
+              <Text>組織名</Text>
+              <Select
+                mt={1}
+                placeholder="組織を選択してください"
+                value={items.stockPlace}
+                onChange={(e) => handleSelectchange(e, "stockPlace")}
+              >
+                {stockPlaces?.map((m: { id: number; name: string }) => (
+                  <option key={m.id} value={m.name}>
+                    {m.name}
+                  </option>
+                ))}
+              </Select>
+            </Box>
+          </>
         )}
 
         <Flex gap={3} w="100%" flexDirection={{ base: "column", md: "row" }}>
@@ -341,10 +433,11 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={!items.quantity || isLimit()}
+            disabled={!items.quantity || isLimitDyeing()}
             onClick={() => {
               items.stockType === "stock" && orderFabricDyeingFromStock();
               items.stockType === "ranning" && orderFabricDyeingRanning();
+              onClose();
             }}
           >
             登録
@@ -354,8 +447,11 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            // disabled={stockLimit2()}
-            // onClick={onClickOrderfabric}
+            disabled={!items.quantity || isLimitPurchase()}
+            onClick={() => {
+              orderFabricPurchase(items.stockType);
+              onClose();
+            }}
           >
             登録
           </Button>

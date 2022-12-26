@@ -30,6 +30,11 @@ const index = () => {
             </Link>
           </Box>
           <Box w="100%">
+            <Link href="/settings/stock-places">
+              <Button>送り先の追加・編集</Button>
+            </Link>
+          </Box>
+          <Box w="100%">
             <Link href="/settings/colors">
               <Button>色の追加・編集</Button>
             </Link>

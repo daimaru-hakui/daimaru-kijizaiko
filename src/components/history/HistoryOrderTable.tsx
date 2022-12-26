@@ -23,7 +23,6 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { getSerialNumber, todayDate } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
-
 import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "./CommentModal";
@@ -40,6 +39,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
 
+  // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(
       (history: { quantity: number }) => history.quantity > 0
@@ -57,23 +57,8 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
-  // 日付を取得
-  const convertTimestampToDate = (timestamp: Date) => {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    let month = String(date.getMonth() + 1);
-    month = ("0" + month).slice(-2);
-    let day = String(date.getDate());
-    day = ("0" + day).slice(-2);
-    let hour = String(date.getHours());
-    hour = ("0" + hour).slice(-2);
-    let minutes = String(date.getMinutes());
-    minutes = ("0" + minutes).slice(-2);
-    return `${year}-${month}-${day}-${hour}-${minutes}`;
-  };
-
-  // 染色Orderを削除 type stock
-  const deleteFabricDyeingOrderStock = async (history: any) => {
+  // 生地仕掛状況　Orderを削除 type stock
+  const deleteHistoryFabricDyeingOrderStock = async (history: any) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -112,8 +97,10 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     } finally {
     }
   };
-  // 染色Orderを削除 type ranning
-  const deleteFabricDyeingOrderRanning = async (history: HistoryType) => {
+  // 生地仕掛状況　Orderを削除  type ranning
+  const deleteHistoryFabricDyeingOrderRanning = async (
+    history: HistoryType
+  ) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -142,42 +129,44 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
+  //　生地仕掛状況　Order　編集（Stock在庫）
   const updateHistoryFabricDyeingOrderStock = async (history: HistoryType) => {
-    const grayFabricRef = doc(db, "grayFabrics", history.grayFabricId);
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
-        const grayFabricDocSnap = await transaction.get(grayFabricRef);
+        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
         if (!grayFabricDocSnap.exists())
           throw "grayFabricDocSnap does not exist!";
 
-        const productDocSnap = await transaction.get(productRef);
+        const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const historyDocSnap = await transaction.get(historyRef);
+        const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const stock = grayFabricDocSnap.data().stock || 0;
         const newStock = stock + history.quantity - items.quantity;
-        transaction.update(grayFabricRef, {
+        transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
         const wip = productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity + items.quantity;
-        transaction.update(productRef, {
+        transaction.update(productDocRef, {
           wip: newWip,
         });
 
-        transaction.update(historyRef, {
+        transaction.update(historyDocRef, {
           quantity: items.quantity,
           price: items.price,
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
           updateUser: currentUser,
+          updatedAt: serverTimestamp(),
         });
       });
     } catch (err) {
@@ -186,34 +175,35 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
-  //　生地オーダー編集（ランニング在庫）
+  //　生地仕掛状況　Order　編集（ranning在庫）
   const updateHistoryFabricDyeingOrderRanning = async (
     history: HistoryType
   ) => {
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productRef);
+        const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const historyDocSnap = await transaction.get(historyRef);
+        const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const wip = productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity + items.quantity;
-        transaction.update(productRef, {
+        transaction.update(productDocRef, {
           wip: newWip,
         });
 
-        transaction.update(historyRef, {
+        transaction.update(historyDocRef, {
           quantity: items.quantity,
           price: items.price,
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
           updateUser: currentUser,
+          updatedAt: serverTimestamp(),
         });
       });
     } catch (err) {
@@ -222,12 +212,13 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
+  // 生地染色　確定処理
   const confirmProcessingFabricDyeing = async (history: HistoryType) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const orderHistoryRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const orderHistoryDocRef = doc(db, "historyFabricDyeingOrders", history.id);
     const confirmHistoryRef = collection(db, "historyFabricDyeingConfirms");
 
     try {
@@ -246,7 +237,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
           externalStock: newStock,
         });
 
-        transaction.update(orderHistoryRef, {
+        transaction.update(orderHistoryDocRef, {
           quantity: items.remainingOrder,
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
@@ -257,6 +248,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
         await addDoc(confirmHistoryRef, {
           serialNumber: history.serialNumber,
+          orderType: history.orderType,
           grayFabricId: history.grayFabricId,
           productId: history.productId,
           productNumber: history.productNumber,
@@ -279,6 +271,199 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     } finally {
     }
   };
+
+  // 購入状況　orderを削除（stock ranning共通）
+  const deleteHistoryFabricPurchaseOrder = async (history: any) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricPurchaseOrders", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyDocRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        if (history.stockType === "stock") {
+          const externalStock = productDocSnap.data().externalStock || 0;
+          const newExternalStock = externalStock + history.quantity;
+          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const newArrivingQuantity = arrivingQuantity - history.quantity;
+          transaction.update(productDocRef, {
+            externalStock: newExternalStock,
+            arrivingQuantity: newArrivingQuantity,
+          });
+        }
+        if (history.stockType === "ranning") {
+          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const newArrivingQuantity = arrivingQuantity - history.quantity;
+          transaction.update(productDocRef, {
+            arrivingQuantity: newArrivingQuantity,
+          });
+        }
+
+        transaction.delete(historyDocRef);
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  //　購入状況　orderを編集（stock ranning共通）
+  const updateHistoryFabricPurchaseOrder = async (history: HistoryType) => {
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricPurchaseOrders", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyDocRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        if (history.stockType === "stock") {
+          const externalStock = productDocSnap.data().externalStock || 0;
+          const newExternalStock =
+            externalStock + history.quantity - items.quantity;
+
+          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const newArrivingQuantity =
+            arrivingQuantity - history.quantity + items.quantity;
+
+          transaction.update(productDocRef, {
+            externalStock: newExternalStock,
+            arrivingQuantity: newArrivingQuantity,
+          });
+        }
+        if (history.stockType === "ranning") {
+          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const newArrivingQuantity =
+            arrivingQuantity - history.quantity + items.quantity;
+
+          transaction.update(productDocRef, {
+            arrivingQuantity: newArrivingQuantity,
+          });
+        }
+
+        transaction.update(historyDocRef, {
+          quantity: items.quantity,
+          price: items.price,
+          orderedAt: items.orderedAt,
+          scheduledAt: items.scheduledAt,
+          comment: items.comment,
+          updateUser: currentUser,
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  // 購入状況　確定処理
+  const confirmProcessingFabricPurchase = async (history: HistoryType) => {
+    const result = window.confirm("確定して宜しいでしょうか");
+    if (!result) return;
+
+    const productDocRef = doc(db, "products", history.productId);
+    const orderHistoryDocRef = doc(
+      db,
+      "historyFabricPurchaseOrders",
+      history.id
+    );
+    const confirmHistoryRef = collection(db, "historyFabricPurchaseConfirms");
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product does not exist!!";
+
+        const newArrivingQuantity =
+          productDocSnap.data()?.arrivingQuantity -
+            history.quantity +
+            items.remainingOrder || 0;
+
+        const newTokushimaStock =
+          productDocSnap.data()?.tokushimaStock + items.quantity || 0;
+
+        transaction.update(productDocRef, {
+          arrivingQuantity: newArrivingQuantity,
+          tokushimaStock: newTokushimaStock,
+        });
+
+        transaction.update(orderHistoryDocRef, {
+          quantity: items.remainingOrder,
+          orderedAt: items.orderedAt || todayDate(),
+          scheduledAt: items.scheduledAt || todayDate(),
+          comment: items.comment,
+          updateUser: currentUser,
+          updatedAt: serverTimestamp(),
+        });
+
+        await addDoc(confirmHistoryRef, {
+          serialNumber: history.serialNumber,
+          orderType: history.orderType,
+          grayFabricId: history.grayFabricId,
+          productId: history.productId,
+          productNumber: history.productNumber,
+          productName: history.productName,
+          colorName: history.colorName,
+          supplierId: history.supplierId,
+          supplierName: history.supplierName,
+          price: history.price,
+          quantity: items.quantity,
+          comment: items.comment,
+          orderedAt: items.orderedAt || history.orderedAt,
+          fixedAt: items.fixedAt || todayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
+
+  const elementComment = (history: HistoryType, collectionName: string) => (
+    <Flex gap={3}>
+      <CommentModal
+        id={history.id}
+        comment={history.comment}
+        collectionName={collectionName}
+      />
+      {history?.comment.slice(0, 20) +
+        (history.comment.length >= 1 ? "..." : "")}
+    </Flex>
+  );
+
+  const elmentEditDelete = (
+    history: HistoryType,
+    onClickUpdate: Function,
+    onClickDelete: Function
+  ) => (
+    <Td>
+      <Flex gap={3}>
+        <HistoryEditModal
+          history={history}
+          type="order"
+          items={items}
+          setItems={setItems}
+          onClick={() => onClickUpdate(history)}
+        />
+        <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
+      </Flex>
+    </Td>
+  );
 
   return (
     <TableContainer p={6} w="100%">
@@ -312,7 +497,14 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                     history={history}
                     items={items}
                     setItems={setItems}
-                    onClick={confirmProcessingFabricDyeing}
+                    onClick={() => {
+                      if (history.orderType === "dyeing") {
+                        confirmProcessingFabricDyeing(history);
+                      }
+                      if (history.orderType === "purchase") {
+                        confirmProcessingFabricPurchase(history);
+                      }
+                    }}
                   />
                 </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
@@ -330,50 +522,35 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                   </>
                 )}
                 <Td w="100%" textAlign="center">
-                  <Flex gap={3}>
-                    <CommentModal
-                      id={history.id}
-                      comment={history.comment}
-                      collectionName="historyFabricDyeingOrders"
-                    />
-                    {history?.comment.slice(0, 20) +
-                      (history.comment.length >= 1 ? "..." : "")}
-                  </Flex>
+                  {history.orderType === "dyeing" &&
+                    elementComment(history, "historyFabricDyeingOrders")}
+                  {history.orderType === "purchase" &&
+                    elementComment(history, "historyFabricDyeingOrders")}
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    {history.stockType === "stock" && (
+                    {history.orderType === "dyeing" && (
                       <>
-                        <HistoryEditModal
-                          history={history}
-                          type="order"
-                          items={items}
-                          setItems={setItems}
-                          onClick={updateHistoryFabricDyeingOrderStock}
-                        />
-                        <FaTrashAlt
-                          cursor="pointer"
-                          onClick={() => deleteFabricDyeingOrderStock(history)}
-                        />
+                        {history.stockType === "stock" &&
+                          elmentEditDelete(
+                            history,
+                            updateHistoryFabricDyeingOrderStock,
+                            deleteHistoryFabricDyeingOrderStock
+                          )}
+                        {history.stockType === "ranning" &&
+                          elmentEditDelete(
+                            history,
+                            updateHistoryFabricDyeingOrderRanning,
+                            deleteHistoryFabricDyeingOrderRanning
+                          )}
                       </>
                     )}
-                    {history.stockType === "ranning" && (
-                      <>
-                        <HistoryEditModal
-                          history={history}
-                          type="order"
-                          items={items}
-                          setItems={setItems}
-                          onClick={updateHistoryFabricDyeingOrderRanning}
-                        />
-                        <FaTrashAlt
-                          cursor="pointer"
-                          onClick={() =>
-                            deleteFabricDyeingOrderRanning(history)
-                          }
-                        />
-                      </>
-                    )}
+                    {history.orderType === "purchase" &&
+                      elmentEditDelete(
+                        history,
+                        updateHistoryFabricPurchaseOrder,
+                        deleteHistoryFabricPurchaseOrder
+                      )}
                   </Flex>
                 </Td>
               </Tr>

@@ -19,6 +19,7 @@ import {
   grayFabricsState,
   materialNamesState,
   productsState,
+  stockPlacesState,
   suppliersState,
   usersState,
 } from "../../store";
@@ -29,6 +30,7 @@ export default function Home() {
   const [products, setProducts] = useRecoilState(productsState);
   const [grayFabrics, setGrayFabrics] = useRecoilState(grayFabricsState);
   const [suppliers, setSuppliers] = useRecoilState(suppliersState);
+  const [stockPlaces, setStockPlaces] = useRecoilState(stockPlacesState);
   const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
   const [colors, setColors] = useRecoilState(colorsState);
   const currentUser = useRecoilValue(currentUserState);
@@ -105,7 +107,7 @@ export default function Home() {
     getGrayfabrics();
   }, [setGrayFabrics]);
 
-  // suppliers情報;
+  // 仕入先　情報;
   useEffect(() => {
     const getSuppliers = async () => {
       const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
@@ -121,6 +123,23 @@ export default function Home() {
     };
     getSuppliers();
   }, [setSuppliers]);
+
+  // 送り先　情報;
+  useEffect(() => {
+    const getStockPlaces = async () => {
+      const q = query(collection(db, "stockPlaces"), orderBy("kana", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setStockPlaces(
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getStockPlaces();
+  }, [setStockPlaces]);
 
   // 色のデータを取得
   useEffect(() => {
