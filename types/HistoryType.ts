@@ -1,10 +1,11 @@
 export type HistoryType = {
   id: string;
   serialNumber: number;
+  orderType: string;
+  stockType: string;
   grayFabricId: string;
   supplierId: string;
   supplierName: string;
-  stockType: string;
   productId: string;
   productNumber: string;
   productName: string;
@@ -13,6 +14,7 @@ export type HistoryType = {
   quantity: number;
   remainingOrder: number;
   comment: string;
+  stockPlace: string;
   orderedAt: string;
   scheduledAt: string;
   fixedAt: string;

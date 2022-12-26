@@ -16,24 +16,17 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import {
-  colorsState,
-  materialNamesState,
-  productsState,
-  usersState,
-} from "../../../store";
+import { productsState, usersState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import { ProductType } from "../../../types/productType";
 
 const Products = () => {
   const products = useRecoilValue(productsState);
-  const colors = useRecoilValue(colorsState);
   const users = useRecoilValue(usersState);
-  const materialNames = useRecoilValue(materialNamesState);
 
   // 混率の表示
-  const displayMixed = (materials: any) => {
+  const getMixed = (materials: any) => {
     let array = [];
     const t = materials.t ? `ポリエステル${materials.t}% ` : "";
     const c = materials.c ? `綿${materials.c}% ` : "";
@@ -151,9 +144,9 @@ const Products = () => {
                   </Td>
                   <Td
                     isNumeric
-                    fontWeight={quantityBold(product?.shippingQuantity)}
+                    fontWeight={quantityBold(product?.arrivingQuantity)}
                   >
-                    {product?.shippingQuantity || 0}m
+                    {product?.arrivingQuantity || 0}m
                   </Td>
                   <Td
                     isNumeric
@@ -163,7 +156,7 @@ const Products = () => {
                   </Td>
                   <Td>{product.materialName}</Td>
                   <Td>
-                    <Flex gap={1}>{displayMixed(product.materials)}</Flex>
+                    <Flex gap={1}>{getMixed(product.materials)}</Flex>
                   </Td>
                   <Td>
                     <Flex>

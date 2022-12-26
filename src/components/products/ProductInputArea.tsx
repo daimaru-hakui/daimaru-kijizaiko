@@ -102,6 +102,13 @@ const ProductInputArea: NextPage<Props> = ({
     }
   };
 
+  const getSupplierName = (supplierId: string) => {
+    const supplierObj = suppliers.find(
+      (supplier: { id: string }) => supplier.id === supplierId
+    );
+    return supplierObj.name;
+  };
+
   const getMixed = (materials: any) => {
     let array = [];
     const t = materials.t ? `ポリエステル${materials.t}% ` : "";
@@ -133,6 +140,7 @@ const ProductInputArea: NextPage<Props> = ({
         productType: items.productType || 1,
         staff: items.productType === 2 ? items.staff : "R&D",
         supplierId: items.supplierId || "",
+        supplierName: getSupplierName(items.supplierId) || "",
         grayFabricId: items.grayFabricId || "",
         productNumber:
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
@@ -169,6 +177,7 @@ const ProductInputArea: NextPage<Props> = ({
         productType: items.productType || 1,
         staff: items.productType === 2 ? items.staff : "R&D",
         supplierId: items.supplierId || "",
+        supplierName: getSupplierName(items.supplierId) || "",
         productNumber:
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
@@ -277,7 +286,7 @@ const ProductInputArea: NextPage<Props> = ({
               <Select
                 mt={1}
                 placeholder="メーカーを選択してください"
-                value={items.supplier}
+                value={items.supplierId}
                 onChange={(e) => handleSelectchange(e, "supplier")}
               >
                 {suppliers?.map((supplier: { id: string; name: string }) => (

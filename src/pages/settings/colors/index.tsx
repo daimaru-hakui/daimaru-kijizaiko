@@ -1,7 +1,5 @@
-import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
-import { db } from "../../../../firebase";
 import { colorsState } from "../../../../store";
 import SettingAddPage from "../../../components/settings/SettingAddPage";
 

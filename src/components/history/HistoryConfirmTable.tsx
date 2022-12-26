@@ -55,40 +55,25 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
     }
   };
 
-  // 日付を取得
-  const convertTimestampToDate = (timestamp: Date) => {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    let month = String(date.getMonth() + 1);
-    month = ("0" + month).slice(-2);
-    let day = String(date.getDate());
-    day = ("0" + day).slice(-2);
-    let hour = String(date.getHours());
-    hour = ("0" + hour).slice(-2);
-    let minutes = String(date.getMinutes());
-    minutes = ("0" + minutes).slice(-2);
-    return `${year}-${month}-${day}-${hour}-${minutes}`;
-  };
-
   const updateHistoryFabricDyeingConfirm = async (history: HistoryType) => {
-    const productRef = doc(db, "products", history.productId);
-    const historyRef = doc(db, "historyFabricDyeingConfirms", history.id);
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricDyeingConfirms", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productRef);
+        const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const historyDocSnap = await transaction.get(historyRef);
+        const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const stock = productDocSnap.data().externalStock || 0;
         const newStock = stock - history.quantity + items.quantity;
-        transaction.update(productRef, {
+        transaction.update(productDocRef, {
           externalStock: newStock,
         });
 
-        transaction.update(historyRef, {
+        transaction.update(historyDocRef, {
           quantity: items.quantity,
           price: items.price,
           fixedAt: items.fixedAt,
@@ -101,6 +86,50 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
     } finally {
     }
   };
+
+  const updateHistoryFabricPurchaseConfirm = async (history: HistoryType) => {
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricPurchaseConfirms", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyDocRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        const stock = productDocSnap.data().tokushimaStock || 0;
+        const newStock = stock - history.quantity + items.quantity;
+        transaction.update(productDocRef, {
+          tokushimaStock: newStock,
+        });
+
+        transaction.update(historyDocRef, {
+          quantity: items.quantity,
+          price: items.price,
+          fixedAt: items.fixedAt,
+          comment: items.comment,
+          updateUser: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
+  const elementComment = (history: HistoryType, collectionName: string) => (
+    <Flex gap={3}>
+      <CommentModal
+        id={history.id}
+        comment={history.comment}
+        collectionName={collectionName}
+      />
+      {history?.comment.slice(0, 20) +
+        (history.comment.length >= 1 ? "..." : "")}
+    </Flex>
+  );
 
   return (
     <TableContainer p={6} w="100%">
@@ -139,15 +168,10 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
                 <Td>{history?.price}円</Td>
                 <Td>{history?.quantity * history?.price}円</Td>
                 <Td w="100%" textAlign="center">
-                  <Flex gap={3}>
-                    <CommentModal
-                      id={history.id}
-                      comment={history.comment}
-                      collectionName="historyFabricDyeingConfirms"
-                    />
-                    {history?.comment.slice(0, 20) +
-                      (history.comment.length >= 1 ? "..." : "")}
-                  </Flex>
+                  {history.orderType === "dyeing" &&
+                    elementComment(history, "historyFabricDyeingConfirms")}
+                  {history.orderType === "purchase" &&
+                    elementComment(history, "historyFabricPurchaseConfirms")}
                 </Td>
                 <Td>
                   <Flex gap={3}>
@@ -156,7 +180,14 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
                       type="confirm"
                       items={items}
                       setItems={setItems}
-                      onClick={updateHistoryFabricDyeingConfirm}
+                      onClick={() => {
+                        if (history.orderType === "dyeing") {
+                          updateHistoryFabricDyeingConfirm(history);
+                        }
+                        if (history.orderType === "purchase") {
+                          updateHistoryFabricPurchaseConfirm(history);
+                        }
+                      }}
                     />
                   </Flex>
                 </Td>

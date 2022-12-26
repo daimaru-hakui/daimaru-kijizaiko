@@ -1,32 +1,9 @@
 import React, { useState } from "react";
+import { ProductType } from "../../../types/productType";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
 const ProductsNew = () => {
-  const [items, setItems] = useState<any>({
-    productType: 1,
-    staff: "",
-    supplierId: "",
-    grayFabricId: "",
-    productNumber: "",
-    productNum: "",
-    productName: "",
-    colorNum: "",
-    color: "",
-    price: "",
-    materialName: "",
-    materials: "",
-    fabricWidth: 0,
-    fabricWeight: 0,
-    fabricLength: 0,
-    features: [],
-    noteProduct: "",
-    noteFabric: "",
-    noteEtc: "",
-    wip: 0,
-    externalStock: 0,
-    shippingQuantity: 0,
-    tokushimaStock: 0,
-  });
+  const [items, setItems] = useState({} as ProductType);
 
   return (
     <ProductInputArea

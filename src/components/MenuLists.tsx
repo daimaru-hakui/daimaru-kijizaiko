@@ -12,7 +12,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: <OrderDrawer />, link: "" },
     { id: 3, title: "生地仕掛状況", link: "/products/history/fabric-dyeing" },
-    { id: 4, title: "購入状況", link: "/history/fabric-shipment" },
+    { id: 4, title: "購入状況", link: "/products/history/fabric-purchase" },
     // { id: 3, title: "裁断報告書", link: "/cutting-report" },
     { id: 5, title: "マスター登録", link: "/products/new" },
   ];
