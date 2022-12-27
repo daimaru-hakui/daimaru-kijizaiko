@@ -25,7 +25,7 @@ import { db } from "../../../firebase";
 import { currentUserState, suppliersState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
-import CommentModal from "./CommentModal";
+import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "./HistoryEditModal";
 import { todayDate } from "../../../functions";
 

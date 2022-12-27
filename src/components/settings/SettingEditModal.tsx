@@ -13,6 +13,7 @@ import {
 import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
 
 type Props = {
@@ -51,10 +52,7 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
 
   return (
     <>
-      <Button size="xs" mr={3} onClick={onOpen}>
-        編集
-      </Button>
-
+      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

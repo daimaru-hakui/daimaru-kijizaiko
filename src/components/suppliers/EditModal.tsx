@@ -16,21 +16,17 @@ import {
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
+import { SupplierType } from "../../../types/SupplierType";
 
 type Props = {
-  supplier: {
-    id: string;
-    name: string;
-    kana: string;
-    comment: string;
-  };
+  supplier: SupplierType;
 };
 
 const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState<any>({});
-  // const [supplier, setSupplier] = useState<any>();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -69,8 +65,7 @@ const EditModal: NextPage<Props> = ({ supplier }) => {
 
   return (
     <>
-      <Button onClick={onOpen}>編集</Button>
-
+      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
       <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

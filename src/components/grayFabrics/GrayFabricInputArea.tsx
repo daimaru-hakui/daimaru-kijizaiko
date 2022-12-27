@@ -34,17 +34,11 @@ const GrayFabricInputArea: NextPage<Props> = ({
   const grayFabrics = useRecoilValue(grayFabricsState);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleSelectchange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    name: string
-  ) => {
     const value = e.target.value;
     setItems({ ...items, [name]: value });
   };
@@ -89,7 +83,8 @@ const GrayFabricInputArea: NextPage<Props> = ({
             mt={1}
             placeholder="メーカーを選択してください"
             value={items.supplierId}
-            onChange={(e) => handleSelectchange(e, "supplierId")}
+            name="supplierId"
+            onChange={(e) => handleInputChange(e)}
           >
             {suppliers?.map((supplier: { id: string; name: string }) => (
               <option key={supplier.id} value={supplier.id}>
@@ -137,7 +132,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
             mt={1}
             name="productNumber"
             type="text"
-            placeholder="例）AQSK2336 "
+            placeholder="例）AQSK2336"
             value={items.productNumber}
             onChange={handleInputChange}
           />

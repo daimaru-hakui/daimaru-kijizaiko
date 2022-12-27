@@ -16,7 +16,7 @@ export type ProductType = {
   fabricWidth: number;
   fabricWeight: number;
   fabricLength: number;
-  features: [];
+  features: string[];
   noteProduct: string;
   noteFabric: string;
   noteEtc: string;

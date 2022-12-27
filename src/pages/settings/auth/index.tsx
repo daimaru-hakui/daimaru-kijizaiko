@@ -61,11 +61,6 @@ const Auth = () => {
 
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="900px" mt={6} p={0}>
-        <Link href="/settings">
-          <Button w="100%">一覧へ</Button>
-        </Link>
-      </Container>
       <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6} maxW="100%">
           <Box as="h2" fontSize="2xl">

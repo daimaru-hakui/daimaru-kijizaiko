@@ -23,7 +23,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import {
@@ -158,7 +158,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           colorName: product?.colorName,
           quantity: items?.quantity,
           price: items.price || product.price,
-          comment: items.comment,
+          comment: items.comment || "",
           supplierId: product.supplierId,
           supplierName: getSupplierName(product?.supplierId),
           orderedAt: items.orderedAt || todayDate(),
@@ -218,7 +218,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           colorName: product?.colorName,
           quantity: items?.quantity,
           price: items.price || product.price,
-          comment: items.comment,
+          comment: items.comment || "",
           supplierId: product.supplierId,
           supplierName: getSupplierName(product?.supplierId),
           orderedAt: items.orderedAt || todayDate(),
@@ -284,9 +284,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           colorName: product?.colorName,
           quantity: items?.quantity,
           price: items.price || product.price,
-          comment: items.comment,
+          comment: items.comment || "",
           supplierId: product.supplierId,
           supplierName: product.supplierName,
+          stockPlace: items.stockPlace || "徳島工場",
           orderedAt: items.orderedAt || todayDate(),
           scheduledAt: items.scheduledAt || todayDate(),
           createUser: currentUser,
@@ -299,7 +300,6 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       console.log(err);
     }
   };
-
   return (
     <Box>
       <Stack spacing={6}>
@@ -307,7 +307,6 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <RadioGroup
             mt={3}
             onChange={(e) => handleRadioChange(e, "stockType")}
-            defaultValue="ranning"
             value={items.stockType}
           >
             <Stack direction="column">
@@ -342,11 +341,12 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               </Stack>
             </RadioGroup>
             <Box w="100%">
-              <Text>組織名</Text>
+              <Text>送り先名</Text>
               <Select
                 mt={1}
-                placeholder="組織を選択してください"
+                placeholder="送り先を選択してください"
                 value={items.stockPlace}
+                defaultValue="徳島工場"
                 onChange={(e) => handleSelectchange(e, "stockPlace")}
               >
                 {stockPlaces?.map((m: { id: number; name: string }) => (

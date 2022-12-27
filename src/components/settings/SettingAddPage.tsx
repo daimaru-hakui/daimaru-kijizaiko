@@ -12,13 +12,13 @@ import {
   Th,
   Thead,
   Tr,
-} from '@chakra-ui/react';
-import { addDoc, collection, deleteDoc, doc } from 'firebase/firestore';
-import { NextPage } from 'next';
-import Link from 'next/link';
-import React from 'react';
-import { db } from '../../../firebase';
-import SettingEditModal from './SettingEditModal';
+} from "@chakra-ui/react";
+import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
+import { NextPage } from "next";
+import React from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import { db } from "../../../firebase";
+import SettingEditModal from "./SettingEditModal";
 
 type Props = {
   items: { name: string };
@@ -49,12 +49,12 @@ const SettingAddPage: NextPage<Props> = ({
     await addDoc(collectionRef, {
       name: items.name,
     });
-    setItems({ name: '' });
+    setItems({ name: "" });
   };
 
   // 削除
   const deleteFunc = async (id: string) => {
-    const result = window.confirm('削除して宜しいでしょうか');
+    const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
     const docRef = doc(db, `${pathName}`, `${id}`);
     await deleteDoc(docRef);
@@ -70,35 +70,34 @@ const SettingAddPage: NextPage<Props> = ({
   };
 
   return (
-    <Box w='100%' mt={12} px={6}>
-      <Container maxW='600px' mt={6} p={0}>
-        <Link href='/settings'>
-          <Button w='100%'>一覧へ</Button>
-        </Link>
-      </Container>
+    <Box w="100%" mt={12} px={6}>
       <Container
-        maxW='600px'
+        maxW="600px"
         p={6}
         my={6}
-        rounded='md'
-        bg='white'
-        boxShadow='md'
+        rounded="md"
+        bg="white"
+        boxShadow="md"
       >
-        <Box fontSize='2xl' fontWeight='bold' color='red'>
-          {registeredInput() && 'すでに登録されています。'}
+        <Box fontSize="2xl" fontWeight="bold" color="red">
+          {registeredInput() && "※すでに登録されています。"}
         </Box>
-        <Text>{title}を追加</Text>
+        <Box as="h2" fontSize="2xl">
+          {title}一覧
+        </Box>
+
         <Flex
+          mt={6}
           gap={2}
-          alignItems='center'
-          justifyContent='flex-start'
-          flexDirection={{ base: 'column', md: 'row' }}
+          alignItems="center"
+          justifyContent="flex-start"
+          flexDirection={{ base: "column", md: "row" }}
         >
-          <Box w='100%'>
+          <Box w="100%">
             <Input
-              name='name'
-              type='text'
-              placeholder=''
+              name="name"
+              type="text"
+              placeholder=""
               value={items.name}
               onChange={handleInputChange}
             />
@@ -109,7 +108,7 @@ const SettingAddPage: NextPage<Props> = ({
         </Flex>
 
         <TableContainer mt={6}>
-          <Table variant='simple' size='sm'>
+          <Table variant="simple" size="sm">
             <Thead>
               <Tr>
                 <Th>{title}</Th>
@@ -119,27 +118,21 @@ const SettingAddPage: NextPage<Props> = ({
             <Tbody>
               {array?.map((a: { id: string; name: string }) => (
                 <Tr key={a.id}>
-                  <Td w='100%'>{a.name}</Td>
-                  <Td w='20px'>
-                    <SettingEditModal obj={a} pathName={pathName} />
-                    <Button
-                      size='xs'
-                      colorScheme='red'
-                      onClick={() => deleteFunc(a.id)}
-                    >
-                      削除
-                    </Button>
+                  <Td w="100%">{a.name}</Td>
+                  <Td w="20px">
+                    <Flex alignItems="center" justifyContent="center" gap={2}>
+                      <SettingEditModal obj={a} pathName={pathName} />
+                      <FaTrashAlt
+                        cursor="pointer"
+                        onClick={() => deleteFunc(a.id)}
+                      />
+                    </Flex>
                   </Td>
                 </Tr>
               ))}
             </Tbody>
           </Table>
         </TableContainer>
-      </Container>
-      <Container maxW='600px' mt={6} p={0}>
-        <Link href='/settings'>
-          <Button w='100%'>一覧へ</Button>
-        </Link>
       </Container>
     </Box>
   );

@@ -25,7 +25,7 @@ import { getSerialNumber, todayDate } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
-import CommentModal from "./CommentModal";
+import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {

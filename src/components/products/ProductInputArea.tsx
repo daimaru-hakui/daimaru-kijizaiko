@@ -62,16 +62,10 @@ const ProductInputArea: NextPage<Props> = ({
   const materialNames = useRecoilValue(materialNamesState);
   const setLoading = useSetRecoilState(loadingState);
 
-  const handleSelectchange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    name: string
-  ) => {
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -265,7 +259,8 @@ const ProductInputArea: NextPage<Props> = ({
                 mt={1}
                 placeholder="担当者名を選択"
                 value={items.staff}
-                onChange={(e) => handleSelectchange(e, "staff")}
+                name="staff"
+                onChange={(e) => handleInputChange(e)}
               >
                 {users?.map((user: { id: string; name: string }) => (
                   <option key={user.id} value={user.id}>
@@ -287,7 +282,8 @@ const ProductInputArea: NextPage<Props> = ({
                 mt={1}
                 placeholder="メーカーを選択してください"
                 value={items.supplierId}
-                onChange={(e) => handleSelectchange(e, "supplier")}
+                name="supplierId"
+                onChange={(e) => handleInputChange(e)}
               >
                 {suppliers?.map((supplier: { id: string; name: string }) => (
                   <option key={supplier.id} value={supplier.id}>
@@ -346,7 +342,8 @@ const ProductInputArea: NextPage<Props> = ({
                 mt={1}
                 placeholder="色を選択"
                 value={items.colorName}
-                onChange={(e) => handleSelectchange(e, "colorName")}
+                name="colorName"
+                onChange={(e) => handleInputChange(e)}
               >
                 {colors?.map((c: { id: number; name: string }) => (
                   <option key={c.id} value={c.name}>
@@ -404,7 +401,8 @@ const ProductInputArea: NextPage<Props> = ({
                 mt={1}
                 placeholder="キバタを選択してください"
                 value={items.grayFabricId}
-                onChange={(e) => handleSelectchange(e, "grayFabricId")}
+                name="grayFabricId"
+                onChange={(e) => handleInputChange(e)}
               >
                 {grayFabrics?.map(
                   (grayFabric: {
@@ -446,7 +444,8 @@ const ProductInputArea: NextPage<Props> = ({
                   mt={1}
                   placeholder="組織を選択してください"
                   value={items.materialName}
-                  onChange={(e) => handleSelectchange(e, "materialName")}
+                  name="materialName"
+                  onChange={(e) => handleInputChange(e)}
                 >
                   {materialNames?.map((m: { id: number; name: string }) => (
                     <option key={m.id} value={m.name}>
