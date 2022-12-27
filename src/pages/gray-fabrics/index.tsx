@@ -17,7 +17,7 @@ import { db } from "../../../firebase";
 import { grayFabricsState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
-import CommentModal from "../../components/history/CommentModal";
+import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
 
 const GrayFabrics = () => {

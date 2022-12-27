@@ -14,7 +14,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
-import { db } from "../../../firebase";
+import { db } from "../../firebase";
 
 type Props = {
   id: string;

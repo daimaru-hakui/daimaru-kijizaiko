@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Container,
-  Divider,
   Flex,
   Input,
   Stack,
@@ -13,10 +12,14 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
+import { suppliersState } from "../../../../store";
+import { SupplierType } from "../../../../types/SupplierType";
 
 const SupplierNew = () => {
-  const [items, setItems] = useState<any>({});
+  const [items, setItems] = useState({} as SupplierType);
+  const suppliers = useRecoilValue(suppliersState);
   const router = useRouter();
 
   const handleInputChange = (
@@ -25,6 +28,15 @@ const SupplierNew = () => {
     const name = e.target.name;
     const value = e.target.value;
     setItems({ ...items, [name]: value });
+  };
+
+  // 登録しているかのチェック
+  const registeredInput = () => {
+    const name = items.name;
+    const base = suppliers.map((a: { name: string }) => a.name);
+    const result = base?.includes(name);
+    if (!result) return;
+    return result;
   };
 
   const addSupplier = async () => {
@@ -65,6 +77,9 @@ const SupplierNew = () => {
         </Flex>
         <Stack spacing={6} mt={6}>
           <Flex gap={6} flexDirection={{ base: "column" }}>
+            <Box fontSize="2xl" fontWeight="bold" color="red">
+              {registeredInput() && "※すでに登録されています。"}
+            </Box>
             <Box w="100%" flex={2}>
               <Text>仕入先名</Text>
               <Input
@@ -99,7 +114,7 @@ const SupplierNew = () => {
           </Flex>
 
           <Button
-            disabled={!items.name || !items.kana}
+            disabled={!items.name || !items.kana || registeredInput()}
             colorScheme="facebook"
             onClick={addSupplier}
           >

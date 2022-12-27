@@ -13,10 +13,15 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
+import { currentUserState, stockPlacesState } from "../../../../store";
+import { StockPlaceType } from "../../../../types/StockPlaceType";
 
 const StockPlaceNew = () => {
-  const [items, setItems] = useState<any>({});
+  const [items, setItems] = useState({} as StockPlaceType);
+  const currentUser = useRecoilValue(currentUserState);
+  const stockPlaces = useRecoilValue(stockPlacesState);
   const router = useRouter();
 
   const handleInputChange = (
@@ -27,6 +32,15 @@ const StockPlaceNew = () => {
     setItems({ ...items, [name]: value });
   };
 
+  // 登録しているかのチェック
+  const registeredInput = () => {
+    const name = items.name;
+    const base = stockPlaces.map((a: { name: string }) => a.name);
+    const result = base?.includes(name);
+    if (!result) return;
+    return result;
+  };
+
   const addStockPlace = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -35,13 +49,18 @@ const StockPlaceNew = () => {
       await addDoc(collectionStockPlaces, {
         name: items.name || "",
         kana: items.kana || "",
+        address: items.address || "",
+        tel: items.tel || "",
+        fax: items.fax || "",
         comment: items.comment || "",
+        createUser: currentUser || "",
+        updateUser: currentUser || "",
         createdAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);
     } finally {
-      router.push("/stock-places");
+      router.push("/settings/stock-places");
     }
   };
 
@@ -65,6 +84,9 @@ const StockPlaceNew = () => {
         </Flex>
         <Stack spacing={6} mt={6}>
           <Flex gap={6} flexDirection={{ base: "column" }}>
+            <Box fontSize="2xl" fontWeight="bold" color="red">
+              {registeredInput() && "※すでに登録されています。"}
+            </Box>
             <Box w="100%" flex={2}>
               <Text>送り先名</Text>
               <Input
@@ -82,11 +104,35 @@ const StockPlaceNew = () => {
                 mt={1}
                 name="kana"
                 type="text"
-                placeholder=""
+                placeholder="トクシマコウジョウ"
                 value={items.kana}
                 onChange={handleInputChange}
               />
             </Box>
+            <Flex gap={3}>
+              <Box w="100%" flex={1}>
+                <Text>TEL</Text>
+                <Input
+                  mt={1}
+                  name="tel"
+                  type="text"
+                  placeholder=""
+                  value={items.tel}
+                  onChange={handleInputChange}
+                />
+              </Box>
+              <Box w="100%" flex={1}>
+                <Text>FAX</Text>
+                <Input
+                  mt={1}
+                  name="fax"
+                  type="text"
+                  placeholder=""
+                  value={items.fax}
+                  onChange={handleInputChange}
+                />
+              </Box>
+            </Flex>
             <Box w="100%" flex={1}>
               <Text>備考</Text>
               <Textarea
@@ -99,7 +145,7 @@ const StockPlaceNew = () => {
           </Flex>
 
           <Button
-            disabled={!items.name || !items.kana}
+            disabled={!items.name || !items.kana || registeredInput()}
             colorScheme="facebook"
             onClick={addStockPlace}
           >

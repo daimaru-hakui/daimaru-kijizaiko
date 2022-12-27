@@ -19,6 +19,7 @@ const Sidebar = () => {
       position="sticky"
       top="0"
       zIndex={1}
+      overflow="auto"
     >
       <MenuLists onClose={returnNull} />
     </Box>

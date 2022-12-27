@@ -15,13 +15,16 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Select,
   Stack,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
+import { useRecoilValue } from "recoil";
 import { todayDate } from "../../../functions";
+import { stockPlacesState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
@@ -39,6 +42,7 @@ const HistoryConfirmModal: NextPage<Props> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [status, setStatus] = useState(1);
+  const stockPlaces = useRecoilValue(stockPlacesState);
 
   useEffect(() => {
     setItems({ ...history });
@@ -46,7 +50,9 @@ const HistoryConfirmModal: NextPage<Props> = ({
   }, [history]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -145,6 +151,27 @@ const HistoryConfirmModal: NextPage<Props> = ({
                         onChange={handleInputChange}
                       />
                     </Box>
+                    {items.orderType === "purchase" && (
+                      <Box w="100%" mt={3}>
+                        <Text>送り先</Text>
+                        <Select
+                          mt={1}
+                          name="stockPlace"
+                          placeholder="送り先を選択してください"
+                          value={items.stockPlace || history.stockPlace}
+                          defaultValue="徳島工場"
+                          onChange={(e) => handleInputChange(e)}
+                        >
+                          {stockPlaces?.map(
+                            (m: { id: number; name: string }) => (
+                              <option key={m.id} value={m.name}>
+                                {m.name}
+                              </option>
+                            )
+                          )}
+                        </Select>
+                      </Box>
+                    )}
                   </>
                 )}
                 {status === 2 && (

@@ -17,22 +17,34 @@ import {
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../../store";
+import EditModal from "../../../components/stock-places/EditModal";
+import CommentModal from "../../../components/CommentModal";
+import { StockPlaceType } from "../../../../types/StockPlaceType";
+import { FaTrashAlt } from "react-icons/fa";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
 const StockPlaces = () => {
   const stockPlaces = useRecoilValue(stockPlacesState);
 
+  const deleteStockPlace = async (stockPlaceId: string) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+    const docRef = doc(db, "stockPlaces", stockPlaceId);
+    try {
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="900px" mt={6} p={0}>
-        <Link href="/settings">
-          <Button w="100%">一覧へ</Button>
-        </Link>
-      </Container>
-      <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
+      <Container maxW="1200px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6}>
           <Flex justifyContent="space-between">
             <Box as="h2" fontSize="2xl">
-              仕入先一覧
+              送り先一覧
             </Box>
             <Link href="/settings/stock-places/new">
               <Button>新規登録</Button>
@@ -41,25 +53,47 @@ const StockPlaces = () => {
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
-                <Th>仕入先名</Th>
+                <Th>送り先名</Th>
                 <Th>フリガナ</Th>
-                <Th>編集</Th>
+                <Th>住所</Th>
+                <Th>TEL</Th>
+                <Th>FAX</Th>
+                <Th w="100%">コメント</Th>
+                <Th>編集/削除</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {stockPlaces?.map(
-                (stockPlace: { id: string; name: string; kana: string }) => (
-                  <Tr key={stockPlace.id}>
-                    <Td>{stockPlace.name}</Td>
-                    <Td>{stockPlace.kana}</Td>
-                    <Td>
-                      <Link href={`/settings/stock-places/${stockPlace.id}`}>
-                        <Button>詳細</Button>
-                      </Link>
-                    </Td>
-                  </Tr>
-                )
-              )}
+              {stockPlaces?.map((stockPlace: StockPlaceType) => (
+                <Tr key={stockPlace.id}>
+                  <Td>{stockPlace.name}</Td>
+                  <Td>{stockPlace.kana}</Td>
+                  <Td>{stockPlace.address}</Td>
+                  <Td>{stockPlace.tel}</Td>
+                  <Td>{stockPlace.fax}</Td>
+                  <Td>
+                    <Flex gap={3}>
+                      <CommentModal
+                        id={stockPlace.id}
+                        comment={stockPlace.comment}
+                        collectionName="stockPlaces"
+                      />
+                      {stockPlace?.comment.slice(0, 10) +
+                        (stockPlace.comment.length >= 1 ? "..." : "")}
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Flex alignItems="center" justifyContent="center" gap={2}>
+                      <EditModal stockPlace={stockPlace} />
+                      {stockPlace?.id !== "ifk1EZX80Jecxy04fqxu" && (
+                        <FaTrashAlt
+                          cursor="pointer"
+                          onClick={() => deleteStockPlace(stockPlace.id)}
+                        />
+                      )}
+                    </Flex>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>

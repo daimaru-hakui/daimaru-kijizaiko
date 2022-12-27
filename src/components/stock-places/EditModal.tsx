@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Flex,
   Input,
   Modal,
   ModalBody,
@@ -16,20 +18,20 @@ import {
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
+import { currentUserState } from "../../../store";
+import { StockPlaceType } from "../../../types/StockPlaceType";
 
 type Props = {
-  stockPlace: {
-    id: string;
-    name: string;
-    kana: string;
-    comment: string;
-  };
+  stockPlace: StockPlaceType;
 };
 
 const EditModal: NextPage<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState<any>({});
+  const currentUser = useRecoilValue(currentUserState);
   // const [supplier, setSupplier] = useState<any>();
 
   const handleInputChange = (
@@ -52,7 +54,11 @@ const EditModal: NextPage<Props> = ({ stockPlace }) => {
       await updateDoc(docRef, {
         name: items.name || "",
         kana: items.kana || "",
+        address: items.address || "",
+        tel: items.tel || "",
+        fax: items.fax || "",
         comment: items.comment || "",
+        createUser: currentUser || "",
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
@@ -69,8 +75,7 @@ const EditModal: NextPage<Props> = ({ stockPlace }) => {
 
   return (
     <>
-      <Button onClick={onOpen}>編集</Button>
-
+      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
       <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -90,6 +95,30 @@ const EditModal: NextPage<Props> = ({ stockPlace }) => {
                 value={items?.kana}
                 onChange={handleInputChange}
               />
+              <Text>住所</Text>
+              <Input
+                name="address"
+                value={items?.address}
+                onChange={handleInputChange}
+              />
+              <Flex gap={3}>
+                <Box>
+                  <Text>TEL</Text>
+                  <Input
+                    name="tel"
+                    value={items?.tel}
+                    onChange={handleInputChange}
+                  />
+                </Box>
+                <Box>
+                  <Text>FAX</Text>
+                  <Input
+                    name="fax"
+                    value={items?.fax}
+                    onChange={handleInputChange}
+                  />
+                </Box>
+              </Flex>
               <Text>備考</Text>
               <Textarea
                 name="comment"

@@ -17,7 +17,7 @@ import { db } from "../../../firebase";
 import { getSerialNumber } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
-import CommentModal from "./CommentModal";
+import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
