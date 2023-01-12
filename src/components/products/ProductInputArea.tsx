@@ -35,10 +35,12 @@ import {
   suppliersState,
   usersState,
 } from "../../../store";
+import { GrayFabricType } from "../../../types/GrayFabricType";
+import { ProductType } from "../../../types/productType";
 import MaterialsModal from "./MaterialsModal";
 
 type Props = {
-  items: any;
+  items: ProductType;
   setItems: Function;
   title: string;
   toggleSwitch: string;
@@ -82,16 +84,20 @@ const ProductInputArea: NextPage<Props> = ({
     setItems({ ...items, [name]: Number(value) });
   };
 
-  const handleCheckedChange = (e: any, name: string) => {
+  const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name;
+    const value = e.target.value;
     if (e.target.checked) {
       setItems({
         ...items,
-        [name]: [...(items[name] || []), e.target.value],
+        [name]: [...(items["features"] || []), value],
       });
     } else {
       setItems({
         ...items,
-        [name]: [...items[name]?.filter((n: string) => n !== e.target.value)],
+        [name]: [
+          ...items["features"]?.filter((feature: string) => feature !== value),
+        ],
       });
     }
   };
@@ -208,7 +214,7 @@ const ProductInputArea: NextPage<Props> = ({
     const staff = items.productType === 2 ? items.staff : true;
     return (
       !staff ||
-      !items.supplier ||
+      !items.supplierId ||
       !items.productNum ||
       !items.colorName ||
       !items.price
@@ -404,17 +410,11 @@ const ProductInputArea: NextPage<Props> = ({
                 name="grayFabricId"
                 onChange={(e) => handleInputChange(e)}
               >
-                {grayFabrics?.map(
-                  (grayFabric: {
-                    id: string;
-                    productNumber: string;
-                    productName: string;
-                  }) => (
-                    <option key={grayFabric.id} value={grayFabric.id}>
-                      {grayFabric.productNumber} {grayFabric.productName}
-                    </option>
-                  )
-                )}
+                {grayFabrics?.map((grayFabric: GrayFabricType) => (
+                  <option key={grayFabric.id} value={grayFabric.id}>
+                    {grayFabric.productNumber} {grayFabric.productName}
+                  </option>
+                ))}
               </Select>
             </Box>
           </Flex>
@@ -541,14 +541,15 @@ const ProductInputArea: NextPage<Props> = ({
               borderColor="gray.100"
               gap={3}
             >
-              {features.map((f, index) => (
+              {features.map((f) => (
                 <Box key={f}>
                   <input
                     id={f}
                     type="checkbox"
                     checked={items?.features?.includes(f)}
                     value={f}
-                    onChange={(e) => handleCheckedChange(e, "features")}
+                    name="features"
+                    onChange={(e) => handleCheckedChange(e)}
                   />
                   <Box as="span" mx={1}>
                     <label htmlFor={f}>{f}</label>
@@ -606,7 +607,7 @@ const ProductInputArea: NextPage<Props> = ({
             <Button
               colorScheme="facebook"
               disabled={
-                !items.supplier ||
+                !items.supplierId ||
                 !items.productNum ||
                 !items.colorName ||
                 !items.price ||
