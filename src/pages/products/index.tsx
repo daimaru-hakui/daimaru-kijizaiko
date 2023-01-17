@@ -32,14 +32,15 @@ const Products = () => {
     const c = materials.c ? `綿${materials.c}% ` : "";
     const n = materials.n ? `ナイロン${materials.n}% ` : "";
     const r = materials.r ? `レーヨン${materials.r}% ` : "";
-    const f = materials.f ? `麻${materials.f}% ` : "";
+    const h = materials.h ? `麻${materials.h}% ` : "";
     const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
     const w = materials.w ? `ウール${materials.w}% ` : "";
     const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
     const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
     const si = materials.si ? `シルク${materials.si}% ` : "";
     const z = materials.z ? `指定外繊維${materials.z}% ` : "";
-    array.push(t, c, n, r, f, pu, w, ac, cu, si, z);
+    const f = materials.f ? `複合繊維${materials.f}% ` : "";
+    array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
 
     return array
       .filter((item) => item)
