@@ -35,13 +35,14 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
     { id: "c", name: "綿" },
     { id: "n", name: "ナイロン" },
     { id: "r", name: "レーヨン" },
-    { id: "f", name: "麻" },
+    { id: "h", name: "麻" },
     { id: "pu", name: "ポリウレタン" },
-    { id: "si", name: "シルク" },
     { id: "w", name: "ウール" },
     { id: "ac", name: "アクリル" },
     { id: "cu", name: "キュプラ" },
+    { id: "si", name: "シルク" },
     { id: "z", name: "指定外繊維" },
+    { id: "f", name: "複合繊維" },
   ];
 
   const handleInputChange = (e: string, name: string) => {
