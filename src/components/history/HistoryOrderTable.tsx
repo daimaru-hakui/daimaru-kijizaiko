@@ -31,9 +31,15 @@ import { HistoryType } from "../../../types/HistoryType";
 type Props = {
   histories: HistoryType[];
   title: string;
+  orderType: string;
 };
 
-const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
+const HistoryOrderTable: NextPage<Props> = ({
+  histories,
+  title,
+  orderType,
+}) => {
+  const HOUSE_FACTORY = "徳島工場";
   const [filterHistories, setFilterHistories] = useState<any>();
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
@@ -390,8 +396,11 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
             history.quantity +
             items.remainingOrder || 0;
 
-        const newTokushimaStock =
-          productDocSnap.data()?.tokushimaStock + items.quantity || 0;
+        let newTokushimaStock = 0;
+        if (items.stockPlace === HOUSE_FACTORY) {
+          newTokushimaStock =
+            productDocSnap.data()?.tokushimaStock + items.quantity || 0;
+        }
 
         transaction.update(productDocRef, {
           arrivingQuantity: newArrivingQuantity,
@@ -419,6 +428,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
           supplierName: history.supplierName,
           price: history.price,
           quantity: items.quantity,
+          stockPlace: items.stockPlace,
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || todayDate(),
@@ -451,18 +461,16 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     onClickUpdate: Function,
     onClickDelete: Function
   ) => (
-    <Td>
-      <Flex gap={3}>
-        <HistoryEditModal
-          history={history}
-          type="order"
-          items={items}
-          setItems={setItems}
-          onClick={() => onClickUpdate(history)}
-        />
-        <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
-      </Flex>
-    </Td>
+    <Flex gap={3}>
+      <HistoryEditModal
+        history={history}
+        type="order"
+        items={items}
+        setItems={setItems}
+        onClick={() => onClickUpdate(history)}
+      />
+      <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
+    </Flex>
   );
 
   return (
@@ -485,6 +493,7 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
               <Th>数量</Th>
               <Th>単価</Th>
               <Th>金額</Th>
+              {orderType === "purchase" && <Th>出荷先</Th>}
               <Th>コメント</Th>
               <Th>編集/削除</Th>
             </Tr>
@@ -520,6 +529,9 @@ const HistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                     <Td>{history?.price}円</Td>
                     <Td>{history?.quantity * history?.price}円</Td>
                   </>
+                )}
+                {history.orderType === "purchase" && (
+                  <Td>{history?.stockPlace}</Td>
                 )}
                 <Td w="100%" textAlign="center">
                   {history.orderType === "dyeing" &&

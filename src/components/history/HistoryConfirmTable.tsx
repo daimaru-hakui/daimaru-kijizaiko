@@ -23,9 +23,15 @@ import { HistoryType } from "../../../types/HistoryType";
 type Props = {
   histories: HistoryType[];
   title: string;
+  orderType: string;
 };
 
-const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
+const HistoryConfirmTable: NextPage<Props> = ({
+  histories,
+  title,
+  orderType,
+}) => {
+  const HOUSE_FACTORY = "徳島工場";
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
@@ -99,11 +105,13 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const stock = productDocSnap.data().tokushimaStock || 0;
-        const newStock = stock - history.quantity + items.quantity;
-        transaction.update(productDocRef, {
-          tokushimaStock: newStock,
-        });
+        if (history.stockPlace === HOUSE_FACTORY) {
+          const stock = productDocSnap.data().tokushimaStock || 0;
+          const newStock = stock - history.quantity + items.quantity;
+          transaction.update(productDocRef, {
+            tokushimaStock: newStock,
+          });
+        }
 
         transaction.update(historyDocRef, {
           quantity: items.quantity,
@@ -150,6 +158,7 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
               <Th>数量</Th>
               <Th>単価</Th>
               <Th>金額</Th>
+              {orderType === "purchase" && <Th>出荷先</Th>}
               <Th>コメント</Th>
               <Th>編集</Th>
             </Tr>
@@ -167,6 +176,9 @@ const HistoryConfirmTable: NextPage<Props> = ({ histories, title }) => {
                 <Td>{history?.quantity}m</Td>
                 <Td>{history?.price}円</Td>
                 <Td>{history?.quantity * history?.price}円</Td>
+                {history.orderType === "purchase" && (
+                  <Td>{history?.stockPlace}</Td>
+                )}
                 <Td w="100%" textAlign="center">
                   {history.orderType === "dyeing" &&
                     elementComment(history, "historyFabricDyeingConfirms")}

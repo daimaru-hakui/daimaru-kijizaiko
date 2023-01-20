@@ -66,12 +66,14 @@ const HistoryFabricPurchase = () => {
               <HistoryOrderTable
                 histories={historyOrders}
                 title="入荷予定一覧"
+                orderType="purchase"
               />
             </TabPanel>
             <TabPanel>
               <HistoryConfirmTable
                 histories={historyConfirms}
                 title="購入履歴"
+                orderType="purchase"
               />
             </TabPanel>
           </TabPanels>
