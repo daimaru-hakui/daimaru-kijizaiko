@@ -46,7 +46,7 @@ export const HistoryEditModal: NextPage<Props> = ({
   useEffect(() => {
     setItems({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history]);
+  }, [history, isOpen]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

@@ -65,13 +65,15 @@ const HistoryFabricDyeings = () => {
             <TabPanel>
               <HistoryOrderTable
                 histories={historyOrders}
-                title={"生地仕掛一覧"}
+                title="生地仕掛一覧"
+                orderType="dyeing"
               />
             </TabPanel>
             <TabPanel>
               <HistoryConfirmTable
                 histories={historyConfirms}
-                title={"生地発注履歴"}
+                title="生地発注履歴"
+                orderType="dyeing"
               />
             </TabPanel>
           </TabPanels>
