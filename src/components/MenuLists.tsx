@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Divider, List, ListItem, useDisclosure } from "@chakra-ui/react";
+import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
 import OrderDrawer from "./products/OrderDrawer";
@@ -20,7 +20,10 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 2, title: "キバタ仕掛状況", link: "/gray-fabrics/history" },
     { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
-  const menu3 = [{ id: 1, title: "一覧", link: "/cutting-report" }];
+  const menu3 = [
+    { id: 1, title: "入荷予定一覧", link: "/tokushima/history" },
+    { id: 2, title: "裁断報告書", link: "" },
+  ];
   const menu4 = [
     { id: 1, title: "権限", link: "/settings/auth/" },
     { id: 2, title: "仕入先", link: "/settings/suppliers/" },
@@ -82,7 +85,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       <Divider />
 
       {elementMenuList("キバタ", menu2)}
-      {elementMenuList("裁断報告書", menu3)}
+      {elementMenuList("徳島工場", menu3)}
       {elementMenuList("経理部", menu5)}
       {elementMenuList("設定", menu4)}
     </>
