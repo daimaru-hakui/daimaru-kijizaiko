@@ -25,8 +25,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { HistoryType } from "../../../../types/HistoryType";
-import GrayFabricHistoryConfirmTable from "../../../components/history/GrayFabricHistoryConfirmTable";
-import GrayFabricHistoryOrderTable from "../../../components/history/GrayFabricHistoryOrderTable";
+import GrayFabricHistoryConfirmTable from "../../../components/grayFabrics/GrayFabricHistoryConfirmTable";
+import GrayFabricHistoryOrderTable from "../../../components/grayFabrics/GrayFabricHistoryOrderTable";
 
 const GrayFabricHistorys = () => {
   const [historyOrders, setHistoryOrders] = useState<any>();

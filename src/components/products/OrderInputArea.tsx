@@ -294,6 +294,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           updateUser: currentUser,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
+          accounting: false,
         });
       });
     } catch (err) {

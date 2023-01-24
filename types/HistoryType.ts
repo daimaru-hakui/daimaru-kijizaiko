@@ -22,4 +22,5 @@ export type HistoryType = {
   updateUser: string;
   createdAt: Date;
   updatedAt: Date;
+  accounting: boolean;
 };

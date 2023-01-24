@@ -28,6 +28,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 4, title: "色", link: "/settings/colors/" },
     { id: 5, title: "組織名", link: "/settings/material-names/" },
   ];
+  const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept/" }];
 
   const elementMenuList = (
     title: string,
@@ -82,6 +83,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
 
       {elementMenuList("キバタ", menu2)}
       {elementMenuList("裁断報告書", menu3)}
+      {elementMenuList("経理部", menu5)}
       {elementMenuList("設定", menu4)}
     </>
   );

@@ -17,7 +17,7 @@ import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import CommentModal from "../CommentModal";
-import { HistoryEditModal } from "./HistoryEditModal";
+import { HistoryEditModal } from "../history/HistoryEditModal";
 
 type Props = {
   histories: HistoryType[];
