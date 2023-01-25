@@ -18,13 +18,13 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
+import { UserType } from "../../../../types/UserType";
 import EditModal from "../../../components/settings/auth/AuthEditModal";
 
 const Auth = () => {
-  const [users, setUsers] = useState<any>();
+  const [users, setUsers] = useState([] as UserType[]);
 
   //firestore users 情報の取得
   useEffect(() => {
@@ -32,16 +32,19 @@ const Auth = () => {
     const q = query(usersCollectionRef, orderBy("rank", "asc"));
     const unsub = onSnapshot(q, (querySnapshot) => {
       setUsers(
-        querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }))
+        querySnapshot.docs.map(
+          (doc) =>
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
+        )
       );
     });
     return unsub;
   }, []);
 
-  // R&Dに追加
+  // 権限管理
   const isAuthToggle = async (user: any, prop: string) => {
     try {
       const docRef = doc(db, "users", user.uid);
@@ -58,6 +61,17 @@ const Auth = () => {
       console.log(e);
     }
   };
+  const elementAuthButton = (user: any, prop: string) => (
+    <Td>
+      <Button
+        colorScheme={user[prop] ? "facebook" : "gray"}
+        size="sm"
+        onClick={() => isAuthToggle(user, prop)}
+      >
+        {user[prop] ? "有効" : "無効"}
+      </Button>
+    </Td>
+  );
 
   return (
     <Box w="100%" mt={12}>
@@ -72,46 +86,26 @@ const Auth = () => {
                 <Th>ID</Th>
                 <Th>名前</Th>
                 <Th>R&D</Th>
+                <Th>経理</Th>
+                <Th>徳島工場</Th>
                 <Th>入力権限</Th>
                 <Th>編集</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {users?.map(
-                (user: {
-                  uid: string;
-                  rank: number;
-                  name: string;
-                  rd: boolean;
-                  order: boolean;
-                }) => (
-                  <Tr key={user.uid}>
-                    <Td>{user.rank}</Td>
-                    <Td>{user.name}</Td>
-                    <Td>
-                      <Button
-                        colorScheme={user.rd ? "facebook" : "gray"}
-                        size="sm"
-                        onClick={() => isAuthToggle(user, "rd")}
-                      >
-                        {user.rd ? "有効" : "無効"}
-                      </Button>
-                    </Td>
-                    <Td>
-                      <Button
-                        colorScheme={user.order ? "facebook" : "gray"}
-                        size="sm"
-                        onClick={() => isAuthToggle(user, "order")}
-                      >
-                        {user.order ? "有効" : "無効"}
-                      </Button>
-                    </Td>
-                    <Td>
-                      <EditModal uid={user.uid} />
-                    </Td>
-                  </Tr>
-                )
-              )}
+              {users?.map((user: UserType) => (
+                <Tr key={user.uid}>
+                  <Td>{user.rank}</Td>
+                  <Td>{user.name}</Td>
+                  <Td>{elementAuthButton(user, "rd")}</Td>
+                  <Td>{elementAuthButton(user, "accounting")}</Td>
+                  <Td>{elementAuthButton(user, "tokushima")}</Td>
+                  <Td>{elementAuthButton(user, "order")}</Td>
+                  <Td>
+                    <EditModal uid={user.uid} />
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>
