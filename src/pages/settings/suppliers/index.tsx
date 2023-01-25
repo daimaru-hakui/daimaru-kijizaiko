@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import Link from "next/link";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { suppliersState } from "../../../../store";
 import EditModal from "../../../components/suppliers/EditModal";
 import { FaTrashAlt } from "react-icons/fa";
@@ -24,7 +24,7 @@ import { db } from "../../../../firebase";
 import CommentModal from "../../../components/CommentModal";
 
 const Suppliers = () => {
-  const [suppliers, setSuppliers] = useRecoilState(suppliersState);
+  const suppliers = useRecoilValue(suppliersState);
 
   const deleteSupplier = async (supplierId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");

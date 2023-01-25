@@ -236,6 +236,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           productDocSnap.data()?.wip -
             history.quantity +
             items.remainingOrder || 0;
+
         const newStock =
           productDocSnap.data()?.externalStock + items.quantity || 0;
         transaction.update(productDocRef, {
