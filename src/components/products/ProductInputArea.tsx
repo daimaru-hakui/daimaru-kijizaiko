@@ -19,7 +19,13 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
@@ -28,6 +34,7 @@ import { features } from "../../../datalist";
 import { db } from "../../../firebase";
 import {
   colorsState,
+  currentUserState,
   grayFabricsState,
   loadingState,
   materialNamesState,
@@ -54,6 +61,7 @@ const ProductInputArea: NextPage<Props> = ({
   toggleSwitch,
   product,
 }) => {
+  const currentUser = useRecoilValue(currentUserState);
   const router = useRouter();
   const productId = router.query.productId;
   const grayFabrics = useRecoilValue(grayFabricsState);
@@ -106,7 +114,7 @@ const ProductInputArea: NextPage<Props> = ({
     const supplierObj = suppliers.find(
       (supplier: { id: string }) => supplier.id === supplierId
     );
-    return supplierObj.name;
+    return supplierObj?.name;
   };
 
   const getMixed = (materials: any) => {
@@ -130,6 +138,37 @@ const ProductInputArea: NextPage<Props> = ({
       .map((item) => <Text key={item}>{item}</Text>);
   };
 
+  const obj = {
+    productType: items.productType || 1,
+    staff: items.productType === 2 ? items.staff : "R&D",
+    supplierId: items.supplierId || "",
+    supplierName: getSupplierName(items.supplierId) || "",
+    grayFabricId: items.grayFabricId || "",
+    productNumber:
+      items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
+    productNum: items.productNum || "",
+    productName: items.productName || "",
+    colorNum: items.colorNum || "",
+    colorName: items.colorName || "",
+    price: Number(items.price) || 0,
+    materialName: items.materialName || "",
+    materials: items.materials || {},
+    fabricWidth: items.fabricWidth || "",
+    fabricWeight: items.fabricWeight || "",
+    fabricLength: items.fabricLength || "",
+    features: items.features || [],
+    noteProduct: items.noteProduct || "",
+    noteFabric: items.noteFabric || "",
+    noteEtc: items.noteEtc || "",
+    wip: 0,
+    externalStock: 0,
+    arrivingQuantity: 0,
+    tokushimaStock: 0,
+    createUser: currentUser,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
   // 生地登録
   const addProduct = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
@@ -138,31 +177,7 @@ const ProductInputArea: NextPage<Props> = ({
     const docRef = collection(db, "products");
     try {
       await addDoc(docRef, {
-        productType: items.productType || 1,
-        staff: items.productType === 2 ? items.staff : "R&D",
-        supplierId: items.supplierId || "",
-        supplierName: getSupplierName(items.supplierId) || "",
-        grayFabricId: items.grayFabricId || "",
-        productNumber:
-          items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
-        productNum: items.productNum || "",
-        productName: items.productName || "",
-        colorNum: items.colorNum || "",
-        colorName: items.colorName || "",
-        price: Number(items.price) || 0,
-        materialName: items.materialName || "",
-        materials: items.materials || {},
-        fabricWidth: items.fabricWidth || "",
-        fabricWeight: items.fabricWeight || "",
-        fabricLength: items.fabricLength || "",
-        features: items.features || [],
-        noteProduct: items.noteProduct || "",
-        noteFabric: items.noteFabric || "",
-        noteEtc: items.noteEtc || "",
-        wip: 0,
-        externalStock: 0,
-        arrivingQuantity: 0,
-        tokushimaStock: 0,
+        ...obj,
       });
     } catch (err) {
       console.log(err);
@@ -179,31 +194,7 @@ const ProductInputArea: NextPage<Props> = ({
     const docRef = doc(db, "products", `${productId}`);
     try {
       await updateDoc(docRef, {
-        productType: items.productType || 1,
-        staff: items.productType === 2 ? items.staff : "R&D",
-        supplierId: items.supplierId || "",
-        supplierName: getSupplierName(items.supplierId) || "",
-        grayFabricId: items.grayFabricId || "",
-        productNumber:
-          items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
-        productNum: items.productNum || "",
-        productName: items.productName || "",
-        colorNum: items.colorNum || "",
-        colorName: items.colorName || "",
-        price: Number(items.price) || 0,
-        materialName: items.materialName || "",
-        materials: items.materials || {},
-        fabricWidth: items.fabricWidth || "",
-        fabricWeight: items.fabricWeight || "",
-        fabricLength: items.fabricLength || "",
-        features: items.features || [],
-        noteProduct: items.noteProduct || "",
-        noteFabric: items.noteFabric || "",
-        noteEtc: items.noteEtc || "",
-        wip: 0,
-        externalStock: 0,
-        arrivingQuantity: 0,
-        tokushimaStock: 0,
+        ...obj,
       });
     } catch (err) {
       console.log(err);
