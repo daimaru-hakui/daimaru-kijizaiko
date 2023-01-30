@@ -8,10 +8,16 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  serverTimestamp,
+} from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { suppliersState } from "../../../../store";
@@ -19,7 +25,8 @@ import { SupplierType } from "../../../../types/SupplierType";
 
 const SupplierNew = () => {
   const [items, setItems] = useState({} as SupplierType);
-  const suppliers = useRecoilValue(suppliersState);
+  // const suppliers = useRecoilValue(suppliersState);
+  const [suppliers, setSuppliers] = useState<any>();
   const router = useRouter();
 
   const handleInputChange = (
@@ -30,10 +37,19 @@ const SupplierNew = () => {
     setItems({ ...items, [name]: value });
   };
 
+  useEffect(() => {
+    const getSuppliers = async () => {
+      const collectionSupplier = collection(db, "suppliers");
+      const docSnap = await getDocs(collectionSupplier);
+      setSuppliers(docSnap.docs.map((doc) => doc.data()));
+    };
+    getSuppliers();
+  }, []);
+
   // 登録しているかのチェック
   const registeredInput = () => {
     const name = items.name;
-    const base = suppliers.map((a: { name: string }) => a.name);
+    const base = suppliers?.map((a: { name: string }) => a.name);
     const result = base?.includes(name);
     if (!result) return;
     return result;

@@ -159,6 +159,10 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
+        wip: 0,
+        externalStock: 0,
+        arrivingQuantity: 0,
+        tokushimaStock: 0,
       });
     } catch (err) {
       console.log(err);
@@ -179,6 +183,7 @@ const ProductInputArea: NextPage<Props> = ({
         staff: items.productType === 2 ? items.staff : "R&D",
         supplierId: items.supplierId || "",
         supplierName: getSupplierName(items.supplierId) || "",
+        grayFabricId: items.grayFabricId || "",
         productNumber:
           items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
         productNum: items.productNum || "",
@@ -195,7 +200,10 @@ const ProductInputArea: NextPage<Props> = ({
         noteProduct: items.noteProduct || "",
         noteFabric: items.noteFabric || "",
         noteEtc: items.noteEtc || "",
-        grayFabricId: items.grayFabricId || "",
+        wip: 0,
+        externalStock: 0,
+        arrivingQuantity: 0,
+        tokushimaStock: 0,
       });
     } catch (err) {
       console.log(err);

@@ -3,8 +3,10 @@ export const todayDate = () => {
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
+  let monthStr = "0" + month;
+  monthStr = monthStr.slice(-2);
   const day = date.getDate();
-  return `${year}-${month}-${day}`;
+  return `${year}-${monthStr}-${day}`;
 };
 
 export const getSerialNumber = (serialNumber: number) => {
