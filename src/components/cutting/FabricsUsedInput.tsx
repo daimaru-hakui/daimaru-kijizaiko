@@ -116,8 +116,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
                 textAlign="right"
                 readOnly
                 value={scaleCalc(
-                  items.totalQuantity,
-                  items?.contents[rowIndex].quantity
+                  items?.contents[rowIndex].quantity,
+                  items.totalQuantity
                 )}
               />
             </Box>
