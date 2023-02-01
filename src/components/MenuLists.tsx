@@ -22,7 +22,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menu3 = [
     { id: 1, title: "入荷予定一覧", link: "/tokushima/history" },
-    { id: 2, title: "裁断報告書", link: "" },
+    { id: 2, title: "裁断報告書一覧", link: "" },
+    { id: 2, title: "裁断報告書作成", link: "/tokushima/cutting-report/new" },
   ];
   const menu4 = [
     { id: 1, title: "権限", link: "/settings/auth/" },
