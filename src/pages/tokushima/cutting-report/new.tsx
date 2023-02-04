@@ -9,29 +9,25 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Radio,
+  RadioGroup,
   Select,
   Stack,
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { FaPlus } from "react-icons/fa";
 import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
-import { productsState, usersState } from "../../../../store";
+import { usersState } from "../../../../store";
 import { FabricsUsedInput } from "../../../components/cutting/FabricsUsedInput";
-
-type cuttingReportType = {
-  staff: string;
-  orderNumber: number;
-  totalMeter: number;
-  totalQuantity: number;
-  productNumber: string;
-  contents: { productId: string; quantity: number }[];
-};
+import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { CuttingProductType } from "../../../../types/CuttingProductType";
 
 const CuttingReportNew = () => {
   const [items, setItems] = useState({
-    contents: [{ productId: "", quantity: 0 }],
-  } as cuttingReportType);
+    products: [{ productId: "", quantity: 0 }],
+  } as CuttingReportType);
 
   const users = useRecoilValue(usersState);
 
@@ -50,45 +46,87 @@ const CuttingReportNew = () => {
     setItems({ ...items, [name]: Number(value) });
   };
 
+  const handleRadioChange = (e: string, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: Number(value) });
+  };
+
   const addInput = () => {
     setItems({
       ...items,
-      contents: [...items.contents, { productId: "", quantity: 0 }],
+      products: [...items.products, { select: "", productId: "", quantity: 0 }],
     });
   };
+  console.log(items);
 
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
+      <Container maxW="900px" my={6} p={6} bg="white" rounded="md">
         <Box as="h1" fontSize="2xl">
           裁断報告書作成
         </Box>
         <Stack spacing={6} mt={6}>
+          <RadioGroup
+            defaultValue="1"
+            value={String(items.itemType)}
+            onChange={(e) => handleRadioChange(e, "itemType")}
+          >
+            <Stack direction="row">
+              <Radio value="1">既製品</Radio>
+              <Radio value="2">別注品</Radio>
+            </Stack>
+          </RadioGroup>
+          <Flex gap={3}>
+            <Box w="full">
+              <Text fontWeight="bold">加工指示書NO.</Text>
+              <Input
+                mt={1}
+                type="number"
+                name="orderNumber"
+                value={items.orderNumber === 0 ? "" : items.orderNumber}
+                onChange={(e) => handleInputChange(e)}
+              />
+            </Box>
+            <Box w="full">
+              <Text fontWeight="bold">担当者</Text>
+              <Select
+                mt={1}
+                placeholder="担当者名を選択"
+                value={items.staff}
+                name="staff"
+                onChange={(e) => handleInputChange(e)}
+              >
+                {users?.map((user: { id: string; name: string }) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </Select>
+            </Box>
+          </Flex>
           <Box>
-            <Text fontWeight="bold">加工指示書NO.</Text>
+            <Text fontWeight="bold">受託先名</Text>
             <Input
               mt={1}
-              type="number"
-              name="orderNumber"
-              value={items.orderNumber === 0 ? "" : items.orderNumber}
+              type="text"
+              name="client"
+              value={items.client}
               onChange={(e) => handleInputChange(e)}
             />
           </Box>
           <Box>
-            <Text fontWeight="bold">担当者</Text>
-            <Select
+            <Text fontWeight="bold">製品名</Text>
+            <Input
               mt={1}
-              placeholder="担当者名を選択"
-              value={items.staff}
-              name="staff"
+              type="text"
+              name="itemName"
+              value={items.itemName}
               onChange={(e) => handleInputChange(e)}
-            >
-              {users?.map((user: { id: string; name: string }) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </Select>
+            />
+          </Box>
+          <Box>
+            <Text fontWeight="bold">明細</Text>
+            <Textarea mt={1} />
           </Box>
           <Flex gap={3}>
             <Box>
@@ -110,21 +148,18 @@ const CuttingReportNew = () => {
               </NumberInput>
             </Box>
           </Flex>
-          <Box>
-            <Text fontWeight="bold">明細</Text>
-            <Textarea mt={1} />
-          </Box>
-          {items?.contents?.map((item: any, index: number) => (
+
+          {items?.products?.map((product, index) => (
             <FabricsUsedInput
               key={index}
               items={items}
               setItems={setItems}
-              content={item.content}
+              product={product as CuttingProductType}
               rowIndex={index}
             />
           ))}
           <Flex justifyContent="center">
-            <Button mx="auto" w="50px" onClick={addInput}>
+            <Button leftIcon={<FaPlus />} p={2} mx="auto" onClick={addInput}>
               追加
             </Button>
           </Flex>
