@@ -17,7 +17,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { usersState } from "../../../../store";
 import { FabricsUsedInput } from "../../../components/cutting/FabricsUsedInput";
@@ -25,11 +25,22 @@ import { CuttingReportType } from "../../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 
 const CuttingReportNew = () => {
+const [sample,setSample] = useState()
   const [items, setItems] = useState({
     products: [{ productId: "", quantity: 0 }],
   } as CuttingReportType);
 
   const users = useRecoilValue(usersState);
+  useEffect(()=>{
+    const getFetch = async() => {
+      const response =  await fetch('http://localhost:3000/api/hello');
+      const result = await response.json()
+      setSample(result)
+    }
+
+    getFetch()
+  },[])
+  console.log(sample)
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -57,7 +68,7 @@ const CuttingReportNew = () => {
       products: [...items.products, { select: "", productId: "", quantity: 0 }],
     });
   };
-  console.log(items);
+  
 
   return (
     <Box w="100%" mt={12}>
