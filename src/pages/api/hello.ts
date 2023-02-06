@@ -1,24 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { useRecoilValue } from 'recoil';
-import { auth, db } from '../../../firebase';
-import { currentUserState } from '../../../store';
+import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = {
-  name: string
-  base:any
-}
+  name: string;
+  base: any;
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-
- 
-  // auth.signOut()
-  console.log(auth.currentUser?.uid)
-  res.status(200).json({ name: 'John Doe', base: auth.currentUser?.uid })
-
+  console.log(req.headers.api_key);
+  if (req.headers.api_key) {
+    res.status(200).json({ name: "John Doe", base: req.headers.api_key });
+  } else {
+    res.status(404);
+    res.end("");
+  }
 }
