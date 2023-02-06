@@ -36,7 +36,8 @@ const CuttingReportNew = () => {
       const response = await fetch("http://localhost:3000/api/hello", {
         method: "GET",
         headers: {
-          API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
+          API_KEY: "fgzmLExAiAcFcikzqHpqe7avIfu2",
+          // API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
         },
       });
       const result = await response.json();
