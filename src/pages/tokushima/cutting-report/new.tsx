@@ -25,22 +25,27 @@ import { CuttingReportType } from "../../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 
 const CuttingReportNew = () => {
-const [sample,setSample] = useState()
+  const [sample, setSample] = useState();
+  const users = useRecoilValue(usersState);
   const [items, setItems] = useState({
     products: [{ productId: "", quantity: 0 }],
   } as CuttingReportType);
 
-  const users = useRecoilValue(usersState);
-  useEffect(()=>{
-    const getFetch = async() => {
-      const response =  await fetch('http://localhost:3000/api/hello');
-      const result = await response.json()
-      setSample(result)
-    }
+  useEffect(() => {
+    const getFetch = async () => {
+      const response = await fetch("http://localhost:3000/api/hello", {
+        method: "GET",
+        headers: {
+          API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
+        },
+      });
+      const result = await response.json();
+      setSample(result);
+    };
 
-    getFetch()
-  },[])
-  console.log(sample)
+    getFetch();
+  }, []);
+  console.log(sample);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -68,7 +73,6 @@ const [sample,setSample] = useState()
       products: [...items.products, { select: "", productId: "", quantity: 0 }],
     });
   };
-  
 
   return (
     <Box w="100%" mt={12}>
