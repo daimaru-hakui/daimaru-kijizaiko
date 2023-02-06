@@ -33,13 +33,7 @@ const CuttingReportNew = () => {
 
   useEffect(() => {
     const getFetch = async () => {
-      const response = await fetch("http://localhost:3000/api/hello", {
-        method: "GET",
-        headers: {
-          API_KEY: "fgzmLExAiAcFcikzqHpqe7avIfu2",
-          // API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
-        },
-      });
+      const response = await fetch("http://localhost:3000/api/hello");
       const result = await response.json();
       setSample(result);
     };
