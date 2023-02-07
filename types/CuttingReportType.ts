@@ -1,11 +1,12 @@
 export type CuttingReportType = {
   staff: string;
-  orderNumber: number;
+  processNumber: number;
+  cuttingDay: string;
   itemName: string;
   itemType: string;
   client: string;
-  totalMeter: number;
   totalQuantity: number;
-  productNumber: string;
-  products: { select: string; productId: string; quantity: number }[];
+  comment: string;
+  products: { category: string; productId: string; quantity: number }[];
+  serialNumber: number;
 };

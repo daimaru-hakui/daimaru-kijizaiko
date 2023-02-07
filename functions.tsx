@@ -14,7 +14,7 @@ export const getSerialNumber = (serialNumber: number) => {
   return str.slice(-7);
 };
 
-export const getCreateUserName = (users: any, userId: string) => {
+export const getUserName = (users: any, userId: string) => {
   const user = users?.find((user: { uid: string }) => userId === user.uid);
   return user?.name || "";
 };

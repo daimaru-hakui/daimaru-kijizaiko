@@ -52,7 +52,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
   }, [histories]);
 
   // 担当者の表示
-  const getCreateUserName = (userId: string) => {
+  const getUserName = (userId: string) => {
     if (userId === "R&D") {
       return "R&D";
     } else {
@@ -169,7 +169,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
                 <Td>{history?.fixedAt}</Td>
-                <Td>{getCreateUserName(history.createUser)}</Td>
+                <Td>{getUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 <Td>{history.colorName}</Td>
                 <Td>{history.productName}</Td>

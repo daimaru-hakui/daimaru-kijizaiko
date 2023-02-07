@@ -54,7 +54,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   }, [histories]);
 
   // 担当者の表示
-  const getCreateUserName = (userId: string) => {
+  const getUserName = (userId: string) => {
     if (userId === "R&D") {
       return "R&D";
     } else {
@@ -520,7 +520,7 @@ const HistoryOrderTable: NextPage<Props> = ({
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
                 <Td>{history?.scheduledAt}</Td>
-                <Td>{getCreateUserName(history.createUser)}</Td>
+                <Td>{getUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>

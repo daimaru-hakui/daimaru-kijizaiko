@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 type Data = {
   name: string;
-  base: any;
 };
 
 export default async function handler(
@@ -11,10 +10,9 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   // res.status(200).json({ name: "John Doe", base: req.headers.api_key });
-  if (req.headers.api_key === "fgzmLExAiAcFcikzqHpqe7avIfu2") {
-    res.status(200).json({ name: "John Doe", base: req.headers.api_key });
+  if (req.headers.api_key === process.env.NEXT_PUBLIC_BACKEND_API_KEY) {
+    res.status(200).json({ name: "John Doe" });
   } else {
-    res.status(404);
-    res.end("");
+    res.status(200);
   }
 }
