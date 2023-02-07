@@ -18,35 +18,59 @@ import {
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { usersState } from "../../../../store";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  currentUserState,
+  loadingState,
+  productsState,
+  usersState,
+} from "../../../../store";
 import { FabricsUsedInput } from "../../../components/cutting/FabricsUsedInput";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useRouter } from "next/router";
+import { db } from "../../../../firebase";
 
 const CuttingReportNew = () => {
-  const [sample, setSample] = useState();
+  const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
+  const products = useRecoilValue(productsState);
+  const router = useRouter();
+  const setLoading = useSetRecoilState(loadingState);
   const [items, setItems] = useState({
-    products: [{ productId: "", quantity: 0 }],
+    staff: "",
+    processNumber: 0,
+    itemName: "",
+    itemType: "",
+    client: "",
+    totalQuantity: 0,
+    comment: "",
+    products: [{ category: "", productId: "", quantity: 0 }],
   } as CuttingReportType);
 
-  useEffect(() => {
-    const getFetch = async () => {
-      const response = await fetch("/api/hello", {
-        method: "GET",
-        headers: {
-          // API_KEY: "fgzmLExAiAcFcikzqHpqe7avIfu2",
-          API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
-        },
-      });
-      const result = await response.json();
-      setSample(result);
-    };
+  //　サンプル
+  // useEffect(() => {
+  //   const getFetch = async () => {
+  //     const response = await fetch("/api/hello", {
+  //       method: "GET",
+  //       headers: {
+  //         API_KEY: process.env.NEXT_PUBLIC_BACKEND_API_KEY || "",
+  //       },
+  //     });
+  //     const result = await response.json();
+  //     setSample(result);
+  //   };
 
-    getFetch();
-  }, []);
-  console.log(sample);
+  //   getFetch();
+  // }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -71,8 +95,56 @@ const CuttingReportNew = () => {
   const addInput = () => {
     setItems({
       ...items,
-      products: [...items.products, { select: "", productId: "", quantity: 0 }],
+      products: [
+        ...items.products,
+        { category: "", productId: "", quantity: 0 },
+      ],
     });
+  };
+
+  // 生地登録
+  const addCuttingReport = async () => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    setLoading(true);
+    const serialNumberDocRef = doc(db, "serialNumbers", "cuttingReportNumbers");
+    const cuttingReportsRef = collection(db, "cuttingReports");
+
+    try {
+      runTransaction(db, async (transaction) => {
+        const serialNumberDocSnap = await transaction.get(serialNumberDocRef);
+        if (!serialNumberDocSnap.exists())
+          throw "serialNumberDocSnap does not exist!";
+        const newSerialNumber = serialNumberDocSnap.data().serialNumber + 1;
+
+        items.products.map(async (product) => {
+          const productDocRef = doc(db, "products", product.productId);
+          const productSnap = await getDoc(productDocRef);
+          if (!productSnap.exists()) throw "productSnap does not exist!";
+          const tokushimaStock = productSnap.data()?.tokushimaStock || 0;
+          transaction.update(productDocRef, {
+            tokushimaStock: tokushimaStock - product.quantity,
+          });
+        });
+
+        transaction.update(serialNumberDocRef, {
+          serialNumber: newSerialNumber,
+        });
+
+        await addDoc(cuttingReportsRef, {
+          ...items,
+          serialNumber: newSerialNumber,
+          createUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+      router.push("/tokushima/cutting-report");
+    }
   };
 
   return (
@@ -92,14 +164,24 @@ const CuttingReportNew = () => {
               <Radio value="2">別注品</Radio>
             </Stack>
           </RadioGroup>
-          <Flex gap={3}>
+          <Flex gap={3} flexDirection={{ base: "column", md: "row" }}>
+            <Box w="full">
+              <Text fontWeight="bold">裁断日</Text>
+              <Input
+                mt={1}
+                type="date"
+                name="cuttingDay"
+                value={items.cuttingDay}
+                onChange={(e) => handleInputChange(e)}
+              />
+            </Box>
             <Box w="full">
               <Text fontWeight="bold">加工指示書NO.</Text>
               <Input
                 mt={1}
                 type="number"
-                name="orderNumber"
-                value={items.orderNumber === 0 ? "" : items.orderNumber}
+                name="processNumber"
+                value={items.processNumber === 0 ? "" : items.processNumber}
                 onChange={(e) => handleInputChange(e)}
               />
             </Box>
@@ -142,7 +224,7 @@ const CuttingReportNew = () => {
           </Box>
           <Box>
             <Text fontWeight="bold">明細</Text>
-            <Textarea mt={1} />
+            <Textarea mt={1} name="comment" value={items.comment} />
           </Box>
           <Flex gap={3}>
             <Box>
@@ -180,7 +262,12 @@ const CuttingReportNew = () => {
             </Button>
           </Flex>
         </Stack>
-        <Button w="full" my={12} colorScheme="facebook">
+        <Button
+          w="full"
+          my={12}
+          colorScheme="facebook"
+          onClick={addCuttingReport}
+        >
           送信
         </Button>
       </Container>

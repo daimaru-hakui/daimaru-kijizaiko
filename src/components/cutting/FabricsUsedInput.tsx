@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Input,
   NumberDecrementStepper,
@@ -35,7 +36,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const selectType = ["表地", "裏地", "芯地", "配色", "その他"];
+  const categories = ["表地", "裏地", "芯地", "配色", "その他"];
 
   useEffect(() => {
     setFilterProducts(
@@ -73,7 +74,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
     setItems(() => {
       let newArray = [];
       newArray = items.products.map((product, index) =>
-        index === rowIndex ? { ...product, [name]: value } : product
+        index === rowIndex ? { ...product, [name]: Number(value) } : product
       );
       return { ...items, products: [...newArray] };
     });
@@ -95,6 +96,13 @@ export const FabricsUsedInput: NextPage<Props> = ({
     if (meter === 0 || totalQuantity === 0) return 0;
     const value = meter / totalQuantity;
     return value ? value.toFixed(2) : 0;
+  };
+
+  const getProductStock = (productId: string) => {
+    const stock = products
+      .filter((product: ProductType) => product.id === productId)
+      .map((product: ProductType) => product.tokushimaStock);
+    return stock || 0;
   };
 
   return (
@@ -124,10 +132,9 @@ export const FabricsUsedInput: NextPage<Props> = ({
                   placeholder="品番絞り込み"
                   onChange={(e) => setSearchText(e.target.value)}
                 />
-                <FaWindowClose
-                  cursor="pointer"
-                  onClick={() => setSearchText("")}
-                />
+                <Button size="xs" onClick={() => setSearchText("")}>
+                  解除
+                </Button>
               </Flex>
             </Flex>
             <FaWindowClose
@@ -143,19 +150,23 @@ export const FabricsUsedInput: NextPage<Props> = ({
               <Select
                 mt={1}
                 placeholder="選択"
-                value={product.select}
-                name="select"
+                value={product.category}
+                name="category"
                 onChange={(e) => handleInputsChange(e, rowIndex)}
               >
-                {selectType?.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {categories?.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
                   </option>
                 ))}
               </Select>
             </Box>
             <Box w="full">
-              <Text fontWeight="bold">品名</Text>
+              <Text fontWeight="bold">
+                品名{" "}
+                {product.productId &&
+                  `(在庫 ${getProductStock(product.productId)}m)`}
+              </Text>
               <Select
                 mt={1}
                 placeholder="選択"
@@ -182,7 +193,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
                 name="quantity"
                 defaultValue={0}
                 min={0}
-                max={10000}
+                max={getProductStock(product.productId)}
                 value={product?.quantity}
                 onChange={(e) => handleNumbersChange(e, "quantity", rowIndex)}
               >
