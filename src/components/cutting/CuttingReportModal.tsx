@@ -22,9 +22,11 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { NextPage } from "next";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { db } from "../../../firebase";
 import { getSerialNumber, getUserName } from "../../../functions";
 import { productsState, usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
@@ -32,13 +34,24 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { ProductType } from "../../../types/productType";
 
 type Props = {
-  report: CuttingReportType;
+  // report: CuttingReportType;
+  reportId: string;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ report }) => {
+const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const products = useRecoilValue(productsState);
   const users = useRecoilValue(usersState);
+  const [report, setReport] = useState({} as CuttingReportType);
+
+  useEffect(() => {
+    const getCuttingReport = async () => {
+      const docRef = doc(db, "cuttingReports", reportId);
+      const docSnap = await getDoc(docRef);
+      setReport({ ...docSnap.data() } as CuttingReportType);
+    };
+    getCuttingReport();
+  }, [isOpen, reportId]);
 
   const getProductNumber = (products: ProductType[], productId: string) => {
     const result = products.find((product) => product.id === productId);
@@ -152,7 +165,7 @@ const CuttingReportModal: NextPage<Props> = ({ report }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {report.products.map((product: any) => (
+                    {report.products?.map((product: any) => (
                       <Tr key={product.productId}>
                         <Td>{product.category}</Td>
                         <Td>{getProductNumber(products, product.productId)}</Td>

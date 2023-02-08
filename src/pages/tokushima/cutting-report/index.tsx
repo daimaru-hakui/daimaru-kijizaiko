@@ -33,7 +33,7 @@ const CuttingReport = () => {
         onSnapshot(q, (querySnap) =>
           setCuttingReports(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data() } as CuttingReportType)
+              (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
             )
           )
         );
@@ -43,7 +43,7 @@ const CuttingReport = () => {
     };
     getCuttingReports();
   }, []);
-
+  console.log(cuttingReports);
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md">
@@ -76,7 +76,7 @@ const CuttingReport = () => {
                   <Td isNumeric>{report.totalQuantity}</Td>
                   <Td>{getUserName(users, report.staff)}</Td>
                   <Td>
-                    <CuttingReportModal report={report} />
+                    <CuttingReportModal reportId={report.id} />
                   </Td>
                 </Tr>
               ))}
