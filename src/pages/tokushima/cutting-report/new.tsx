@@ -170,7 +170,7 @@ const CuttingReportNew = () => {
               <Input
                 mt={1}
                 type="date"
-                name="cuttingDay"
+                name="cuttingDate"
                 value={items.cuttingDate}
                 onChange={(e) => handleInputChange(e)}
               />
