@@ -17,6 +17,7 @@ import { productsState, usersState } from "../../../../../store";
 import { CuttingProductType } from "../../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../../types/CuttingReportType";
 import { ProductType } from "../../../../../types/productType";
+import CuttingReport from "../../cutting-report";
 
 const HistoryCutting = () => {
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
@@ -36,13 +37,8 @@ const HistoryCutting = () => {
               .map((doc) => ({ ...doc.data(), id: doc.id }))
               .map((cuttingReport: any) =>
                 cuttingReport.products.map((product: CuttingProductType) => ({
+                  ...cuttingReport,
                   ...product,
-                  serialNumber: cuttingReport.serialNumber,
-                  cuttingDate: cuttingReport.cuttingDate || "",
-                  processNumber: cuttingReport.processNumber,
-                  client: cuttingReport.client,
-                  itemName: cuttingReport.itemName,
-                  staff: cuttingReport.staff,
                 }))
               )
               .flat()
@@ -68,7 +64,6 @@ const HistoryCutting = () => {
     return `${result?.productName}`;
   };
 
-  console.log(cuttingList);
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md">
@@ -96,7 +91,7 @@ const HistoryCutting = () => {
               {cuttingList.map((list: any) => (
                 <Tr key={list.serialNumber}>
                   <Td>{getSerialNumber(list.serialNumber)}</Td>
-                  <Td>{list.cuttingDay}</Td>
+                  <Td>{list.cuttingDate}</Td>
                   <Td>{getProductNumber(products, list.productId)}</Td>
                   <Td>{getColorName(products, list.productId)}</Td>
                   <Td>{getProductName(products, list.productId)}</Td>
