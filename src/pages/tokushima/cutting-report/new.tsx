@@ -171,7 +171,7 @@ const CuttingReportNew = () => {
                 mt={1}
                 type="date"
                 name="cuttingDay"
-                value={items.cuttingDay}
+                value={items.cuttingDate}
                 onChange={(e) => handleInputChange(e)}
               />
             </Box>

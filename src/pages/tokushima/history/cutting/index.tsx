@@ -27,7 +27,7 @@ const HistoryCutting = () => {
     const getCuttingReports = () => {
       const q = query(
         collection(db, "cuttingReports"),
-        orderBy("cuttingDay", "desc")
+        orderBy("cuttingDate", "desc")
       );
       try {
         onSnapshot(q, (querySnap) =>
@@ -38,7 +38,7 @@ const HistoryCutting = () => {
                 cuttingReport.products.map((product: CuttingProductType) => ({
                   ...product,
                   serialNumber: cuttingReport.serialNumber,
-                  cuttingDay: cuttingReport.cuttingDay || "",
+                  cuttingDate: cuttingReport.cuttingDate || "",
                   processNumber: cuttingReport.processNumber,
                   client: cuttingReport.client,
                   itemName: cuttingReport.itemName,

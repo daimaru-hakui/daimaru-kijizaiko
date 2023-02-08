@@ -69,7 +69,7 @@ const CuttingReport = () => {
               {cuttingReports.map((report: CuttingReportType) => (
                 <Tr key={report.serialNumber}>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>
-                  <Td>{report.cuttingDay}</Td>
+                  <Td>{report.cuttingDate}</Td>
                   <Td>{report.processNumber}</Td>
                   <Td>{report.itemName}</Td>
                   <Td>{report.client}</Td>
