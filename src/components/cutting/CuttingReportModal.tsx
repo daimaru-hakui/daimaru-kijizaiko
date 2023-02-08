@@ -10,14 +10,23 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
+  Table,
+  TableCaption,
+  TableContainer,
+  Tbody,
+  Td,
   Text,
+  Tfoot,
+  Th,
+  Thead,
+  Tr,
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import React from "react";
 import { useRecoilValue } from "recoil";
-import { getSerialNumber } from "../../../functions";
-import { productsState } from "../../../store";
+import { getSerialNumber, getUserName } from "../../../functions";
+import { productsState, usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { ProductType } from "../../../types/productType";
@@ -29,11 +38,27 @@ type Props = {
 const CuttingReportModal: NextPage<Props> = ({ report }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const products = useRecoilValue(productsState);
+  const users = useRecoilValue(usersState);
 
   const getProductNumber = (products: ProductType[], productId: string) => {
     const result = products.find((product) => product.id === productId);
-    return `${result?.productNumber} ${result?.colorName} ${result?.productName}`;
+    return `${result?.productNumber}`;
   };
+  const getColorName = (products: ProductType[], productId: string) => {
+    const result = products.find((product) => product.id === productId);
+    return `${result?.colorName}`;
+  };
+  const getProductName = (products: ProductType[], productId: string) => {
+    const result = products.find((product) => product.id === productId);
+    return `${result?.productName}`;
+  };
+
+  const scaleCalc = (meter: number, totalQuantity: number) => {
+    if (meter === 0 || totalQuantity === 0) return 0;
+    const value = meter / totalQuantity;
+    return value ? value.toFixed(2) : 0;
+  };
+
   return (
     <>
       <Button
@@ -46,7 +71,7 @@ const CuttingReportModal: NextPage<Props> = ({ report }) => {
         詳細
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>裁断報告書</ModalHeader>
@@ -60,42 +85,88 @@ const CuttingReportModal: NextPage<Props> = ({ report }) => {
                 </Box>
                 <Box>
                   <Text fontWeight="bold">裁断日</Text>
-                  <Box>{report.cuttingDay}</Box>
+                  <Box>{report.cuttingDate}</Box>
+                </Box>
+                <Box>
+                  <Text fontWeight="bold">担当者</Text>
+                  <Box>{getUserName(users, report.staff)}</Box>
                 </Box>
               </Flex>
-              <Flex gap={6}>
-                <Box>
-                  <Text fontWeight="bold">加工指示書</Text>
-                  <Box>No.{report.processNumber}</Box>
-                </Box>
-                <Box>
-                  <Text fontWeight="bold">受注先名</Text>
-                  <Box>{report.client}</Box>
-                </Box>
-              </Flex>
-              <Flex gap={6}>
-                <Box>
-                  <Text fontWeight="bold">種別</Text>
-                  <Box>{report.itemType === "1" ? "既製" : "別注"}</Box>
-                </Box>
-                <Box>
-                  <Text fontWeight="bold">品名</Text>
-                  <Box>{report.itemName}</Box>
-                </Box>
-                <Box>
-                  <Text fontWeight="bold">枚数</Text>
-                  <Box textAlign="right">{report.totalQuantity}</Box>
-                </Box>
-              </Flex>
-              <Box>
-                {report.products.map((product: any) => (
-                  <Flex key={product.productId} gap={3}>
-                    <Box>{product.category}</Box>
-                    <Box>{getProductNumber(products, product.productId)}</Box>
-                    <Box>{product.quantity}m</Box>
+              <Flex
+                alignItems="stretch"
+                flexDirection={{ base: "column", md: "row" }}
+                gap={6}
+              >
+                <Stack spacing={6} w="full">
+                  <Flex gap={6}>
+                    <Box>
+                      <Text fontWeight="bold">加工指示書</Text>
+                      <Box>No.{report.processNumber}</Box>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="bold">受注先名</Text>
+                      <Box>{report.client}</Box>
+                    </Box>
                   </Flex>
-                ))}
-              </Box>
+                  <Flex gap={6}>
+                    <Box>
+                      <Text fontWeight="bold">種別</Text>
+                      <Box>{report.itemType === "1" ? "既製" : "別注"}</Box>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="bold">品名</Text>
+                      <Box>{report.itemName}</Box>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="bold">枚数</Text>
+                      <Box textAlign="right">{report.totalQuantity}</Box>
+                    </Box>
+                  </Flex>
+                </Stack>
+                {report.comment && (
+                  <Box w="full">
+                    <Text fontWeight="bold">明細・備考</Text>
+                    <Box
+                      h="full"
+                      p={3}
+                      mt={2}
+                      border="1px"
+                      borderColor="gray.100"
+                    >
+                      {report.comment}
+                    </Box>
+                  </Box>
+                )}
+              </Flex>
+
+              <TableContainer>
+                <Table variant="simple" mt={6}>
+                  <Thead>
+                    <Tr>
+                      <Th>種別</Th>
+                      <Th>生地品番</Th>
+                      <Th>色</Th>
+                      <Th>品名</Th>
+                      <Th isNumeric>数量</Th>
+                      <Th isNumeric>用尺</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {report.products.map((product: any) => (
+                      <Tr key={product.productId}>
+                        <Td>{product.category}</Td>
+                        <Td>{getProductNumber(products, product.productId)}</Td>
+                        <Td>{getColorName(products, product.productId)}</Td>
+                        <Td>{getProductName(products, product.productId)}</Td>
+                        <Td isNumeric>{product.quantity}m</Td>
+                        <Td isNumeric>
+                          {scaleCalc(product.quantity, report.totalQuantity)}m
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
             </Stack>
           </ModalBody>
 

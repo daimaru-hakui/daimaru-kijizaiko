@@ -21,9 +21,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
   const menu3 = [
-    { id: 1, title: "入荷予定一覧", link: "/tokushima/history" },
+    {
+      id: 1,
+      title: "入荷予定一覧",
+      link: "/tokushima/history/fabric-purchase",
+    },
     { id: 2, title: "裁断報告書一覧", link: "/tokushima/cutting-report" },
-    { id: 2, title: "裁断報告書作成", link: "/tokushima/cutting-report/new" },
+    { id: 3, title: "裁断報告書作成", link: "/tokushima/cutting-report/new" },
+    { id: 4, title: "裁断生地履歴", link: "/tokushima/history/cutting" },
   ];
   const menu4 = [
     { id: 1, title: "権限", link: "/settings/auth/" },

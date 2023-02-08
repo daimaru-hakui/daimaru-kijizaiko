@@ -224,7 +224,12 @@ const CuttingReportNew = () => {
           </Box>
           <Box>
             <Text fontWeight="bold">明細</Text>
-            <Textarea mt={1} name="comment" value={items.comment} />
+            <Textarea
+              mt={1}
+              name="comment"
+              value={items.comment}
+              onChange={handleInputChange}
+            />
           </Box>
           <Flex gap={3}>
             <Box>

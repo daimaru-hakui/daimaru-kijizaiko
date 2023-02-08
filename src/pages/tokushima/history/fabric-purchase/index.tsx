@@ -1,10 +1,10 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { db } from "../../../../firebase";
-import { HistoryType } from "../../../../types/HistoryType";
-import HistoryConfirmTable from "../../../components/history/HistoryConfirmTable";
-import HistoryOrderTable from "../../../components/history/HistoryOrderTable";
+import { db } from "../../../../../firebase";
+import { HistoryType } from "../../../../../types/HistoryType";
+import HistoryConfirmTable from "../../../../components/history/HistoryConfirmTable";
+import HistoryOrderTable from "../../../../components/history/HistoryOrderTable";
 
 const HistoryFabricPurchase = () => {
   const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
