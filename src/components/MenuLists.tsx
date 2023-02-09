@@ -28,7 +28,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     },
     { id: 2, title: "裁断報告書一覧", link: "/tokushima/cutting-report" },
     { id: 3, title: "裁断報告書作成", link: "/tokushima/cutting-report/new" },
-    { id: 4, title: "裁断生地履歴", link: "/tokushima/history/cutting" },
+    { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-report/history" },
   ];
   const menu4 = [
     { id: 1, title: "権限", link: "/settings/auth/" },
@@ -38,6 +38,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 5, title: "組織名", link: "/settings/material-names/" },
   ];
   const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept/" }];
+  const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
 
   const elementMenuList = (
     title: string,
@@ -93,6 +94,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       {elementMenuList("キバタ", menu2)}
       {elementMenuList("徳島工場", menu3)}
       {elementMenuList("経理部", menu5)}
+      {elementMenuList("調整", menu6)}
       {elementMenuList("設定", menu4)}
     </>
   );
