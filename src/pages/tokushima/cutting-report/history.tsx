@@ -11,13 +11,12 @@ import {
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../../../firebase";
-import { getSerialNumber, getUserName } from "../../../../../functions";
-import { productsState, usersState } from "../../../../../store";
-import { CuttingProductType } from "../../../../../types/CuttingProductType";
-import { CuttingReportType } from "../../../../../types/CuttingReportType";
-import { ProductType } from "../../../../../types/productType";
-import CuttingReport from "../../cutting-report";
+import { db } from "../../../../firebase";
+import { getSerialNumber, getUserName } from "../../../../functions";
+import { productsState, usersState } from "../../../../store";
+import { CuttingProductType } from "../../../../types/CuttingProductType";
+import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { ProductType } from "../../../../types/productType";
 
 const HistoryCutting = () => {
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
@@ -75,12 +74,12 @@ const HistoryCutting = () => {
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
-                <Th>裁断報告書NO.</Th>
                 <Th>裁断日</Th>
                 <Th>生地品番</Th>
                 <Th>色番</Th>
                 <Th>品名</Th>
                 <Th>数量</Th>
+                <Th>裁断報告書NO.</Th>
                 <Th>加工指示書NO</Th>
                 <Th>受注先名</Th>
                 <Th>製品名</Th>
@@ -88,14 +87,14 @@ const HistoryCutting = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {cuttingList.map((list: any) => (
-                <Tr key={list.serialNumber}>
-                  <Td>{getSerialNumber(list.serialNumber)}</Td>
+              {cuttingList.map((list: any, index: number) => (
+                <Tr key={index}>
                   <Td>{list.cuttingDate}</Td>
                   <Td>{getProductNumber(products, list.productId)}</Td>
                   <Td>{getColorName(products, list.productId)}</Td>
                   <Td>{getProductName(products, list.productId)}</Td>
                   <Td isNumeric>{list.quantity}m</Td>
+                  <Td>{getSerialNumber(list.serialNumber)}</Td>
                   <Td>{getSerialNumber(list.processNumber)}</Td>
                   <Td>{list.client}</Td>
                   <Td>{list.itemName}</Td>

@@ -42,6 +42,7 @@ import { db } from "../../../../firebase";
 const CuttingReportNew = () => {
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
+  const [validate, setValidate] = useState(true);
   const products = useRecoilValue(productsState);
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
@@ -146,6 +147,18 @@ const CuttingReportNew = () => {
       router.push("/tokushima/cutting-report");
     }
   };
+  useEffect(() => {
+    const validate = () => {
+      const array = items.products.map((product: any) => product.productId);
+      const setArray = new Set(array);
+      if (array.length === Array.from(setArray).length) {
+        setValidate(false);
+      } else {
+        setValidate(true);
+      }
+    };
+    validate();
+  }, [items]);
 
   return (
     <Box w="100%" mt={12}>
@@ -271,6 +284,7 @@ const CuttingReportNew = () => {
           w="full"
           my={12}
           colorScheme="facebook"
+          disabled={validate}
           onClick={addCuttingReport}
         >
           送信
