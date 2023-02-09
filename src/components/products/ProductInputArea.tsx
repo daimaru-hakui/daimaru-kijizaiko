@@ -51,7 +51,7 @@ type Props = {
   setItems: Function;
   title: string;
   toggleSwitch: string;
-  product: ProductType;
+  product: any;
 };
 
 const ProductInputArea: NextPage<Props> = ({
