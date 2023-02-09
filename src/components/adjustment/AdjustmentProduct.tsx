@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Input, Td, Tr } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -26,8 +26,6 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
     setItems({ price: product.price, tokushimaStock: product.tokushimaStock });
   }, [product.price, product.tokushimaStock]);
 
-  console.log("product.tokushimaStock");
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -49,14 +47,15 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   };
 
   const updateStock = async () => {
-    const result = window.confirm("更新して宜しいでしょうか");
-    if (!result) return;
+    // const result = window.confirm("更新して宜しいでしょうか");
+    // if (!result) return;
     setLoading(true);
     try {
       const docRef = doc(db, "products", product.id);
       await updateDoc(docRef, {
         price: items.price,
         tokushimaStock: items.tokushimaStock,
+        updatedAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);

@@ -19,12 +19,16 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
+import { isAuth } from "../../../../functions";
+import { currentUserState } from "../../../../store";
 import { UserType } from "../../../../types/UserType";
 import EditModal from "../../../components/settings/auth/AuthEditModal";
 
 const Auth = () => {
   const [users, setUsers] = useState([] as UserType[]);
+  const currentUser = useRecoilValue(currentUserState);
 
   //firestore users 情報の取得
   useEffect(() => {
@@ -62,15 +66,13 @@ const Auth = () => {
     }
   };
   const elementAuthButton = (user: any, prop: string) => (
-    <Td>
-      <Button
-        colorScheme={user[prop] ? "facebook" : "gray"}
-        size="sm"
-        onClick={() => isAuthToggle(user, prop)}
-      >
-        {user[prop] ? "有効" : "無効"}
-      </Button>
-    </Td>
+    <Button
+      colorScheme={user[prop] ? "facebook" : "gray"}
+      size="sm"
+      onClick={() => isAuthToggle(user, prop)}
+    >
+      {user[prop] ? "有効" : "無効"}
+    </Button>
   );
 
   return (

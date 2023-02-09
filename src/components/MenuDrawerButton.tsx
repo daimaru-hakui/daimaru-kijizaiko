@@ -31,15 +31,9 @@ const MenuDrawerButton = () => {
           <DrawerCloseButton />
           <DrawerHeader>Menu</DrawerHeader>
 
-          <DrawerBody>
+          <DrawerBody pr={0}>
             <MenuLists onClose={onClose} />
           </DrawerBody>
-
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              閉じる
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>

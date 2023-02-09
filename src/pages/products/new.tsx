@@ -3,7 +3,11 @@ import { ProductType } from "../../../types/productType";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
 const ProductsNew = () => {
-  const [items, setItems] = useState({} as ProductType);
+  const [items, setItems] = useState({
+    productNum: "",
+    colorNum: "",
+    colorName: "",
+  } as ProductType);
 
   return (
     <ProductInputArea

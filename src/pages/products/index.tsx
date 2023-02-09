@@ -11,7 +11,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
@@ -80,13 +80,29 @@ const Products = () => {
     return quantity > 0 ? "bold" : "normal";
   };
 
-  // 削除
+  // 物理削除
   const deleteProduct = async (id: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
     const docRef = doc(db, "products", `${id}`);
     await deleteDoc(docRef);
   };
+
+  // 論理削除
+  // const deleteProduct = async (id: string) => {
+  //   const result = window.confirm("削除して宜しいでしょうか");
+  //   if (!result) return;
+  //   try {
+  //     const docRef = doc(db, "products", `${id}`);
+
+  //     await updateDoc(docRef, {
+  //       deletedAt: serverTimestamp(),
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //   }
+  // };
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

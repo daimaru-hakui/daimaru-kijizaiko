@@ -3,11 +3,17 @@ import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
 import OrderDrawer from "./products/OrderDrawer";
+import { adminAuth, isAuth } from "../../functions";
+import { useRecoilValue } from "recoil";
+import { currentUserState, usersState } from "../../store";
 
 type Props = {
   onClose: Function;
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
+  const currentUser = useRecoilValue(currentUserState);
+  const users = useRecoilValue(usersState);
+
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: <OrderDrawer />, link: "" },
@@ -31,14 +37,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-report/history" },
   ];
   const menu4 = [
-    { id: 1, title: "権限", link: "/settings/auth/" },
-    { id: 2, title: "仕入先", link: "/settings/suppliers/" },
-    { id: 3, title: "送り先", link: "/settings/stock-places/" },
-    { id: 4, title: "色", link: "/settings/colors/" },
-    { id: 5, title: "組織名", link: "/settings/material-names/" },
+    { id: 1, title: "仕入先", link: "/settings/suppliers/" },
+    { id: 2, title: "送り先", link: "/settings/stock-places/" },
+    { id: 3, title: "色", link: "/settings/colors/" },
+    { id: 4, title: "組織名", link: "/settings/material-names/" },
   ];
   const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept/" }];
   const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
+  const menu7 = [{ id: 1, title: "権限", link: "/settings/auth/" }];
 
   const elementMenuList = (
     title: string,
@@ -62,7 +68,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   );
 
   return (
-    <>
+    <Box overflow="auto" h="100%" py={6}>
       <List my={2} spacing={1}>
         <ListItem fontSize="sm">
           <Link href="/">トップページ</Link>
@@ -91,12 +97,15 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </List>
       <Divider />
 
-      {elementMenuList("キバタ", menu2)}
-      {elementMenuList("徳島工場", menu3)}
-      {elementMenuList("経理部", menu5)}
-      {elementMenuList("調整", menu6)}
-      {elementMenuList("設定", menu4)}
-    </>
+      {isAuth(users, currentUser, "rd") && elementMenuList("キバタ", menu2)}
+      {isAuth(users, currentUser, "rd") && elementMenuList("設定", menu4)}
+      {isAuth(users, currentUser, "rd") && elementMenuList("調整", menu6)}
+      {isAuth(users, currentUser, "tokushima") &&
+        elementMenuList("徳島工場", menu3)}
+      {isAuth(users, currentUser, "accounting") &&
+        elementMenuList("経理部", menu5)}
+      {adminAuth(currentUser) && elementMenuList("管理者", menu7)}
+    </Box>
   );
 };
 
