@@ -70,7 +70,7 @@ const GrayFabrics = () => {
                 <Th w="100px">キバタ仕掛</Th>
                 <Th w="100px">キバタ在庫</Th>
                 <Th>コメント</Th>
-                <Th>編集/削除</Th>
+                <Th>編集</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -110,10 +110,10 @@ const GrayFabrics = () => {
                   <Td>
                     <Flex alignItems="center" gap={3}>
                       <GrayFabricEditModal grayFabric={item} />
-                      <FaTrashAlt
+                      {/* <FaTrashAlt
                         cursor="pointer"
                         onClick={() => deleteGrayFabric(item.id)}
-                      />
+                      /> */}
                     </Flex>
                   </Td>
                 </Tr>

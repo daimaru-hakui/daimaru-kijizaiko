@@ -24,4 +24,9 @@ export type ProductType = {
   externalStock: number;
   arrivingQuantity: number;
   tokushimaStock: number;
+  createUser: string;
+  updateUser: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | string;
 };

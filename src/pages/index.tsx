@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   setDoc,
+  where,
 } from "firebase/firestore";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -23,6 +24,7 @@ import {
   suppliersState,
   usersState,
 } from "../../store";
+import { ProductType } from "../../types/productType";
 
 export default function Home() {
   const [user] = useAuthState(auth);
@@ -39,15 +41,28 @@ export default function Home() {
   useEffect(() => {
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("rank", "asc"));
-    getDocs(q).then((querySnapshot) => {
+    onSnapshot(q, (querySnapshot) =>
       setUsers(
         querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }))
-      );
-    });
+      )
+    );
   }, [setUsers]);
+  // // users情報;
+  // useEffect(() => {
+  //   const usersRef = collection(db, "users");
+  //   const q = query(usersRef, orderBy("rank", "asc"));
+  //   getDocs(q).then((querySnapshot) => {
+  //     setUsers(
+  //       querySnapshot.docs.map((doc) => ({
+  //         ...doc.data(),
+  //         id: doc.id,
+  //       }))
+  //     );
+  //   });
+  // }, [setUsers]);
 
   // 未登録であればauthorityに登録;
   useEffect(() => {
@@ -72,12 +87,15 @@ export default function Home() {
     const getProducts = async () => {
       const q = query(
         collection(db, "products"),
+        // where("deletedAt", "==", "")
         orderBy("productNumber", "asc")
       );
       try {
         onSnapshot(q, (querySnap) =>
           setProducts(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs
+              .map((doc) => ({ ...doc.data(), id: doc.id }))
+              .sort(compareFunc)
           )
         );
       } catch (err) {
@@ -86,6 +104,10 @@ export default function Home() {
     };
     getProducts();
   }, [setProducts]);
+
+  function compareFunc(a: any, b: any) {
+    return a.productNumber - b.productNumber;
+  }
 
   // キバタ情報;
   useEffect(() => {

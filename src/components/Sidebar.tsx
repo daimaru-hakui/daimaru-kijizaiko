@@ -10,8 +10,8 @@ const Sidebar = () => {
     <Box
       as="nav"
       display={{ base: "none", "2xl": "block" }}
-      p={6}
-      pt={16}
+      pt={12}
+      pl={6}
       minW="250px"
       h="100vh"
       bg="white"
@@ -19,7 +19,6 @@ const Sidebar = () => {
       position="sticky"
       top="0"
       zIndex={1}
-      overflow="auto"
     >
       <MenuLists onClose={returnNull} />
     </Box>

@@ -51,7 +51,7 @@ type Props = {
   setItems: Function;
   title: string;
   toggleSwitch: string;
-  product: any;
+  product: ProductType;
 };
 
 const ProductInputArea: NextPage<Props> = ({
@@ -164,9 +164,7 @@ const ProductInputArea: NextPage<Props> = ({
     externalStock: 0,
     arrivingQuantity: 0,
     tokushimaStock: 0,
-    createUser: currentUser,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    deletedAt: "",
   };
 
   // 生地登録
@@ -178,6 +176,10 @@ const ProductInputArea: NextPage<Props> = ({
     try {
       await addDoc(docRef, {
         ...obj,
+        createUser: currentUser,
+        updateUser: currentUser,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);
@@ -195,6 +197,8 @@ const ProductInputArea: NextPage<Props> = ({
     try {
       await updateDoc(docRef, {
         ...obj,
+        updateUser: currentUser,
+        updatedAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);
@@ -229,7 +233,6 @@ const ProductInputArea: NextPage<Props> = ({
         product.productNum + product.colorNum + product.colorName
     );
     const result = base?.includes(item);
-    if (!result) return;
     return result;
   };
 
