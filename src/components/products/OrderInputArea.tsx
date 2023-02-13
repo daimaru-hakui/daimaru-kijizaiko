@@ -107,6 +107,26 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     return items.stockType === "stock" && stock < items.quantity ? true : false;
   };
 
+  const Obj = {
+    stockType: items.stockType,
+    orderType: orderType,
+    productId: product?.id,
+    productNumber: product?.productNumber,
+    productName: product?.productName,
+    colorName: product?.colorName,
+    quantity: items?.quantity,
+    price: items.price || product.price,
+    comment: items.comment || "",
+    supplierId: product.supplierId,
+    supplierName: getSupplierName(product?.supplierId),
+    orderedAt: items.orderedAt || todayDate(),
+    scheduledAt: items.scheduledAt || todayDate(),
+    createUser: currentUser,
+    updateUser: currentUser,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
   //////////// キバタ在庫から染めOrder依頼 関数//////////////
   const orderFabricDyeingFromStock = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
@@ -151,24 +171,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
-          stockType: items.stockType,
-          orderType: orderType,
+          ...Obj,
           grayFabricId: grayFabricDocSnap.id,
-          productId: product?.id,
-          productNumber: product?.productNumber,
-          productName: product?.productName,
-          colorName: product?.colorName,
-          quantity: items?.quantity,
-          price: items.price || product.price,
-          comment: items.comment || "",
-          supplierId: product.supplierId,
-          supplierName: getSupplierName(product?.supplierId),
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
-          createUser: currentUser,
-          updateUser: currentUser,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
         });
       });
     } catch (err) {
@@ -211,24 +215,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
-          stockType: items.stockType,
-          orderType: orderType,
+          ...Obj,
           grayFabricId: "",
-          productId: product?.id,
-          productNumber: product?.productNumber,
-          productName: product?.productName,
-          colorName: product?.colorName,
-          quantity: items?.quantity,
-          price: items.price || product.price,
-          comment: items.comment || "",
-          supplierId: product.supplierId,
-          supplierName: getSupplierName(product?.supplierId),
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
-          createUser: currentUser,
-          updateUser: currentUser,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
         });
       });
     } catch (err) {
@@ -277,25 +265,9 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
 
         await addDoc(historyDocRef, {
           serialNumber: newSerialNumber,
-          stockType: items.stockType,
-          orderType: orderType,
+          ...Obj,
           grayFabricId: "",
-          productId: product?.id,
-          productNumber: product?.productNumber,
-          productName: product?.productName,
-          colorName: product?.colorName,
-          quantity: items?.quantity,
-          price: items.price || product.price,
-          comment: items.comment || "",
-          supplierId: product.supplierId,
-          supplierName: product.supplierName,
           stockPlace: items.stockPlace || "徳島工場",
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
-          createUser: currentUser,
-          updateUser: currentUser,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
           accounting: false,
         });
       });

@@ -74,7 +74,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
     setItems(() => {
       let newArray = [];
       newArray = items.products.map((product, index) =>
-        index === rowIndex ? { ...product, [name]: Number(value) } : product
+        index === rowIndex ? { ...product, [name]: value } : product
       );
       return { ...items, products: [...newArray] };
     });

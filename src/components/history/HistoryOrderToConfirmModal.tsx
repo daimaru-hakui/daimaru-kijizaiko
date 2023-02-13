@@ -85,7 +85,7 @@ const HistoryConfirmModal: NextPage<Props> = ({
           onOpen();
         }}
       >
-        確定
+        {items.orderType === "purchase" ? "入荷確定" : "確定"}
       </Button>
 
       <Modal
@@ -141,8 +141,9 @@ const HistoryConfirmModal: NextPage<Props> = ({
                         </NumberInputStepper>
                       </NumberInput>
                     </Box>
+
                     <Box w="100%" mt={3}>
-                      <Text>仕上り日</Text>
+                      <Text>入荷日</Text>
                       <Input
                         type="date"
                         mt={1}
@@ -196,16 +197,18 @@ const HistoryConfirmModal: NextPage<Props> = ({
                         </NumberInputStepper>
                       </NumberInput>
                     </Box>
-                    <Box w="100%" mt={3}>
-                      <Text>予定納期</Text>
-                      <Input
-                        type="date"
-                        mt={1}
-                        name="scheduledAt"
-                        value={items.scheduledAt}
-                        onChange={handleInputChange}
-                      />
-                    </Box>
+                    {items.remainingOrder > 0 && (
+                      <Box w="100%" mt={3}>
+                        <Text>予定納期</Text>
+                        <Input
+                          type="date"
+                          mt={1}
+                          name="scheduledAt"
+                          value={items.scheduledAt}
+                          onChange={handleInputChange}
+                        />
+                      </Box>
+                    )}
                   </>
                 )}
               </Box>
