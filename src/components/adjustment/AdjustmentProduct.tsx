@@ -29,7 +29,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     const value = e.target.value;
-    setItems({ ...items, [name]: Number(value) });
+    setItems({ ...items, [name]: value });
   };
 
   // 担当者の表示
@@ -47,14 +47,12 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   };
 
   const updateStock = async () => {
-    // const result = window.confirm("更新して宜しいでしょうか");
-    // if (!result) return;
     setLoading(true);
     try {
       const docRef = doc(db, "products", product.id);
       await updateDoc(docRef, {
         price: items.price,
-        tokushimaStock: items.tokushimaStock,
+        tokushimaStock: Number(items.tokushimaStock),
         updatedAt: serverTimestamp(),
       });
     } catch (err) {

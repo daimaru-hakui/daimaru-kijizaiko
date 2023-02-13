@@ -103,7 +103,7 @@ const CuttingReportNew = () => {
     });
   };
 
-  // 生地登録
+  // 裁断報告書作成
   const addCuttingReport = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
@@ -124,7 +124,7 @@ const CuttingReportNew = () => {
           if (!productSnap.exists()) throw "productSnap does not exist!";
           const tokushimaStock = productSnap.data()?.tokushimaStock || 0;
           transaction.update(productDocRef, {
-            tokushimaStock: tokushimaStock - product.quantity,
+            tokushimaStock: tokushimaStock - Number(product.quantity),
           });
         });
 
@@ -142,6 +142,7 @@ const CuttingReportNew = () => {
       });
     } catch (err) {
       console.log(err);
+      window.alert("登録失敗");
     } finally {
       setLoading(false);
       router.push("/tokushima/cutting-report");
@@ -159,6 +160,8 @@ const CuttingReportNew = () => {
     };
     validate();
   }, [items]);
+
+  console.log(Number(items.totalQuantity));
 
   return (
     <Box w="100%" mt={12}>
