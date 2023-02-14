@@ -1,7 +1,7 @@
 export type CuttingReportType = {
   id: string;
   staff: string;
-  processNumber: number;
+  processNumber: string;
   cuttingDate: string;
   itemName: string;
   itemType: string;
