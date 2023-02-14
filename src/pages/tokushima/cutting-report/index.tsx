@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Flex,
   Table,
   TableContainer,
   Tbody,
@@ -17,6 +18,7 @@ import { getSerialNumber, getUserName } from "../../../../functions";
 import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/cutting/CuttingReportModal";
+import EditCuttingReportModal from "../../../components/cutting/EditCuttingReportModal";
 
 const CuttingReport = () => {
   const [cuttingReports, setCuttingReports] = useState(
@@ -43,7 +45,7 @@ const CuttingReport = () => {
     };
     getCuttingReports();
   }, []);
-  console.log(cuttingReports);
+
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md">
@@ -55,6 +57,7 @@ const CuttingReport = () => {
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
+                <Th>詳細</Th>
                 <Th>裁断報告書NO.</Th>
                 <Th>裁断日</Th>
                 <Th>加工指示書NO.</Th>
@@ -62,12 +65,15 @@ const CuttingReport = () => {
                 <Th>受注先名</Th>
                 <Th>数量</Th>
                 <Th>担当者名</Th>
-                <Th w="full">詳細</Th>
+                <Th w="full">編集</Th>
               </Tr>
             </Thead>
             <Tbody>
               {cuttingReports.map((report: CuttingReportType) => (
                 <Tr key={report.serialNumber}>
+                  <Td>
+                    <CuttingReportModal reportId={report.id} />
+                  </Td>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>
                   <Td>{report.cuttingDate}</Td>
                   <Td>{report.processNumber}</Td>
@@ -76,7 +82,9 @@ const CuttingReport = () => {
                   <Td isNumeric>{report.totalQuantity}</Td>
                   <Td>{getUserName(users, report.staff)}</Td>
                   <Td>
-                    <CuttingReportModal reportId={report.id} />
+                    <Flex alignItems="center" gap={3}>
+                      <EditCuttingReportModal reportId={report.id} />
+                    </Flex>
                   </Td>
                 </Tr>
               ))}

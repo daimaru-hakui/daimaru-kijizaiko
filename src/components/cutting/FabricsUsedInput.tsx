@@ -10,21 +10,25 @@ import {
   NumberInputStepper,
   Select,
   Text,
+  transition,
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { productsState } from "../../../store";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { loadingState, productsState } from "../../../store";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { ProductType } from "../../../types/productType";
+import { db } from "../../../firebase";
+import { doc, getDoc, runTransaction, updateDoc } from "firebase/firestore";
 
 type Props = {
   items: CuttingReportType;
   setItems: Function;
   product: CuttingProductType;
   rowIndex: number;
+  reportId: string;
 };
 
 export const FabricsUsedInput: NextPage<Props> = ({
@@ -32,10 +36,12 @@ export const FabricsUsedInput: NextPage<Props> = ({
   setItems,
   product,
   rowIndex,
+  reportId,
 }) => {
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const setLoading = useSetRecoilState(loadingState);
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
 
   useEffect(() => {
@@ -80,7 +86,22 @@ export const FabricsUsedInput: NextPage<Props> = ({
     });
   };
 
-  // 商品の行を削除
+  // 用尺計算
+  const scaleCalc = (meter: number, totalQuantity: number) => {
+    if (meter === 0 || totalQuantity === 0) return 0;
+    const value = meter / totalQuantity;
+    return value ? value.toFixed(2) : 0;
+  };
+
+  // 在庫数を取得
+  const getProductStock = (productId: string) => {
+    const stock = products
+      .filter((product: ProductType) => product.id === productId)
+      .map((product: ProductType) => product.tokushimaStock);
+    return stock || 0;
+  };
+
+  // 商品の行を削除;
   const deleteRowProduct = (rowIndex: number) => {
     const result = window.confirm("削除してよろしいでしょうか?");
     if (!result) return;
@@ -91,18 +112,55 @@ export const FabricsUsedInput: NextPage<Props> = ({
     });
   };
 
-  // 用尺計算
-  const scaleCalc = (meter: number, totalQuantity: number) => {
-    if (meter === 0 || totalQuantity === 0) return 0;
-    const value = meter / totalQuantity;
-    return value ? value.toFixed(2) : 0;
-  };
+  // 商品の行を削除（編集画面）;
+  const deleteRowProductUpdate = async (rowIndex: number) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+    setLoading(true);
 
-  const getProductStock = (productId: string) => {
-    const stock = products
-      .filter((product: ProductType) => product.id === productId)
-      .map((product: ProductType) => product.tokushimaStock);
-    return stock || 0;
+    setItems(() => {
+      let newArray = [];
+      newArray = items.products.filter((_, index) => index !== rowIndex);
+      return { ...items, products: [...newArray] };
+    });
+    setLoading(false);
+
+    if (!items.products[rowIndex].productId) {
+      return;
+    }
+
+    const cuttingReportDocRef = doc(db, "cuttingReports", reportId);
+    const productDocRef = doc(db, "products", product.productId);
+
+    try {
+      runTransaction(db, async (transaction) => {
+        const cuttingReportSnap = await getDoc(cuttingReportDocRef);
+        if (!cuttingReportSnap.exists())
+          throw "cuttingReportSnap does not exist!";
+
+        const productSnap = await getDoc(productDocRef);
+        if (!productSnap.exists()) throw "productSnap does not exist!";
+
+        let newArray = [];
+        newArray = items.products.filter((_, index) => index !== rowIndex);
+        const newObj = { ...items, products: [...newArray] };
+
+        transaction.update(cuttingReportDocRef, {
+          ...newObj,
+        });
+
+        const newTokushimaStock =
+          productSnap.data().tokushimaStock + (Number(product.quantity) || 0);
+        transaction.update(productDocRef, {
+          tokushimaStock: Number(newTokushimaStock),
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      window.alert("登録失敗");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -139,7 +197,11 @@ export const FabricsUsedInput: NextPage<Props> = ({
             </Flex>
             <FaWindowClose
               cursor="pointer"
-              onClick={() => deleteRowProduct(rowIndex)}
+              onClick={() =>
+                reportId
+                  ? deleteRowProductUpdate(rowIndex)
+                  : deleteRowProduct(rowIndex)
+              }
             />
           </Flex>
         </Box>
@@ -193,7 +255,11 @@ export const FabricsUsedInput: NextPage<Props> = ({
                 name="quantity"
                 defaultValue={0}
                 min={0}
-                max={getProductStock(product.productId)}
+                max={
+                  reportId
+                    ? getProductStock(product.productId) + product?.quantity
+                    : getProductStock(product.productId)
+                }
                 value={product?.quantity}
                 onChange={(e) => handleNumbersChange(e, "quantity", rowIndex)}
               >
