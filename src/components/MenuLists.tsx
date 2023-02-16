@@ -6,6 +6,7 @@ import OrderDrawer from "./products/OrderDrawer";
 import { adminAuth, isAuth } from "../../functions";
 import { useRecoilValue } from "recoil";
 import { currentUserState, usersState } from "../../store";
+import { useRouter } from "next/router";
 
 type Props = {
   onClose: Function;
@@ -13,6 +14,7 @@ type Props = {
 const MenuLists: NextPage<Props> = ({ onClose }) => {
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
+  const router = useRouter()
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
@@ -56,7 +58,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </Box>
       <List my={3} pl={3} spacing={1} fontSize="sm">
         {array.map((m, i: number) => (
-          <ListItem key={i} p={1} pl={2} rounded="base" bg={m?.link == location?.pathname ? "blue.50" : "none"}
+          <ListItem key={i} p={1} pl={2} rounded="base" bg={m?.link == router.pathname ? "blue.50" : "none"}
           >
             <Link href={m.link} onClick={() => onClose()} >
               {m.title}
