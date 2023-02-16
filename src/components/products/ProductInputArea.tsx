@@ -23,6 +23,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   serverTimestamp,
   updateDoc,
@@ -77,12 +78,15 @@ const ProductInputArea: NextPage<Props> = ({
 
 
   useEffect(() => {
+    if (!product.id) return
     const getProduct = async () => {
-      setItems({ ...product })
+      const docRef = doc(db, 'products', product.id)
+      const docSnap = await getDoc(docRef);
+      setItems({ ...docSnap.data() })
     }
     getProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product]);
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -247,7 +251,7 @@ const ProductInputArea: NextPage<Props> = ({
     const result = base?.includes(item);
     return result;
   };
-
+  console.log(items)
   return (
     <Box w="100%" mt={12}>
       <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
