@@ -82,25 +82,32 @@ const AuthEditModal: NextPage<Props> = ({ uid }) => {
           <ModalHeader>名前編集</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Stack>
-              <Text>id</Text>
-              <NumberInput
-                name="rank"
-                onChange={handleIncrementChange}
-                value={user?.rank}
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-              <Text>名前</Text>
-              <Input
-                name="name"
-                value={user?.name}
-                onChange={handleInputChange}
-              />
+            <Stack spacing={3}>
+              <Box>
+                <Text>id</Text>
+                <NumberInput
+                  name="rank"
+                  onChange={handleIncrementChange}
+                  value={user?.rank}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </Box>
+              <Box>
+                <Text>名前</Text>
+                <Input
+                  name="name"
+                  value={user?.name}
+                  onChange={handleInputChange}
+                />
+              </Box>
+              <Box>
+                <Box><Box as="span" mr={2}>email:</Box>{user?.email}</Box>
+              </Box>
             </Stack>
           </ModalBody>
 

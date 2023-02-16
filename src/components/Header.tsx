@@ -84,9 +84,6 @@ const Header = () => {
                 <Link href="/">
                   <MenuItem>トップページ</MenuItem>
                 </Link>
-                <Link href="/settings">
-                  <MenuItem>設定</MenuItem>
-                </Link>
                 <MenuItem onClick={signOut}>ログアウト</MenuItem>
               </MenuList>
             </Menu>

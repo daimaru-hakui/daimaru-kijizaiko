@@ -37,27 +37,28 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-report/history" },
   ];
   const menu4 = [
-    { id: 1, title: "仕入先", link: "/settings/suppliers/" },
-    { id: 2, title: "送り先", link: "/settings/stock-places/" },
-    { id: 3, title: "色", link: "/settings/colors/" },
-    { id: 4, title: "組織名", link: "/settings/material-names/" },
+    { id: 1, title: "仕入先", link: "/settings/suppliers" },
+    { id: 2, title: "送り先", link: "/settings/stock-places" },
+    { id: 3, title: "色", link: "/settings/colors" },
+    { id: 4, title: "組織名", link: "/settings/material-names" },
   ];
-  const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept/" }];
+  const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept" }];
   const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
-  const menu7 = [{ id: 1, title: "権限", link: "/settings/auth/" }];
+  const menu7 = [{ id: 1, title: "権限", link: "/settings/auth" }];
 
   const elementMenuList = (
     title: string,
-    array: { title: string; link: string }[]
+    array: { title: any; link: string }[]
   ) => (
     <>
       <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
         {title}
       </Box>
-      <List my={3} ml={3} spacing={1} fontSize="sm">
+      <List my={3} pl={3} spacing={1} fontSize="sm">
         {array.map((m, i: number) => (
-          <ListItem key={i}>
-            <Link href={m.link} onClick={() => onClose()}>
+          <ListItem key={i} p={1} pl={2} rounded="base" bg={m?.link == location?.pathname ? "blue.50" : "none"}
+          >
+            <Link href={m.link} onClick={() => onClose()} >
               {m.title}
             </Link>
           </ListItem>
@@ -68,7 +69,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   );
 
   return (
-    <Box overflow="auto" h="100%" py={6}>
+    <Box overflow="auto" h="100%" py={6} pr={6}>
       <List my={2} spacing={1}>
         <ListItem fontSize="sm">
           <Link href="/">トップページ</Link>
@@ -76,34 +77,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </List>
       <Divider />
 
-      <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
-        生地
-      </Box>
-      <List my={3} ml={3} spacing={1} fontSize="sm">
-        {menu1.map((m, i) => (
-          <ListItem key={i}>
-            <Link
-              href={m.link}
-              onClick={() => {
-                if (m.id !== 2) {
-                  onClose();
-                }
-              }}
-            >
-              {m.title}
-            </Link>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-
+      {elementMenuList("生地", menu1)}
       {isAuth(users, currentUser, "rd") && elementMenuList("キバタ", menu2)}
-      {isAuth(users, currentUser, "rd") && elementMenuList("設定", menu4)}
       {isAuth(users, currentUser, "rd") && elementMenuList("調整", menu6)}
       {isAuth(users, currentUser, "tokushima") &&
         elementMenuList("徳島工場", menu3)}
       {isAuth(users, currentUser, "accounting") &&
         elementMenuList("経理部", menu5)}
+      {isAuth(users, currentUser, "rd") && elementMenuList("設定", menu4)}
       {adminAuth(currentUser) && elementMenuList("管理者", menu7)}
     </Box>
   );

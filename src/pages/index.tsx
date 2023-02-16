@@ -75,6 +75,7 @@ export default function Home() {
             uid: currentUser,
             name: user?.email || "",
             rank: 1000,
+            email: user?.email || ""
           });
         }
       };
