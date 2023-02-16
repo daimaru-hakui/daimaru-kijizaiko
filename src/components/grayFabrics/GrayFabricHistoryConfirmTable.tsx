@@ -58,7 +58,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "historyDocSnap does not exist!";
 
         const newStock =
-          grayFabricDocSnap.data()?.stock - history.quantity + items.quantity ||
+          await grayFabricDocSnap.data()?.stock - history.quantity + items.quantity ||
           0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,

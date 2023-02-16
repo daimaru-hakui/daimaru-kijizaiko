@@ -139,7 +139,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     );
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabricId);
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = collection(db, "historyFabricDyeingOrders");
+    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -152,24 +152,24 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product does not exist!";
 
-        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
-        const stockGrayFabric = grayFabricDocSnap.data().stock || 0;
+        const stockGrayFabric = await grayFabricDocSnap.data().stock || 0;
         const newStockGrayFabric = stockGrayFabric - items?.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStockGrayFabric,
         });
 
-        const wipProduct = productDocSnap.data().wip || 0;
+        const wipProduct = await productDocSnap.data().wip || 0;
         const newWipProduct = wipProduct + items?.quantity;
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
 
-        await addDoc(historyDocRef, {
+        transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
           ...Obj,
           grayFabricId: grayFabricDocSnap.id,
@@ -192,7 +192,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       "fabricDyeingOrderNumbers"
     );
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = collection(db, "historyFabricDyeingOrders");
+    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -202,18 +202,18 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
-        const wipProduct = productDocSnap.data().wip || 0;
+        const wipProduct = await productDocSnap.data().wip || 0;
         const newWipProduct = wipProduct + items?.quantity;
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
 
-        await addDoc(historyDocRef, {
+        transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
           ...Obj,
           grayFabricId: "",
@@ -234,7 +234,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       "fabricPurchaseOrderNumbers"
     );
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = collection(db, "historyFabricPurchaseOrders");
+    const historyDocRef = doc(collection(db, "historyFabricPurchaseOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -244,26 +244,26 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
         if (stockType === "stock") {
-          const externalStock = productDocSnap.data().externalStock || 0;
+          const externalStock = await productDocSnap.data().externalStock || 0;
           const newEternalStock = externalStock - items.quantity;
           transaction.update(productDocRef, {
             externalStock: newEternalStock,
           });
         }
 
-        const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+        const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
         const newArrivingQuantity = arrivingQuantity + items.quantity;
         transaction.update(productDocRef, {
           arrivingQuantity: newArrivingQuantity,
         });
 
-        await addDoc(historyDocRef, {
+        transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
           ...Obj,
           grayFabricId: "",
@@ -275,6 +275,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       console.log(err);
     }
   };
+
   return (
     <Box>
       <Stack spacing={6}>

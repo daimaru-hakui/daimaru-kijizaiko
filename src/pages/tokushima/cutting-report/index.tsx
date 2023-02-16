@@ -17,8 +17,8 @@ import { db } from "../../../../firebase";
 import { getSerialNumber, getUserName } from "../../../../functions";
 import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
-import CuttingReportModal from "../../../components/cutting/CuttingReportModal";
-import EditCuttingReportModal from "../../../components/cutting/EditCuttingReportModal";
+import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
+import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";
 
 const CuttingReport = () => {
   const [cuttingReports, setCuttingReports] = useState(

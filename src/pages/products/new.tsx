@@ -16,6 +16,7 @@ const ProductsNew = () => {
       title={"生地の登録"}
       toggleSwitch={"new"}
       product={{}}
+      onClose={() => { }}
     />
   );
 };

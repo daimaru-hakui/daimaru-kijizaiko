@@ -70,7 +70,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
         if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
 
-        const newWip = grayFabricDocSnap.data()?.wip - history.quantity;
+        const newWip = await grayFabricDocSnap.data()?.wip - history.quantity;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -98,7 +98,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
         if (!historyDocSnap.exists()) throw "Document does not exist!!";
 
         const newWip =
-          grayFabricDocSnap.data()?.wip - history.quantity + items.quantity ||
+          await grayFabricDocSnap.data()?.wip - history.quantity + items.quantity ||
           0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
@@ -125,7 +125,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
     const grayFabricDocRef = doc(db, "grayFabrics", history?.grayFabricId);
     const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
-    const confirmHistoryRef = collection(db, "historyGrayFabricConfirms");
+    const confirmHistoryDocRef = doc(collection(db, "historyGrayFabricConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -134,8 +134,8 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
         const newStock = grayFabricDocSnap.data()?.stock + items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
@@ -151,7 +151,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
           updatedAt: serverTimestamp(),
         });
 
-        await addDoc(confirmHistoryRef, {
+        transaction.set(confirmHistoryDocRef, {
           serialNumber: history.serialNumber,
           grayFabricId: history.grayFabricId,
           orderedAt: items.orderedAt || history.orderedAt,

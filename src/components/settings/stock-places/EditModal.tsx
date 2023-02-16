@@ -20,9 +20,9 @@ import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
-import { currentUserState } from "../../../store";
-import { StockPlaceType } from "../../../types/StockPlaceType";
+import { db } from "../../../../firebase";
+import { currentUserState } from "../../../../store";
+import { StockPlaceType } from "../../../../types/StockPlaceType";
 
 type Props = {
   stockPlace: StockPlaceType;
@@ -58,7 +58,7 @@ const EditModal: NextPage<Props> = ({ stockPlace }) => {
         tel: items.tel || "",
         fax: items.fax || "",
         comment: items.comment || "",
-        createUser: currentUser || "",
+        updateUser: currentUser || "",
         updatedAt: serverTimestamp(),
       });
     } catch (err) {

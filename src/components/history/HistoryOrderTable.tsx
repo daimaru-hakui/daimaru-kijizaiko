@@ -84,13 +84,13 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        let stock = grayFabricDoSnap.data().stock || 0;
+        let stock = await grayFabricDoSnap.data().stock || 0;
         const newStock = stock + history.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
-        let wip = productDocSnap.data().wip || 0;
+        let wip = await productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -121,7 +121,7 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        let wip = productDocSnap.data().wip || 0;
+        let wip = await productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -153,13 +153,13 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const stock = grayFabricDocSnap.data().stock || 0;
+        const stock = await grayFabricDocSnap.data().stock || 0;
         const newStock = stock + history.quantity - items.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
-        const wip = productDocSnap.data().wip || 0;
+        const wip = await productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity + items.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -196,7 +196,7 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const wip = productDocSnap.data().wip || 0;
+        const wip = await productDocSnap.data().wip || 0;
         const newWip = wip - history.quantity + items.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -225,7 +225,7 @@ const HistoryOrderTable: NextPage<Props> = ({
 
     const productDocRef = doc(db, "products", history.productId);
     const orderHistoryDocRef = doc(db, "historyFabricDyeingOrders", history.id);
-    const confirmHistoryRef = collection(db, "historyFabricDyeingConfirms");
+    const confirmHistoryDocRef = doc(collection(db, "historyFabricDyeingConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -233,12 +233,12 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!productDocSnap.exists()) throw "product does not exist!!";
 
         const newWip =
-          productDocSnap.data()?.wip -
-            history.quantity +
-            items.remainingOrder || 0;
+          await productDocSnap.data()?.wip -
+          history.quantity +
+          items.remainingOrder || 0;
 
         const newStock =
-          productDocSnap.data()?.externalStock + items.quantity || 0;
+          await productDocSnap.data()?.externalStock + items.quantity || 0;
         transaction.update(productDocRef, {
           wip: newWip,
           externalStock: newStock,
@@ -253,7 +253,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           updatedAt: serverTimestamp(),
         });
 
-        await addDoc(confirmHistoryRef, {
+        transaction.set(confirmHistoryDocRef, {
           serialNumber: history.serialNumber,
           orderType: history.orderType,
           grayFabricId: history.grayFabricId,
@@ -296,9 +296,9 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         if (history.stockType === "stock") {
-          const externalStock = productDocSnap.data().externalStock || 0;
+          const externalStock = await productDocSnap.data().externalStock || 0;
           const newExternalStock = externalStock + history.quantity;
-          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
           const newArrivingQuantity = arrivingQuantity - history.quantity;
           transaction.update(productDocRef, {
             externalStock: newExternalStock,
@@ -306,7 +306,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           });
         }
         if (history.stockType === "ranning") {
-          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
           const newArrivingQuantity = arrivingQuantity - history.quantity;
           transaction.update(productDocRef, {
             arrivingQuantity: newArrivingQuantity,
@@ -335,11 +335,11 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         if (history.stockType === "stock") {
-          const externalStock = productDocSnap.data().externalStock || 0;
+          const externalStock = await productDocSnap.data().externalStock || 0;
           const newExternalStock =
             externalStock + history.quantity - items.quantity;
 
-          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
           const newArrivingQuantity =
             arrivingQuantity - history.quantity + items.quantity;
 
@@ -349,7 +349,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           });
         }
         if (history.stockType === "ranning") {
-          const arrivingQuantity = productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
           const newArrivingQuantity =
             arrivingQuantity - history.quantity + items.quantity;
 
@@ -385,7 +385,7 @@ const HistoryOrderTable: NextPage<Props> = ({
       "historyFabricPurchaseOrders",
       history.id
     );
-    const confirmHistoryRef = collection(db, "historyFabricPurchaseConfirms");
+    const confirmHistoryDocRef = doc(collection(db, "historyFabricPurchaseConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -393,14 +393,14 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!productDocSnap.exists()) throw "product does not exist!!";
 
         const newArrivingQuantity =
-          productDocSnap.data()?.arrivingQuantity -
-            history.quantity +
-            items.remainingOrder || 0;
+          await productDocSnap.data()?.arrivingQuantity -
+          history.quantity +
+          items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === HOUSE_FACTORY) {
           newTokushimaStock =
-            productDocSnap.data()?.tokushimaStock + items.quantity || 0;
+            await productDocSnap.data()?.tokushimaStock + items.quantity || 0;
         }
 
         transaction.update(productDocRef, {
@@ -417,7 +417,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           updatedAt: serverTimestamp(),
         });
 
-        await addDoc(confirmHistoryRef, {
+        transaction.set(confirmHistoryDocRef, {
           serialNumber: history.serialNumber,
           orderType: history.orderType,
           grayFabricId: history.grayFabricId,

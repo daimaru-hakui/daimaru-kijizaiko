@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../../store";
-import EditModal from "../../../components/stock-places/EditModal";
+import EditModal from "../../../components/settings/stock-places/EditModal";
 import CommentModal from "../../../components/CommentModal";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
 import { FaTrashAlt } from "react-icons/fa";

@@ -35,7 +35,7 @@ const StockPlaceNew = () => {
   // 登録しているかのチェック
   const registeredInput = () => {
     const name = items.name;
-    const base = stockPlaces.map((a: { name: string }) => a.name);
+    const base = stockPlaces.map((place: { name: string }) => place.name);
     const result = base?.includes(name);
     if (!result) return;
     return result;
@@ -56,6 +56,7 @@ const StockPlaceNew = () => {
         createUser: currentUser || "",
         updateUser: currentUser || "",
         createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);
@@ -106,6 +107,17 @@ const StockPlaceNew = () => {
                 type="text"
                 placeholder="トクシマコウジョウ"
                 value={items.kana}
+                onChange={handleInputChange}
+              />
+            </Box>
+            <Box w="100%" flex={1}>
+              <Text>住所</Text>
+              <Input
+                mt={1}
+                name="address"
+                type="text"
+                placeholder=""
+                value={items.address}
                 onChange={handleInputChange}
               />
             </Box>

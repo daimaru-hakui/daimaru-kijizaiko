@@ -25,7 +25,7 @@ import {
   productsState,
   usersState,
 } from "../../../../store";
-import { FabricsUsedInput } from "../../../components/cutting/FabricsUsedInput";
+import { FabricsUsedInput } from "../../../components/tokushima/FabricsUsedInput";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import {
@@ -39,7 +39,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { db } from "../../../../firebase";
-import CuttingReportInputArea from "../../../components/cutting/CuttingReportInputArea";
+import CuttingReportInputArea from "../../../components/tokushima/CuttingReportInputArea";
 
 const CuttingReportNew = () => {
   const currentUser = useRecoilValue(currentUserState);

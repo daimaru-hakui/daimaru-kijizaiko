@@ -11,16 +11,18 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, } from "firebase/firestore";
 import { db } from "../../../firebase";
-import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { productsState, usersState } from "../../../store";
+import { currentUserState, productsState, usersState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import { ProductType } from "../../../types/productType";
+import ProductModal from "../../components/products/ProductModal";
+import { adminAuth } from "../../../functions";
 
 const Products = () => {
+  const currentUser = useRecoilValue(currentUserState)
   const products = useRecoilValue(productsState);
   const users = useRecoilValue(usersState);
 
@@ -128,7 +130,9 @@ const Products = () => {
                 <Th>混率</Th>
                 <Th>規格</Th>
                 <Th>機能性</Th>
-                <Th>削除</Th>
+                {adminAuth(currentUser) && (
+                  <Th>削除</Th>
+                )}
               </Tr>
             </Thead>
             <Tbody>
@@ -136,9 +140,10 @@ const Products = () => {
                 <Tr key={product.id}>
                   <Td>
                     <Flex alignItems="center" gap={3}>
-                      <Link href={`/products/${product.id}`}>
+                      {/* <Link href={`/products/${product.id}`}>
                         <Button size="xs">詳細</Button>
-                      </Link>
+                      </Link> */}
+                      <ProductModal productId={product.id} />
                       <OrderAreaModal product={product} buttonSize="xs" />
                     </Flex>
                   </Td>
@@ -192,10 +197,12 @@ const Products = () => {
                     </Flex>
                   </Td>
                   <Td>
-                    <FaTrashAlt
-                      cursor="pointer"
-                      onClick={() => deleteProduct(product.id)}
-                    />
+                    {adminAuth(currentUser) && (
+                      <FaTrashAlt
+                        cursor="pointer"
+                        onClick={() => deleteProduct(product.id)}
+                      />
+                    )}
                   </Td>
                 </Tr>
               ))}

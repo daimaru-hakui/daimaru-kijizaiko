@@ -66,13 +66,16 @@ const EditCuttingReportModal: NextPage<Props> = ({ reportId }) => {
     const productsRef = collection(db, "products");
     try {
       runTransaction(db, async (transaction) => {
+        transaction.update(cuttingReportDocRef, {
+          ...items,
+        });
         items.products?.map(async (product, index) => {
           if (!product.productId) return;
           const productDocRef = doc(productsRef, product.productId);
           const productSnap = await getDoc(productDocRef);
           if (!productSnap.exists()) throw "productSnap does not exist!";
 
-          const tokushimaStock = productSnap.data()?.tokushimaStock || 0;
+          const tokushimaStock = await productSnap.data()?.tokushimaStock || 0;
 
           const initValue = report?.products[index]?.quantity || 0;
 
@@ -88,9 +91,7 @@ const EditCuttingReportModal: NextPage<Props> = ({ reportId }) => {
           });
         });
 
-        transaction.update(cuttingReportDocRef, {
-          ...items,
-        });
+
       });
     } catch (err) {
       console.log(err);

@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { suppliersState } from "../../../../store";
-import EditModal from "../../../components/suppliers/EditModal";
+import EditModal from "../../../components/settings/suppliers/EditModal";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";

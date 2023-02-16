@@ -17,8 +17,8 @@ import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { db } from "../../../firebase";
-import { SupplierType } from "../../../types/SupplierType";
+import { db } from "../../../../firebase";
+import { SupplierType } from "../../../../types/SupplierType";
 
 type Props = {
   supplier: SupplierType;

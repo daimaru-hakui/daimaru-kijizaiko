@@ -23,6 +23,7 @@ import {
   addDoc,
   collection,
   doc,
+  onSnapshot,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -52,6 +53,7 @@ type Props = {
   title: string;
   toggleSwitch: string;
   product: any;
+  onClose: Function
 };
 
 const ProductInputArea: NextPage<Props> = ({
@@ -60,10 +62,11 @@ const ProductInputArea: NextPage<Props> = ({
   title,
   toggleSwitch,
   product,
+  onClose
 }) => {
   const currentUser = useRecoilValue(currentUserState);
   const router = useRouter();
-  const productId = router.query.productId;
+  const productId = product.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
@@ -71,6 +74,15 @@ const ProductInputArea: NextPage<Props> = ({
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
   const setLoading = useSetRecoilState(loadingState);
+
+
+  useEffect(() => {
+    const getProduct = async () => {
+      setItems({ ...product })
+    }
+    getProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -204,13 +216,13 @@ const ProductInputArea: NextPage<Props> = ({
       console.log(err);
     } finally {
       setLoading(false);
-      router.push(`/products/${productId}`);
+      onClose();
     }
   };
 
   const reset = () => {
     setItems(product);
-    router.push(`/products/${productId}`);
+    onClose()
   };
 
   // 必須項目を入力しているかをチェック

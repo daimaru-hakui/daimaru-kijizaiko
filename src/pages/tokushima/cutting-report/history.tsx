@@ -95,7 +95,7 @@ const HistoryCutting = () => {
                   <Td>{getProductName(products, list.productId)}</Td>
                   <Td isNumeric>{list.quantity}m</Td>
                   <Td>{getSerialNumber(list.serialNumber)}</Td>
-                  <Td>{getSerialNumber(list.processNumber)}</Td>
+                  <Td>{list.processNumber}</Td>
                   <Td>{list.client}</Td>
                   <Td>{list.itemName}</Td>
                   <Td>{getUserName(users, list.staff)}</Td>
