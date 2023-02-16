@@ -11,6 +11,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
+import { useRef, useState } from "react"
 import { deleteDoc, doc, } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useRecoilValue } from "recoil";
@@ -25,6 +26,7 @@ const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
   const products = useRecoilValue(productsState);
   const users = useRecoilValue(usersState);
+  const ref = useRef<any>()
 
   // 混率の表示
   const getMixed = (materials: any) => {
@@ -106,6 +108,7 @@ const Products = () => {
   //   }
   // };
 
+
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
@@ -140,9 +143,6 @@ const Products = () => {
                 <Tr key={product.id}>
                   <Td>
                     <Flex alignItems="center" gap={3}>
-                      {/* <Link href={`/products/${product.id}`}>
-                        <Button size="xs">詳細</Button>
-                      </Link> */}
                       <ProductModal productId={product.id} />
                       <OrderAreaModal product={product} buttonSize="xs" />
                     </Flex>
