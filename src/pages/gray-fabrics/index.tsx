@@ -14,16 +14,17 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { grayFabricsState, suppliersState } from "../../../store";
+import { grayFabricsState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const suppliers = useRecoilValue(suppliersState);
   const [filterGrayFabrics, setFilterGrayFabrics] = useState([]);
+  const { getSupplierName } = useGetDisplay()
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {
@@ -36,13 +37,6 @@ const GrayFabrics = () => {
     getFilterGrayFabrics();
   }, [grayFabrics]);
 
-  const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
-    );
-    return supplier?.name;
-  };
-
   const deleteGrayFabric = async (id: string) => {
     let result = window.confirm("削除して宜しいでしょうか。");
     if (!result) return;
@@ -53,6 +47,7 @@ const GrayFabrics = () => {
     const docRef = doc(db, "grayFabrics", id);
     await deleteDoc(docRef);
   };
+
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} mx="auto" rounded="md" bg="white" boxShadow="md">
@@ -110,10 +105,10 @@ const GrayFabrics = () => {
                   <Td>
                     <Flex alignItems="center" gap={3}>
                       <GrayFabricEditModal grayFabric={item} />
-                      {/* <FaTrashAlt
+                      <FaTrashAlt
                         cursor="pointer"
                         onClick={() => deleteGrayFabric(item.id)}
-                      /> */}
+                      />
                     </Flex>
                   </Td>
                 </Tr>

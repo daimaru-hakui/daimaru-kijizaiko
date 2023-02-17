@@ -21,7 +21,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
-import { useInputHandle } from "../../../hooks/UseInputHandle";
+import { useInputHandle } from "../../../hooks/useInputHandle";
 
 const StockPlaceNew = () => {
   const router = useRouter();

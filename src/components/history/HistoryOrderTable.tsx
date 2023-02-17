@@ -21,12 +21,13 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { getSerialNumber, todayDate } from "../../../functions";
+import { todayDate } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   histories: HistoryType[];
@@ -44,6 +45,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
+  const { getSerialNumber } = useGetDisplay()
 
   // 数量０のデータを非表示
   useEffect(() => {

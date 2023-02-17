@@ -17,7 +17,7 @@ import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../store";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 import AdjustmentProduct from "../../components/adjustment/AdjustmentProduct";
 
 const Adjustment = () => {

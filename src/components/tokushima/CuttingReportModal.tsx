@@ -27,11 +27,11 @@ import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { getSerialNumber, getUserName } from "../../../functions";
 import { productsState, usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   // report: CuttingReportType;
@@ -43,6 +43,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
   const products = useRecoilValue(productsState);
   const users = useRecoilValue(usersState);
   const [report, setReport] = useState({} as CuttingReportType);
+  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisplay()
 
   useEffect(() => {
     const getCuttingReport = async () => {
@@ -52,19 +53,6 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
     };
     getCuttingReport();
   }, [isOpen, reportId]);
-
-  const getProductNumber = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.productNumber}`;
-  };
-  const getColorName = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.colorName}`;
-  };
-  const getProductName = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.productName}`;
-  };
 
   const scaleCalc = (meter: number, totalQuantity: number) => {
     if (meter === 0 || totalQuantity === 0) return 0;
@@ -102,7 +90,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                 </Box>
                 <Box>
                   <Text fontWeight="bold">担当者</Text>
-                  <Box>{getUserName(users, report.staff)}</Box>
+                  <Box>{getUserName(report.staff)}</Box>
                 </Box>
               </Flex>
               <Flex
@@ -168,9 +156,9 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                     {report.products?.map((product: any) => (
                       <Tr key={product.productId}>
                         <Td>{product.category}</Td>
-                        <Td>{getProductNumber(products, product.productId)}</Td>
-                        <Td>{getColorName(products, product.productId)}</Td>
-                        <Td>{getProductName(products, product.productId)}</Td>
+                        <Td>{getProductNumber(product.productId)}</Td>
+                        <Td>{getColorName(product.productId)}</Td>
+                        <Td>{getProductName(product.productId)}</Td>
                         <Td isNumeric>{product.quantity}m</Td>
                         <Td isNumeric>
                           {scaleCalc(product.quantity, report.totalQuantity)}m

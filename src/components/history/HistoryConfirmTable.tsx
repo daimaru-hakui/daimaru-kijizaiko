@@ -14,11 +14,11 @@ import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { getSerialNumber } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   histories: HistoryType[];
@@ -35,6 +35,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
+  const { getSerialNumber } = useGetDisplay()
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,

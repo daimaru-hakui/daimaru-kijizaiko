@@ -10,18 +10,14 @@ import {
 } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { getSerialNumber, getUserName } from "../../../../functions";
-import { productsState, usersState } from "../../../../store";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
-import { ProductType } from "../../../../types/productType";
+import { useGetDisplay } from "../../../hooks/useGetDisplay";
 
 const HistoryCutting = () => {
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
-  const users = useRecoilValue(usersState);
-  const products = useRecoilValue(productsState);
+  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisplay()
 
   useEffect(() => {
     const getCuttingReports = () => {
@@ -50,19 +46,6 @@ const HistoryCutting = () => {
     getCuttingReports();
   }, []);
 
-  const getProductNumber = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.productNumber}`;
-  };
-  const getColorName = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.colorName}`;
-  };
-  const getProductName = (products: ProductType[], productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return `${result?.productName}`;
-  };
-
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md">
@@ -90,15 +73,15 @@ const HistoryCutting = () => {
               {cuttingList.map((list: any, index: number) => (
                 <Tr key={index}>
                   <Td>{list.cuttingDate}</Td>
-                  <Td>{getProductNumber(products, list.productId)}</Td>
-                  <Td>{getColorName(products, list.productId)}</Td>
-                  <Td>{getProductName(products, list.productId)}</Td>
+                  <Td>{getProductNumber(list.productId)}</Td>
+                  <Td>{getColorName(list.productId)}</Td>
+                  <Td>{getProductName(list.productId)}</Td>
                   <Td isNumeric>{list.quantity}m</Td>
                   <Td>{getSerialNumber(list.serialNumber)}</Td>
                   <Td>{list.processNumber}</Td>
                   <Td>{list.client}</Td>
                   <Td>{list.itemName}</Td>
-                  <Td>{getUserName(users, list.staff)}</Td>
+                  <Td>{getUserName(list.staff)}</Td>
                   <Td></Td>
                 </Tr>
               ))}

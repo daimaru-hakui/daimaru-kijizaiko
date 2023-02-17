@@ -7,78 +7,24 @@ import {
   Th,
   Td,
   TableContainer,
-  Button,
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react"
 import { deleteDoc, doc, } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useRecoilValue } from "recoil";
-import { currentUserState, productsState, usersState } from "../../../store";
+import { currentUserState, productsState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
-import { ProductType } from "../../../types/productType";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
+import { ProductType } from "../../../types/ProductType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
   const products = useRecoilValue(productsState);
-  const users = useRecoilValue(usersState);
-  const ref = useRef<any>()
-
-  // 混率の表示
-  const getMixed = (materials: any) => {
-    let array = [];
-    const t = materials.t ? `ポリエステル${materials.t}% ` : "";
-    const c = materials.c ? `綿${materials.c}% ` : "";
-    const n = materials.n ? `ナイロン${materials.n}% ` : "";
-    const r = materials.r ? `レーヨン${materials.r}% ` : "";
-    const h = materials.h ? `麻${materials.h}% ` : "";
-    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
-    const w = materials.w ? `ウール${materials.w}% ` : "";
-    const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
-    const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
-    const si = materials.si ? `シルク${materials.si}% ` : "";
-    const z = materials.z ? `指定外繊維${materials.z}% ` : "";
-    const f = materials.f ? `複合繊維${materials.f}% ` : "";
-    array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
-
-    return array
-      .filter((item) => item)
-      .map((item) => <Text key={item}>{item}</Text>);
-  };
-
-  // 担当者の表示
-  const displayName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
-      return user?.name;
-    }
-  };
-
-  // 規格の表示
-  const displayStd = (
-    fabricWidth: number,
-    fabricLength: number,
-    fabricWeight: number | null
-  ) => {
-    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
-    const length = fabricLength ? `長さ:${fabricLength}m` : "";
-    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
-    const mark = width && length ? "×" : "";
-    return (
-      <>
-        <Text>{width}</Text>
-        <Text>{mark}</Text>
-        <Text>{length}</Text>
-        <Text ml={3}>{weigth}</Text>
-      </>
-    );
-  };
+  const { getUserName, getMixed, getFabricStd } = useGetDisplay()
 
   const quantityBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";
@@ -110,107 +56,111 @@ const Products = () => {
 
 
   return (
-    <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
-        <TableContainer p={6} w="100%">
-          <Box as="h2" fontSize="2xl">
-            生地品番一覧
-          </Box>
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th></Th>
-                <Th>担当</Th>
-                <Th>生地品番</Th>
-                <Th>色</Th>
-                <Th>品名</Th>
-                <Th>単価</Th>
-                <Th>生地仕掛</Th>
-                <Th>外部在庫</Th>
-                <Th>入荷待ち</Th>
-                <Th>徳島在庫</Th>
-                <Th>組織名</Th>
-                <Th>混率</Th>
-                <Th>規格</Th>
-                <Th>機能性</Th>
-                {adminAuth(currentUser) && (
-                  <Th>削除</Th>
-                )}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {products?.map((product: ProductType) => (
-                <Tr key={product.id}>
-                  <Td>
-                    <Flex alignItems="center" gap={3}>
-                      <ProductModal productId={product.id} />
-                      <OrderAreaModal product={product} buttonSize="xs" />
-                    </Flex>
-                  </Td>
-                  <Td>{displayName(product.staff)}</Td>
-                  <Td>{product.productNumber}</Td>
-
-                  <Td>{product?.colorName}</Td>
-                  <Td>{product?.productName}</Td>
-                  <Td isNumeric>{product.price}円</Td>
-
-                  <Td isNumeric fontWeight={quantityBold(product?.wip)}>
-                    {product?.wip || 0}m
-                  </Td>
-                  <Td
-                    isNumeric
-                    fontWeight={quantityBold(product?.externalStock)}
-                  >
-                    {product?.externalStock || 0}m
-                  </Td>
-                  <Td
-                    isNumeric
-                    fontWeight={quantityBold(product?.arrivingQuantity)}
-                  >
-                    {product?.arrivingQuantity || 0}m
-                  </Td>
-                  <Td
-                    isNumeric
-                    fontWeight={quantityBold(product?.tokushimaStock)}
-                  >
-                    {product?.tokushimaStock || 0}m
-                  </Td>
-                  <Td>{product.materialName}</Td>
-                  <Td>
-                    <Flex gap={1}>{getMixed(product.materials)}</Flex>
-                  </Td>
-                  <Td>
-                    <Flex>
-                      {displayStd(
-                        product.fabricWidth,
-                        product.fabricLength,
-                        null
-                      )}
-                    </Flex>
-                  </Td>
-
-                  <Td>
-                    <Flex gap={2}>
-                      {product?.features.map((f, index) => (
-                        <Text key={index}>{f}</Text>
-                      ))}
-                    </Flex>
-                  </Td>
-                  <Td>
+    <>
+      {currentUser && (
+        <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
+          <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
+            <TableContainer p={6} w="100%">
+              <Box as="h2" fontSize="2xl">
+                生地品番一覧
+              </Box>
+              <Table mt={6} variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>担当</Th>
+                    <Th>生地品番</Th>
+                    <Th>色</Th>
+                    <Th>品名</Th>
+                    <Th>単価</Th>
+                    <Th>生地仕掛</Th>
+                    <Th>外部在庫</Th>
+                    <Th>入荷待ち</Th>
+                    <Th>徳島在庫</Th>
+                    <Th>組織名</Th>
+                    <Th>混率</Th>
+                    <Th>規格</Th>
+                    <Th>機能性</Th>
                     {adminAuth(currentUser) && (
-                      <FaTrashAlt
-                        cursor="pointer"
-                        onClick={() => deleteProduct(product.id)}
-                      />
+                      <Th>削除</Th>
                     )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Box>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {products?.map((product: ProductType) => (
+                    <Tr key={product.id}>
+                      <Td>
+                        <Flex alignItems="center" gap={3}>
+                          <ProductModal productId={product.id} />
+                          <OrderAreaModal product={product} buttonSize="xs" />
+                        </Flex>
+                      </Td>
+                      <Td>{getUserName(product.staff)}</Td>
+                      <Td>{product.productNumber}</Td>
+
+                      <Td>{product?.colorName}</Td>
+                      <Td>{product?.productName}</Td>
+                      <Td isNumeric>{product.price}円</Td>
+
+                      <Td isNumeric fontWeight={quantityBold(product?.wip)}>
+                        {product?.wip || 0}m
+                      </Td>
+                      <Td
+                        isNumeric
+                        fontWeight={quantityBold(product?.externalStock)}
+                      >
+                        {product?.externalStock || 0}m
+                      </Td>
+                      <Td
+                        isNumeric
+                        fontWeight={quantityBold(product?.arrivingQuantity)}
+                      >
+                        {product?.arrivingQuantity || 0}m
+                      </Td>
+                      <Td
+                        isNumeric
+                        fontWeight={quantityBold(product?.tokushimaStock)}
+                      >
+                        {product?.tokushimaStock || 0}m
+                      </Td>
+                      <Td>{product.materialName}</Td>
+                      <Td>
+                        <Flex gap={1}>{getMixed(product.materials)}</Flex>
+                      </Td>
+                      <Td>
+                        <Flex>
+                          {getFabricStd(
+                            product.fabricWidth,
+                            product.fabricLength,
+                            product.fabricWeight
+                          )}
+                        </Flex>
+                      </Td>
+
+                      <Td>
+                        <Flex gap={2}>
+                          {product?.features.map((f, index) => (
+                            <Text key={index}>{f}</Text>
+                          ))}
+                        </Flex>
+                      </Td>
+                      <Td>
+                        {adminAuth(currentUser) && (
+                          <FaTrashAlt
+                            cursor="pointer"
+                            onClick={() => deleteProduct(product.id)}
+                          />
+                        )}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

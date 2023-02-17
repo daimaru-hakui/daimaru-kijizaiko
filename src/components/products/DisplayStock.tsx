@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 
 type Props = {
   product: ProductType;

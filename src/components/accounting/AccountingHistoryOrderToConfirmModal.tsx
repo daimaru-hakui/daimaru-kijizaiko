@@ -18,47 +18,73 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect } from "react";
+import { useRecoilValue } from "recoil";
+import { db } from "../../../firebase";
+import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { useInputHandle } from "../../hooks/useInputHandle";
 
 type Props = {
   history: HistoryType;
-  items: HistoryType;
-  setItems: Function;
-  onClick: Function;
 };
 
 const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
   history,
-  items,
-  setItems,
-  onClick,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { items, setItems, handleNumberChange } = useInputHandle()
+  const currentUser = useRecoilValue(currentUserState);
+  const HOUSE_FACTORY = "徳島工場";
 
   useEffect(() => {
     setItems({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
   const inputReset = () => {
     setItems({ ...history });
+  };
+
+  // 購入状況　確定処理
+  const confirmProcessingAccounting = async (history: HistoryType, items: HistoryType) => {
+    const result = window.confirm("確定して宜しいでしょうか");
+    if (!result) return;
+
+    const productDocRef = doc(db, "products", history.productId);
+    const confirmHistoryDocRef = doc(
+      db,
+      "historyFabricPurchaseConfirms",
+      history.id
+    );
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product does not exist!!";
+
+        if (history.stockPlace === HOUSE_FACTORY) {
+          const stock = productDocSnap.data().tokushimaStock || 0;
+          const newStock = stock - history.quantity + items.quantity;
+          transaction.update(productDocRef, {
+            tokushimaStock: newStock,
+          });
+        }
+
+        transaction.update(confirmHistoryDocRef, {
+          quantity: items.quantity,
+          price: items.price,
+          updateUser: currentUser,
+          updatedAt: serverTimestamp(),
+          accounting: true,
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
   };
 
   return (
@@ -70,7 +96,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
           onOpen();
         }}
       >
-        確定
+        金額確定
       </Button>
 
       <Modal
@@ -151,7 +177,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
               <Button
                 colorScheme="facebook"
                 onClick={() => {
-                  onClick(history);
+                  confirmProcessingAccounting(history, items);
                   onClose();
                 }}
               >

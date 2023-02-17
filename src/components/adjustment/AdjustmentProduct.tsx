@@ -1,46 +1,29 @@
-import { Box, Button, Flex, Input, Td, Tr } from "@chakra-ui/react";
+import { Box, Button, Flex, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Td, Tr } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useState, useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
-import { loadingState, usersState } from "../../../store";
-import { ProductType } from "../../../types/productType";
+import { loadingState } from "../../../store";
+import { ProductType } from "../../../types/ProductType";
+import { useInputHandle } from "../../hooks/useInputHandle";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   product: ProductType;
 };
 
-type ItemsType = {
-  tokushimaStock: number;
-  price: number;
-};
-
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
-  const users = useRecoilValue(usersState);
   const setLoading = useSetRecoilState(loadingState);
-  const [items, setItems] = useState({} as ItemsType);
+  const { items, setItems, handleNumberChange } = useInputHandle()
+  const { getUserName } = useGetDisplay()
 
   useEffect(() => {
     setItems({ price: product.price, tokushimaStock: product.tokushimaStock });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.price, product.tokushimaStock]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  // 担当者の表示
-  const displayName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
-      return user?.name;
-    }
-  };
 
   const quantityBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";
@@ -51,7 +34,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
     try {
       const docRef = doc(db, "products", product.id);
       await updateDoc(docRef, {
-        price: items.price,
+        price: Number(items.price),
         tokushimaStock: Number(items.tokushimaStock),
         updatedAt: serverTimestamp(),
       });
@@ -68,34 +51,54 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
 
   return (
     <Tr key={product.id}>
-      <Td>{displayName(product.staff)}</Td>
+      <Td>{getUserName(product.staff)}</Td>
       <Td>{product.productNumber}</Td>
       <Td>{product?.colorName}</Td>
       <Td isNumeric>
-        <Input
-          type="text"
-          name="price"
-          w="80px"
-          textAlign="right"
-          value={items.price || 0}
-          onChange={(e) => handleInputChange(e)}
-        />
-        <Box as="span" ml={2}>
-          円
-        </Box>
+        <Flex alignItems="center">
+          <NumberInput
+            mt={1}
+            w="90px"
+            name="price"
+            defaultValue={0}
+            min={0}
+            max={100000}
+            value={items.price}
+            onChange={(e) => handleNumberChange(e, "price")}
+          >
+            <NumberInputField textAlign="right" />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Box as="span" ml={2}>
+            円
+          </Box>
+        </Flex>
       </Td>
       <Td isNumeric fontWeight={quantityBold(product?.tokushimaStock)}>
-        <Input
-          type="text"
-          name="tokushimaStock"
-          w="80px"
-          textAlign="right"
-          value={items.tokushimaStock || 0}
-          onChange={(e) => handleInputChange(e)}
-        />
-        <Box as="span" ml={2}>
-          m
-        </Box>
+        <Flex alignItems="center">
+          <NumberInput
+            mt={1}
+            w="90px"
+            name="tokushimaStock"
+            defaultValue={0}
+            min={0}
+            max={100000}
+            value={items.tokushimaStock}
+            onChange={(e) => handleNumberChange(e, "tokushimaStock")}
+          >
+            <NumberInputField textAlign="right" />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Box as="span" ml={2}>
+            m
+          </Box>
+        </Flex>
       </Td>
       <Td>
         <Flex alignItems="center" gap={3}>

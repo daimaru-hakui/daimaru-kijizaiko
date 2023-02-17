@@ -32,6 +32,7 @@ const SettingListPage: NextPage<Props> = ({
   array,
   pathName,
 }) => {
+
   // 削除
   const deleteFunc = async (id: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -58,7 +59,6 @@ const SettingListPage: NextPage<Props> = ({
             <Button>新規登録</Button>
           </Link>
         </Flex>
-        {/* <SettingAddModal title={title} collectionName={collectionName} /> */}
         <TableContainer mt={6}>
           <Table variant="simple" size="sm">
             <Thead>

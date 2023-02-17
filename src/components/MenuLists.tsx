@@ -3,18 +3,15 @@ import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
 import OrderDrawer from "./products/OrderDrawer";
-import { adminAuth, isAuth } from "../../functions";
-import { useRecoilValue } from "recoil";
-import { currentUserState, usersState } from "../../store";
 import { useRouter } from "next/router";
+import { useAuthManegment } from "../hooks/useAuthManegment";
 
 type Props = {
   onClose: Function;
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
-  const currentUser = useRecoilValue(currentUserState);
-  const users = useRecoilValue(usersState);
   const router = useRouter()
+  const { isAdminAuth, isAuth } = useAuthManegment()
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
@@ -80,14 +77,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       <Divider />
 
       {elementMenuList("生地", menu1)}
-      {isAuth(users, currentUser, "rd") && elementMenuList("キバタ", menu2)}
-      {isAuth(users, currentUser, "rd") && elementMenuList("調整", menu6)}
-      {isAuth(users, currentUser, "tokushima") &&
+      {isAuth("rd") && elementMenuList("キバタ", menu2)}
+      {isAuth("rd") && elementMenuList("調整", menu6)}
+      {isAuth("tokushima") &&
         elementMenuList("徳島工場", menu3)}
-      {isAuth(users, currentUser, "accounting") &&
+      {isAuth("accounting") &&
         elementMenuList("経理部", menu5)}
-      {isAuth(users, currentUser, "rd") && elementMenuList("設定", menu4)}
-      {adminAuth(currentUser) && elementMenuList("管理者", menu7)}
+      {isAuth("rd") && elementMenuList("設定", menu4)}
+      {isAdminAuth() && elementMenuList("管理者", menu7)}
     </Box>
   );
 };

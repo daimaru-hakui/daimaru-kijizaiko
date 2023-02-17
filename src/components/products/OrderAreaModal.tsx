@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import React from "react";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 import DisplayStock from "./DisplayStock";
 import OrderInputArea from "./OrderInputArea";
 

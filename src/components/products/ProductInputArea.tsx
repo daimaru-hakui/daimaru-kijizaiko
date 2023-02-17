@@ -45,7 +45,7 @@ import {
   usersState,
 } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 import MaterialsModal from "./MaterialsModal";
 
 type Props = {

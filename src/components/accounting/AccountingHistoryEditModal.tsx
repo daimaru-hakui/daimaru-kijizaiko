@@ -20,27 +20,29 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
+import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
+import { useRecoilValue } from "recoil";
+import { db } from "../../../firebase";
+import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { useInputHandle } from "../../hooks/useInputHandle";
 
 type Props = {
-  history: HistoryType;
   type: string;
-  onClick: Function;
-  items: any;
-  setItems: Function;
+  history: HistoryType;
 };
 
 export const AccountingHistoryEditModal: NextPage<Props> = ({
-  history,
   type,
-  items,
-  setItems,
-  onClick,
+  history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { items, setItems, handleInputChange, handleNumberChange } = useInputHandle()
+  const currentUser = useRecoilValue(currentUserState);
+  const HOUSE_FACTORY = "徳島工場";
 
   // 初期値をitemsに代入
   useEffect(() => {
@@ -48,21 +50,42 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
   const inputReset = () => {
     setItems({ ...history });
+  };
+
+  const updateHistoryAccountingOrder = async (history: HistoryType, items: HistoryType) => {
+    const productDocRef = doc(db, "products", history.productId);
+    const historyDocRef = doc(db, "historyFabricPurchaseConfirms", history.id);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const productDocSnap = await transaction.get(productDocRef);
+        if (!productDocSnap.exists()) throw "product document does not exist!";
+
+        const historyDocSnap = await transaction.get(historyDocRef);
+        if (!historyDocSnap.exists()) throw "history document does not exist!";
+
+        if (history.stockPlace === HOUSE_FACTORY) {
+          const stock = productDocSnap.data().tokushimaStock || 0;
+          const newStock = stock - history.quantity + items.quantity;
+          transaction.update(productDocRef, {
+            tokushimaStock: newStock,
+          });
+        }
+
+        transaction.update(historyDocRef, {
+          quantity: items.quantity,
+          price: items.price,
+          fixedAt: items.fixedAt,
+          comment: items.comment,
+          updateUser: currentUser,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
   };
 
   return (
@@ -176,7 +199,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
             <Button
               colorScheme="blue"
               onClick={() => {
-                onClick(history);
+                updateHistoryAccountingOrder(history, items);
                 onClose();
               }}
             >

@@ -19,7 +19,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingState, productsState } from "../../../store";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 import { db } from "../../../firebase";
 import { doc, getDoc, runTransaction, updateDoc } from "firebase/firestore";
 

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { db } from '../../../firebase'
 import { grayFabricsState, suppliersState, usersState } from '../../../store'
-import { ProductType } from '../../../types/productType'
+import { ProductType } from '../../../types/ProductType'
 import ProductEditModal from './ProductEditModal'
 
 type Props = {

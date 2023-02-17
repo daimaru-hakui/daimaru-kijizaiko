@@ -33,7 +33,7 @@ import {
   suppliersState,
 } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 
 type Props = {
   product: ProductType;

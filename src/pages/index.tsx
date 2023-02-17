@@ -24,7 +24,7 @@ import {
   suppliersState,
   usersState,
 } from "../../store";
-import { ProductType } from "../../types/productType";
+import { ProductType } from "../../types/ProductType";
 
 export default function Home() {
   const [user] = useAuthState(auth);

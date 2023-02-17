@@ -28,6 +28,7 @@ import HistoryOrderToConfirmModal from "../history/HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { todayDate } from "../../../functions";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   histories: HistoryType[];
@@ -35,27 +36,11 @@ type Props = {
 };
 
 const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
-  const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
-  const suppliers = useRecoilValue(suppliersState);
   const [items, setItems] = useState({} as HistoryType);
+  const { getSerialNumber, getUserName } = useGetDisplay()
 
-  const getCreateUserName = (userId: string) => {
-    const user = users.find((user: { uid: string }) => userId === user.uid);
-    return user?.name || "";
-  };
 
-  const getSerialNumber = (serialNumber: number) => {
-    const str = "0000000" + String(serialNumber);
-    return str.slice(-7);
-  };
-
-  const getSupplierName = (supplierId: string) => {
-    const supplierObj = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
-    );
-    return supplierObj.name;
-  };
 
   // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
@@ -208,7 +193,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                 <Td>{getSerialNumber(history.serialNumber)}</Td>
                 <Td>{history.orderedAt}</Td>
                 <Td>{history.scheduledAt}</Td>
-                <Td>{getCreateUserName(history.createUser)}</Td>
+                <Td>{getUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 <Td>{history.productName}</Td>
                 <Td>{history.supplierName}</Td>

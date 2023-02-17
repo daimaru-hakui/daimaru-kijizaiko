@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ProductType } from "../../../types/productType";
+import { ProductType } from "../../../types/ProductType";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
 const ProductsNew = () => {

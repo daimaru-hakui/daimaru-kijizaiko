@@ -14,17 +14,18 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { getSerialNumber, getUserName } from "../../../../functions";
 import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";
+import { useGetDisplay } from "../../../hooks/useGetDisplay";
 
 const CuttingReport = () => {
+  const { getSerialNumber, getUserName } = useGetDisplay()
   const [cuttingReports, setCuttingReports] = useState(
     [] as CuttingReportType[]
   );
-  const users = useRecoilValue(usersState);
+
   useEffect(() => {
     const getCuttingReports = () => {
       const q = query(
@@ -80,7 +81,7 @@ const CuttingReport = () => {
                   <Td>{report.itemName}</Td>
                   <Td>{report.client}</Td>
                   <Td isNumeric>{report.totalQuantity}</Td>
-                  <Td>{getUserName(users, report.staff)}</Td>
+                  <Td>{getUserName(report.staff)}</Td>
                   <Td>
                     <Flex alignItems="center" gap={3}>
                       <EditCuttingReportModal reportId={report.id} />

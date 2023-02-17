@@ -36,6 +36,7 @@ import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
 import { currentUserState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   grayFabric: GrayFabricType;
@@ -44,7 +45,7 @@ type Props = {
 const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
-  const suppliers = useRecoilValue(suppliersState);
+  const { getSupplierName } = useGetDisplay()
   const [items, setItems] = useState({
     orderedAt: "",
     scheduledAt: "",
@@ -65,12 +66,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     setItems({ ...items, [name]: Number(value) });
   };
 
-  const getSupplierName = (supplierId: string) => {
-    const supplierObj = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
-    );
-    return supplierObj.name;
-  };
+
 
   // キバタ仕掛発注
   const orderGrayFabric = async () => {

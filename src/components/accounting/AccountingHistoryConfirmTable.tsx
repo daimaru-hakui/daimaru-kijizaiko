@@ -9,16 +9,12 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
-import { getSerialNumber } from "../../../functions";
-import { currentUserState, usersState } from "../../../store";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { AccountingHistoryEditModal } from "./AccountingHistoryEditModal";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {
   histories: HistoryType[];
@@ -29,11 +25,8 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
 }) => {
-  const HOUSE_FACTORY = "徳島工場";
   const [filterHistories, setFilterHistories] = useState<any>();
-  const currentUser = useRecoilValue(currentUserState);
-  const users = useRecoilValue(usersState);
-  const [items, setItems] = useState({} as HistoryType);
+  const { getUserName, getSerialNumber } = useGetDisplay()
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -44,88 +37,6 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
     setFilterHistories(newHistorys);
   }, [histories]);
 
-  // 担当者の表示
-  const getCreateUserName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
-      return user?.name;
-    }
-  };
-
-  const updateHistoryAccountingOrder = async (history: HistoryType) => {
-    const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricPurchaseConfirms", history.id);
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        if (history.stockPlace === HOUSE_FACTORY) {
-          const stock = productDocSnap.data().tokushimaStock || 0;
-          const newStock = stock - history.quantity + items.quantity;
-          transaction.update(productDocRef, {
-            tokushimaStock: newStock,
-          });
-        }
-
-        transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
-          fixedAt: items.fixedAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  // 購入状況　確定処理
-  const confirmProcessingAccounting = async (history: HistoryType) => {
-    const result = window.confirm("確定して宜しいでしょうか");
-    if (!result) return;
-
-    const productDocRef = doc(db, "products", history.productId);
-    const confirmHistoryDocRef = doc(
-      db,
-      "historyFabricPurchaseConfirms",
-      history.id
-    );
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product does not exist!!";
-
-        if (history.stockPlace === HOUSE_FACTORY) {
-          const stock = productDocSnap.data().tokushimaStock || 0;
-          const newStock = stock - history.quantity + items.quantity;
-          transaction.update(productDocRef, {
-            tokushimaStock: newStock,
-          });
-        }
-
-        transaction.update(confirmHistoryDocRef, {
-          quantity: items.quantity,
-          price: items.price,
-          updateUser: currentUser,
-          updatedAt: serverTimestamp(),
-          accounting: true,
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-    }
-  };
 
   const elementComment = (history: HistoryType, collectionName: string) => (
     <Flex gap={3}>
@@ -139,14 +50,11 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
     </Flex>
   );
 
-  const elmentEdit = (history: HistoryType, onClickUpdate: Function) => (
+  const elmentEdit = (history: HistoryType) => (
     <Flex gap={3}>
       <AccountingHistoryEditModal
-        history={history}
         type="order"
-        items={items}
-        setItems={setItems}
-        onClick={() => onClickUpdate(history)}
+        history={history}
       />
     </Flex>
   );
@@ -181,7 +89,7 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
                 <Td>{history?.fixedAt}</Td>
-                <Td>{getCreateUserName(history.createUser)}</Td>
+                <Td>{getUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
@@ -198,7 +106,7 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    {elmentEdit(history, updateHistoryAccountingOrder)}
+                    {elmentEdit(history)}
                   </Flex>
                 </Td>
               </Tr>

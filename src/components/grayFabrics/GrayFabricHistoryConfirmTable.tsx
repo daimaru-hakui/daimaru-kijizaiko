@@ -16,6 +16,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { useGetDisplay } from "../../hooks/useGetDisplay";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 
@@ -28,19 +29,9 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
 }) => {
-  const users = useRecoilValue(usersState);
-  const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
+  const { getSerialNumber, getUserName } = useGetDisplay()
 
-  const getCreateUserName = (userId: string) => {
-    const user = users.find((user: { uid: string }) => userId === user.uid);
-    return user?.name || "";
-  };
-
-  const getSerialNumber = (serialNumber: number) => {
-    const str = "0000000" + String(serialNumber);
-    return str.slice(-7);
-  };
 
   const updateConfirmHistory = async (history: any) => {
     const result = window.confirm("更新して宜しいでしょうか");
@@ -104,7 +95,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
                 <Td>{getSerialNumber(history.serialNumber)}</Td>
                 <Td>{history.orderedAt}</Td>
                 <Td>{history.fixedAt}</Td>
-                <Td>{getCreateUserName(history.createUser)}</Td>
+                <Td>{getUserName(history.createUser)}</Td>
                 <Td>{history.productNumber}</Td>
                 <Td>{history.productName}</Td>
                 <Td>{history.supplierName}</Td>
