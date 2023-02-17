@@ -1,19 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRecoilValue } from "recoil";
 import { materialNamesState } from "../../../../store";
-import SettingAddPage from "../../../components/settings/SettingAddPage";
+import SettingListPage from "../../../components/settings/SettingListPage";
 
 const MaterialNameIndex = () => {
-  const [items, setItems] = useState({ name: "" });
   const materialNames = useRecoilValue(materialNamesState);
 
   return (
-    <SettingAddPage
+    <SettingListPage
       title="組織名"
-      items={items}
-      setItems={setItems}
       array={materialNames}
-      pathName={"materialNames"}
+      pathName={"material-names"}
+      collectionName={"materialNames"}
     />
   );
 };

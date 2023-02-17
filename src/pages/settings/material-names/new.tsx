@@ -6,12 +6,10 @@ import {
   Input,
   Stack,
   Text,
-  Textarea,
 } from "@chakra-ui/react";
 import {
   addDoc,
   collection,
-  doc,
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
@@ -19,31 +17,28 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
-import { SupplierType } from "../../../../types/SupplierType";
 import { useInputHandle } from "../../../hooks/UseInputHandle";
 
-const SupplierNew = () => {
-  const [suppliers, setSuppliers] = useState([{}] as SupplierType[]);
-  const router = useRouter();
+const MaterialNamesNew = () => {
   const { items, handleInputChange } = useInputHandle();
+  const [materialNames, setMaterialNames] = useState([{ id: "", name: "" }]);
+  const router = useRouter();
   const [flag, setFlag] = useState(false);
 
   useEffect(() => {
-    const getSuppliers = async () => {
-      const collectionSupplier = collection(db, "suppliers");
-      const docSnap = await getDocs(collectionSupplier);
-      setSuppliers(
-        docSnap.docs.map((doc) => ({ ...doc.data() } as SupplierType))
-      );
+    const getMaterialNames = async () => {
+      const docsRef = collection(db, "materialNames");
+      const docSnap = await getDocs(docsRef);
+      setMaterialNames(docSnap.docs.map((doc) => ({ ...doc.data() } as any)));
     };
-    getSuppliers();
+    getMaterialNames();
   }, []);
 
   // 登録しているかのチェック
   useEffect(() => {
     let name = items.name;
     if (!name) name = "noValue";
-    const base = suppliers?.map((a: { name: string }) => a.name);
+    const base = materialNames?.map((a: { name: string }) => a.name);
     const result = base?.includes(name);
     if (!result) {
       setFlag(false);
@@ -53,28 +48,26 @@ const SupplierNew = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
-  const addSupplier = async () => {
+  const addMaterialName = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    const collectionSupplier = collection(db, "suppliers");
+    const docRef = collection(db, "materialNames");
     try {
-      await addDoc(collectionSupplier, {
+      await addDoc(docRef, {
         name: items.name || "",
-        kana: items.kana || "",
-        comment: items.comment || "",
         createdAt: serverTimestamp(),
       });
     } catch (err) {
       console.log(err);
     } finally {
-      router.push("/settings/suppliers");
+      router.push("/settings/material-names");
     }
   };
 
   return (
     <Box w="100%" mt={12}>
       <Container
-        maxW="800px"
+        maxW="600px"
         my={6}
         p={6}
         bg="white"
@@ -83,9 +76,9 @@ const SupplierNew = () => {
       >
         <Flex justifyContent="space-between">
           <Box as="h2" fontSize="2xl">
-            仕入先登録
+            組織名の登録
           </Box>
-          <Link href="/settings/suppliers/">
+          <Link href="/settings/material-names/">
             <Button>戻る</Button>
           </Link>
         </Flex>
@@ -95,42 +88,22 @@ const SupplierNew = () => {
               {flag && "※すでに登録されています。"}
             </Box>
             <Box w="100%" flex={2}>
-              <Text>仕入先名</Text>
+              <Text>組織名</Text>
               <Input
                 mt={1}
                 name="name"
                 type="text"
-                placeholder="例）クラボウインターナショナル"
-                value={items.name}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>フリガナ</Text>
-              <Input
-                mt={1}
-                name="kana"
-                type="text"
                 placeholder=""
-                value={items.kana}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>備考</Text>
-              <Textarea
-                mt={1}
-                name="comment"
-                value={items.comment}
+                value={items.name}
                 onChange={handleInputChange}
               />
             </Box>
           </Flex>
 
           <Button
-            disabled={!items.name || !items.kana || flag}
+            disabled={!items.name || flag}
             colorScheme="facebook"
-            onClick={addSupplier}
+            onClick={addMaterialName}
           >
             登録
           </Button>
@@ -140,4 +113,4 @@ const SupplierNew = () => {
   );
 };
 
-export default SupplierNew;
+export default MaterialNamesNew;

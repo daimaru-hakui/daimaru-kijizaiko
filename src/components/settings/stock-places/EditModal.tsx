@@ -23,6 +23,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
+import { useInputHandle } from "../../../hooks/UseInputHandle";
 
 type Props = {
   stockPlace: StockPlaceType;
@@ -30,20 +31,12 @@ type Props = {
 
 const EditModal: NextPage<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState<any>({});
   const currentUser = useRecoilValue(currentUserState);
-  // const [supplier, setSupplier] = useState<any>();
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
+  const { items, setItems, handleInputChange } = useInputHandle();
 
   useEffect(() => {
     setItems(stockPlace);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stockPlace]);
 
   const updateStockPlace = async () => {
