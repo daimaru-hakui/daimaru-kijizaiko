@@ -30,6 +30,7 @@ import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import { useInputHandle } from "../../hooks/useInputHandle";
 
+
 type Props = {
   type: string;
   history: HistoryType;
