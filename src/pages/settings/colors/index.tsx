@@ -1,19 +1,17 @@
-import React, { useState } from "react";
-import { useRecoilState } from "recoil";
+import React from "react";
+import { useRecoilValue } from "recoil";
 import { colorsState } from "../../../../store";
-import SettingAddPage from "../../../components/settings/SettingAddPage";
+import SettingListPage from "../../../components/settings/SettingListPage";
 
 const ColorIndex = () => {
-  const [items, setItems] = useState({ name: "" });
-  const [colors, setColors] = useRecoilState(colorsState);
+  const colors = useRecoilValue(colorsState);
 
   return (
-    <SettingAddPage
+    <SettingListPage
       title="色"
-      items={items}
-      setItems={setItems}
       array={colors}
       pathName={"colors"}
+      collectionName={"colors"}
     />
   );
 };

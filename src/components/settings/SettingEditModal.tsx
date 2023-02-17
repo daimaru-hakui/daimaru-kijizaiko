@@ -12,35 +12,30 @@ import {
 } from "@chakra-ui/react";
 import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
+import { useInputHandle } from "../../hooks/UseInputHandle";
 
 type Props = {
   obj: {
     id: string;
     name: string;
   };
-  pathName: string;
+  collectionName: string;
 };
 
-const EditModal: NextPage<Props> = ({ obj, pathName }) => {
+const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState<any>();
+  const { items, setItems, handleInputChange } = useInputHandle();
+
   useEffect(() => {
     setItems(obj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
   const updateDocEdit = async () => {
-    const docRef = doc(db, `${pathName}`, `${obj.id}`);
+    const docRef = doc(db, `${collectionName}`, `${obj.id}`);
     await updateDoc(docRef, {
       name: items.name,
     });
@@ -94,4 +89,4 @@ const EditModal: NextPage<Props> = ({ obj, pathName }) => {
   );
 };
 
-export default EditModal;
+export default SettingEditModal;

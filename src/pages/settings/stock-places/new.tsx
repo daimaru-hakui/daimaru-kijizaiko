@@ -2,44 +2,58 @@ import {
   Box,
   Button,
   Container,
-  Divider,
   Flex,
   Input,
   Stack,
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+} from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState, stockPlacesState } from "../../../../store";
+import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
+import { useInputHandle } from "../../../hooks/UseInputHandle";
 
 const StockPlaceNew = () => {
-  const [items, setItems] = useState({} as StockPlaceType);
-  const currentUser = useRecoilValue(currentUserState);
-  const stockPlaces = useRecoilValue(stockPlacesState);
   const router = useRouter();
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
+  const currentUser = useRecoilValue(currentUserState);
+  const [stockPlaces, setStockPlaces] = useState([{}] as StockPlaceType[]);
+  const { items, handleInputChange } = useInputHandle();
+  const [flag, setFlag] = useState(false);
 
   // 登録しているかのチェック
-  const registeredInput = () => {
-    const name = items.name;
-    const base = stockPlaces.map((place: { name: string }) => place.name);
+  useEffect(() => {
+    let name = items.name;
+    if (!name) name = "noValue";
+    const base = stockPlaces?.map((a: { name: string }) => a.name);
     const result = base?.includes(name);
-    if (!result) return;
-    return result;
-  };
+    if (!result) {
+      setFlag(false);
+    } else {
+      setFlag(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  useEffect(() => {
+    const getStockPlaces = async () => {
+      const docsRef = collection(db, "stockPlaces");
+      const querySnap = await getDocs(docsRef);
+      setStockPlaces(
+        querySnap.docs.map((doc) => ({ ...doc.data() } as StockPlaceType))
+      );
+    };
+    getStockPlaces();
+  }, []);
 
   const addStockPlace = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
@@ -86,7 +100,7 @@ const StockPlaceNew = () => {
         <Stack spacing={6} mt={6}>
           <Flex gap={6} flexDirection={{ base: "column" }}>
             <Box fontSize="2xl" fontWeight="bold" color="red">
-              {registeredInput() && "※すでに登録されています。"}
+              {flag && "※すでに登録されています。"}
             </Box>
             <Box w="100%" flex={2}>
               <Text>送り先名</Text>
@@ -157,7 +171,7 @@ const StockPlaceNew = () => {
           </Flex>
 
           <Button
-            disabled={!items.name || !items.kana || registeredInput()}
+            disabled={!items.name || !items.kana || flag}
             colorScheme="facebook"
             onClick={addStockPlace}
           >
