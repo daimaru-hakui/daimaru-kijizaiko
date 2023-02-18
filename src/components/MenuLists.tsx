@@ -3,14 +3,14 @@ import Link from "next/link";
 import { NextPage } from "next";
 import OrderDrawer from "./products/OrderDrawer";
 import { useRouter } from "next/router";
-import { useAuthManegment } from "../hooks/UseAuthManegment";
+import { useAuthManagement } from "../hooks/UseAuthManagement";
 
 type Props = {
   onClose: Function;
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
   const router = useRouter()
-  const { isAdminAuth, isAuth } = useAuthManegment()
+  const { isAdminAuth, isAuth } = useAuthManagement()
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },

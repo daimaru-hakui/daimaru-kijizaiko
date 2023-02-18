@@ -1,7 +1,7 @@
 import { useRecoilValue } from "recoil";
 import { currentUserState, usersState } from "../../store";
 
-export const useAuthManegment = () => {
+export const useAuthManagement = () => {
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
 
