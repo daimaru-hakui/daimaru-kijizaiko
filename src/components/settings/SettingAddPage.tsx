@@ -17,7 +17,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { db } from "../../../firebase";
-import useInputHandle from "../../hooks/useInputHandle";
 import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 type Props = {

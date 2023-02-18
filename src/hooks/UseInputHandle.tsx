@@ -8,8 +8,8 @@ type ObjectType = StockPlaceType | ProductType | MaterialsType
 
 
 
-const UseInputHandle = (items, setItems: Function) => {
-  // const [items, setItems] = useState<any>({} as ObjectType);
+export const useInputHandle = () => {
+  const [items, setItems] = useState<any>({});
 
   const handleInputChange: any = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -26,5 +26,3 @@ const UseInputHandle = (items, setItems: Function) => {
 
   return { items, setItems, handleInputChange, handleNumberChange };
 };
-
-export default UseInputHandle
