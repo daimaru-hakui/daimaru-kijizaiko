@@ -17,7 +17,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";

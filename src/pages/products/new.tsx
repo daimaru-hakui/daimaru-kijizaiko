@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ProductType } from "../../../types/ProductType";
 import ProductInputArea from "../../components/products/ProductInputArea";
 

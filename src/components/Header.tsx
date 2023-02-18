@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { MdOutlineSettings } from "react-icons/md";
 import { useRouter } from "next/router";
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { auth } from "../../firebase";
 import { currentUserState, usersState } from "../../store";

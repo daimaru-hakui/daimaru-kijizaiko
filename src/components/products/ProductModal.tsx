@@ -1,7 +1,7 @@
 import { Box, Button, CheckboxGroup, Container, Divider, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text, Textarea, useDisclosure } from '@chakra-ui/react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { NextPage } from 'next'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { db } from '../../../firebase'
 import { grayFabricsState, suppliersState, usersState } from '../../../store'

@@ -1,6 +1,4 @@
-import react from "react"
 import SettingAddPage from "../../../components/settings/SettingAddPage";
-
 
 const ColorsNew = () => {
   return (

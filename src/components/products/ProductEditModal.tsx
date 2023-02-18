@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
 import { NextPage } from 'next'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ProductType } from '../../../types/ProductType'
 import ProductInputArea from './ProductInputArea'
 

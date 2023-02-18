@@ -22,7 +22,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { HistoryType } from "../../../../types/HistoryType";
 import GrayFabricHistoryConfirmTable from "../../../components/grayFabrics/GrayFabricHistoryConfirmTable";

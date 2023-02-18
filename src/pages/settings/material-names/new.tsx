@@ -1,3 +1,4 @@
+import SettingAddPage from "../../../components/settings/SettingAddPage";
 
 
 const MaterialNamesNew = () => {

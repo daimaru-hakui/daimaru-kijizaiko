@@ -27,14 +27,14 @@ import {
   doc,
   runTransaction,
   serverTimestamp,
-  updateDoc,
+
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
-import { currentUserState, suppliersState } from "../../../store";
+import { currentUserState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { useGetDisplay } from "../../hooks/useGetDisplay";
 

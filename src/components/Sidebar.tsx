@@ -1,5 +1,4 @@
 import { Box } from "@chakra-ui/react";
-import React from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store";
 import MenuLists from "./MenuLists";

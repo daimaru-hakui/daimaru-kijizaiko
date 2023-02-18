@@ -18,7 +18,7 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { isAuth } from "../../../../functions";
@@ -38,10 +38,10 @@ const Auth = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as UserType)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as UserType)
         )
       );
     });

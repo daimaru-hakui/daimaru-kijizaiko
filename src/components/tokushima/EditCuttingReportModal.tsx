@@ -19,7 +19,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
 import { loadingState } from "../../../store";

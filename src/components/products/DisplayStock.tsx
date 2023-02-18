@@ -1,6 +1,5 @@
 import { Box, Container, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
-import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
 import { ProductType } from "../../../types/ProductType";

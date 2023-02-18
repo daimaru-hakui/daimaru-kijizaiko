@@ -10,7 +10,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { AccountingHistoryEditModal } from "./AccountingHistoryEditModal";

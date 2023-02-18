@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 
 import { NextPage } from "next";
-import React from "react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";

@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";

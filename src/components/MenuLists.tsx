@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";

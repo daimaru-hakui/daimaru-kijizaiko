@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";

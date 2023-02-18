@@ -14,7 +14,6 @@ import {
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { NextPage } from "next";
-import React from "react";
 import { db } from "../../../firebase";
 import SettingEditModal from "./SettingEditModal";
 import Link from "next/link";

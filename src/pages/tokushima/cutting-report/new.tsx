@@ -1,29 +1,9 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Radio,
-  RadioGroup,
-  Select,
-  Stack,
-  Text,
-  Textarea,
-} from "@chakra-ui/react";
-import { FaPlus } from "react-icons/fa";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   currentUserState,
   loadingState,
-  productsState,
-  usersState,
+
 } from "../../../../store";
 import { FabricsUsedInput } from "../../../components/tokushima/FabricsUsedInput";
 import { CuttingReportType } from "../../../../types/CuttingReportType";

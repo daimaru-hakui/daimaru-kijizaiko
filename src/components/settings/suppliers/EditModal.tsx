@@ -13,9 +13,9 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types/SupplierType";

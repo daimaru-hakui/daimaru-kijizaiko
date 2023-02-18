@@ -30,7 +30,7 @@ import {
 } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { features } from "../../../datalist";
 import { db } from "../../../firebase";

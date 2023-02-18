@@ -21,7 +21,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { HistoryType } from "../../../types/HistoryType";
 

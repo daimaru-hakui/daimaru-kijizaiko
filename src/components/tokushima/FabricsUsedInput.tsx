@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingState, productsState } from "../../../store";
 import { CuttingReportType } from "../../../types/CuttingReportType";

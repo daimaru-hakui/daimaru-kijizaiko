@@ -23,7 +23,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import {

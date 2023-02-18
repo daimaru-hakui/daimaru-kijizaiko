@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/router";

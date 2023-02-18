@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useInputHandle } from "../../hooks/useInputHandle";

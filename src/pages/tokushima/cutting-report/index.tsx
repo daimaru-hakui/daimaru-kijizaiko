@@ -11,7 +11,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { usersState } from "../../../../store";

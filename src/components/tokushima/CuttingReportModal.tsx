@@ -22,9 +22,9 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { productsState, usersState } from "../../../store";

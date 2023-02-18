@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Box, Button, Container, Flex, Input } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";

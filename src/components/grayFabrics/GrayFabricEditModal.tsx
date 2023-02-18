@@ -12,7 +12,7 @@ import {
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";

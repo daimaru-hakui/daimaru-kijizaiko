@@ -9,11 +9,9 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";

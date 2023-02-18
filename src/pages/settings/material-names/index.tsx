@@ -1,4 +1,3 @@
-import React from "react";
 import { useRecoilValue } from "recoil";
 import { materialNamesState } from "../../../../store";
 import SettingListPage from "../../../components/settings/SettingListPage";

@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";

@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";

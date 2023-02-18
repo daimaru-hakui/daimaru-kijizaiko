@@ -1,7 +1,7 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { db } from "../../../../../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import HistoryOrderTable from "../../../../components/history/HistoryOrderTable";
 import HistoryConfirmTable from "../../../../components/history/HistoryConfirmTable";
 import { HistoryType } from "../../../../../types/HistoryType";

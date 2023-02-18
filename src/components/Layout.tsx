@@ -1,6 +1,6 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import Header from "./Header";
 import Loading from "./Loading";
 import Sidebar from "./Sidebar";
