@@ -141,7 +141,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                     defaultValue={0}
                     min={0}
                     max={10000}
-                    value={items?.price === 0 ? "" : items.price}
+                    value={items?.price === 0 ? "" : items?.price}
                     onChange={(e) => handleNumberChange(e, "price")}
                   >
                     <NumberInputField textAlign="right" />
@@ -158,7 +158,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   type="date"
                   mt={1}
                   name="orderedAt"
-                  value={items.orderedAt}
+                  value={items?.orderedAt}
                   onChange={handleInputChange}
                 />
               </Box>
@@ -168,7 +168,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   type="date"
                   mt={1}
                   name="fixedAt"
-                  value={items.fixedAt}
+                  value={items?.fixedAt}
                   onChange={handleInputChange}
                 />
               </Box>
@@ -178,7 +178,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                 <Textarea
                   mt={1}
                   name="comment"
-                  value={items.comment}
+                  value={items?.comment}
                   onChange={handleInputChange}
                 />
               </Box>
