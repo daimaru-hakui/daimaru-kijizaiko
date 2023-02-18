@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 import { useState } from "react";
 import { MaterialsType } from "../../types/MaterialsType";
-import { ProductType } from "../../types/ProductType";
+// import { ProductType } from "../../types/ProductType";
 import { StockPlaceType } from "../../types/StockPlaceType";
 
-type ObjectType = StockPlaceType | ProductType | MaterialsType
+type ObjectType = StockPlaceType | MaterialsType
 
 
 
