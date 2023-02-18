@@ -15,14 +15,12 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
+import { StockPlaceType } from "../../../types/StockPlaceType";
 import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 
 type Props = {
-  obj: {
-    id: string;
-    name: string;
-  };
+  obj: StockPlaceType
   collectionName: string;
 };
 
@@ -31,7 +29,7 @@ const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { items, setItems, handleInputChange } = UseInputSettings()
 
   useEffect(() => {
-    setItems(obj);
+    setItems({ ...obj });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj]);
 

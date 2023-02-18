@@ -57,7 +57,7 @@ const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) =>
       await addDoc(collectionRef, {
         name: items.name,
       });
-      setItems({ id: "", name: "" });
+      setItems({ id: "", name: "" } as any);
     } catch (err) {
       console.log(err)
     } finally {
