@@ -1,6 +1,15 @@
-import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure
+} from '@chakra-ui/react'
 import { NextPage } from 'next'
-import { useState } from 'react'
 import { ProductType } from '../../../types/FabricType'
 import ProductInputArea from './ProductInputArea'
 
@@ -9,7 +18,6 @@ type Props = {
 }
 
 const ProductEditModal: NextPage<Props> = ({ product }) => {
-  const [items, setItems] = useState({} as any);
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
@@ -22,8 +30,6 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           <ModalCloseButton />
           <ModalBody>
             <ProductInputArea
-              // items={items}
-              // setItems={setItems}
               title={"生地の編集"}
               toggleSwitch={"edit"}
               product={product}
@@ -35,7 +41,6 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
     </>
   )
 }

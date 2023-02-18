@@ -32,11 +32,11 @@ import {
   stockPlacesState,
   suppliersState,
 } from "../../../store";
+import { ProductType } from "../../../types/FabricType";
 import { HistoryType } from "../../../types/HistoryType";
-// import { ProductType } from "../../../types/ProductType";
 
 type Props = {
-  product: any;
+  product: ProductType;
   orderType: string;
   onClose: Function;
 };

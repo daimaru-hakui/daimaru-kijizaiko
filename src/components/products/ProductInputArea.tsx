@@ -20,25 +20,17 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import {
-  addDoc,
-  collection,
   doc,
   getDoc,
-  onSnapshot,
-  serverTimestamp,
-  updateDoc,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
 import { db } from "../../../firebase";
 import {
   colorsState,
-  currentUserState,
   grayFabricsState,
-  loadingState,
   materialNamesState,
   productsState,
   suppliersState,
@@ -49,11 +41,10 @@ import { GrayFabricType } from "../../../types/GrayFabricType";
 import { SupplierType } from "../../../types/SupplierType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputProduct } from "../../hooks/UseInputProduct";
+import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
 
 type Props = {
-  // items: any;
-  // setItems: Function;
   title: string;
   toggleSwitch: string;
   product: ProductType;
@@ -61,15 +52,11 @@ type Props = {
 };
 
 const ProductInputArea: NextPage<Props> = ({
-  // items,
-  // setItems,
   title,
   toggleSwitch,
   product,
   onClose
 }) => {
-  const currentUser = useRecoilValue(currentUserState);
-  const router = useRouter();
   const productId = product.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
@@ -77,9 +64,16 @@ const ProductInputArea: NextPage<Props> = ({
   const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
-  const setLoading = useSetRecoilState(loadingState);
-  const { getSupplierName, getMixed } = useGetDisp()
-  const { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, handleCheckedChange } = useInputProduct()
+ 
+  const { getMixed } = useGetDisp();
+  const { items,
+    setItems,
+    handleInputChange,
+    handleNumberChange,
+    handleRadioChange,
+    handleCheckedChange
+  } = useInputProduct();
+  const { addProduct,updateProduct,reset } = useProductFunc(items,setItems);
 
 
   useEffect(() => {
@@ -92,119 +86,6 @@ const ProductInputArea: NextPage<Props> = ({
     getProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // const handleInputChange = (
-  //   e: React.ChangeEvent<
-  //     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-  //   >
-  // ) => {
-  //   const name = e.target.name;
-  //   const value = e.target.value;
-  //   setItems({ ...items, [name]: value });
-  // };
-
-  // const handleNumberChange = (e: string, name: string) => {
-  //   const value = e;
-  //   setItems({ ...items, [name]: Number(value) });
-  // };
-
-  // const handleRadioChange = (e: string, name: string) => {
-  //   const value = e;
-  //   setItems({ ...items, [name]: Number(value) });
-  // };
-
-  // const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const name = e.target.name;
-  //   const value = e.target.value;
-  //   if (e.target.checked) {
-  //     setItems({
-  //       ...items,
-  //       [name]: [...(items["features"] || []), value],
-  //     });
-  //   } else {
-  //     setItems({
-  //       ...items,
-  //       [name]: [
-  //         ...items["features"]?.filter((feature: string) => feature !== value),
-  //       ],
-  //     });
-  //   }
-  // };
-
-  const obj = {
-    productType: items.productType || 1,
-    staff: items.productType === 2 ? items.staff : "R&D",
-    supplierId: items.supplierId || "",
-    supplierName: getSupplierName(items.supplierId) || "",
-    grayFabricId: items.grayFabricId || "",
-    productNumber:
-      items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
-    productNum: items.productNum || "",
-    productName: items.productName || "",
-    colorNum: items.colorNum || "",
-    colorName: items.colorName || "",
-    price: Number(items.price) || 0,
-    materialName: items.materialName || "",
-    materials: items.materials || {},
-    fabricWidth: items.fabricWidth || "",
-    fabricWeight: items.fabricWeight || "",
-    fabricLength: items.fabricLength || "",
-    features: items.features || [],
-    noteProduct: items.noteProduct || "",
-    noteFabric: items.noteFabric || "",
-    noteEtc: items.noteEtc || "",
-    wip: 0,
-    externalStock: 0,
-    arrivingQuantity: 0,
-    tokushimaStock: 0,
-    deletedAt: "",
-  };
-
-  // 生地登録
-  const addProduct = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    setLoading(true);
-    const docRef = collection(db, "products");
-    try {
-      await addDoc(docRef, {
-        ...obj,
-        createUser: currentUser,
-        updateUser: currentUser,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-      router.push("/products");
-    }
-  };
-
-  const updateProduct = async () => {
-    const result = window.confirm("更新して宜しいでしょうか");
-    if (!result) return;
-    setLoading(true);
-    const docRef = doc(db, "products", `${productId}`);
-    try {
-      await updateDoc(docRef, {
-        ...obj,
-        updateUser: currentUser,
-        updatedAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-      onClose();
-    }
-  };
-
-  const reset = () => {
-    setItems(product);
-    onClose()
-  };
 
   // 必須項目を入力しているかをチェック
   const requiredInput = () => {
@@ -616,10 +497,18 @@ const ProductInputArea: NextPage<Props> = ({
           )}
           {toggleSwitch === "edit" && (
             <Flex gap={3}>
-              <Button w="100%" onClick={reset}>
+              <Button w="100%"
+                onClick={() => {
+                reset(product);
+                onClose()
+              }}>
                 キャンセル
               </Button>
-              <Button w="100%" colorScheme="facebook" onClick={updateProduct}>
+              <Button w="100%" colorScheme="facebook"
+                onClick={() => {
+                updateProduct(productId);
+                onClose();
+              }}>
                 更新
               </Button>
             </Flex>
