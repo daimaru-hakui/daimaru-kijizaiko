@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types/SupplierType";
-import { UseInputSettings } from "../../../hooks/UseInputSettings";
+import { UseInputSetting } from "../../../hooks/UseInputSetting";
 
 type Props = {
   supplier: SupplierType;
@@ -27,7 +27,7 @@ type Props = {
 
 const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange } = UseInputSettings()
+  const { items, setItems, handleInputChange } = UseInputSetting()
 
   useEffect(() => {
     setItems(supplier);

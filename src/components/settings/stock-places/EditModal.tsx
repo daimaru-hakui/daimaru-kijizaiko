@@ -23,7 +23,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
-import { UseInputSettings } from "../../../hooks/UseInputSettings";
+import { UseInputSetting } from "../../../hooks/UseInputSetting";
 
 type Props = {
   stockPlace: StockPlaceType;
@@ -32,8 +32,7 @@ type Props = {
 const EditModal: NextPage<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
-  // const [items, setItems] = useState({} as StockPlaceType)
-  const { items, setItems, handleInputChange } = UseInputSettings()
+  const { items, setItems, handleInputChange } = UseInputSetting()
 
 
   useEffect(() => {

@@ -29,8 +29,6 @@ import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import { useInputHistory } from "../../hooks/UseInputHistory";
-import { UseInputSettings } from "../../hooks/UseInputSettings";
-
 
 type Props = {
   type: string;

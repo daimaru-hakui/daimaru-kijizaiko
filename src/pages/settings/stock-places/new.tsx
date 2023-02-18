@@ -21,13 +21,13 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
-import { UseInputSettings } from "../../../hooks/UseInputSettings";
+import { UseInputSetting } from "../../../hooks/UseInputSetting";
 
 const StockPlaceNew = () => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
-  const { items, setItems, handleInputChange } = UseInputSettings()
+  const { items, setItems, handleInputChange } = UseInputSetting()
   const [flag, setFlag] = useState(false);
 
   // 登録しているかのチェック

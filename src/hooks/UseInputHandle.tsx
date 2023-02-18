@@ -9,8 +9,7 @@ export const useInputHandle = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const { name, value } = e.target;
     setItems({ ...items, [name]: value });
   };
 

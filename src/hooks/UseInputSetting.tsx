@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { StockPlaceType } from "../../types/StockPlaceType";
+import { SupplierType } from "../../types/SupplierType";
 
-export const UseInputSettings = () => {
-  const [items, setItems] = useState({} as StockPlaceType);
+export const UseInputSetting = () => {
+  const [items, setItems] = useState({} as StockPlaceType | SupplierType);
 
   const handleInputChange: any = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const { name, value } = e.target;
     setItems({ ...items, [name]: value });
   };
 

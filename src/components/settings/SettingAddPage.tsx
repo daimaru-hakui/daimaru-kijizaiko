@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { db } from "../../../firebase";
-import { UseInputSettings } from "../../hooks/UseInputSettings";
+import { UseInputSetting } from "../../hooks/UseInputSetting";
 
 type Props = {
   title: string;
@@ -32,7 +32,7 @@ type ArrayType = {
 
 const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) => {
   const [array, setArray] = useState([] as ArrayType[]);
-  const { items, setItems, handleInputChange } = UseInputSettings();
+  const { items, setItems, handleInputChange } = UseInputSetting();
 
   const [flag, setFlag] = useState(false);
   const router = useRouter()
