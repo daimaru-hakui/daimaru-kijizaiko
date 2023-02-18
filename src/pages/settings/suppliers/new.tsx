@@ -50,6 +50,7 @@ const SupplierNew = () => {
     } else {
       setFlag(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   const addSupplier = async () => {
