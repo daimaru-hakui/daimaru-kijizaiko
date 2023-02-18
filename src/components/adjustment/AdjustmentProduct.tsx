@@ -7,7 +7,7 @@ import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
 import { loadingState } from "../../../store";
 import { ProductType } from "../../../types/ProductType";
-import { useInputHandle } from "../../hooks/useInputHandle";
+import useInputHandle from "../../hooks/useInputHandle";
 import { useGetDisplay } from "../../hooks/useGetDisplay";
 
 type Props = {

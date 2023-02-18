@@ -8,7 +8,7 @@ type ObjectType = StockPlaceType | ProductType | MaterialsType
 
 
 
-export const useInputHandle = (items, setItems): any => {
+const useInputHandle = (items, setItems): any => {
   // const [items, setItems] = useState<any>({} as ObjectType);
 
   const handleInputChange: any = (
@@ -26,3 +26,5 @@ export const useInputHandle = (items, setItems): any => {
 
   return { items, setItems, handleInputChange, handleNumberChange };
 };
+
+export default useInputHandle
