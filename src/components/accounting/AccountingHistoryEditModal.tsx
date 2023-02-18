@@ -44,7 +44,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   const [items, setItems] = useState({} as HistoryType)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { handleInputChange, handleNumberChange } = useInputHandle(items, setItems);
+  const { handleInputChange, handleNumberChange }: any = useInputHandle(items, setItems);
 
 
   // 初期値をitemsに代入
