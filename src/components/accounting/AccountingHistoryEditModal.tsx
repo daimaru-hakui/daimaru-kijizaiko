@@ -29,6 +29,7 @@ import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import useInputHandle from "../../hooks/useInputHandle";
+import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 
 type Props = {
@@ -41,10 +42,10 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState({} as HistoryType)
+  // const [items, setItems] = useState({} as HistoryType)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { handleInputChange, handleNumberChange } = useInputHandle(items, setItems);
+  const { items, setItems, handleInputChange, handleNumberChange } = UseInputSettings();
 
 
   // 初期値をitemsに代入
