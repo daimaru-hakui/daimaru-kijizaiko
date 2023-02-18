@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { db } from '../../../firebase'
 import { grayFabricsState, suppliersState, usersState } from '../../../store'
-import { ProductType } from '../../../types/ProductType'
+// import { ProductType } from '../../../types/ProductType'
 import ProductEditModal from './ProductEditModal'
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 }
 
 const ProductModal: NextPage<Props> = ({ productId }) => {
-  const [product, setProduct] = useState({} as ProductType);
+  const [product, setProduct] = useState({} as any);
   const suppliers = useRecoilValue(suppliersState);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
@@ -23,7 +23,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
     const getProduct = async () => {
       const docRef = doc(db, "products", `${productId}`);
       try {
-        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id } as ProductType));
+        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id } as any));
       } catch (err) {
         console.log(err);
       } finally {

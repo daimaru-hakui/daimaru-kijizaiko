@@ -45,11 +45,11 @@ import {
   usersState,
 } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import MaterialsModal from "./MaterialsModal";
 
 type Props = {
-  items: ProductType;
+  items: any;
   setItems: Function;
   title: string;
   toggleSwitch: string;
