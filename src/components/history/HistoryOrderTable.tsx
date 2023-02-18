@@ -27,7 +27,7 @@ import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 type Props = {
   histories: HistoryType[];

@@ -36,7 +36,7 @@ import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
 import { currentUserState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 type Props = {
   grayFabric: GrayFabricType;

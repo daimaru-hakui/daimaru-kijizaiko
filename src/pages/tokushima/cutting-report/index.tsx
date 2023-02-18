@@ -18,7 +18,7 @@ import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";
-import { useGetDisplay } from "../../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../../hooks/UseGetDisplay";
 
 const CuttingReport = () => {
   const { getSerialNumber, getUserName } = useGetDisplay()

@@ -18,7 +18,7 @@ import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 type Props = {
   histories: HistoryType[];

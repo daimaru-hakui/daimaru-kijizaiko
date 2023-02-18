@@ -19,7 +19,7 @@ import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);

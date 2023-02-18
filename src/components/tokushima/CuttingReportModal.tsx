@@ -31,7 +31,7 @@ import { productsState, usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { ProductType } from "../../../types/ProductType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 type Props = {
   // report: CuttingReportType;

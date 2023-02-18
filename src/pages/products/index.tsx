@@ -19,7 +19,7 @@ import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
 import { ProductType } from "../../../types/ProductType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)

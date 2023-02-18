@@ -16,7 +16,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 

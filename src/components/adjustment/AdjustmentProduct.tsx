@@ -6,12 +6,11 @@ import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
 import { loadingState } from "../../../store";
-import { useGetDisplay } from "../../hooks/useGetDisplay";
+import { useGetDisplay } from "../../hooks/UseGetDisplay";
 import { useInputHandle } from "../../hooks/UseInputHandle";
-import { ProductType } from "../../../types/ProductType";
 
 type Props = {
-  product: ProductType
+  product: any
 };
 
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
