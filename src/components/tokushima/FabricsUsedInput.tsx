@@ -10,7 +10,6 @@ import {
   NumberInputStepper,
   Select,
   Text,
-  transition,
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
 import { NextPage } from "next";
