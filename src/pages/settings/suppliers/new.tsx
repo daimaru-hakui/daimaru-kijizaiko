@@ -24,7 +24,8 @@ import { useInputHandle } from "../../../hooks/useInputHandle";
 const SupplierNew = () => {
   const [suppliers, setSuppliers] = useState([] as SupplierType[]);
   const router = useRouter();
-  const { items, handleInputChange } = useInputHandle();
+  const [items, setItems] = useState({} as SupplierType)
+  const { handleInputChange } = useInputHandle(items, setItems);
   const [flag, setFlag] = useState(false);
 
   useEffect(() => {

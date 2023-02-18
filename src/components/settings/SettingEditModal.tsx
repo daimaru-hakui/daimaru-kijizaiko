@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useInputHandle } from "../../hooks/useInputHandle";
@@ -27,7 +27,11 @@ type Props = {
 
 const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange } = useInputHandle();
+  const [items, setItems] = useState({
+    id: "",
+    name: "string"
+  })
+  const { handleInputChange } = useInputHandle(items, setItems);
 
   useEffect(() => {
     setItems(obj);

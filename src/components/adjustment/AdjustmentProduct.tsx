@@ -2,7 +2,7 @@ import { Box, Button, Flex, NumberDecrementStepper, NumberIncrementStepper, Numb
 import { GiCancel } from "react-icons/gi";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
 import { loadingState } from "../../../store";
@@ -16,7 +16,8 @@ type Props = {
 
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const setLoading = useSetRecoilState(loadingState);
-  const { items, setItems, handleNumberChange } = useInputHandle()
+  const [items, setItems] = useState({ price: product.price, tokushimaStock: product.tokushimaStock })
+  const { handleNumberChange } = useInputHandle(items, setItems)
   const { getUserName } = useGetDisplay()
 
   useEffect(() => {

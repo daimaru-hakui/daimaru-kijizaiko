@@ -27,7 +27,8 @@ const StockPlaceNew = () => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
-  const { items, handleInputChange } = useInputHandle();
+  const [items, setItems] = useState({} as StockPlaceType)
+  const { handleInputChange } = useInputHandle(items, setItems);
   const [flag, setFlag] = useState(false);
 
   // 登録しているかのチェック

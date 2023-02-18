@@ -1,3 +1,4 @@
+import { NextPage } from "next";
 import { useState } from "react";
 import { MaterialsType } from "../../types/MaterialsType";
 import { ProductType } from "../../types/ProductType";
@@ -6,8 +7,9 @@ import { StockPlaceType } from "../../types/StockPlaceType";
 type ObjectType = StockPlaceType | ProductType | MaterialsType
 
 
-export const useInputHandle = () => {
-  const [items, setItems] = useState<any>({} as ObjectType);
+
+export const useInputHandle = (items, setItems): any => {
+  // const [items, setItems] = useState<any>({} as ObjectType);
 
   const handleInputChange: any = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

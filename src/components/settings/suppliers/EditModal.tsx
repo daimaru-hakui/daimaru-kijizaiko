@@ -27,7 +27,8 @@ type Props = {
 
 const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange } = useInputHandle();
+  const [items, setItems] = useState({} as SupplierType)
+  const { handleInputChange } = useInputHandle(items, setItems);
 
   useEffect(() => {
     setItems(supplier);

@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
@@ -35,7 +35,8 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleNumberChange } = useInputHandle()
+  const [items, setItems] = useState({} as HistoryType)
+  const { handleNumberChange } = useInputHandle(items, setItems)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
 

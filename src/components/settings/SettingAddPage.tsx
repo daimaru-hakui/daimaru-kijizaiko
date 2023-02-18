@@ -32,7 +32,9 @@ type ArrayType = {
 
 const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) => {
   const [array, setArray] = useState([] as ArrayType[]);
-  const { items, setItems, handleInputChange } = useInputHandle();
+  const [items, setItems] = useState({} as ArrayType)
+  const { handleInputChange } = useInputHandle(items, setItems);
+
   const [flag, setFlag] = useState(false);
   const router = useRouter()
 
@@ -56,7 +58,7 @@ const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) =>
       await addDoc(collectionRef, {
         name: items.name,
       });
-      setItems({ name: "" });
+      setItems({ id: "", name: "" });
     } catch (err) {
       console.log(err)
     } finally {

@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
@@ -41,10 +41,10 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const { items, setItems, handleInputChange, handleNumberChange } = useInputHandle()
+  const [items, setItems] = useState({} as HistoryType)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { items, setItems, handleInputChange, handleNumberChange } = useInputHandle();
+  const { handleInputChange, handleNumberChange } = useInputHandle(items, setItems);
 
 
   // 初期値をitemsに代入
