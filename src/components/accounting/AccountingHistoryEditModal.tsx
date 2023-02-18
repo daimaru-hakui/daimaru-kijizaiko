@@ -28,7 +28,6 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import useInputHandle from "../../hooks/useInputHandle";
 import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 
