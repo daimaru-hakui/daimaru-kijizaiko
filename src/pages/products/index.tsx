@@ -18,8 +18,8 @@ import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
-// import { ProductType } from "../../../types/ProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { ProductType } from "../../../types/ProductType";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
@@ -87,7 +87,7 @@ const Products = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {products?.map((product: any) => (
+                  {products?.map((product: ProductType) => (
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>

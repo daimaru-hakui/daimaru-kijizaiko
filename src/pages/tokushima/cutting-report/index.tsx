@@ -12,9 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";

@@ -5,11 +5,8 @@ import {
   loadingState,
 
 } from "../../../../store";
-import { FabricsUsedInput } from "../../../components/tokushima/FabricsUsedInput";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
-import { CuttingProductType } from "../../../../types/CuttingProductType";
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
