@@ -5,7 +5,7 @@ import { grayFabricsState } from "../../../store";
 import { ProductType } from "../../../types/ProductType";
 
 type Props = {
-  product: ProductType;
+  product: ProductType
 };
 
 const DisplayStock: NextPage<Props> = ({ product }) => {
