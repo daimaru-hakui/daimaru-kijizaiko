@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import { db } from "../../../firebase";
-import { useInputHandle } from "../../hooks/UseInputHandle";
+import { useInputHandle } from "../../hooks/useInputHandle";
 
 type Props = {
   title: string;

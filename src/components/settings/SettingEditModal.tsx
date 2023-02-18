@@ -15,7 +15,7 @@ import { NextPage } from "next";
 import React, { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
-import { useInputHandle } from "../../hooks/UseInputHandle";
+import { useInputHandle } from "../../hooks/useInputHandle";
 
 type Props = {
   obj: {
