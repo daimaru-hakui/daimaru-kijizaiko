@@ -22,7 +22,7 @@ import { SupplierType } from "../../../../types/SupplierType";
 import { useInputHandle } from "../../../hooks/useInputHandle";
 
 const SupplierNew = () => {
-  const [suppliers, setSuppliers] = useState([{}] as SupplierType[]);
+  const [suppliers, setSuppliers] = useState([] as SupplierType[]);
   const router = useRouter();
   const { items, handleInputChange } = useInputHandle();
   const [flag, setFlag] = useState(false);
@@ -40,7 +40,7 @@ const SupplierNew = () => {
 
   // 登録しているかのチェック
   useEffect(() => {
-    let name = items.name;
+    let name = items?.name;
     if (!name) name = "noValue";
     const base = suppliers?.map((a: { name: string }) => a.name);
     const result = base?.includes(name);
@@ -101,7 +101,7 @@ const SupplierNew = () => {
                 type="text"
                 placeholder="例）クラボウインターナショナル"
                 value={items.name}
-                onChange={handleInputChange}
+                onChange={(e) => handleInputChange(e)}
               />
             </Box>
             <Box w="100%" flex={1}>
@@ -112,7 +112,7 @@ const SupplierNew = () => {
                 type="text"
                 placeholder=""
                 value={items.kana}
-                onChange={handleInputChange}
+                onChange={(e) => handleInputChange(e)}
               />
             </Box>
             <Box w="100%" flex={1}>
@@ -121,7 +121,7 @@ const SupplierNew = () => {
                 mt={1}
                 name="comment"
                 value={items.comment}
-                onChange={handleInputChange}
+                onChange={(e) => handleInputChange(e)}
               />
             </Box>
           </Flex>

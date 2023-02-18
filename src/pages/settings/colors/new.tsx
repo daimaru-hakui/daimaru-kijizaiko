@@ -1,4 +1,6 @@
-import SettingAddPage from "../../../components/settings/SettingAddPagel";
+import SettingAddPage from "../../../components/settings/SettingAddPage";
+
+
 const ColorsNew = () => {
   return (
     <SettingAddPage title={'色'} collectionName='colors' pathName='colors' />

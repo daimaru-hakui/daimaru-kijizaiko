@@ -31,7 +31,7 @@ type ArrayType = {
 };
 
 const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) => {
-  const [array, setArray] = useState([{}] as ArrayType[]);
+  const [array, setArray] = useState([] as ArrayType[]);
   const { items, setItems, handleInputChange } = useInputHandle();
   const [flag, setFlag] = useState(false);
   const router = useRouter()

@@ -26,13 +26,13 @@ import { useInputHandle } from "../../../hooks/useInputHandle";
 const StockPlaceNew = () => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
-  const [stockPlaces, setStockPlaces] = useState([{}] as StockPlaceType[]);
+  const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
   const { items, handleInputChange } = useInputHandle();
   const [flag, setFlag] = useState(false);
 
   // 登録しているかのチェック
   useEffect(() => {
-    let name = items.name;
+    let name = items?.name;
     if (!name) name = "noValue";
     const base = stockPlaces?.map((a: { name: string }) => a.name);
     const result = base?.includes(name);
@@ -49,7 +49,7 @@ const StockPlaceNew = () => {
       const docsRef = collection(db, "stockPlaces");
       const querySnap = await getDocs(docsRef);
       setStockPlaces(
-        querySnap.docs.map((doc) => ({ ...doc.data() } as StockPlaceType))
+        querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType))
       );
     };
     getStockPlaces();

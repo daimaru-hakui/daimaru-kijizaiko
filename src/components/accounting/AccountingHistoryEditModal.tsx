@@ -122,7 +122,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   defaultValue={0}
                   min={0}
                   max={10000}
-                  value={items.quantity}
+                  value={items?.quantity}
                   onChange={(e) => handleNumberChange(e, "quantity")}
                 >
                   <NumberInputField textAlign="right" />
@@ -132,7 +132,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   </NumberInputStepper>
                 </NumberInput>
               </Box>
-              {items.price && (
+              {items?.price && (
                 <Box w="100%">
                   <Text>金額（円）</Text>
                   <NumberInput
@@ -141,7 +141,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                     defaultValue={0}
                     min={0}
                     max={10000}
-                    value={items.price === 0 ? "" : items.price}
+                    value={items?.price === 0 ? "" : items.price}
                     onChange={(e) => handleNumberChange(e, "price")}
                   >
                     <NumberInputField textAlign="right" />
