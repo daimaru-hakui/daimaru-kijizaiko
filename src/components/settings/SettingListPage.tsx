@@ -17,11 +17,12 @@ import { NextPage } from "next";
 import { db } from "../../../firebase";
 import SettingEditModal from "./SettingEditModal";
 import Link from "next/link";
+import { StockPlaceType } from "../../../types/StockPlaceType";
 
 type Props = {
   title: string;
   collectionName: string;
-  array: { id: string; name: string }[];
+  array: StockPlaceType[];
   pathName: string;
 };
 
@@ -67,7 +68,7 @@ const SettingListPage: NextPage<Props> = ({
               </Tr>
             </Thead>
             <Tbody>
-              {array?.map((a: { id: string; name: string }, index: number) => (
+              {array?.map((a: StockPlaceType, index: number) => (
                 <Tr key={index}>
                   <Td w="100%">{a.name}</Td>
                   <Td w="20px">
