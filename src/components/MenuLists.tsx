@@ -3,7 +3,7 @@ import Link from "next/link";
 import { NextPage } from "next";
 import OrderDrawer from "./products/OrderDrawer";
 import { useRouter } from "next/router";
-import { useAuthManegment } from "../hooks/useAuthManegment";
+import { useAuthManegment } from "../hooks/UseAuthManegment";
 
 type Props = {
   onClose: Function;
