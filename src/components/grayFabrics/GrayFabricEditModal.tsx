@@ -10,13 +10,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import GrayFabricInputArea from "./GrayFabricInputArea";
 
 type Props = {

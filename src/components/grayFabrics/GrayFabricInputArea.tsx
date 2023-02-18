@@ -8,13 +8,15 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
-import { grayFabricsState, suppliersState } from "../../../store";
+import { suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { useInputGrayFabric } from "../../hooks/UseInputGrayFabric";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 type Props = {
   title: string;
@@ -29,8 +31,8 @@ const GrayFabricInputArea: NextPage<Props> = ({
   toggleSwitch,
   onClose
 }) => {
+  const [grayFabrics, setGrayFabrics] = useState([] as GrayFabricType[])
   const suppliers = useRecoilValue(suppliersState);
-  const grayFabrics = useRecoilValue(grayFabricsState);
   const { items, setItems, handleInputChange } = useInputGrayFabric();
   const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc(items, setItems);
 
@@ -38,6 +40,20 @@ const GrayFabricInputArea: NextPage<Props> = ({
     setItems({ ...grayFabric } as GrayFabricType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grayFabric])
+
+
+  useEffect(() => {
+    const getGrayFabrics = async () => {
+      const docsRef = collection(db, 'grayFabrics');
+      const querysnap = await getDocs(docsRef);
+      setGrayFabrics(
+        querysnap.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType)
+        )
+      );
+    };
+    getGrayFabrics();
+  }, []);
 
   // 生地が登録しているかのチェック
   const registeredInput = () => {

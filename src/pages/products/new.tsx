@@ -6,7 +6,7 @@ const ProductsNew = () => {
     <ProductInputArea
       title={"生地の登録"}
       toggleSwitch={"new"}
-      product={{} as ProductType}
+      product={{productNum:"", colorNum:"",colorName:""} as ProductType}
       onClose={() => { }}
     />
   );

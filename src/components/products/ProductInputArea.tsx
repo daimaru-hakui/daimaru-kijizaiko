@@ -19,15 +19,16 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { collection, getDocs } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
+import { db } from "../../../firebase";
 import {
   colorsState,
   grayFabricsState,
   materialNamesState,
-  productsState,
   suppliersState,
   usersState,
 } from "../../../store";
@@ -35,7 +36,6 @@ import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { SupplierType } from "../../../types/SupplierType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useGetDoc } from "../../hooks/UseGetDoc";
 import { useInputProduct } from "../../hooks/UseInputProduct";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
@@ -57,11 +57,9 @@ const ProductInputArea: NextPage<Props> = ({
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
-  const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
-
-  const { getMixed } = useGetDisp();
+  const [products, setProducts] = useState([] as ProductType[])
   const { items,
     setItems,
     handleInputChange,
@@ -70,11 +68,25 @@ const ProductInputArea: NextPage<Props> = ({
     handleCheckedChange
   } = useInputProduct();
   const { addProduct, updateProduct, reset } = useProductFunc(items, setItems);
- 
+  const { getMixed } = useGetDisp();
+
   useEffect(() => {
-    setItems({...product} as ProductType)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[product])
+    setItems({ ...product } as ProductType)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product])
+
+  useEffect(() => {
+    const getProducts = async () => {
+      const docsRef = collection(db, 'products');
+      const querysnap = await getDocs(docsRef);
+      setProducts(
+        querysnap.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id } as ProductType)
+        )
+      );
+    };
+    getProducts();
+  }, []);
 
   // 必須項目を入力しているかをチェック
   const requiredInput = () => {
