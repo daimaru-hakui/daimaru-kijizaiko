@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types/SupplierType";
-import { useInputHandle } from "../../../hooks/useInputHandle";
+import { useInputHandle } from "../../../hooks/UseInputHandle";
 
 const SupplierNew = () => {
   const [suppliers, setSuppliers] = useState([] as SupplierType[]);
