@@ -96,8 +96,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
   // 在庫数を取得
   const getProductStock = (productId: string) => {
     const stock = products
-      .filter((product: ProductType) => product.id === productId)
-      .map((product: ProductType) => product.tokushimaStock);
+      .filter((product: any) => product.id === productId)
+      .map((product: any) => product.tokushimaStock);
     return stock || 0;
   };
 
