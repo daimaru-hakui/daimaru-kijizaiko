@@ -19,12 +19,12 @@ import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
 import { ProductType } from "../../../types/ProductType";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
   const products = useRecoilValue(productsState);
-  const { getUserName, getMixed, getFabricStd } = useGetDisplay()
+  const { getUserName, getMixed, getFabricStd } = useGetDisp()
 
   const quantityBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";

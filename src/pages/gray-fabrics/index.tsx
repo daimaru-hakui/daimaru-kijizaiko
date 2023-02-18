@@ -19,12 +19,12 @@ import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
   const [filterGrayFabrics, setFilterGrayFabrics] = useState([]);
-  const { getSupplierName } = useGetDisplay()
+  const { getSupplierName } = useGetDisp()
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {

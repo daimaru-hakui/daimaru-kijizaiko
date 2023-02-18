@@ -18,10 +18,10 @@ import { usersState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";
-import { useGetDisplay } from "../../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const CuttingReport = () => {
-  const { getSerialNumber, getUserName } = useGetDisplay()
+  const { getSerialNumber, getUserName } = useGetDisp()
   const [cuttingReports, setCuttingReports] = useState(
     [] as CuttingReportType[]
   );

@@ -13,11 +13,11 @@ import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
-import { useGetDisplay } from "../../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const HistoryCutting = () => {
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
-  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisplay()
+  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisp()
 
   useEffect(() => {
     const getCuttingReports = () => {

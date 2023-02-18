@@ -36,7 +36,7 @@ import { db } from "../../../firebase";
 import { todayDate } from "../../../functions";
 import { currentUserState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   grayFabric: GrayFabricType;
@@ -45,7 +45,7 @@ type Props = {
 const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
-  const { getSupplierName } = useGetDisplay()
+  const { getSupplierName } = useGetDisp()
   const [items, setItems] = useState({
     orderedAt: "",
     scheduledAt: "",

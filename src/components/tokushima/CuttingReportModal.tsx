@@ -31,7 +31,7 @@ import { productsState, usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { ProductType } from "../../../types/ProductType";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   // report: CuttingReportType;
@@ -43,7 +43,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
   const products = useRecoilValue(productsState);
   const users = useRecoilValue(usersState);
   const [report, setReport] = useState({} as CuttingReportType);
-  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisplay()
+  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisp()
 
   useEffect(() => {
     const getCuttingReport = async () => {

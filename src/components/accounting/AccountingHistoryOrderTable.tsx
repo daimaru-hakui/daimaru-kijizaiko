@@ -17,7 +17,7 @@ import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { AccountingHistoryEditModal } from "./AccountingHistoryEditModal";
 import AccountingHistoryOrderToConfirmModal from "./AccountingHistoryOrderToConfirmModal";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   histories: HistoryType[];
@@ -28,7 +28,7 @@ const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
   const [filterHistories, setFilterHistories] = useState<any>();
   const users = useRecoilValue(usersState);
-  const { getUserName, getSerialNumber } = useGetDisplay()
+  const { getUserName, getSerialNumber } = useGetDisp()
   const HOUSE_FACTORY = "徳島工場";
   const currentUser = useRecoilValue(currentUserState);
   // 数量０のデータを非表示

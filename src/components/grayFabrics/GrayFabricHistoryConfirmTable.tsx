@@ -16,7 +16,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 
@@ -30,7 +30,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
   title,
 }) => {
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber, getUserName } = useGetDisplay()
+  const { getSerialNumber, getUserName } = useGetDisp()
 
 
   const updateConfirmHistory = async (history: any) => {

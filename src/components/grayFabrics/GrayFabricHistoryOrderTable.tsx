@@ -28,7 +28,7 @@ import HistoryOrderToConfirmModal from "../history/HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { todayDate } from "../../../functions";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   histories: HistoryType[];
@@ -38,8 +38,7 @@ type Props = {
 const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber, getUserName } = useGetDisplay()
-
+  const { getSerialNumber, getUserName } = useGetDisp()
 
 
   // キバタ仕掛から削除

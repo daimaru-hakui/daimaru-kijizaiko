@@ -27,7 +27,7 @@ import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   histories: HistoryType[];
@@ -45,7 +45,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber } = useGetDisplay()
+  const { getSerialNumber } = useGetDisp()
 
   // 数量０のデータを非表示
   useEffect(() => {

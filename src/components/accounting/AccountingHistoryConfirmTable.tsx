@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { AccountingHistoryEditModal } from "./AccountingHistoryEditModal";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   histories: HistoryType[];
@@ -26,7 +26,7 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
   title,
 }) => {
   const [filterHistories, setFilterHistories] = useState<any>();
-  const { getUserName, getSerialNumber } = useGetDisplay()
+  const { getUserName, getSerialNumber } = useGetDisp()
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(

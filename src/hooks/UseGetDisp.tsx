@@ -4,7 +4,7 @@ import { productsState, suppliersState, usersState } from "../../store";
 import { MaterialsType } from "../../types/MaterialsType";
 import { ProductType } from "../../types/ProductType";
 
-export const useGetDisplay = () => {
+export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
   const products = useRecoilValue(productsState)

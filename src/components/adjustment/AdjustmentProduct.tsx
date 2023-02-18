@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
 import { loadingState } from "../../../store";
-import { useGetDisplay } from "../../hooks/UseGetDisplay";
 import { useInputHandle } from "../../hooks/UseInputHandle";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   product: any
@@ -17,7 +17,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const setLoading = useSetRecoilState(loadingState);
   // const [items, setItems] = useState({ price: product.price, tokushimaStock: product.tokushimaStock })
   const { items, setItems, handleNumberChange } = useInputHandle()
-  const { getUserName } = useGetDisplay()
+  const { getUserName } = useGetDisp()
 
   useEffect(() => {
     setItems({ price: product.price, tokushimaStock: product.tokushimaStock });
