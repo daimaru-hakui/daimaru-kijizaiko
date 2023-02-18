@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
 const ProductsNew = () => {
@@ -7,7 +7,7 @@ const ProductsNew = () => {
     productNum: "",
     colorNum: "",
     colorName: "",
-  } as ProductType);
+  } as any);
 
   return (
     <ProductInputArea
