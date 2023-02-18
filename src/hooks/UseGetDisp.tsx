@@ -2,7 +2,7 @@ import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { productsState, suppliersState, usersState } from "../../store";
 import { MaterialsType } from "../../types/MaterialsType";
-import { ProductType } from "../../types/ProductType";
+// import { ProductType } from "../../types/ProductType";
 
 export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
@@ -75,16 +75,16 @@ export const useGetDisp = () => {
   };
 
   const getProductNumber = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find((product: any) => product.id === productId);
     return `${result?.productNumber}`;
   };
 
   const getColorName = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find((product: any) => product.id === productId);
     return `${result?.colorName}`;
   };
   const getProductName = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find((product: any) => product.id === productId);
     return `${result?.productName}`;
   };
 
