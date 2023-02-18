@@ -26,6 +26,7 @@ import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import { useInputHandle } from "../../hooks/UseInputHandle";
+import { useInputHistory } from "../../hooks/UseInputHistory";
 
 type Props = {
   history: HistoryType;
@@ -35,8 +36,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [items, setItems] = useState({} as HistoryType)
-  const { items, setItems, handleNumberChange } = useInputHandle()
+  const { items, setItems, handleNumberChange } = useInputHistory()
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
 

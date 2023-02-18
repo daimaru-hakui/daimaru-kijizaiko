@@ -1,12 +1,8 @@
-import { NextPage } from "next";
 import { useState } from "react";
-import { MaterialsType } from "../../types/MaterialsType";
-// import { ProductType } from "../../types/ProductType";
 import { StockPlaceType } from "../../types/StockPlaceType";
+import { SupplierType } from "../../types/SupplierType";
 
-type ObjectType = StockPlaceType | MaterialsType
-
-
+type ObjectType = StockPlaceType | SupplierType
 
 export const UseInputSettings = () => {
   const [items, setItems] = useState<any>({});

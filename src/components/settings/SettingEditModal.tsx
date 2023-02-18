@@ -15,7 +15,7 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
-import { useInputHandle } from "../../hooks/UseInputHandle";
+import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 
 type Props = {
@@ -28,11 +28,7 @@ type Props = {
 
 const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [items, setItems] = useState({
-  //   id: "",
-  //   name: "string"
-  // })
-  const { items, setItems, handleInputChange } = useInputHandle()
+  const { items, setItems, handleInputChange } = UseInputSettings()
 
   useEffect(() => {
     setItems(obj);

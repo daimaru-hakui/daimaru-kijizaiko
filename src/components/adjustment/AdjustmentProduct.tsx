@@ -3,11 +3,11 @@ import { GiCancel } from "react-icons/gi";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
-import { loadingState } from "../../../store";
-import { useInputHandle } from "../../hooks/UseInputHandle";
+import { currentUserState, loadingState } from "../../../store";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useInputProduct } from "../../hooks/UseInputProduct";
 
 type Props = {
   product: any
@@ -15,12 +15,13 @@ type Props = {
 
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const setLoading = useSetRecoilState(loadingState);
+  const currentUser = useRecoilValue(currentUserState)
   // const [items, setItems] = useState({ price: product.price, tokushimaStock: product.tokushimaStock })
-  const { items, setItems, handleNumberChange } = useInputHandle()
+  const { items, setItems, handleNumberChange } = useInputProduct()
   const { getUserName } = useGetDisp()
 
   useEffect(() => {
-    setItems({ price: product.price, tokushimaStock: product.tokushimaStock });
+    setItems({ ...product });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.price, product.tokushimaStock]);
 
@@ -37,6 +38,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
         price: Number(items.price),
         tokushimaStock: Number(items.tokushimaStock),
         updatedAt: serverTimestamp(),
+        updateUser: currentUser
       });
     } catch (err) {
       console.log(err);
@@ -46,7 +48,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   };
 
   const reset = () => {
-    setItems({ price: product.price, tokushimaStock: product.tokushimaStock });
+    setItems({ ...product });
   };
 
   return (
