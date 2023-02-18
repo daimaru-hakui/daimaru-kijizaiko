@@ -28,6 +28,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { useInputHistory } from "../../hooks/UseInputHistory";
 import { UseInputSettings } from "../../hooks/UseInputSettings";
 
 
@@ -44,7 +45,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   // const [items, setItems] = useState({} as HistoryType)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { items, setItems, handleInputChange, handleNumberChange } = UseInputSettings();
+  const { items, setItems, handleInputChange, handleNumberChange } = useInputHistory()
 
 
   // 初期値をitemsに代入
