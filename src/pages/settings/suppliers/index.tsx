@@ -21,6 +21,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import CommentModal from "../../../components/CommentModal";
+import { SupplierType } from "../../../../types/SupplierType";
 
 const Suppliers = () => {
   const suppliers = useRecoilValue(suppliersState);
@@ -59,12 +60,7 @@ const Suppliers = () => {
             </Thead>
             <Tbody>
               {suppliers?.map(
-                (supplier: {
-                  id: string;
-                  name: string;
-                  kana: string;
-                  comment: string;
-                }) => (
+                (supplier: SupplierType) => (
                   <Tr key={supplier.id}>
                     <Td>{supplier.name}</Td>
                     <Td>{supplier.kana}</Td>
