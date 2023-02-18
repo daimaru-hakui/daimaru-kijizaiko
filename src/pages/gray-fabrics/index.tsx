@@ -9,44 +9,33 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
 import { grayFabricsState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState([]);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as GrayFabricType[]);
   const { getSupplierName } = useGetDisp()
+  const {deleteGrayFabric} = useGrayFabricFunc(null ,null)
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {
       setFilterGrayFabrics(
-        await grayFabrics.filter((item: GrayFabricType) =>
-          item.productNumber.includes("")
+        await grayFabrics.filter((fabric: GrayFabricType) =>
+          fabric.productNumber.includes("")
         )
       );
     };
     getFilterGrayFabrics();
   }, [grayFabrics]);
-
-  const deleteGrayFabric = async (id: string) => {
-    let result = window.confirm("削除して宜しいでしょうか。");
-    if (!result) return;
-
-    result = window.confirm("本当に削除して宜しいでしょうか。");
-    if (!result) return;
-
-    const docRef = doc(db, "grayFabrics", id);
-    await deleteDoc(docRef);
-  };
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -69,45 +58,45 @@ const GrayFabrics = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterGrayFabrics?.map((item: GrayFabricType) => (
-                <Tr key={item.id}>
+              {filterGrayFabrics?.map((fabric: GrayFabricType) => (
+                <Tr key={fabric.id}>
                   <Td>
-                    <GrayFabricOrderAreaModal grayFabric={item} />
+                    <GrayFabricOrderAreaModal grayFabric={fabric} />
                   </Td>
-                  <Td>{item.productNumber}</Td>
-                  <Td>{item.productName}</Td>
-                  <Td>{getSupplierName(item.supplierId)}</Td>
+                  <Td>{fabric.productNumber}</Td>
+                  <Td>{fabric.productName}</Td>
+                  <Td>{getSupplierName(fabric.supplierId)}</Td>
                   <Td
                     isNumeric
                     fontSize="md"
-                    fontWeight={item.wip > 0 ? "bold" : "normal"}
+                    fontWeight={fabric.wip > 0 ? "bold" : "normal"}
                   >
-                    {item.wip || 0}m
+                    {fabric.wip || 0}m
                   </Td>
                   <Td
                     isNumeric
                     fontSize="md"
-                    fontWeight={item.stock > 0 ? "bold" : "normal"}
+                    fontWeight={fabric.stock > 0 ? "bold" : "normal"}
                   >
-                    {item.stock || 0}m
+                    {fabric.stock || 0}m
                   </Td>
                   <Td w="100%">
                     <Flex gap={3}>
                       <CommentModal
-                        id={item.id}
-                        comment={item.comment}
+                        id={fabric.id}
+                        comment={fabric.comment}
                         collectionName="grayFabrics"
                       />
-                      {item?.comment.slice(0, 10) +
-                        (item.comment.length >= 1 ? "..." : "")}
+                      {fabric?.comment.slice(0, 10) +
+                        (fabric?.comment.length >= 1 ? "..." : "")}
                     </Flex>
                   </Td>
                   <Td>
                     <Flex alignItems="center" gap={3}>
-                      <GrayFabricEditModal grayFabric={item} />
+                      <GrayFabricEditModal grayFabric={fabric} />
                       <FaTrashAlt
                         cursor="pointer"
-                        onClick={() => deleteGrayFabric(item.id)}
+                        onClick={() => deleteGrayFabric(fabric.id)}
                       />
                     </Flex>
                   </Td>

@@ -19,15 +19,10 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import {
-  doc,
-  getDoc,
-} from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
-import { db } from "../../../firebase";
 import {
   colorsState,
   grayFabricsState,
@@ -40,6 +35,7 @@ import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { SupplierType } from "../../../types/SupplierType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useGetDoc } from "../../hooks/UseGetDoc";
 import { useInputProduct } from "../../hooks/UseInputProduct";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
@@ -64,7 +60,7 @@ const ProductInputArea: NextPage<Props> = ({
   const products = useRecoilValue(productsState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
- 
+
   const { getMixed } = useGetDisp();
   const { items,
     setItems,
@@ -73,19 +69,12 @@ const ProductInputArea: NextPage<Props> = ({
     handleRadioChange,
     handleCheckedChange
   } = useInputProduct();
-  const { addProduct,updateProduct,reset } = useProductFunc(items,setItems);
-
-
+  const { addProduct, updateProduct, reset } = useProductFunc(items, setItems);
+ 
   useEffect(() => {
-    if (!product.id) return
-    const getProduct = async () => {
-      const docRef = doc(db, 'products', product.id)
-      const docSnap = await getDoc(docRef);
-      setItems({ ...docSnap.data(), id: docSnap.id } as ProductType)
-    }
-    getProduct();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setItems({...product} as ProductType)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[product])
 
   // 必須項目を入力しているかをチェック
   const requiredInput = () => {
@@ -499,16 +488,16 @@ const ProductInputArea: NextPage<Props> = ({
             <Flex gap={3}>
               <Button w="100%"
                 onClick={() => {
-                reset(product);
-                onClose()
-              }}>
+                  reset(product);
+                  onClose()
+                }}>
                 キャンセル
               </Button>
               <Button w="100%" colorScheme="facebook"
                 onClick={() => {
-                updateProduct(productId);
-                onClose();
-              }}>
+                  updateProduct(productId);
+                  onClose();
+                }}>
                 更新
               </Button>
             </Flex>

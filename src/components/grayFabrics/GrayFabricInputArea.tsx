@@ -8,59 +8,49 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-
+import { useEffect } from 'react';
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState, suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
+import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
+import { useInputGrayFabric } from "../../hooks/UseInputGrayFabric";
 
 type Props = {
+  title: string;
   grayFabric: GrayFabricType | undefined;
-  items: GrayFabricType;
-  setItems: Function;
-  onClick: Function;
-  btnTitle: string;
+  toggleSwitch: string;
+  onClose: Function;
 };
 
 const GrayFabricInputArea: NextPage<Props> = ({
+  title,
   grayFabric,
-  items,
-  setItems,
-  onClick,
-  btnTitle,
+  toggleSwitch,
+  onClose
 }) => {
   const suppliers = useRecoilValue(suppliersState);
   const grayFabrics = useRecoilValue(grayFabricsState);
+  const { items, setItems, handleInputChange } = useInputGrayFabric();
+  const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc(items, setItems);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
+  useEffect(() => {
+    setItems({ ...grayFabric } as GrayFabricType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grayFabric])
 
-  // 登録済みを登録できなくする
-  const isRegistered = (
-    prevProductNumber: string = "",
-    currentProductNumber: string,
-    currentSupplierId: string
-  ) => {
-    let result = grayFabrics.filter(
-      (grayFabric: GrayFabricType) =>
-        grayFabric.productNumber === currentProductNumber &&
-        grayFabric.supplierId === currentSupplierId
-    );
-    if (btnTitle === "更新") {
-      result = result?.filter(
-        (grayFabric: GrayFabricType) =>
-          prevProductNumber !== currentProductNumber
-      );
-      return result.length >= 1 ? true : false;
+  // 生地が登録しているかのチェック
+  const registeredInput = () => {
+    let item = items?.productNumber
+    if (item === "") {
+      item = 'noValue';
     }
-    return result.length >= 1 ? true : false;
+    const base = grayFabrics.map(
+      (grayFabric: GrayFabricType) =>
+        grayFabric.productNumber
+    );
+    const result = base?.includes(item);
+    return result;
   };
 
   return (
@@ -73,7 +63,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
               ml={1}
               as="span"
               textColor="red"
-              display={btnTitle === "登録" ? "display" : "none"}
+              display={title === "登録" ? "display" : "none"}
             >
               ※必須
             </Box>
@@ -83,7 +73,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
             placeholder="メーカーを選択してください"
             value={items.supplierId}
             name="supplierId"
-            onChange={(e) => handleInputChange(e)}
+            onChange={handleInputChange}
           >
             {suppliers?.map((supplier: { id: string; name: string }) => (
               <option key={supplier.id} value={supplier.id}>
@@ -93,22 +83,11 @@ const GrayFabricInputArea: NextPage<Props> = ({
           </Select>
         </Box>
       </Flex>
-      <Box
-        fontSize="lg"
-        fontWeight="bold"
-        color="red"
-        display={
-          isRegistered(
-            grayFabric?.productNumber,
-            items.productNumber,
-            items.supplierId
-          )
-            ? "block"
-            : "none"
-        }
-      >
-        すでに登録済みです。
-      </Box>
+      {toggleSwitch === "new" && (
+        <Box fontSize="3xl" fontWeight="bold" color="red">
+          {registeredInput() && "すでに登録されています。"}
+        </Box>
+      )}
       <Flex
         gap={6}
         alignItems="center"
@@ -122,7 +101,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
               ml={1}
               as="span"
               textColor="red"
-              display={btnTitle === "登録" ? "display" : "none"}
+              display={title === "登録" ? "display" : "none"}
             >
               ※必須
             </Box>
@@ -157,21 +136,35 @@ const GrayFabricInputArea: NextPage<Props> = ({
           onChange={handleInputChange}
         />
       </Box>
-      <Button
-        colorScheme="facebook"
-        disabled={
-          !items.supplierId ||
-          !items.productNumber ||
-          isRegistered(
-            grayFabric?.productNumber,
-            items.productNumber,
-            items.supplierId
-          )
-        }
-        onClick={() => onClick()}
-      >
-        {btnTitle}
-      </Button>
+      {toggleSwitch === 'new' && (
+        <Button
+          colorScheme="facebook"
+          disabled={
+            !items.supplierId ||
+            !items.productNumber ||
+            registeredInput()
+          }
+          onClick={addGrayFabric}
+        >
+          登録
+        </Button>
+      )}
+
+      {toggleSwitch === 'edit' && (
+        <Button
+          colorScheme="facebook"
+          disabled={
+            !items.supplierId ||
+            !items.productNumber
+          }
+          onClick={() => {
+            updateGrayFabric(grayFabric.id);
+            onClose();
+          }}
+        >
+          更新
+        </Button>
+      )}
     </Stack>
   );
 };
