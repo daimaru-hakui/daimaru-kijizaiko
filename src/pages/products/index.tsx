@@ -19,7 +19,7 @@ import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { FabricType } from "../../../types/FabricType";
+import { ProductType } from "../../../types/FabricType";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
@@ -87,7 +87,7 @@ const Products = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {products?.map((product: FabricType) => (
+                  {products?.map((product: ProductType) => (
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>

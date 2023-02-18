@@ -1,4 +1,4 @@
-export type FabricType = {
+export type ProductType = {
   id: string;
   productType: number;
   staff: string;
