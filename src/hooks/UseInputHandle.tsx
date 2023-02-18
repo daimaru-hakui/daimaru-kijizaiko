@@ -1,17 +1,14 @@
-import { NextPage } from "next";
 import { useState } from "react";
+import { ProductType } from "../../types/FabricType";
 import { MaterialsType } from "../../types/MaterialsType";
-// import { ProductType } from "../../types/ProductType";
 import { StockPlaceType } from "../../types/StockPlaceType";
 
-type ObjectType = StockPlaceType | MaterialsType
-
-
+type ObjectType = StockPlaceType | MaterialsType | ProductType
 
 export const useInputHandle = () => {
-  const [items, setItems] = useState<any>({});
+  const [items, setItems] = useState({} as ObjectType);
 
-  const handleInputChange: any = (
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const name = e.target.name;
@@ -19,7 +16,7 @@ export const useInputHandle = () => {
     setItems({ ...items, [name]: value } as ObjectType);
   };
 
-  const handleNumberChange: any = (e: any, name: string) => {
+  const handleNumberChange = (e: any, name: string) => {
     const value = e;
     setItems({ ...items, [name]: value } as ObjectType);
   };
