@@ -19,7 +19,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingState, productsState } from "../../../store";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import { db } from "../../../firebase";
 import { doc, getDoc, runTransaction, updateDoc } from "firebase/firestore";
 
@@ -236,7 +236,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
                 name="productId"
                 onChange={(e) => handleInputsChange(e, rowIndex)}
               >
-                {filterProducts?.map((product: ProductType, index: number) => (
+                {filterProducts?.map((product: any, index: number) => (
                   <option key={index} value={product.id}>
                     {product.productNumber}
                     {"  "}
