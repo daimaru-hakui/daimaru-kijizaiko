@@ -14,12 +14,12 @@ import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../store";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import AdjustmentProduct from "../../components/adjustment/AdjustmentProduct";
 
 const Adjustment = () => {
   const products = useRecoilValue(productsState);
-  const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
+  const [filterProducts, setFilterProducts] = useState([] as any[]);
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const Adjustment = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterProducts.map((product: ProductType) => (
+              {filterProducts.map((product: any) => (
                 <AdjustmentProduct key={product.id} product={product} />
               ))}
             </Tbody>

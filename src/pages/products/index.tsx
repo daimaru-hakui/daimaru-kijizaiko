@@ -18,7 +18,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { adminAuth } from "../../../functions";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 
 const Products = () => {
@@ -87,7 +87,7 @@ const Products = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {products?.map((product: ProductType) => (
+                  {products?.map((product: any) => (
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>
