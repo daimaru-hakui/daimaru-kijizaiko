@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
@@ -6,34 +6,34 @@ import { currentUserState, loadingState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { useGetDisp } from "./UseGetDisp";
 
-export const useProductFunc = (items: ProductType,setItems:Function) => {
+export const useProductFunc = (items: ProductType | null,setItems:Function |null) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
   const { getSupplierName } = useGetDisp();
 
   const obj = {
-    productType: items.productType || 1,
-    staff: items.productType === 2 ? items.staff : "R&D",
-    supplierId: items.supplierId || "",
-    supplierName: getSupplierName(items.supplierId) || "",
-    grayFabricId: items.grayFabricId || "",
+    productType: items?.productType || 1,
+    staff: items?.productType === 2 ? items?.staff : "R&D",
+    supplierId: items?.supplierId || "",
+    supplierName: getSupplierName(items?.supplierId) || "",
+    grayFabricId: items?.grayFabricId || "",
     productNumber:
-      items.productNum + (items.colorNum ? "-" + items.colorNum : "") || "",
-    productNum: items.productNum || "",
-    productName: items.productName || "",
-    colorNum: items.colorNum || "",
-    colorName: items.colorName || "",
-    price: Number(items.price) || 0,
-    materialName: items.materialName || "",
-    materials: items.materials || {},
-    fabricWidth: items.fabricWidth || "",
-    fabricWeight: items.fabricWeight || "",
-    fabricLength: items.fabricLength || "",
-    features: items.features || [],
-    noteProduct: items.noteProduct || "",
-    noteFabric: items.noteFabric || "",
-    noteEtc: items.noteEtc || "",
+      items?.productNum + (items?.colorNum ? "-" + items?.colorNum : "") || "",
+    productNum: items?.productNum || "",
+    productName: items?.productName || "",
+    colorNum: items?.colorNum || "",
+    colorName: items?.colorName || "",
+    price: Number(items?.price) || 0,
+    materialName: items?.materialName || "",
+    materials: items?.materials || {},
+    fabricWidth: items?.fabricWidth || "",
+    fabricWeight: items?.fabricWeight || "",
+    fabricLength: items?.fabricLength || "",
+    features: items?.features || [],
+    noteProduct: items?.noteProduct || "",
+    noteFabric: items?.noteFabric || "",
+    noteEtc: items?.noteEtc || "",
     wip: 0,
     externalStock: 0,
     arrivingQuantity: 0,
@@ -82,10 +82,34 @@ export const useProductFunc = (items: ProductType,setItems:Function) => {
     }
   };
 
-    const reset = (product:ProductType) => {
+    // 物理削除
+  const deleteProduct = async (productId: string) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+    const docRef = doc(db, "products", productId);
+    await deleteDoc(docRef);
+  };
+
+  // 論理削除
+  // const deleteProduct = async (id: string) => {
+  //   const result = window.confirm("削除して宜しいでしょうか");
+  //   if (!result) return;
+  //   try {
+  //     const docRef = doc(db, "products", `${id}`);
+
+  //     await updateDoc(docRef, {
+  //       deletedAt: serverTimestamp(),
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //   }
+  // };
+
+  const reset = (product:ProductType) => {
     setItems(product);
     // onClose()
   };
 
-  return { addProduct,updateProduct,reset }
+  return { addProduct,updateProduct,deleteProduct,reset }
 }

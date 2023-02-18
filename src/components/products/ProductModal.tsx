@@ -1,10 +1,7 @@
 import { Box, Button, CheckboxGroup, Container, Divider, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text, Textarea, useDisclosure } from '@chakra-ui/react'
-import { doc, onSnapshot } from 'firebase/firestore'
 import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
-import { db } from '../../../firebase'
-import { ProductType } from '../../../types/FabricType'
 import { useGetDisp } from '../../hooks/UseGetDisp'
+import { useGetDoc } from '../../hooks/UseGetDoc'
 import ProductEditModal from './ProductEditModal'
 
 type Props = {
@@ -12,28 +9,16 @@ type Props = {
 }
 
 const ProductModal: NextPage<Props> = ({ productId }) => {
-  const [product, setProduct] = useState({} as ProductType);
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {product} = useGetDoc(productId)
   const {
     getUserName,
     getSupplierName,
     getMixed,
     getFabricStd,
     getGrayFabricName,
-    getGrayFabricNumber } = useGetDisp()
-
-  useEffect(() => {
-    const getProduct = async () => {
-      const docRef = doc(db, "products", `${productId}`);
-      try {
-        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id } as ProductType));
-      } catch (err) {
-        console.log(err);
-      } finally {
-      }
-    };
-    getProduct();
-  }, [productId]);
+    getGrayFabricNumber
+  } = useGetDisp()
 
   return (
     <>

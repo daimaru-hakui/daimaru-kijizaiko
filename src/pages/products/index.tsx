@@ -10,50 +10,26 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { deleteDoc, doc, } from "firebase/firestore";
-import { db } from "../../../firebase";
 import { useRecoilValue } from "recoil";
 import { currentUserState, productsState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
-import { adminAuth } from "../../../functions";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { ProductType } from "../../../types/FabricType";
+import { useProductFunc } from "../../hooks/UseProductFunc";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState)
   const products = useRecoilValue(productsState);
   const { getUserName, getMixed, getFabricStd } = useGetDisp()
+  const { deleteProduct } = useProductFunc(null, null)
+  const {isAdminAuth} = useAuthManagement()
 
   const quantityBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";
   };
-
-  // 物理削除
-  const deleteProduct = async (id: string) => {
-    const result = window.confirm("削除して宜しいでしょうか");
-    if (!result) return;
-    const docRef = doc(db, "products", `${id}`);
-    await deleteDoc(docRef);
-  };
-
-  // 論理削除
-  // const deleteProduct = async (id: string) => {
-  //   const result = window.confirm("削除して宜しいでしょうか");
-  //   if (!result) return;
-  //   try {
-  //     const docRef = doc(db, "products", `${id}`);
-
-  //     await updateDoc(docRef, {
-  //       deletedAt: serverTimestamp(),
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   } finally {
-  //   }
-  // };
-
 
   return (
     <>
@@ -81,7 +57,7 @@ const Products = () => {
                     <Th>混率</Th>
                     <Th>規格</Th>
                     <Th>機能性</Th>
-                    {adminAuth(currentUser) && (
+                    {isAdminAuth() && (
                       <Th>削除</Th>
                     )}
                   </Tr>
@@ -145,7 +121,7 @@ const Products = () => {
                         </Flex>
                       </Td>
                       <Td>
-                        {adminAuth(currentUser) && (
+                        {isAdminAuth() && (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}
