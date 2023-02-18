@@ -28,5 +28,5 @@ export type ProductType = {
   updateUser: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | string;
+  deletedAt: Date
 };
