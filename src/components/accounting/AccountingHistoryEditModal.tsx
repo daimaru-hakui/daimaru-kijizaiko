@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
@@ -41,9 +41,25 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange, handleNumberChange } = useInputHandle()
+  // const { items, setItems, handleInputChange, handleNumberChange } = useInputHandle()
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
+
+  const [items, setItems] = useState<any>({});
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setItems({ ...items, [name]: value });
+  };
+
+  const handleNumberChange = (e: any, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: value });
+  };
+
 
   // 初期値をitemsに代入
   useEffect(() => {
@@ -123,7 +139,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   min={0}
                   max={10000}
                   value={items?.quantity}
-                // onChange={(e) => handleNumberChange(e, "quantity")}
+                  onChange={(e) => handleNumberChange(e, "quantity")}
                 >
                   <NumberInputField textAlign="right" />
                   <NumberInputStepper>
@@ -142,7 +158,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                     min={0}
                     max={10000}
                     value={items?.price === 0 ? "" : items?.price}
-                  // onChange={(e) => handleNumberChange(e, "price")}
+                    onChange={(e) => handleNumberChange(e, "price")}
                   >
                     <NumberInputField textAlign="right" />
                     <NumberInputStepper>
@@ -159,7 +175,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   mt={1}
                   name="orderedAt"
                   value={items?.orderedAt}
-                // onChange={handleInputChange}
+                  onChange={handleInputChange}
                 />
               </Box>
               <Box w="100%">
@@ -169,7 +185,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   mt={1}
                   name="fixedAt"
                   value={items?.fixedAt}
-                // onChange={handleInputChange}
+                  onChange={handleInputChange}
                 />
               </Box>
 
@@ -179,7 +195,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
                   mt={1}
                   name="comment"
                   value={items?.comment}
-                // onChange={handleInputChange}
+                  onChange={handleInputChange}
                 />
               </Box>
             </Stack>
