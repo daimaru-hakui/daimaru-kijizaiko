@@ -28,9 +28,9 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { productsState, usersState } from "../../../store";
-import { CuttingProductType } from "../../../types/CuttingProductType";
+// import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
