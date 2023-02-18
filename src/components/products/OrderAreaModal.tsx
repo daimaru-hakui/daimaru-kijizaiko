@@ -20,12 +20,12 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import DisplayStock from "./DisplayStock";
 import OrderInputArea from "./OrderInputArea";
 
 type Props = {
-  product: ProductType;
+  product: any;
   buttonSize: string;
 };
 
