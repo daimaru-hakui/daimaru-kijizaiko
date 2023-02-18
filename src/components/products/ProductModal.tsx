@@ -2,10 +2,9 @@ import { Box, Button, CheckboxGroup, Container, Divider, Flex, Modal, ModalBody,
 import { doc, onSnapshot } from 'firebase/firestore'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 import { db } from '../../../firebase'
-import { grayFabricsState, suppliersState, usersState } from '../../../store'
-// import { ProductType } from '../../../types/ProductType'
+import { ProductType } from '../../../types/FabricType'
+import { useGetDisp } from '../../hooks/UseGetDisp'
 import ProductEditModal from './ProductEditModal'
 
 type Props = {
@@ -13,17 +12,21 @@ type Props = {
 }
 
 const ProductModal: NextPage<Props> = ({ productId }) => {
-  const [product, setProduct] = useState({} as any);
-  const suppliers = useRecoilValue(suppliersState);
-  const grayFabrics = useRecoilValue(grayFabricsState);
-  const users = useRecoilValue(usersState);
+  const [product, setProduct] = useState({} as ProductType);
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    getUserName,
+    getSupplierName,
+    getMixed,
+    getFabricStd,
+    getGrayFabricName,
+    getGrayFabricNumber } = useGetDisp()
 
   useEffect(() => {
     const getProduct = async () => {
       const docRef = doc(db, "products", `${productId}`);
       try {
-        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id } as any));
+        onSnapshot(docRef, (doc) => setProduct({ ...doc.data(), id: doc.id } as ProductType));
       } catch (err) {
         console.log(err);
       } finally {
@@ -31,68 +34,6 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
     };
     getProduct();
   }, [productId]);
-
-  // 担当者名の表示
-  const dispStaff = (id: string) => {
-    const user = users?.find(
-      (user: { id: string; name: string }) => id === user.id
-    );
-    return user?.name;
-  };
-
-  // 仕入先名の表示
-  const dispSupplier = (id: string) => {
-    const supplier = suppliers?.find(
-      (supplier: { id: string; name: string }) => id === supplier.id
-    );
-    return supplier?.name;
-  };
-
-  const getGrayFabricName = (id: string) => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => id === grayFabric.id
-    );
-    return `${grayFabric?.productNumber} ${grayFabric?.productName}`;
-  };
-
-  const dispMixed = (materials: any) => {
-    let array = [];
-    const t = materials.t ? `ポリエステル${materials.t}% ` : "";
-    const c = materials.c ? `綿${materials.c}% ` : "";
-    const n = materials.n ? `ナイロン${materials.n}% ` : "";
-    const r = materials.r ? `レーヨン${materials.r}% ` : "";
-    const f = materials.f ? `麻${materials.f}% ` : "";
-    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
-    const w = materials.w ? `ウール${materials.w}% ` : "";
-    const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
-    const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
-    const si = materials.si ? `シルク${materials.si}% ` : "";
-    const z = materials.z ? `指定外繊維${materials.z}% ` : "";
-    array.push(t, c, n, r, f, pu, w, ac, cu, si, z);
-
-    return array
-      .filter((item) => item)
-      .map((item) => <Text key={item}>{item}</Text>);
-  };
-
-  const dispStd = (
-    fabricWidth: number,
-    fabricLength: number,
-    fabricWeight: number
-  ) => {
-    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
-    const length = fabricLength ? `長さ:${fabricLength}m` : "";
-    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
-    const mark = width && length ? "×" : "";
-    return (
-      <>
-        <Text>{width}</Text>
-        <Text>{mark}</Text>
-        <Text>{length}</Text>
-        <Text ml={3}>{weigth}</Text>
-      </>
-    );
-  };
 
   return (
     <>
@@ -114,13 +55,13 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                 {product?.productType === 2 && (
                   <Box>
                     <Text fontWeight="bold">担当者</Text>
-                    <Box>{dispStaff(product?.staff)}</Box>
+                    <Box>{getUserName(product?.staff)}</Box>
                   </Box>
                 )}
                 <Flex gap={6}>
                   <Box w="100%">
                     <Text fontWeight="bold">仕入先</Text>
-                    <Box>{dispSupplier(product?.supplierId)}</Box>
+                    <Box>{getSupplierName(product?.supplierId)}</Box>
                   </Box>
                 </Flex>
                 <Flex
@@ -166,7 +107,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                 {product?.grayFabricId && (
                   <Box flex={1} w="100%">
                     <Text fontWeight="bold">使用キバタ</Text>
-                    <Box mt={1}>{getGrayFabricName(product?.grayFabricId)}</Box>
+                    <Box mt={1}>{getGrayFabricNumber(product?.grayFabricId)} {getGrayFabricName(product?.grayFabricId)}</Box>
                   </Box>
                 )}
 
@@ -193,7 +134,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                       <Box w="100%">
                         <Text fontWeight="bold">規格</Text>
                         <Flex>
-                          {dispStd(
+                          {getFabricStd(
                             product?.fabricWidth,
                             product?.fabricLength,
                             product?.fabricWeight
@@ -214,7 +155,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                           borderColor="gray.100"
                         >
                           <Stack spacing={3} w="100%">
-                            {dispMixed(product?.materials)}
+                            {getMixed(product?.materials)}
                           </Stack>
                         </Box>
                       )}

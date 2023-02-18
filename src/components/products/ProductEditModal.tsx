@@ -1,11 +1,11 @@
 import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
 import { NextPage } from 'next'
 import { useState } from 'react'
-// import { ProductType } from '../../../types/ProductType'
+import { ProductType } from '../../../types/FabricType'
 import ProductInputArea from './ProductInputArea'
 
 type Props = {
-  product: any
+  product: ProductType
 }
 
 const ProductEditModal: NextPage<Props> = ({ product }) => {
@@ -22,8 +22,8 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           <ModalCloseButton />
           <ModalBody>
             <ProductInputArea
-              items={items}
-              setItems={setItems}
+              // items={items}
+              // setItems={setItems}
               title={"生地の編集"}
               toggleSwitch={"edit"}
               product={product}

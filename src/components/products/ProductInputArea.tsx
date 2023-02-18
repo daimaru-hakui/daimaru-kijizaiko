@@ -44,22 +44,25 @@ import {
   suppliersState,
   usersState,
 } from "../../../store";
+import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-// import { ProductType } from "../../../types/ProductType";
+import { SupplierType } from "../../../types/SupplierType";
+import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useInputProduct } from "../../hooks/UseInputProduct";
 import MaterialsModal from "./MaterialsModal";
 
 type Props = {
-  items: any;
-  setItems: Function;
+  // items: any;
+  // setItems: Function;
   title: string;
   toggleSwitch: string;
-  product: any;
+  product: ProductType;
   onClose: Function
 };
 
 const ProductInputArea: NextPage<Props> = ({
-  items,
-  setItems,
+  // items,
+  // setItems,
   title,
   toggleSwitch,
   product,
@@ -75,6 +78,8 @@ const ProductInputArea: NextPage<Props> = ({
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
   const setLoading = useSetRecoilState(loadingState);
+  const { getSupplierName, getMixed } = useGetDisp()
+  const { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, handleCheckedChange } = useInputProduct()
 
 
   useEffect(() => {
@@ -82,77 +87,49 @@ const ProductInputArea: NextPage<Props> = ({
     const getProduct = async () => {
       const docRef = doc(db, 'products', product.id)
       const docSnap = await getDoc(docRef);
-      setItems({ ...docSnap.data() })
+      setItems({ ...docSnap.data(), id: docSnap.id } as ProductType)
     }
     getProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
+  // const handleInputChange = (
+  //   e: React.ChangeEvent<
+  //     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  //   >
+  // ) => {
+  //   const name = e.target.name;
+  //   const value = e.target.value;
+  //   setItems({ ...items, [name]: value });
+  // };
 
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
+  // const handleNumberChange = (e: string, name: string) => {
+  //   const value = e;
+  //   setItems({ ...items, [name]: Number(value) });
+  // };
 
-  const handleRadioChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
+  // const handleRadioChange = (e: string, name: string) => {
+  //   const value = e;
+  //   setItems({ ...items, [name]: Number(value) });
+  // };
 
-  const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    if (e.target.checked) {
-      setItems({
-        ...items,
-        [name]: [...(items["features"] || []), value],
-      });
-    } else {
-      setItems({
-        ...items,
-        [name]: [
-          ...items["features"]?.filter((feature: string) => feature !== value),
-        ],
-      });
-    }
-  };
-
-  const getSupplierName = (supplierId: string) => {
-    const supplierObj = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
-    );
-    return supplierObj?.name;
-  };
-
-  const getMixed = (materials: any) => {
-    let array = [];
-    const t = materials.t ? `ポリエステル${materials.t}% ` : "";
-    const c = materials.c ? `綿${materials.c}% ` : "";
-    const n = materials.n ? `ナイロン${materials.n}% ` : "";
-    const r = materials.r ? `レーヨン${materials.r}% ` : "";
-    const h = materials.h ? `麻${materials.h}% ` : "";
-    const pu = materials.pu ? `ポリウレタン${materials.pu}% ` : "";
-    const w = materials.w ? `ウール${materials.w}% ` : "";
-    const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
-    const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
-    const si = materials.si ? `シルク${materials.si}% ` : "";
-    const z = materials.z ? `指定外繊維${materials.z}% ` : "";
-    const f = materials.f ? `複合繊維${materials.f}% ` : "";
-    array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
-
-    return array
-      .filter((item) => item)
-      .map((item) => <Text key={item}>{item}</Text>);
-  };
+  // const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const name = e.target.name;
+  //   const value = e.target.value;
+  //   if (e.target.checked) {
+  //     setItems({
+  //       ...items,
+  //       [name]: [...(items["features"] || []), value],
+  //     });
+  //   } else {
+  //     setItems({
+  //       ...items,
+  //       [name]: [
+  //         ...items["features"]?.filter((feature: string) => feature !== value),
+  //       ],
+  //     });
+  //   }
+  // };
 
   const obj = {
     productType: items.productType || 1,
@@ -245,13 +222,13 @@ const ProductInputArea: NextPage<Props> = ({
   const registeredInput = () => {
     const item = items.productNum + items.colorNum + items.colorName;
     const base = products.map(
-      (product: { productNum: string; colorNum: string; colorName: string }) =>
+      (product: ProductType) =>
         product.productNum + product.colorNum + product.colorName
     );
     const result = base?.includes(item);
     return result;
   };
-  console.log(items)
+
   return (
     <Box w="100%" mt={12}>
       <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
@@ -310,7 +287,7 @@ const ProductInputArea: NextPage<Props> = ({
                 name="supplierId"
                 onChange={(e) => handleInputChange(e)}
               >
-                {suppliers?.map((supplier: { id: string; name: string }) => (
+                {suppliers?.map((supplier: SupplierType) => (
                   <option key={supplier.id} value={supplier.id}>
                     {supplier.name}
                   </option>

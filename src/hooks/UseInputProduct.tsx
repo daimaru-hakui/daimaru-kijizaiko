@@ -16,5 +16,28 @@ export const useInputProduct = () => {
     setItems({ ...items, [name]: value });
   };
 
-  return { items, setItems, handleInputChange, handleNumberChange };
+  const handleRadioChange = (e: string, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: Number(value) });
+  };
+
+  const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    if (e.target.checked) {
+      setItems({
+        ...items,
+        [name]: [...(items["features"] || []), value],
+      });
+    } else {
+      setItems({
+        ...items,
+        [name]: [
+          ...items["features"]?.filter((feature: string) => feature !== value),
+        ],
+      });
+    }
+  };
+
+  return { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, handleCheckedChange };
 };

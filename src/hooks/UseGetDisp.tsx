@@ -1,6 +1,6 @@
 import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { productsState, suppliersState, usersState } from "../../store";
+import { grayFabricsState, productsState, suppliersState, usersState } from "../../store";
 import { MaterialsType } from "../../types/MaterialsType";
 // import { ProductType } from "../../types/ProductType";
 
@@ -8,6 +8,7 @@ export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
   const products = useRecoilValue(productsState)
+  const grayFabrics = useRecoilValue(grayFabricsState)
 
   // 混率の表示
   const getMixed = (materials: MaterialsType) => {
@@ -88,6 +89,20 @@ export const useGetDisp = () => {
     return `${result?.productName}`;
   };
 
+  const getGrayFabricName = (id: string) => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => id === grayFabric.id
+    );
+    return `${grayFabric?.productName}`;
+  };
+
+  const getGrayFabricNumber = (id: string) => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => id === grayFabric.id
+    );
+    return `${grayFabric?.productNumber}`;
+  };
+
   return {
     getSerialNumber,
     getUserName,
@@ -96,6 +111,8 @@ export const useGetDisp = () => {
     getSupplierName,
     getProductNumber,
     getColorName,
-    getProductName
+    getProductName,
+    getGrayFabricName,
+    getGrayFabricNumber
   }
 }
