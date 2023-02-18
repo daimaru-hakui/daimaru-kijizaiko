@@ -18,13 +18,13 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../store";
-import { ProductType } from "../../../types/ProductType";
+// import { ProductType } from "../../../types/ProductType";
 import OrderAreaModal from "./OrderAreaModal";
 
 const OrderDrawer: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const products = useRecoilValue(productsState);
-  const [filterPoduct, setFilterProduct] = useState({} as ProductType);
+  const [filterPoduct, setFilterProduct] = useState({} as any);
   const [items, setItems] = useState({ productNumber: "" });
 
   const handleInputChange = (
@@ -47,7 +47,7 @@ const OrderDrawer: NextPage = () => {
   // input をリセット
   const reset = () => {
     setItems({ productNumber: "" });
-    setFilterProduct({} as ProductType);
+    setFilterProduct({} as any);
   };
   return (
     <>
