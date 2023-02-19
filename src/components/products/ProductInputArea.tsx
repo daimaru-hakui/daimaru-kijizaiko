@@ -42,14 +42,14 @@ import MaterialsModal from "./MaterialsModal";
 
 type Props = {
   title: string;
-  toggleSwitch: string;
+  pageType: string;
   product: ProductType;
   onClose: Function
 };
 
 const ProductInputArea: NextPage<Props> = ({
   title,
-  toggleSwitch,
+  pageType,
   product,
   onClose
 }) => {
@@ -177,7 +177,7 @@ const ProductInputArea: NextPage<Props> = ({
               </Select>
             </Box>
           </Flex>
-          {toggleSwitch === "new" && (
+          {pageType === "new" && (
             <Box fontSize="3xl" fontWeight="bold" color="red">
               {registeredInput() && "すでに登録されています。"}
             </Box>
@@ -481,7 +481,7 @@ const ProductInputArea: NextPage<Props> = ({
               onChange={handleInputChange}
             />
           </Box>
-          {toggleSwitch === "new" && (
+          {pageType === "new" && (
             <Button
               colorScheme="facebook"
               disabled={
@@ -496,7 +496,7 @@ const ProductInputArea: NextPage<Props> = ({
               登録
             </Button>
           )}
-          {toggleSwitch === "edit" && (
+          {pageType === "edit" && (
             <Flex gap={3}>
               <Button w="100%"
                 onClick={() => {

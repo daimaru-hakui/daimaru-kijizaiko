@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Table,
   TableContainer,
@@ -15,7 +14,7 @@ import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
-import EditCuttingReportModal from "../../../components/tokushima/EditCuttingReportModal";
+import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const CuttingReport = () => {
@@ -52,7 +51,6 @@ const CuttingReport = () => {
           <Box as="h2" fontSize="2xl">
             裁断報告書
           </Box>
-
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
@@ -82,7 +80,7 @@ const CuttingReport = () => {
                   <Td>{getUserName(report.staff)}</Td>
                   <Td>
                     <Flex alignItems="center" gap={3}>
-                      <EditCuttingReportModal reportId={report.id} />
+                      <CuttingReportEditModal reportId={report.id} />
                     </Flex>
                   </Td>
                 </Tr>

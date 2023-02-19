@@ -30,9 +30,9 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       title: "入荷予定一覧",
       link: "/tokushima/history/fabric-purchase",
     },
-    { id: 2, title: "裁断報告書一覧", link: "/tokushima/cutting-report" },
-    { id: 3, title: "裁断報告書作成", link: "/tokushima/cutting-report/new" },
-    { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-report/history" },
+    { id: 2, title: "裁断報告書一覧", link: "/tokushima/cutting-reports" },
+    { id: 3, title: "裁断報告書作成", link: "/tokushima/cutting-reports/new" },
+    { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-reports/history" },
   ];
   const menu4 = [
     { id: 1, title: "仕入先", link: "/settings/suppliers" },

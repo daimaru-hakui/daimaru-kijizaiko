@@ -36,6 +36,8 @@ export default function Home() {
   const [colors, setColors] = useRecoilState(colorsState);
   const currentUser = useRecoilValue(currentUserState);
 
+  console.log('start')
+
   // users情報;
   useEffect(() => {
     const usersRef = collection(db, "users");

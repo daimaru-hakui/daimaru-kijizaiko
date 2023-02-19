@@ -48,7 +48,7 @@ const Auth = () => {
   const isAuthToggle = async (user: any, prop: string) => {
     try {
       const docRef = doc(db, "users", user.uid);
-      let toggle;
+      let toggle: boolean;
       if (user[prop] && user[prop] === true) {
         toggle = false;
       } else {

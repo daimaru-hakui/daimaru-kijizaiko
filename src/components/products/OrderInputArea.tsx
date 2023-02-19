@@ -15,23 +15,13 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import {
-  addDoc,
-  collection,
-  doc,
-  runTransaction,
-  serverTimestamp,
-} from "firebase/firestore";
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
 import {
-  currentUserState,
   grayFabricsState,
   stockPlacesState,
 } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";

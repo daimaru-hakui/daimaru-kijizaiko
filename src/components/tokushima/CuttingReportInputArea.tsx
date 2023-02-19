@@ -24,69 +24,55 @@ import { usersState } from "../../../store";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { FabricsUsedInput } from "./FabricsUsedInput";
+import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
+import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
 
 type Props = {
-  onClick: Function;
   title: string;
-  btnTitle: string;
-  items: CuttingReportType;
-  setItems: Function;
-  reportId: string;
+  pageType: string;
+  report: CuttingReportType;
+  onClose: Function;
 };
 
 const CuttingReportInputArea: NextPage<Props> = ({
-  onClick,
   title,
-  btnTitle,
-  items,
-  setItems,
-  reportId,
+  pageType,
+  report,
+  onClose
 }) => {
   const users = useRecoilValue(usersState);
-  const [validate, setValidate] = useState(true);
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
-  const handleRadioChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
+  const [isValidate, setIsValidate] = useState(true);
+  const { items, setItems, handleInputChange, handleNumberChange, handleRadioChange } = useInputCuttingReport()
+  const { addInput, addCuttingReport, updateCuttingReport } = useCuttingReportFunc(items, setItems)
 
   useEffect(() => {
-    const validate = () => {
-      const array = items.products.map((product: any) => product.productId);
+    setItems({ ...report })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [report])
+
+  useEffect(() => {
+    const productNumberValidate = () => {
+      const array = items?.products?.map((product: CuttingProductType) => product.productId);
       const setArray = new Set(array);
-      if (array.length === Array.from(setArray).length) {
-        setValidate(false);
+      if (array?.length === Array.from(setArray).length) {
+        return false;
       } else {
-        setValidate(true);
+        return true;
       }
     };
-    validate();
+    const itemType = items.itemType === "" ? true : false;
+    const totalQuantity = items.totalQuantity === 0 ? true : false
+    const category = items?.products?.some((product) => (product?.category === ""))
+    const productId = items?.products?.some((product) => (product?.productId === ""))
+    const quantity = items?.products?.some((product) => (product?.quantity === 0))
+    setIsValidate(
+      productNumberValidate() ||
+      itemType ||
+      totalQuantity ||
+      category ||
+      productId ||
+      quantity);
   }, [items]);
-
-  const addInput = () => {
-    setItems({
-      ...items,
-      products: [
-        ...items.products,
-        { category: "", productId: "", quantity: 0 },
-      ],
-    });
-  };
 
   return (
     <Box w="100%" mt={12}>
@@ -113,7 +99,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
                 type="date"
                 name="cuttingDate"
                 value={items.cuttingDate}
-                onChange={(e) => handleInputChange(e)}
+                onChange={handleInputChange}
               />
             </Box>
             <Box w="full">
@@ -123,7 +109,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
                 type="text"
                 name="processNumber"
                 value={items.processNumber}
-                onChange={(e) => handleInputChange(e)}
+                onChange={handleInputChange}
               />
             </Box>
             <Box w="full">
@@ -133,7 +119,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
                 placeholder="担当者名を選択"
                 value={items.staff}
                 name="staff"
-                onChange={(e) => handleInputChange(e)}
+                onChange={handleInputChange}
               >
                 {users?.map((user: { id: string; name: string }) => (
                   <option key={user.id} value={user.id}>
@@ -150,7 +136,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               type="text"
               name="client"
               value={items.client}
-              onChange={(e) => handleInputChange(e)}
+              onChange={handleInputChange}
             />
           </Box>
           <Box>
@@ -160,7 +146,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               type="text"
               name="itemName"
               value={items.itemName}
-              onChange={(e) => handleInputChange(e)}
+              onChange={handleInputChange}
             />
           </Box>
           <Box>
@@ -200,7 +186,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               setItems={setItems}
               product={product as CuttingProductType}
               rowIndex={index}
-              reportId={reportId}
+              reportId={report.id}
             />
           ))}
           <Flex justifyContent="center">
@@ -213,11 +199,22 @@ const CuttingReportInputArea: NextPage<Props> = ({
           w="full"
           my={12}
           colorScheme="facebook"
-          disabled={validate}
-          onClick={() => onClick()}
+          disabled={isValidate}
+          onClick={() => {
+            if (pageType === "new") {
+              addCuttingReport();
+            }
+            if (pageType === 'edit') {
+              updateCuttingReport(report.id);
+              onClose();
+            }
+          }}
         >
-          {btnTitle}
+          {pageType === 'new' && '登録する'}
+          {pageType === 'edit' && '更新する'}
         </Button>
+
+
       </Container>
     </Box>
   );
