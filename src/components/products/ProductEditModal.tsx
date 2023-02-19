@@ -31,7 +31,7 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           <ModalBody>
             <ProductInputArea
               title={"生地の編集"}
-              toggleSwitch={"edit"}
+              pageType={"edit"}
               product={product}
               onClose={onClose}
             />
