@@ -21,7 +21,7 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
     productNumber: product?.productNumber,
     productName: product?.productName,
     colorName: product?.colorName,
-    quantity: items?.quantity,
+    quantity: Number(items?.quantity),
     price: items.price || product.price,
     comment: items.comment || "",
     supplierId: product.supplierId,
@@ -65,13 +65,13 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
         });
 
         const stockGrayFabric = await grayFabricDocSnap.data().stock || 0;
-        const newStockGrayFabric = stockGrayFabric - items?.quantity;
+        const newStockGrayFabric = stockGrayFabric - Number(items?.quantity);
         transaction.update(grayFabricDocRef, {
           stock: newStockGrayFabric,
         });
 
         const wipProduct = await productDocSnap.data().wip || 0;
-        const newWipProduct = wipProduct + items?.quantity;
+        const newWipProduct = wipProduct + Number(items?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
@@ -115,7 +115,7 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
         });
 
         const wipProduct = await productDocSnap.data().wip || 0;
-        const newWipProduct = wipProduct + items?.quantity;
+        const newWipProduct = wipProduct + Number(items?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
@@ -158,14 +158,14 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
 
         if (stockType === "stock") {
           const externalStock = await productDocSnap.data().externalStock || 0;
-          const newEternalStock = externalStock - items.quantity;
+          const newEternalStock = externalStock - Number(items?.quantity);
           transaction.update(productDocRef, {
             externalStock: newEternalStock,
           });
         }
 
         const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
-        const newArrivingQuantity = arrivingQuantity + items.quantity;
+        const newArrivingQuantity = arrivingQuantity + Number(items?.quantity);
         transaction.update(productDocRef, {
           arrivingQuantity: newArrivingQuantity,
         });
@@ -182,6 +182,6 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
       console.log(err);
     }
   };
-  console.log(items)
+
   return { orderFabricDyeingFromStock, orderFabricDyeingFromRanning, orderFabricPurchase }
 }

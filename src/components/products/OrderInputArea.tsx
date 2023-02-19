@@ -33,6 +33,7 @@ import {
 import { ProductType } from "../../../types/FabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
+import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
@@ -42,14 +43,12 @@ type Props = {
 };
 
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
-  const currentUser = useRecoilValue(currentUserState);
-  const productId = product?.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricId = product?.grayFabricId || "";
   const stockPlaces = useRecoilValue(stockPlacesState);
   const { getTodayDate } = useUtil();
-  const { getSupplierName } = useGetDisp();
   const { items, handleInputChange, handleNumberChange, handleRadioChange } = useInputHistory()
+  const { orderFabricDyeingFromStock, orderFabricDyeingFromRanning, orderFabricPurchase } = useOrderFabricFunc(items, product, orderType)
 
   const isLimitDyeing = () => {
     const grayFabric = grayFabrics.find(
@@ -63,176 +62,6 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     const stock = product?.externalStock || 0;
     return items.stockType === "stock" && stock < items.quantity ? true : false;
   };
-
-  const Obj = {
-    stockType: items.stockType,
-    orderType: orderType,
-    productId: product?.id,
-    productNumber: product?.productNumber,
-    productName: product?.productName,
-    colorName: product?.colorName,
-    quantity: items?.quantity,
-    price: items.price || product.price,
-    comment: items.comment || "",
-    supplierId: product.supplierId,
-    supplierName: getSupplierName(product?.supplierId),
-    orderedAt: items.orderedAt || getTodayDate(),
-    scheduledAt: items.scheduledAt || getTodayDate(),
-    createUser: currentUser,
-    updateUser: currentUser,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-
-  //////////// キバタ在庫から染めOrder依頼 関数//////////////
-  const orderFabricDyeingFromStock = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-
-    const orderNumberDocRef = doc(
-      db,
-      "serialNumbers",
-      "fabricDyeingOrderNumbers"
-    );
-    const grayFabricDocRef = doc(db, "grayFabrics", grayFabricId);
-    const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
-
-        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "grayFabric does not exist!";
-
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product does not exist!";
-
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
-        transaction.update(orderNumberDocRef, {
-          serialNumber: newSerialNumber,
-        });
-
-        const stockGrayFabric = await grayFabricDocSnap.data().stock || 0;
-        const newStockGrayFabric = stockGrayFabric - items?.quantity;
-        transaction.update(grayFabricDocRef, {
-          stock: newStockGrayFabric,
-        });
-
-        const wipProduct = await productDocSnap.data().wip || 0;
-        const newWipProduct = wipProduct + items?.quantity;
-        transaction.update(productDocRef, {
-          wip: newWipProduct,
-        });
-
-        transaction.set(historyDocRef, {
-          serialNumber: newSerialNumber,
-          ...Obj,
-          grayFabricId: grayFabricDocSnap.id,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  //////////// ランニング生地から染色Order依頼 関数//////////////
-  const orderFabricDyeingFromRanning = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-
-    const orderNumberDocRef = doc(
-      db,
-      "serialNumbers",
-      "fabricDyeingOrderNumbers"
-    );
-    const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
-
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
-        transaction.update(orderNumberDocRef, {
-          serialNumber: newSerialNumber,
-        });
-
-        const wipProduct = await productDocSnap.data().wip || 0;
-        const newWipProduct = wipProduct + items?.quantity;
-        transaction.update(productDocRef, {
-          wip: newWipProduct,
-        });
-
-        transaction.set(historyDocRef, {
-          serialNumber: newSerialNumber,
-          ...Obj,
-          grayFabricId: "",
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  };
-
-  const orderFabricPurchase = async (stockType: string) => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    const orderNumberDocRef = doc(
-      db,
-      "serialNumbers",
-      "fabricPurchaseOrderNumbers"
-    );
-    const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricPurchaseOrders"));
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
-
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
-        transaction.update(orderNumberDocRef, {
-          serialNumber: newSerialNumber,
-        });
-
-        if (stockType === "stock") {
-          const externalStock = await productDocSnap.data().externalStock || 0;
-          const newEternalStock = externalStock - items.quantity;
-          transaction.update(productDocRef, {
-            externalStock: newEternalStock,
-          });
-        }
-
-        const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
-        const newArrivingQuantity = arrivingQuantity + items.quantity;
-        transaction.update(productDocRef, {
-          arrivingQuantity: newArrivingQuantity,
-        });
-
-        transaction.set(historyDocRef, {
-          serialNumber: newSerialNumber,
-          ...Obj,
-          grayFabricId: "",
-          stockPlace: items.stockPlace || "徳島工場",
-          accounting: false,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  console.log(items)
 
   return (
     <Box>

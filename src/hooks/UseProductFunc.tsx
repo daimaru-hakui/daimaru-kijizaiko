@@ -88,6 +88,9 @@ export const useProductFunc = (items: ProductType | null, setItems: Function | n
       const docRef = doc(db, "products", productId);
       await updateDoc(docRef, {
         price: Number(items.price),
+        wip: Number(items.wip),
+        externalStock: Number(items.externalStock),
+        arrivingQuantity: Number(items.arrivingQuantity),
         tokushimaStock: Number(items.tokushimaStock),
         updatedAt: serverTimestamp(),
         updateUser: currentUser

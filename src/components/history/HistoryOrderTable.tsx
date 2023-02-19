@@ -28,6 +28,7 @@ import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
   histories: HistoryType[];
@@ -45,7 +46,8 @@ const HistoryOrderTable: NextPage<Props> = ({
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber } = useGetDisp()
+  const { getSerialNumber, getUserName } = useGetDisp();
+  const { isAdminAuth } = useAuthManagement()
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -55,15 +57,7 @@ const HistoryOrderTable: NextPage<Props> = ({
     setFilterHistories(newHistorys);
   }, [histories]);
 
-  // 担当者の表示
-  const getUserName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
-      return user?.name;
-    }
-  };
+
 
   // 生地仕掛状況　Orderを削除 type stock
   const deleteHistoryFabricDyeingOrderStock = async (history: any) => {
@@ -472,7 +466,9 @@ const HistoryOrderTable: NextPage<Props> = ({
         setItems={setItems}
         onClick={() => onClickUpdate(history)}
       />
-      <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
+      {isAdminAuth() && (
+        <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
+      )}
     </Flex>
   );
 

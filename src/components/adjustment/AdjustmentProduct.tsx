@@ -28,53 +28,97 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
       <Td>{getUserName(product.staff)}</Td>
       <Td>{product.productNumber}</Td>
       <Td>{product?.colorName}</Td>
-      <Td isNumeric>
-        <Flex alignItems="center">
-          <NumberInput
-            mt={1}
-            w="90px"
-            name="price"
-            defaultValue={0}
-            min={0}
-            max={100000}
-            value={items.price}
-            onChange={(e) => handleNumberChange(e, "price")}
-          >
-            <NumberInputField textAlign="right" />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Box as="span" ml={2}>
-            円
-          </Box>
-        </Flex>
+      <Td p={1} isNumeric>
+        <NumberInput
+          mt={1}
+          w="90px"
+          name="price"
+          defaultValue={0}
+          min={0}
+          max={100000}
+          value={items.price}
+          onChange={(e) => handleNumberChange(e, "price")}
+        >
+          <NumberInputField textAlign="right" />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
       </Td>
-      <Td isNumeric fontWeight={quantityValueBold(product?.tokushimaStock)}>
-        <Flex alignItems="center">
-          <NumberInput
-            mt={1}
-            w="90px"
-            name="tokushimaStock"
-            defaultValue={0}
-            min={0}
-            max={100000}
-            value={items.tokushimaStock}
-            onChange={(e) => handleNumberChange(e, "tokushimaStock")}
-          >
-            <NumberInputField textAlign="right" />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Box as="span" ml={2}>
-            m
-          </Box>
-        </Flex>
+      <Td p={1} isNumeric fontWeight={quantityValueBold(product?.wip)}>
+        <NumberInput
+          mt={1}
+          w="90px"
+          name="wip"
+          defaultValue={0}
+          min={0}
+          max={100000}
+          value={items.wip}
+          onChange={(e) => handleNumberChange(e, "wip")}
+        >
+          <NumberInputField textAlign="right" />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
       </Td>
-      <Td>
+      <Td p={1} isNumeric fontWeight={quantityValueBold(product?.externalStock)}>
+        <NumberInput
+          mt={1}
+          w="90px"
+          name="externalStock"
+          defaultValue={0}
+          min={0}
+          max={100000}
+          value={items.externalStock}
+          onChange={(e) => handleNumberChange(e, "externalStock")}
+        >
+          <NumberInputField textAlign="right" />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Td>
+      <Td p={1} isNumeric fontWeight={quantityValueBold(product?.arrivingQuantity)}>
+        <NumberInput
+          mt={1}
+          w="90px"
+          name="arrivingQuantity"
+          defaultValue={0}
+          min={0}
+          max={100000}
+          value={items.arrivingQuantity}
+          onChange={(e) => handleNumberChange(e, "arrivingQuantity")}
+        >
+          <NumberInputField textAlign="right" />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Td>
+      <Td p={1} isNumeric fontWeight={quantityValueBold(product?.tokushimaStock)}>
+        <NumberInput
+          mt={1}
+          w="90px"
+          name="tokushimaStock"
+          defaultValue={0}
+          min={0}
+          max={100000}
+          value={items.tokushimaStock}
+          onChange={(e) => handleNumberChange(e, "tokushimaStock")}
+        >
+          <NumberInputField textAlign="right" />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Td>
+      <Td flex="1">
         <Flex alignItems="center" gap={3}>
           <Button size="xs" colorScheme="facebook" onClick={() => updateAjustmentProduct(product.id)}>
             更新

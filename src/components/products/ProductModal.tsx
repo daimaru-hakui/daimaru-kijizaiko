@@ -10,7 +10,7 @@ type Props = {
 
 const ProductModal: NextPage<Props> = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {product} = useGetDoc(productId)
+  const { product } = useGetDoc(productId)
   const {
     getUserName,
     getSupplierName,
@@ -49,45 +49,35 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                     <Box>{getSupplierName(product?.supplierId)}</Box>
                   </Box>
                 </Flex>
+
                 <Flex
-                  gap={1}
-                  alignItems="flex-start"
-                  justifyContent="space-between"
+                  w="100%"
+                  gap={3}
+                  justifyContent="flex-start"
                   flexDirection={{ base: "column", md: "row" }}
                 >
-                  <Flex
-                    w="100%"
-                    gap={3}
-                    justifyContent="flex-start"
-                    flexDirection={{ base: "column", md: "row" }}
-                  >
-                    <Box w="100%" minW="120px" flex="1">
-                      <Text fontWeight="bold">品番</Text>
-                      <Box>{product?.productNum}</Box>
-                    </Box>
-                    <Box w="100%" minW="120px" flex="1">
-                      <Text fontWeight="bold">色番</Text>
-                      <Box>{product?.colorNum}</Box>
-                    </Box>
-                    <Box w="100%" minW="120px" flex="1">
-                      <Text fontWeight="bold">色</Text>
-                      <Box>{product?.colorName}</Box>
-                    </Box>
-                    <Box w="100%">
-                      <Text fontWeight="bold">品名</Text>
-                      <Box>{product?.productName}</Box>
-                    </Box>
-                  </Flex>
-                  <Flex
-                    justifyContent={{ base: "flex-start", md: "flex-end" }}
-                    minW="80px"
-                  >
-                    <Box>
-                      <Text fontWeight="bold">単価</Text>
-                      <Box>{product?.price}円</Box>
-                    </Box>
-                  </Flex>
+                  <Box w="100%" minW="120px" flex="1">
+                    <Text fontWeight="bold">品番</Text>
+                    <Box>{product?.productNum}</Box>
+                  </Box>
+                  <Box w="100%" minW="120px" flex="1">
+                    <Text fontWeight="bold">色番</Text>
+                    <Box>{product?.colorNum}</Box>
+                  </Box>
+                  <Box w="100%" minW="120px" flex="1">
+                    <Text fontWeight="bold">色</Text>
+                    <Box>{product?.colorName}</Box>
+                  </Box>
                 </Flex>
+                <Box w="100%">
+                  <Text fontWeight="bold">品名</Text>
+                  <Box>{product?.productName}</Box>
+                </Box>
+                <Box w="100%">
+                  <Text fontWeight="bold">単価</Text>
+                  <Box>{product?.price}円</Box>
+                </Box>
+
 
                 {product?.grayFabricId && (
                   <Box flex={1} w="100%">
