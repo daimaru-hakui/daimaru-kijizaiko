@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -27,7 +27,7 @@ type Props = {
 
 const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [materials, setMaterials] = useState<any>([]);
+  const [materials, setMaterials] = useState([]);
   const [total, setTotal] = useState(true);
 
   const list = [

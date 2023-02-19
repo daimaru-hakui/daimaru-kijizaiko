@@ -16,5 +16,14 @@ export const useInputHistory = () => {
     setItems({ ...items, [name]: value });
   };
 
-  return { items, setItems, handleInputChange, handleNumberChange };
+  const handleRadioChange = (e: string, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: value });
+  };
+
+  const onReset = (obj: HistoryType) => {
+    setItems({ ...obj })
+  }
+
+  return { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, onReset };
 };

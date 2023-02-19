@@ -6,7 +6,7 @@ import { currentUserState, loadingState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { useGetDisp } from "./UseGetDisp";
 
-export const useProductFunc = (items: ProductType | null,setItems:Function |null) => {
+export const useProductFunc = (items: ProductType | null, setItems: Function | null) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
@@ -63,7 +63,7 @@ export const useProductFunc = (items: ProductType | null,setItems:Function |null
     }
   }
 
-  const updateProduct = async (productId:string) => {
+  const updateProduct = async (productId: string) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
@@ -82,7 +82,24 @@ export const useProductFunc = (items: ProductType | null,setItems:Function |null
     }
   };
 
-    // 物理削除
+  const updateAjustmentProduct = async (productId: string) => {
+    setLoading(true);
+    try {
+      const docRef = doc(db, "products", productId);
+      await updateDoc(docRef, {
+        price: Number(items.price),
+        tokushimaStock: Number(items.tokushimaStock),
+        updatedAt: serverTimestamp(),
+        updateUser: currentUser
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 物理削除
   const deleteProduct = async (productId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
@@ -106,10 +123,9 @@ export const useProductFunc = (items: ProductType | null,setItems:Function |null
   //   }
   // };
 
-  const reset = (product:ProductType) => {
-    setItems(product);
-    // onClose()
+  const onReset = (product: ProductType) => {
+    setItems({ ...product });
   };
 
-  return { addProduct,updateProduct,deleteProduct,reset }
+  return { addProduct, updateProduct, updateAjustmentProduct, deleteProduct, onReset }
 }

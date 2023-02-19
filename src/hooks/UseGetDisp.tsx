@@ -1,8 +1,8 @@
 import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState, productsState, suppliersState, usersState } from "../../store";
+import { ProductType } from "../../types/FabricType";
 import { MaterialsType } from "../../types/MaterialsType";
-// import { ProductType } from "../../types/ProductType";
 
 export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
@@ -76,24 +76,18 @@ export const useGetDisp = () => {
   };
 
   const getProductNumber = (productId: string) => {
-    const result = products.find((product: any) => product.id === productId);
+    const result = products.find((product: ProductType) => product.id === productId);
     return `${result?.productNumber}`;
   };
 
-  const getColorName = (productId: string) => {
-    const result = products.find((product: any) => product.id === productId);
-    return `${result?.colorName}`;
-  };
   const getProductName = (productId: string) => {
-    const result = products.find((product: any) => product.id === productId);
+    const result = products.find((product: ProductType) => product.id === productId);
     return `${result?.productName}`;
   };
 
-  const getGrayFabricName = (id: string) => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => id === grayFabric.id
-    );
-    return `${grayFabric?.productName}`;
+  const getColorName = (productId: string) => {
+    const result = products.find((product: ProductType) => product.id === productId);
+    return `${result?.colorName}`;
   };
 
   const getGrayFabricNumber = (id: string) => {
@@ -101,6 +95,13 @@ export const useGetDisp = () => {
       (grayFabric: { id: string }) => id === grayFabric.id
     );
     return `${grayFabric?.productNumber}`;
+  };
+
+  const getGrayFabricName = (id: string) => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => id === grayFabric.id
+    );
+    return `${grayFabric?.productName}`;
   };
 
   return {

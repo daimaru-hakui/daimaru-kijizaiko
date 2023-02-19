@@ -18,14 +18,13 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
+import { db } from "../../../firebase";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { HistoryType } from "../../../types/HistoryType";
-import { useInputHandle } from "../../hooks/UseInputHandle";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 
 type Props = {
@@ -36,7 +35,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleNumberChange } = useInputHistory()
+  const { items, setItems, handleNumberChange, onReset } = useInputHistory()
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
 
@@ -44,10 +43,6 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
     setItems({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
-
-  const inputReset = () => {
-    setItems({ ...history });
-  };
 
   // 購入状況　確定処理
   const confirmProcessingAccounting = async (history: HistoryType, items: HistoryType) => {
@@ -103,7 +98,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
       <Modal
         isOpen={isOpen}
         onClose={() => {
-          inputReset();
+          onReset(history);
           onClose();
         }}
       >
@@ -169,7 +164,7 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
               <Button
                 mr={3}
                 onClick={() => {
-                  inputReset();
+                  onReset(history);
                   onClose();
                 }}
               >

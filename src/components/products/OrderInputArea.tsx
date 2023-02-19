@@ -23,17 +23,17 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
-import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import {
   currentUserState,
   grayFabricsState,
   stockPlacesState,
-  suppliersState,
 } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
-import { HistoryType } from "../../../types/HistoryType";
+import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useInputHistory } from "../../hooks/UseInputHistory";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   product: ProductType;
@@ -46,53 +46,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
   const productId = product?.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricId = product?.grayFabricId || "";
-  const suppliers = useRecoilValue(suppliersState);
   const stockPlaces = useRecoilValue(stockPlacesState);
-  const [items, setItems] = useState({} as HistoryType);
-
-  // 今日の日付を取得
-  const todayDate = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    let monthStr = "0" + month;
-    monthStr = monthStr.slice(-2);
-    const day = date.getDate();
-    return `${year}-${monthStr}-${day}`;
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: Number(value) });
-  };
-
-  const handleRadioChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: value });
-  };
-
-  const handleSelectchange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    name: string
-  ) => {
-    const value = e.target.value;
-    setItems({ ...items, [name]: value });
-  };
-
-  const getSupplierName = (supplierId: string) => {
-    const supplierObj = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
-    );
-    return supplierObj.name;
-  };
+  const { getTodayDate } = useUtil();
+  const { getSupplierName } = useGetDisp();
+  const { items, handleInputChange, handleNumberChange, handleRadioChange } = useInputHistory()
 
   const isLimitDyeing = () => {
     const grayFabric = grayFabrics.find(
@@ -119,8 +76,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     comment: items.comment || "",
     supplierId: product.supplierId,
     supplierName: getSupplierName(product?.supplierId),
-    orderedAt: items.orderedAt || todayDate(),
-    scheduledAt: items.scheduledAt || todayDate(),
+    orderedAt: items.orderedAt || getTodayDate(),
+    scheduledAt: items.scheduledAt || getTodayDate(),
     createUser: currentUser,
     updateUser: currentUser,
     createdAt: serverTimestamp(),
@@ -181,8 +138,8 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     }
   };
 
-  //////////// ランニングキバタから染色Order依頼 関数//////////////
-  const orderFabricDyeingRanning = async () => {
+  //////////// ランニング生地から染色Order依頼 関数//////////////
+  const orderFabricDyeingFromRanning = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
 
@@ -275,6 +232,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
       console.log(err);
     }
   };
+  console.log(items)
 
   return (
     <Box>
@@ -320,10 +278,11 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               <Text>送り先名</Text>
               <Select
                 mt={1}
+                name="stockPlace"
                 placeholder="送り先を選択してください"
                 value={items.stockPlace}
                 defaultValue="徳島工場"
-                onChange={(e) => handleSelectchange(e, "stockPlace")}
+                onChange={handleInputChange}
               >
                 {stockPlaces?.map((m: { id: number; name: string }) => (
                   <option key={m.id} value={m.name}>
@@ -342,7 +301,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               mt={1}
               type="date"
               name="orderedAt"
-              value={items.orderedAt || todayDate()}
+              value={items.orderedAt || getTodayDate()}
               onChange={handleInputChange}
             />
           </Box>
@@ -352,7 +311,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               mt={1}
               type="date"
               name="scheduledAt"
-              value={items.scheduledAt || todayDate()}
+              value={items.scheduledAt || getTodayDate()}
               onChange={handleInputChange}
             />
           </Box>
@@ -385,7 +344,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               name="price"
               defaultValue={0}
               min={0}
-              max={10000}
+              max={100000}
               value={items.quantity}
               onChange={(e) => handleNumberChange(e, "quantity")}
             >
@@ -409,10 +368,10 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={!items.quantity || isLimitDyeing()}
+            disabled={!items.stockType || !items.quantity || Number(items.quantity) === 0 || isLimitDyeing()}
             onClick={() => {
               items.stockType === "stock" && orderFabricDyeingFromStock();
-              items.stockType === "ranning" && orderFabricDyeingRanning();
+              items.stockType === "ranning" && orderFabricDyeingFromRanning();
               onClose();
             }}
           >
@@ -423,7 +382,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={!items.quantity || isLimitPurchase()}
+            disabled={!items.stockType || !items.quantity || Number(items.quantity) === 0 || isLimitPurchase()}
             onClick={() => {
               orderFabricPurchase(items.stockType);
               onClose();

@@ -1,55 +1,27 @@
 import { Box, Button, Flex, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Td, Tr } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { db } from "../../../firebase";
-import { currentUserState, loadingState } from "../../../store";
+import { useEffect } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputProduct } from "../../hooks/UseInputProduct";
+import { ProductType } from "../../../types/FabricType";
+import { useProductFunc } from "../../hooks/UseProductFunc";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  product: any
+  product: ProductType
 };
 
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
-  const setLoading = useSetRecoilState(loadingState);
-  const currentUser = useRecoilValue(currentUserState)
-  // const [items, setItems] = useState({ price: product.price, tokushimaStock: product.tokushimaStock })
+  const { getUserName } = useGetDisp()//// ？
   const { items, setItems, handleNumberChange } = useInputProduct()
-  const { getUserName } = useGetDisp()
+  const { updateAjustmentProduct, onReset } = useProductFunc(items, setItems)
+  const { quantityValueBold } = useUtil()
 
   useEffect(() => {
-    setItems({ ...product });
+    setItems({ ...product } as ProductType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.price, product.tokushimaStock]);
-
-
-  const quantityBold = (quantity: number) => {
-    return quantity > 0 ? "bold" : "normal";
-  };
-
-  const updateStock = async () => {
-    setLoading(true);
-    try {
-      const docRef = doc(db, "products", product.id);
-      await updateDoc(docRef, {
-        price: Number(items.price),
-        tokushimaStock: Number(items.tokushimaStock),
-        updatedAt: serverTimestamp(),
-        updateUser: currentUser
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const reset = () => {
-    setItems({ ...product });
-  };
 
   return (
     <Tr key={product.id}>
@@ -79,7 +51,7 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
           </Box>
         </Flex>
       </Td>
-      <Td isNumeric fontWeight={quantityBold(product?.tokushimaStock)}>
+      <Td isNumeric fontWeight={quantityValueBold(product?.tokushimaStock)}>
         <Flex alignItems="center">
           <NumberInput
             mt={1}
@@ -104,10 +76,10 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
       </Td>
       <Td>
         <Flex alignItems="center" gap={3}>
-          <Button size="xs" colorScheme="facebook" onClick={updateStock}>
+          <Button size="xs" colorScheme="facebook" onClick={() => updateAjustmentProduct(product.id)}>
             更新
           </Button>
-          <GiCancel cursor="pointer" onClick={reset} />
+          <GiCancel cursor="pointer" onClick={() => onReset(product)} />
         </Flex>
       </Td>
     </Tr>

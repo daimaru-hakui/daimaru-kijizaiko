@@ -27,10 +27,8 @@ type Props = {
 const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
   const [filterHistories, setFilterHistories] = useState<any>();
-  const users = useRecoilValue(usersState);
   const { getUserName, getSerialNumber } = useGetDisp()
-  const HOUSE_FACTORY = "徳島工場";
-  const currentUser = useRecoilValue(currentUserState);
+
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(

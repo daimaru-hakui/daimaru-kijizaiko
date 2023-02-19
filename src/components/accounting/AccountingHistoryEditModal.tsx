@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
@@ -40,10 +40,9 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   history,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [items, setItems] = useState({} as HistoryType)
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { items, setItems, handleInputChange, handleNumberChange } = useInputHistory()
+  const { items, setItems, handleInputChange, handleNumberChange, onReset } = useInputHistory()
 
 
   // 初期値をitemsに代入
@@ -51,10 +50,6 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
     setItems({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
-
-  const inputReset = () => {
-    setItems({ ...history });
-  };
 
   const updateHistoryAccountingOrder = async (history: HistoryType, items: HistoryType) => {
     const productDocRef = doc(db, "products", history.productId);
@@ -97,7 +92,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
       <Modal
         isOpen={isOpen}
         onClose={() => {
-          inputReset();
+          onReset(history);
           onClose();
         }}
       >
@@ -191,7 +186,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
               variant="ghost"
               mr={3}
               onClick={() => {
-                inputReset();
+                onReset(history);
                 onClose();
               }}
             >

@@ -2,9 +2,10 @@ import { Box, Container, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
+import { ProductType } from "../../../types/FabricType";
 
 type Props = {
-  product: any
+  product: ProductType
 };
 
 const DisplayStock: NextPage<Props> = ({ product }) => {

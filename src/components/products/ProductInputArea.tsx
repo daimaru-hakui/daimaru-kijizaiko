@@ -67,7 +67,7 @@ const ProductInputArea: NextPage<Props> = ({
     handleRadioChange,
     handleCheckedChange
   } = useInputProduct();
-  const { addProduct, updateProduct, reset } = useProductFunc(items, setItems);
+  const { addProduct, updateProduct, onReset } = useProductFunc(items, setItems);
   const { getMixed } = useGetDisp();
 
   useEffect(() => {
@@ -500,7 +500,7 @@ const ProductInputArea: NextPage<Props> = ({
             <Flex gap={3}>
               <Button w="100%"
                 onClick={() => {
-                  reset(product);
+                  onReset(product);
                   onClose()
                 }}>
                 キャンセル

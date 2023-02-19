@@ -25,8 +25,9 @@ const AccountingHistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
 }) => {
-  const [filterHistories, setFilterHistories] = useState<any>();
+  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const { getUserName, getSerialNumber } = useGetDisp()
+
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(
