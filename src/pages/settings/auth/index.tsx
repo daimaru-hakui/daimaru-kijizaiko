@@ -84,6 +84,7 @@ const Auth = () => {
                 <Th>ID</Th>
                 <Th>名前</Th>
                 <Th>R&D</Th>
+                <Th>営業</Th>
                 <Th>経理</Th>
                 <Th>徳島工場</Th>
                 <Th>入力権限</Th>
@@ -96,6 +97,7 @@ const Auth = () => {
                   <Td>{user.rank}</Td>
                   <Td>{user.name}</Td>
                   <Td>{elementAuthButton(user, "rd")}</Td>
+                  <Td>{elementAuthButton(user, "sales")}</Td>
                   <Td>{elementAuthButton(user, "accounting")}</Td>
                   <Td>{elementAuthButton(user, "tokushima")}</Td>
                   <Td>{elementAuthButton(user, "order")}</Td>

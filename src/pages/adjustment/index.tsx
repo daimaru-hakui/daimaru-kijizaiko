@@ -16,27 +16,24 @@ import { useRecoilValue } from "recoil";
 import { productsState } from "../../../store";
 // import { ProductType } from "../../../types/ProductType";
 import AdjustmentProduct from "../../components/adjustment/AdjustmentProduct";
+import { useUtil } from "../../hooks/UseUtil";
 
 const Adjustment = () => {
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([] as any[]);
   const [searchText, setSearchText] = useState("");
+  const { halfToFullChar } = useUtil()
 
   useEffect(() => {
     setFilterProducts(
       products.filter((product: any) =>
         product.productNumber.includes(
-          hankaku2Zenkaku(searchText.toUpperCase())
+          halfToFullChar(searchText.toUpperCase())
         )
       )
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText, products]);
-
-  function hankaku2Zenkaku(str: string) {
-    return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) {
-      return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
-    });
-  }
 
   const reset = () => {
     setSearchText("");

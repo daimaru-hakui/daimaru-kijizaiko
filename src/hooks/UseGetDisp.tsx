@@ -33,8 +33,8 @@ export const useGetDisp = () => {
   };
 
   const getSerialNumber = (serialNumber: number) => {
-    const str = "0000000" + String(serialNumber);
-    return str.slice(-7);
+    const str = "0000000000" + String(serialNumber);
+    return str.slice(-10);
   };
 
   // 担当者の表示

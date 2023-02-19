@@ -42,7 +42,10 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept" }];
   const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
-  const menu7 = [{ id: 1, title: "権限", link: "/settings/auth" }];
+  const menu7 = [
+    { id: 1, title: "権限", link: "/settings/auth" },
+    { id: 2, title: "伝票NO.管理", link: "/serialnumbers" }
+  ];
 
   const elementMenuList = (
     title: string,
