@@ -10,6 +10,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState, productsState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
@@ -19,28 +20,59 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { ProductType } from "../../../types/FabricType";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { useUtil } from "../../hooks/UseUtil";
+import ProductSearchArea from "../../components/products/ProductSearchArea";
 
 const Products = () => {
-  const currentUser = useRecoilValue(currentUserState)
+  const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
-  const { getUserName, getMixed, getFabricStd } = useGetDisp()
-  const { deleteProduct } = useProductFunc(null, null)
-  const {isAdminAuth} = useAuthManagement()
+  const { getUserName, getMixed, getFabricStd } = useGetDisp();
+  const { deleteProduct } = useProductFunc(null, null);
+  const { isAdminAuth } = useAuthManagement();
+  const { quantityValueBold } = useUtil();
+  const [isVisible, setIsVisible] = useState(false);
 
-  const quantityBold = (quantity: number) => {
-    return quantity > 0 ? "bold" : "normal";
+  const toggleVisibility = () => {
+    window.scrollY > 700 ? setIsVisible(true) : setIsVisible(false);
   };
+
+  useEffect(() => {
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
 
   return (
     <>
       {currentUser && (
         <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
           <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
-            <TableContainer p={6} w="100%">
+            <Flex
+              p={6}
+              gap={3}
+              alignItems="center"
+              justifyContent="space-between"
+              flexDirection={{ base: "column", md: "row" }}
+            >
               <Box as="h2" fontSize="2xl">
                 生地品番一覧
               </Box>
-              <Table mt={6} variant="simple" size="sm">
+              <Box
+                transition="0.3s"
+                style={isVisible ? { opacity: 1 } : { opacity: 0 }}
+                position="fixed"
+                top={16}
+                right={12}
+              >
+                <ProductSearchArea />
+              </Box>
+              <Box
+                style={isVisible ? { display: "none" } : { display: "block" }}
+              >
+                <ProductSearchArea />
+              </Box>
+            </Flex>
+            <TableContainer p={6} w="100%">
+              <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
                     <Th></Th>
@@ -57,9 +89,7 @@ const Products = () => {
                     <Th>混率</Th>
                     <Th>規格</Th>
                     <Th>機能性</Th>
-                    {isAdminAuth() && (
-                      <Th>削除</Th>
-                    )}
+                    {isAdminAuth() && <Th>削除</Th>}
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -78,24 +108,29 @@ const Products = () => {
                       <Td>{product?.productName}</Td>
                       <Td isNumeric>{product.price}円</Td>
 
-                      <Td isNumeric fontWeight={quantityBold(product?.wip)}>
+                      <Td
+                        isNumeric
+                        fontWeight={quantityValueBold(product?.wip)}
+                      >
                         {product?.wip || 0}m
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityBold(product?.externalStock)}
+                        fontWeight={quantityValueBold(product?.externalStock)}
                       >
                         {product?.externalStock || 0}m
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityBold(product?.arrivingQuantity)}
+                        fontWeight={quantityValueBold(
+                          product?.arrivingQuantity
+                        )}
                       >
                         {product?.arrivingQuantity || 0}m
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityBold(product?.tokushimaStock)}
+                        fontWeight={quantityValueBold(product?.tokushimaStock)}
                       >
                         {product?.tokushimaStock || 0}m
                       </Td>
