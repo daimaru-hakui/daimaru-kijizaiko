@@ -27,8 +27,8 @@ import { HistoryType } from "../../../types/HistoryType";
 import HistoryOrderToConfirmModal from "../history/HistoryOrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
-import { todayDate } from "../../../functions";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   histories: HistoryType[];
@@ -38,8 +38,8 @@ type Props = {
 const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber, getUserName } = useGetDisp()
-
+  const { getSerialNumber, getUserName } = useGetDisp();
+  const { getTodayDate } = useUtil();
 
   // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
@@ -54,7 +54,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
         if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
 
-        const newWip = await grayFabricDocSnap.data()?.wip - history.quantity;
+        const newWip = (await grayFabricDocSnap.data()?.wip) - history.quantity;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -82,8 +82,9 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
         if (!historyDocSnap.exists()) throw "Document does not exist!!";
 
         const newWip =
-          await grayFabricDocSnap.data()?.wip - history.quantity + items.quantity ||
-          0;
+          (await grayFabricDocSnap.data()?.wip) -
+            history.quantity +
+            items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -109,7 +110,9 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
     const grayFabricDocRef = doc(db, "grayFabrics", history?.grayFabricId);
     const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
-    const confirmHistoryDocRef = doc(collection(db, "historyGrayFabricConfirms"));
+    const confirmHistoryDocRef = doc(
+      collection(db, "historyGrayFabricConfirms")
+    );
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -118,8 +121,8 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
-          history.quantity +
-          items.remainingOrder || 0;
+            history.quantity +
+            items.remainingOrder || 0;
         const newStock = grayFabricDocSnap.data()?.stock + items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
@@ -128,8 +131,8 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
 
         transaction.update(orderHistoryRef, {
           quantity: items.remainingOrder,
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
+          orderedAt: items.orderedAt || getTodayDate(),
+          scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
           updateUser: currentUser,
           updatedAt: serverTimestamp(),
@@ -139,7 +142,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
           serialNumber: history.serialNumber,
           grayFabricId: history.grayFabricId,
           orderedAt: items.orderedAt || history.orderedAt,
-          fixedAt: items.fixedAt || todayDate(),
+          fixedAt: items.fixedAt || getTodayDate(),
           createUser: currentUser,
           productNumber: history.productNumber,
           productName: history.productName,

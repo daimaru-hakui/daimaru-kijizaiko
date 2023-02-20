@@ -1,14 +1,19 @@
 import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { grayFabricsState, productsState, suppliersState, usersState } from "../../store";
+import {
+  grayFabricsState,
+  productsState,
+  suppliersState,
+  usersState,
+} from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { MaterialsType } from "../../types/MaterialsType";
 
 export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
-  const products = useRecoilValue(productsState)
-  const grayFabrics = useRecoilValue(grayFabricsState)
+  const products = useRecoilValue(productsState);
+  const grayFabrics = useRecoilValue(grayFabricsState);
 
   // 混率の表示
   const getMixed = (materials: MaterialsType) => {
@@ -76,17 +81,23 @@ export const useGetDisp = () => {
   };
 
   const getProductNumber = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find(
+      (product: ProductType) => product.id === productId
+    );
     return `${result?.productNumber}`;
   };
 
   const getProductName = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find(
+      (product: ProductType) => product.id === productId
+    );
     return `${result?.productName}`;
   };
 
   const getColorName = (productId: string) => {
-    const result = products.find((product: ProductType) => product.id === productId);
+    const result = products.find(
+      (product: ProductType) => product.id === productId
+    );
     return `${result?.colorName}`;
   };
 
@@ -102,6 +113,15 @@ export const useGetDisp = () => {
       (grayFabric: { id: string }) => id === grayFabric.id
     );
     return `${grayFabric?.productName}`;
+  };
+
+  // キバタ在庫を取得
+  const getGrayFabricStock = (grayFabricId: string) => {
+    const grayFabric = grayFabrics.find(
+      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
+    );
+    const stock = grayFabric?.stock || 0;
+    return stock;
   };
 
   // 徳島在庫数を取得
@@ -123,6 +143,7 @@ export const useGetDisp = () => {
     getProductName,
     getGrayFabricName,
     getGrayFabricNumber,
-    getTokushimaStock
-  }
-}
+    getGrayFabricStock,
+    getTokushimaStock,
+  };
+};

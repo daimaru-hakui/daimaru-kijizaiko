@@ -17,11 +17,9 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
-import {
-  grayFabricsState,
-  stockPlacesState,
-} from "../../../store";
+import { stockPlacesState } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
@@ -33,24 +31,47 @@ type Props = {
 };
 
 const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
-  const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricId = product?.grayFabricId || "";
   const stockPlaces = useRecoilValue(stockPlacesState);
   const { getTodayDate } = useUtil();
-  const { items, handleInputChange, handleNumberChange, handleRadioChange } = useInputHistory()
-  const { orderFabricDyeingFromStock, orderFabricDyeingFromRanning, orderFabricPurchase } = useOrderFabricFunc(items, product, orderType)
+  const { getGrayFabricStock } = useGetDisp();
+  const { items, handleInputChange, handleNumberChange, handleRadioChange } =
+    useInputHistory();
+  const {
+    orderFabricDyeingFromStock,
+    orderFabricDyeingFromRanning,
+    orderFabricPurchase,
+  } = useOrderFabricFunc(items, product, orderType);
 
-  const isLimitDyeing = () => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
+  const isLimit = (orderType: string) => {
+    let stock = 0;
+    if (orderType === "dyeing") {
+      stock = getGrayFabricStock(grayFabricId);
+    }
+    if (orderType === "purchase") {
+      stock = product?.externalStock || 0;
+    }
+    const result =
+      items.stockType === "stock" && stock < items.quantity ? true : false;
+    return (
+      !items.stockType ||
+      !items.quantity ||
+      Number(items.quantity) === 0 ||
+      result
     );
-    const stock = grayFabric?.stock || 0;
-    return items.stockType === "stock" && stock < items.quantity ? true : false;
   };
 
-  const isLimitPurchase = () => {
-    const stock = product?.externalStock || 0;
-    return items.stockType === "stock" && stock < items.quantity ? true : false;
+  const getLimitQuantity = () => {
+    let quantity: number = 100000;
+    if (items.stockType === "stock") {
+      if (orderType === "dyeing") {
+        quantity = getGrayFabricStock(grayFabricId);
+      }
+      if (orderType === "purchase") {
+        quantity = product.externalStock;
+      }
+    }
+    return quantity;
   };
 
   return (
@@ -163,7 +184,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
               name="price"
               defaultValue={0}
               min={0}
-              max={100000}
+              max={getLimitQuantity()}
               value={items.quantity}
               onChange={(e) => handleNumberChange(e, "quantity")}
             >
@@ -187,7 +208,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={!items.stockType || !items.quantity || Number(items.quantity) === 0 || isLimitDyeing()}
+            disabled={isLimit("dyeing")}
             onClick={() => {
               items.stockType === "stock" && orderFabricDyeingFromStock();
               items.stockType === "ranning" && orderFabricDyeingFromRanning();
@@ -201,7 +222,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
           <Button
             size="md"
             colorScheme="facebook"
-            disabled={!items.stockType || !items.quantity || Number(items.quantity) === 0 || isLimitPurchase()}
+            disabled={isLimit("purchase")}
             onClick={() => {
               orderFabricPurchase(items.stockType);
               onClose();

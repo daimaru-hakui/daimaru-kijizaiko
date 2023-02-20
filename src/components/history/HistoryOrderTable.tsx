@@ -21,7 +21,6 @@ import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { todayDate } from "../../../functions";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
@@ -29,6 +28,7 @@ import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   histories: HistoryType[];
@@ -47,7 +47,8 @@ const HistoryOrderTable: NextPage<Props> = ({
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { isAdminAuth } = useAuthManagement()
+  const { isAdminAuth } = useAuthManagement();
+  const { getTodayDate } = useUtil();
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -56,8 +57,6 @@ const HistoryOrderTable: NextPage<Props> = ({
     );
     setFilterHistories(newHistorys);
   }, [histories]);
-
-
 
   // 生地仕掛状況　Orderを削除 type stock
   const deleteHistoryFabricDyeingOrderStock = async (history: any) => {
@@ -80,13 +79,13 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        let stock = await grayFabricDoSnap.data().stock || 0;
+        let stock = (await grayFabricDoSnap.data().stock) || 0;
         const newStock = stock + history.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
-        let wip = await productDocSnap.data().wip || 0;
+        let wip = (await productDocSnap.data().wip) || 0;
         const newWip = wip - history.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -117,7 +116,7 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        let wip = await productDocSnap.data().wip || 0;
+        let wip = (await productDocSnap.data().wip) || 0;
         const newWip = wip - history.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -149,13 +148,13 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const stock = await grayFabricDocSnap.data().stock || 0;
+        const stock = (await grayFabricDocSnap.data().stock) || 0;
         const newStock = stock + history.quantity - items.quantity;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
-        const wip = await productDocSnap.data().wip || 0;
+        const wip = (await productDocSnap.data().wip) || 0;
         const newWip = wip - history.quantity + items.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -192,7 +191,7 @@ const HistoryOrderTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const wip = await productDocSnap.data().wip || 0;
+        const wip = (await productDocSnap.data().wip) || 0;
         const newWip = wip - history.quantity + items.quantity;
         transaction.update(productDocRef, {
           wip: newWip,
@@ -221,7 +220,9 @@ const HistoryOrderTable: NextPage<Props> = ({
 
     const productDocRef = doc(db, "products", history.productId);
     const orderHistoryDocRef = doc(db, "historyFabricDyeingOrders", history.id);
-    const confirmHistoryDocRef = doc(collection(db, "historyFabricDyeingConfirms"));
+    const confirmHistoryDocRef = doc(
+      collection(db, "historyFabricDyeingConfirms")
+    );
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -229,12 +230,12 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!productDocSnap.exists()) throw "product does not exist!!";
 
         const newWip =
-          await productDocSnap.data()?.wip -
-          history.quantity +
-          items.remainingOrder || 0;
+          (await productDocSnap.data()?.wip) -
+            history.quantity +
+            items.remainingOrder || 0;
 
         const newStock =
-          await productDocSnap.data()?.externalStock + items.quantity || 0;
+          (await productDocSnap.data()?.externalStock) + items.quantity || 0;
         transaction.update(productDocRef, {
           wip: newWip,
           externalStock: newStock,
@@ -242,8 +243,8 @@ const HistoryOrderTable: NextPage<Props> = ({
 
         transaction.update(orderHistoryDocRef, {
           quantity: items.remainingOrder,
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
+          orderedAt: items.orderedAt || getTodayDate(),
+          scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
           updateUser: currentUser,
           updatedAt: serverTimestamp(),
@@ -263,7 +264,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           quantity: items.quantity,
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
-          fixedAt: items.fixedAt || todayDate(),
+          fixedAt: items.fixedAt || getTodayDate(),
           createUser: currentUser,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -292,9 +293,11 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         if (history.stockType === "stock") {
-          const externalStock = await productDocSnap.data().externalStock || 0;
+          const externalStock =
+            (await productDocSnap.data().externalStock) || 0;
           const newExternalStock = externalStock + history.quantity;
-          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity =
+            (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity = arrivingQuantity - history.quantity;
           transaction.update(productDocRef, {
             externalStock: newExternalStock,
@@ -302,7 +305,8 @@ const HistoryOrderTable: NextPage<Props> = ({
           });
         }
         if (history.stockType === "ranning") {
-          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity =
+            (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity = arrivingQuantity - history.quantity;
           transaction.update(productDocRef, {
             arrivingQuantity: newArrivingQuantity,
@@ -331,11 +335,13 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         if (history.stockType === "stock") {
-          const externalStock = await productDocSnap.data().externalStock || 0;
+          const externalStock =
+            (await productDocSnap.data().externalStock) || 0;
           const newExternalStock =
             externalStock + history.quantity - items.quantity;
 
-          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity =
+            (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity =
             arrivingQuantity - history.quantity + items.quantity;
 
@@ -345,7 +351,8 @@ const HistoryOrderTable: NextPage<Props> = ({
           });
         }
         if (history.stockType === "ranning") {
-          const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
+          const arrivingQuantity =
+            (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity =
             arrivingQuantity - history.quantity + items.quantity;
 
@@ -381,7 +388,9 @@ const HistoryOrderTable: NextPage<Props> = ({
       "historyFabricPurchaseOrders",
       history.id
     );
-    const confirmHistoryDocRef = doc(collection(db, "historyFabricPurchaseConfirms"));
+    const confirmHistoryDocRef = doc(
+      collection(db, "historyFabricPurchaseConfirms")
+    );
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -389,14 +398,14 @@ const HistoryOrderTable: NextPage<Props> = ({
         if (!productDocSnap.exists()) throw "product does not exist!!";
 
         const newArrivingQuantity =
-          await productDocSnap.data()?.arrivingQuantity -
-          history.quantity +
-          items.remainingOrder || 0;
+          (await productDocSnap.data()?.arrivingQuantity) -
+            history.quantity +
+            items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === HOUSE_FACTORY) {
           newTokushimaStock =
-            await productDocSnap.data()?.tokushimaStock + items.quantity || 0;
+            (await productDocSnap.data()?.tokushimaStock) + items.quantity || 0;
         }
 
         transaction.update(productDocRef, {
@@ -406,8 +415,8 @@ const HistoryOrderTable: NextPage<Props> = ({
 
         transaction.update(orderHistoryDocRef, {
           quantity: items.remainingOrder,
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
+          orderedAt: items.orderedAt || getTodayDate(),
+          scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
           updateUser: currentUser,
           updatedAt: serverTimestamp(),
@@ -428,7 +437,7 @@ const HistoryOrderTable: NextPage<Props> = ({
           stockPlace: items.stockPlace,
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
-          fixedAt: items.fixedAt || todayDate(),
+          fixedAt: items.fixedAt || getTodayDate(),
           createUser: currentUser,
           updateUser: currentUser,
           createdAt: serverTimestamp(),

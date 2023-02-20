@@ -27,16 +27,15 @@ import {
   doc,
   runTransaction,
   serverTimestamp,
-
 } from "firebase/firestore";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { todayDate } from "../../../functions";
 import { currentUserState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   grayFabric: GrayFabricType;
@@ -45,7 +44,8 @@ type Props = {
 const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
-  const { getSupplierName } = useGetDisp()
+  const { getSupplierName } = useGetDisp();
+  const { getTodayDate } = useUtil();
   const [items, setItems] = useState({
     orderedAt: "",
     scheduledAt: "",
@@ -65,8 +65,6 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     const value = e;
     setItems({ ...items, [name]: Number(value) });
   };
-
-
 
   // キバタ仕掛発注
   const orderGrayFabric = async () => {
@@ -107,8 +105,8 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
           productName: grayFabric?.productName,
           price: grayFabric?.price,
           quantity: items.quantity,
-          orderedAt: items.orderedAt || todayDate(),
-          scheduledAt: items.scheduledAt || todayDate(),
+          orderedAt: items.orderedAt || getTodayDate(),
+          scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
           createUser: currentUser,
           supplierId: grayFabric?.supplierId,
@@ -160,7 +158,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     mt={1}
                     type="date"
                     name="orderedAt"
-                    value={items.orderedAt || todayDate()}
+                    value={items.orderedAt || getTodayDate()}
                     onChange={handleInputChange}
                   />
                 </Box>
@@ -170,7 +168,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
                     mt={1}
                     type="date"
                     name="scheduledAt"
-                    value={items.scheduledAt || todayDate()}
+                    value={items.scheduledAt || getTodayDate()}
                     onChange={handleInputChange}
                   />
                 </Box>
