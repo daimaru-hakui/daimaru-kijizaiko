@@ -24,6 +24,7 @@ import { doc, getDoc, runTransaction, updateDoc } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { ProductType } from "../../../types/FabricType";
 
 type Props = {
   items: CuttingReportType;
@@ -51,7 +52,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
 
   useEffect(() => {
     setFilterProducts(
-      products.filter((product: any) =>
+      products.filter((product: ProductType) =>
         product.productNumber.includes(
           halfToFullChar(searchText.toUpperCase())
         )

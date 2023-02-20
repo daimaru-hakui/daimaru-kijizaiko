@@ -9,6 +9,8 @@ import {
   TableContainer,
   Text,
   Flex,
+  Button,
+  TableCaption,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -26,20 +28,59 @@ import ProductSearchArea from "../../components/products/ProductSearchArea";
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
+  const [filterProducts, setFilterProducts] = useState([] as ProductType[])
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { deleteProduct } = useProductFunc(null, null);
   const { isAdminAuth } = useAuthManagement();
-  const { quantityValueBold } = useUtil();
+  const { quantityValueBold, halfToFullChar } = useUtil();
   const [isVisible, setIsVisible] = useState(false);
-
-  const toggleVisibility = () => {
-    window.scrollY > 700 ? setIsVisible(true) : setIsVisible(false);
-  };
+  const [search, setSearch] = useState({ productNumber: "", colorName: "", productName: "", materialName: "" } as ProductType)
 
   useEffect(() => {
-    window.addEventListener("scroll", toggleVisibility);
+    setFilterProducts(
+      products.filter((product: ProductType) =>
+        product.productNumber.includes(
+          halfToFullChar(search.productNumber.toUpperCase())
+        )
+      ).filter((product: ProductType) => (
+        product.colorName.includes(search.colorName)
+      )).filter((product: ProductType) => (
+        product.productName.includes(search.productName)
+      )).filter((product: ProductType) => (
+        product.materialName.includes(search.materialName)
+      ))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, products]);
+
+  const toggleVisibility = () => {
+    window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);
+  };
+
+  const throttle = (fn: Function, interval: number) => {
+    let lastTime = Date.now() - interval
+    return function () {
+      if ((lastTime + interval) < Date.now()) {
+        lastTime = Date.now()
+        fn()
+      }
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("scroll", throttle(toggleVisibility, 100));
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
+
+  const elementFilterButton = () => (
+    <Flex gap={3}>
+      {products.length !== filterProducts.length && (
+        <Button size="sm" colorScheme="facebook" variant='outline' bg="white"
+          onClick={() => setSearch({ productNumber: "", colorName: "", productName: "", materialName: "" } as ProductType)}>解除</Button>
+      )}
+      <ProductSearchArea search={search} setSearch={setSearch} />
+    </Flex>
+  )
 
   return (
     <>
@@ -47,35 +88,34 @@ const Products = () => {
         <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
           <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
             <Flex
-              p={6}
+              pt={6}
+              px={6}
               gap={3}
               alignItems="center"
               justifyContent="space-between"
-              flexDirection={{ base: "column", md: "row" }}
             >
               <Box as="h2" fontSize="2xl">
                 生地品番一覧
               </Box>
-              <Box
-                transition="0.3s"
-                style={isVisible ? { opacity: 1 } : { opacity: 0 }}
-                position="fixed"
-                top={16}
-                right={12}
-              >
-                <ProductSearchArea />
+              <Box style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
+                {elementFilterButton()}
               </Box>
               <Box
-                style={isVisible ? { display: "none" } : { display: "block" }}
+                transition="0.2s"
+                style={isVisible ? { opacity: 1 } : { opacity: 0 }}
+                position="fixed"
+                // top="98px"
+                bottom="20px"
+                right={12}
               >
-                <ProductSearchArea />
+                {elementFilterButton()}
               </Box>
             </Flex>
             <TableContainer p={6} w="100%">
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th></Th>
+                    <Th>詳細/発注</Th>
                     <Th>担当</Th>
                     <Th>生地品番</Th>
                     <Th>色</Th>
@@ -93,7 +133,7 @@ const Products = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {products?.map((product: ProductType) => (
+                  {filterProducts?.map((product: ProductType) => (
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>
@@ -103,11 +143,9 @@ const Products = () => {
                       </Td>
                       <Td>{getUserName(product.staff)}</Td>
                       <Td>{product.productNumber}</Td>
-
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
                       <Td isNumeric>{product.price}円</Td>
-
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.wip)}
@@ -147,7 +185,6 @@ const Products = () => {
                           )}
                         </Flex>
                       </Td>
-
                       <Td>
                         <Flex gap={2}>
                           {product?.features.map((f, index) => (
@@ -166,6 +203,8 @@ const Products = () => {
                     </Tr>
                   ))}
                 </Tbody>
+                <TableCaption placement="top" textAlign="left" fontSize="sm">全{products.length}件中 {filterProducts.length}件表示</TableCaption>
+                <TableCaption textAlign="left" fontSize="sm">全{products.length}件中 {filterProducts.length}件表示</TableCaption>
               </Table>
             </TableContainer>
           </Box>

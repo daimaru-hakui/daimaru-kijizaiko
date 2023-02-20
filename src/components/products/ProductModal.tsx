@@ -52,7 +52,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
 
   return (
     <>
-      <Button size="xs" onClick={onOpen}>
+      <Button size="xs" variant="outline" colorScheme='facebook' onClick={onOpen}>
         詳細
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} size="4xl">
