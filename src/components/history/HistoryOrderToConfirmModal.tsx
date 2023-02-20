@@ -23,9 +23,9 @@ import {
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { todayDate } from "../../../functions";
 import { stockPlacesState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   history: HistoryType;
@@ -43,6 +43,7 @@ const HistoryConfirmModal: NextPage<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [status, setStatus] = useState(1);
   const stockPlaces = useRecoilValue(stockPlacesState);
+  const { getTodayDate } = useUtil();
 
   useEffect(() => {
     setItems({ ...history });
@@ -148,7 +149,7 @@ const HistoryConfirmModal: NextPage<Props> = ({
                         type="date"
                         mt={1}
                         name="fixedAt"
-                        value={items.fixedAt || todayDate()}
+                        value={items.fixedAt || getTodayDate()}
                         onChange={handleInputChange}
                       />
                     </Box>

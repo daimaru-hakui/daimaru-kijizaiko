@@ -1,29 +1,61 @@
-import { Box, Button, CheckboxGroup, Container, Divider, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text, Textarea, useDisclosure } from '@chakra-ui/react'
-import { NextPage } from 'next'
-import { useGetDisp } from '../../hooks/UseGetDisp'
-import { useGetDoc } from '../../hooks/UseGetDoc'
-import ProductEditModal from './ProductEditModal'
+import {
+  Box,
+  Button,
+  CheckboxGroup,
+  Container,
+  Divider,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
+  Textarea,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { doc, getDoc } from "firebase/firestore";
+import { NextPage } from "next";
+import { useEffect, useState } from "react";
+import { db } from "../../../firebase";
+import { ProductType } from "../../../types/FabricType";
+import { useGetDisp } from "../../hooks/UseGetDisp";
+import ProductEditModal from "./ProductEditModal";
 
 type Props = {
-  productId: string
-}
+  productId: string;
+};
 
 const ProductModal: NextPage<Props> = ({ productId }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const { product } = useGetDoc(productId)
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [product, setProduct] = useState({} as ProductType);
   const {
     getUserName,
     getSupplierName,
     getMixed,
     getFabricStd,
     getGrayFabricName,
-    getGrayFabricNumber
-  } = useGetDisp()
+    getGrayFabricNumber,
+  } = useGetDisp();
+
+  useEffect(() => {
+    const getProduct = async () => {
+      const docsRef = doc(db, "products", productId);
+      const docSnap = await getDoc(docsRef);
+      setProduct({ ...docSnap.data(), id: docSnap.id } as ProductType);
+    };
+    getProduct();
+  }, [productId]);
 
   return (
     <>
-      <Button size='xs' onClick={onOpen}>詳細</Button>
-      <Modal isOpen={isOpen} onClose={onClose} size='4xl'>
+      <Button size="xs" onClick={onOpen}>
+        詳細
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>生地詳細</ModalHeader>
@@ -78,17 +110,23 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                   <Box>{product?.price}円</Box>
                 </Box>
 
-
                 {product?.grayFabricId && (
                   <Box flex={1} w="100%">
                     <Text fontWeight="bold">使用キバタ</Text>
-                    <Box mt={1}>{getGrayFabricNumber(product?.grayFabricId)} {getGrayFabricName(product?.grayFabricId)}</Box>
+                    <Box mt={1}>
+                      {getGrayFabricNumber(product?.grayFabricId)}{" "}
+                      {getGrayFabricName(product?.grayFabricId)}
+                    </Box>
                   </Box>
                 )}
 
                 <Box flex={1} w="100%">
                   <Text fontWeight="bold">備考（使用製品品番）</Text>
-                  <Textarea mt={1} name="noteProduct" defaultValue={product?.noteProduct} />
+                  <Textarea
+                    mt={1}
+                    name="noteProduct"
+                    defaultValue={product?.noteProduct}
+                  />
                 </Box>
 
                 <Divider />
@@ -155,25 +193,34 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                 <Box flex={1} w="100%">
                   <Box flex={1} w="100%">
                     <Text fontWeight="bold">備考（生地の性質など）</Text>
-                    <Textarea mt={1} name="noteProduct" defaultValue={product?.noteFabric} />
+                    <Textarea
+                      mt={1}
+                      name="noteProduct"
+                      defaultValue={product?.noteFabric}
+                    />
                   </Box>
                 </Box>
                 <Divider />
                 <Box flex={1} w="100%">
                   <Text fontWeight="bold">備考（その他）</Text>
-                  <Textarea mt={1} name="noteProduct" defaultValue={product?.noteEtc} />
+                  <Textarea
+                    mt={1}
+                    name="noteProduct"
+                    defaultValue={product?.noteEtc}
+                  />
                 </Box>
               </Stack>
             </Container>
           </ModalBody>
           <ModalFooter>
-            <Button variant="outline" onClick={onClose}>Close</Button>
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
     </>
-  )
-}
+  );
+};
 
-export default ProductModal
+export default ProductModal;

@@ -55,38 +55,43 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
                     購入伝票
                   </Tab>
                 </TabList>
-                <Box mt={6} fontSize="xl">
-                  <Flex>
-                    <Text mr={1} fontWeight="bold">
+                <Stack mt={6} spacing={3} fontSize="xl">
+                  <Flex alignItems="center">
+                    <Text mr={3} fontSize="sm" fontWeight="bold">
                       品番
                     </Text>
                     <Flex>
                       <Text mr={3}>{product?.productNumber}</Text>
-                      <Text mr={3}>{product?.colorName}</Text>
-                      {product?.productName}
+                      <Text>{product?.colorName}</Text>
                     </Flex>
                   </Flex>
-                  <Flex mt={2}>
-                    <Text mr={1} fontWeight="bold">
+                  <Flex alignItems="center">
+                    <Text mr={3} fontSize="sm" fontWeight="bold">
+                      品名
+                    </Text>
+                    <Text>{product?.productName}</Text>
+                  </Flex>
+                  <Flex alignItems="center">
+                    <Text mr={3} fontSize="sm" fontWeight="bold">
                       価格
                     </Text>
                     <Flex>
-                      <Text mr={3}>{product?.price}円</Text>
+                      <Text>{product?.price}円</Text>
                     </Flex>
                   </Flex>
-                </Box>
+                </Stack>
                 <TabPanels>
                   <TabPanel>
                     <OrderInputArea
                       product={product}
-                      orderType={"dyeing"}
+                      orderType="dyeing"
                       onClose={onClose}
                     />
                   </TabPanel>
                   <TabPanel>
                     <OrderInputArea
                       product={product}
-                      orderType={"purchase"}
+                      orderType="purchase"
                       onClose={onClose}
                     />
                   </TabPanel>
