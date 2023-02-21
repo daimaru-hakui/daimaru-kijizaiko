@@ -4,6 +4,7 @@ export type UserType = {
   name: string;
   rank: number;
   rd: boolean;
+  sales: boolean;
   accounting: boolean;
   tokushima: boolean;
   order: boolean;

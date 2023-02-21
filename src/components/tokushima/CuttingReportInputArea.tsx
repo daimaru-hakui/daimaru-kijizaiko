@@ -26,6 +26,7 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
+import { UserType } from "../../../types/UserType";
 
 type Props = {
   title: string;
@@ -41,6 +42,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
   onClose,
 }) => {
   const users = useRecoilValue(usersState);
+  const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const {
     items,
@@ -56,6 +58,10 @@ const CuttingReportInputArea: NextPage<Props> = ({
     setItems({ ...report });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report]);
+
+  useEffect(() => {
+    setFilterUsers(users.filter((user: UserType) => user.sales));
+  }, [users]);
 
   useEffect(() => {
     const productNumberValidate = () => {
@@ -136,7 +142,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {users?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user: { id: string; name: string }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>
