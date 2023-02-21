@@ -48,7 +48,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth } = useAuthManagement();
-  const { getTodayDate } = useUtil();
+  const { getTodayDate, mathRound2nd } = useUtil();
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -346,8 +346,8 @@ const HistoryOrderTable: NextPage<Props> = ({
             arrivingQuantity - history.quantity + items.quantity;
 
           transaction.update(productDocRef, {
-            externalStock: newExternalStock,
-            arrivingQuantity: newArrivingQuantity,
+            externalStock: mathRound2nd(newExternalStock),
+            arrivingQuantity: mathRound2nd(newArrivingQuantity),
           });
         }
         if (history.stockType === "ranning") {
@@ -357,7 +357,7 @@ const HistoryOrderTable: NextPage<Props> = ({
             arrivingQuantity - history.quantity + items.quantity;
 
           transaction.update(productDocRef, {
-            arrivingQuantity: newArrivingQuantity,
+            arrivingQuantity: mathRound2nd(newArrivingQuantity),
           });
         }
 
@@ -409,8 +409,8 @@ const HistoryOrderTable: NextPage<Props> = ({
         }
 
         transaction.update(productDocRef, {
-          arrivingQuantity: newArrivingQuantity,
-          tokushimaStock: newTokushimaStock,
+          arrivingQuantity: mathRound2nd(newArrivingQuantity),
+          tokushimaStock: mathRound2nd(newTokushimaStock),
         });
 
         transaction.update(orderHistoryDocRef, {
