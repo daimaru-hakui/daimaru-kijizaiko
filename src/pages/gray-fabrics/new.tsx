@@ -1,10 +1,21 @@
 import { Box, Container } from "@chakra-ui/react";
+import { useState } from "react";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricInputArea from "../../components/grayFabrics/GrayFabricInputArea";
 
 const GrayFabricsNew = () => {
+  const [grayFabric, setGrayFabric] = useState({
+    id: "",
+    supplierId: "",
+    productNumber: "",
+    productName: "",
+    price: 0,
+    comment: "",
+    wip: 0,
+    stock: 0,
+  });
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container
         maxW="800px"
         my={6}
@@ -18,7 +29,7 @@ const GrayFabricsNew = () => {
         </Box>
         <GrayFabricInputArea
           title="登録"
-          grayFabric={{} as GrayFabricType}
+          grayFabric={grayFabric as GrayFabricType}
           toggleSwitch="new"
           onClose={() => {}}
         />

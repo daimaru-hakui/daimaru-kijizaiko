@@ -101,7 +101,9 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button onClick={onClose}>閉じる</Button>
+            <Button variant="outline" onClick={onClose}>
+              閉じる
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

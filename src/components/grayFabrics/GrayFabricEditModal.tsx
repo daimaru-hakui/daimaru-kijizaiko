@@ -23,7 +23,7 @@ const GrayFabricEditModal: NextPage<Props> = ({ grayFabric }) => {
 
   return (
     <>
-      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
+      <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
@@ -33,7 +33,7 @@ const GrayFabricEditModal: NextPage<Props> = ({ grayFabric }) => {
             <GrayFabricInputArea
               title="キバタの更新"
               grayFabric={grayFabric}
-              toggleSwitch='edit'
+              toggleSwitch="edit"
               onClose={onClose}
             />
           </ModalBody>

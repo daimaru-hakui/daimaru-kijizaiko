@@ -41,7 +41,12 @@ const CuttingReportEditModal: NextPage<Props> = ({ reportId }) => {
     <>
       {/* <FaEdit onClick={onOpen} cursor="pointer" /> */}
       {isAuths(["tokushima", "rd"]) && (
-        <Button size="xs" variant="outline" onClick={onOpen}>
+        <Button
+          size="xs"
+          variant="outline"
+          colorScheme="facebook"
+          onClick={onOpen}
+        >
           編集
         </Button>
       )}

@@ -221,6 +221,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                       onClick={updateOrderHistory}
                     />
                     <FaTrashAlt
+                      color="#444"
                       cursor="pointer"
                       onClick={() => deleteGrayFabricOrder(history)}
                     />

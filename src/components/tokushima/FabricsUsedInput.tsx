@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   Flex,
   Input,
   NumberDecrementStepper,
@@ -9,6 +10,7 @@ import {
   NumberInputField,
   NumberInputStepper,
   Select,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
@@ -45,17 +47,15 @@ export const FabricsUsedInput: NextPage<Props> = ({
   const [filterProducts, setFilterProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
   const setLoading = useSetRecoilState(loadingState);
-  const { calcScale } = useCuttingReportFunc(null, null)
-  const { halfToFullChar } = useUtil()
-  const { getTokushimaStock } = useGetDisp()
+  const { calcScale } = useCuttingReportFunc(null, null);
+  const { halfToFullChar } = useUtil();
+  const { getTokushimaStock } = useGetDisp();
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
 
   useEffect(() => {
     setFilterProducts(
       products.filter((product: ProductType) =>
-        product.productNumber.includes(
-          halfToFullChar(searchText.toUpperCase())
-        )
+        product.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -150,15 +150,15 @@ export const FabricsUsedInput: NextPage<Props> = ({
   };
 
   return (
-    <>
+    <Stack spacing={3}>
       <Box>
         <Flex
-          mt={1}
+          mt={6}
           w="full"
           justifyContent="space-between"
           alignItems="center"
         >
-          <Flex gap={6}>
+          <Flex gap={3}>
             <Text fontWeight="bold">
               使用生地
               <Box as="span" pl={2}>
@@ -190,7 +190,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
           />
         </Flex>
       </Box>
-      <Box mt={1} p={3} border="1px" borderColor="gray.200">
+      <Box p={3} border="1px" borderColor="gray.200">
         <Flex gap={3} w="full" flexDirection={{ base: "column", md: "row" }}>
           <Box minW="100px">
             <Text fontWeight="bold">選択</Text>
@@ -271,6 +271,6 @@ export const FabricsUsedInput: NextPage<Props> = ({
           </Box>
         </Flex>
       </Box>
-    </>
+    </Stack>
   );
 };

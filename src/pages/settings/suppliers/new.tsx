@@ -24,7 +24,7 @@ import { UseInputSetting } from "../../../hooks/UseInputSetting";
 const SupplierNew = () => {
   const [suppliers, setSuppliers] = useState([] as SupplierType[]);
   const router = useRouter();
-  const { items, setItems, handleInputChange } = UseInputSetting()
+  const { items, setItems, handleInputChange } = UseInputSetting();
   const [flag, setFlag] = useState(false);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const SupplierNew = () => {
   };
 
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container
         maxW="800px"
         my={6}
@@ -85,7 +85,9 @@ const SupplierNew = () => {
             仕入先登録
           </Box>
           <Link href="/settings/suppliers/">
-            <Button>戻る</Button>
+            <Button size="sm" variant="outline">
+              戻る
+            </Button>
           </Link>
         </Flex>
         <Stack spacing={6} mt={6}>

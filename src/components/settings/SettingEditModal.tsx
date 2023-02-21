@@ -18,15 +18,14 @@ import { db } from "../../../firebase";
 import { StockPlaceType } from "../../../types/StockPlaceType";
 import { UseInputSetting } from "../../hooks/UseInputSetting";
 
-
 type Props = {
-  obj: StockPlaceType
+  obj: StockPlaceType;
   collectionName: string;
 };
 
 const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange } = UseInputSetting()
+  const { items, setItems, handleInputChange } = UseInputSetting();
 
   useEffect(() => {
     setItems({ ...obj });
@@ -46,7 +45,7 @@ const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
 
   return (
     <>
-      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
+      <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -60,7 +59,6 @@ const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
               onChange={handleInputChange}
             />
           </ModalBody>
-
           <ModalFooter>
             <Button
               mr={3}

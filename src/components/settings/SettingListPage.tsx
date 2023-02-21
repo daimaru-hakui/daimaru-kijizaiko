@@ -32,7 +32,6 @@ const SettingListPage: NextPage<Props> = ({
   array,
   pathName,
 }) => {
-
   // 削除
   const deleteFunc = async (id: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -56,7 +55,9 @@ const SettingListPage: NextPage<Props> = ({
             {title}
           </Box>
           <Link href={`/settings/${pathName}/new`}>
-            <Button>新規登録</Button>
+            <Button size="sm" colorScheme="facebook">
+              新規登録
+            </Button>
           </Link>
         </Flex>
         <TableContainer mt={6}>
@@ -72,12 +73,13 @@ const SettingListPage: NextPage<Props> = ({
                 <Tr key={index}>
                   <Td w="100%">{a.name}</Td>
                   <Td w="20px">
-                    <Flex alignItems="center" justifyContent="center" gap={2}>
+                    <Flex alignItems="center" justifyContent="center" gap={3}>
                       <SettingEditModal
                         obj={a}
                         collectionName={collectionName}
                       />
                       <FaTrashAlt
+                        color="#444"
                         cursor="pointer"
                         onClick={() => deleteFunc(a.id)}
                       />

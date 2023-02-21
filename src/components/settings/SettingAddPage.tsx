@@ -7,11 +7,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import {
-  addDoc,
-  collection,
-  getDocs,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -22,7 +18,7 @@ import { UseInputSetting } from "../../hooks/UseInputSetting";
 type Props = {
   title: string;
   collectionName: string;
-  pathName: string
+  pathName: string;
 };
 
 type ArrayType = {
@@ -30,12 +26,15 @@ type ArrayType = {
   name: string;
 };
 
-const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) => {
+const SettingAddPage: NextPage<Props> = ({
+  title,
+  collectionName,
+  pathName,
+}) => {
   const [array, setArray] = useState([] as ArrayType[]);
   const { items, setItems, handleInputChange } = UseInputSetting();
-
   const [flag, setFlag] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const getArray = async () => {
@@ -59,9 +58,9 @@ const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) =>
       });
       setItems({ id: "", name: "" } as any);
     } catch (err) {
-      console.log(err)
+      console.log(err);
     } finally {
-      router.push(`/settings/${pathName}`)
+      router.push(`/settings/${pathName}`);
     }
   };
 
@@ -79,7 +78,6 @@ const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
-
   return (
     <>
       <Box w="100%" mt={12}>
@@ -96,7 +94,9 @@ const SettingAddPage: NextPage<Props> = ({ title, collectionName, pathName }) =>
               {title}の登録
             </Box>
             <Link href={`/settings/${pathName}/`}>
-              <Button>戻る</Button>
+              <Button size="sm" variant="outline">
+                戻る
+              </Button>
             </Link>
           </Flex>
           <Stack spacing={6} mt={6}>

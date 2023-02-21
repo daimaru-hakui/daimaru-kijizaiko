@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { CuttingReportType } from "../../types/CuttingReportType";
+import { useUtil } from "./UseUtil";
 
 export const useInputCuttingReport = () => {
-  const [items, setItems] = useState({} as CuttingReportType);
+  const { getTodayDate } = useUtil();
+  const [items, setItems] = useState({
+    id: "",
+    staff: "",
+    processNumber: "",
+    cuttingDate: getTodayDate(),
+    itemName: "",
+    itemType: "",
+    client: "",
+    totalQuantity: 0,
+    comment: "",
+    products: [{ category: "", productId: "", quantity: 0 }],
+  } as CuttingReportType);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setItems({ ...items, [name]: value });
@@ -28,4 +43,4 @@ export const useInputCuttingReport = () => {
     handleNumberChange,
     handleRadioChange,
   };
-}
+};

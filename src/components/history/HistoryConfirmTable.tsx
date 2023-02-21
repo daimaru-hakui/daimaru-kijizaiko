@@ -35,7 +35,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
-  const { getSerialNumber } = useGetDisp()
+  const { getSerialNumber } = useGetDisp();
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,
@@ -74,7 +74,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        const stock = await productDocSnap.data().externalStock || 0;
+        const stock = (await productDocSnap.data().externalStock) || 0;
         const newStock = stock - history.quantity + items.quantity;
         transaction.update(productDocRef, {
           externalStock: newStock,
@@ -107,7 +107,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         if (history.stockPlace === HOUSE_FACTORY) {
-          const stock = await productDocSnap.data().tokushimaStock || 0;
+          const stock = (await productDocSnap.data().tokushimaStock) || 0;
           const newStock = stock - history.quantity + items.quantity;
           transaction.update(productDocRef, {
             tokushimaStock: newStock,
@@ -180,30 +180,30 @@ const HistoryConfirmTable: NextPage<Props> = ({
                 {history.orderType === "purchase" && (
                   <Td>{history?.stockPlace}</Td>
                 )}
-                <Td w="100%" textAlign="center">
+                <Td w="100%">
                   {history.orderType === "dyeing" &&
                     elementComment(history, "historyFabricDyeingConfirms")}
                   {history.orderType === "purchase" &&
                     elementComment(history, "historyFabricPurchaseConfirms")}
                 </Td>
                 <Td>
-                  {history.accounting !== true && (
-                    <Flex gap={3}>
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => {
-                          if (history.orderType === "dyeing") {
-                            updateHistoryFabricDyeingConfirm(history);
-                          }
-                          if (history.orderType === "purchase") {
-                            updateHistoryFabricPurchaseConfirm(history);
-                          }
-                        }}
-                      />
-                    </Flex>
+                  {history.accounting !== true ? (
+                    <HistoryEditModal
+                      history={history}
+                      type="confirm"
+                      items={items}
+                      setItems={setItems}
+                      onClick={() => {
+                        if (history.orderType === "dyeing") {
+                          updateHistoryFabricDyeingConfirm(history);
+                        }
+                        if (history.orderType === "purchase") {
+                          updateHistoryFabricPurchaseConfirm(history);
+                        }
+                      }}
+                    />
+                  ) : (
+                    "金額確認済"
                   )}
                 </Td>
               </Tr>

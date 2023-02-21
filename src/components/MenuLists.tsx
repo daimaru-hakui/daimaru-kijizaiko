@@ -1,7 +1,7 @@
 import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
-import OrderDrawer from "./products/OrderDrawer";
+import OrderDrawer from "./products/_OrderDrawer";
 import { useRouter } from "next/router";
 import { useAuthManagement } from "../hooks/UseAuthManagement";
 
@@ -14,7 +14,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
-    { id: 2, title: <OrderDrawer />, link: "" },
+    { id: 2, title: "生地の発注", link: "/products/order/new" },
     { id: 3, title: "生地仕掛状況", link: "/products/history/fabric-dyeing" },
     { id: 4, title: "購入状況", link: "/products/history/fabric-purchase" },
     { id: 5, title: "マスター登録", link: "/products/new" },
