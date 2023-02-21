@@ -1,5 +1,4 @@
 export const useUtil = () => {
-
   const quantityValueBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";
   };
@@ -12,7 +11,7 @@ export const useUtil = () => {
     monthStr = monthStr.slice(-2);
     const day = date.getDate();
     return `${year}-${monthStr}-${day}`;
-  }
+  };
 
   // 半角から全角
   function halfToFullChar(str: string) {
@@ -21,5 +20,9 @@ export const useUtil = () => {
     });
   }
 
-  return { quantityValueBold, getTodayDate, halfToFullChar }
-}
+  const mathRound = (num: number) => {
+    return Math.round(num * 100) / 100;
+  };
+
+  return { quantityValueBold, getTodayDate, halfToFullChar, mathRound };
+};
