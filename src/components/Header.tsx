@@ -66,7 +66,7 @@ const Header = () => {
           <Container maxW="100%">
             <Flex alignItems="center" justifyContent="space-between">
               <MenuDrawerButton />
-              <Link href="/">
+              <Link href="/dashboard">
                 <Box fontSize="xl" fontWeight="700">
                   生地在庫WEB
                 </Box>

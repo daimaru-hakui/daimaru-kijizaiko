@@ -1,4 +1,11 @@
 import { atom } from "recoil";
+import { ProductType } from "../types/FabricType";
+import { GrayFabricType } from "../types/GrayFabricType";
+import { HistoryType } from "../types/HistoryType";
+import { StockPlaceType } from "../types/StockPlaceType";
+import { SupplierType } from "../types/SupplierType";
+import { UserType } from "../types/UserType";
+
 export const loadingState = atom<boolean>({
   key: "loadingState",
   default: false,
@@ -9,27 +16,42 @@ export const currentUserState = atom<any>({
   default: "",
 });
 
-export const usersState = atom<any>({
+export const usersState = atom<UserType[]>({
   key: "usersState",
   default: [],
 });
 
-export const productsState = atom<any>({
+export const productsState = atom<ProductType[]>({
   key: "productsState",
   default: [],
 });
 
-export const grayFabricsState = atom<any>({
+export const grayFabricsState = atom<GrayFabricType[]>({
   key: "grayFabricsState",
   default: [],
 });
 
-export const suppliersState = atom<any>({
+export const grayFabricOrdersState = atom<HistoryType[]>({
+  key: "grayFabricOrdersState",
+  default: []
+})
+
+export const fabricDyeingOrdersState = atom<HistoryType[]>({
+  key: "fabricDyeingOrdersState",
+  default: []
+})
+
+export const fabricPurchaseOrdersState = atom<HistoryType[]>({
+  key: "fabricPurchaseOrdersState",
+  default: []
+})
+
+export const suppliersState = atom<SupplierType[]>({
   key: "suppliersState",
   default: [],
 });
 
-export const stockPlacesState = atom<any>({
+export const stockPlacesState = atom<StockPlaceType[]>({
   key: "stockPlacesState",
   default: [],
 });

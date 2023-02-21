@@ -2,7 +2,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -10,13 +9,16 @@ import {
   where,
 } from "firebase/firestore";
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useEffect } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
   colorsState,
   currentUserState,
+  fabricDyeingOrdersState,
+  fabricPurchaseOrdersState,
+  grayFabricOrdersState,
   grayFabricsState,
   materialNamesState,
   productsState,
@@ -29,28 +31,36 @@ import {
   Container,
   Flex,
   Stat,
-  StatGroup,
-  StatHelpText,
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
 import { ProductType } from "../../types/FabricType";
+import { useRouter } from "next/router";
+import { SupplierType } from "../../types/SupplierType";
+import { HistoryType } from "../../types/HistoryType";
+import { GrayFabricType } from "../../types/GrayFabricType";
+import { UserType } from "../../types/UserType";
+import { StockPlaceType } from "../../types/StockPlaceType";
 
 export default function Home() {
   const [user] = useAuthState(auth);
-  const [users, setUsers] = useRecoilState(usersState);
+  const router = useRouter()
+  const currentUser = useRecoilValue(currentUserState);
+  const setUsers = useSetRecoilState(usersState);
   const [products, setProducts] = useRecoilState(productsState);
   const [grayFabrics, setGrayFabrics] = useRecoilState(grayFabricsState);
-  const [suppliers, setSuppliers] = useRecoilState(suppliersState);
-  const [stockPlaces, setStockPlaces] = useRecoilState(stockPlacesState);
-  const [materialNames, setMaterialNames] = useRecoilState(materialNamesState);
-  const [colors, setColors] = useRecoilState(colorsState);
-  const currentUser = useRecoilValue(currentUserState);
-  const [grayFabricOrders, setGrayFabricOrders] = useState<any>();
-  const [fabricDyeingOrders, setFabricDyeingOrders] = useState<any>();
-  const [fabricPurchaseOrders, setFabricPurchaseOrders] = useState<any>();
+  const setSuppliers = useSetRecoilState(suppliersState);
+  const setStockPlaces = useSetRecoilState(stockPlacesState);
+  const setMaterialNames = useSetRecoilState(materialNamesState);
+  const setColors = useSetRecoilState(colorsState);
+  const [grayFabricOrders, setGrayFabricOrders] = useRecoilState(grayFabricOrdersState)
+  const [fabricDyeingOrders, setFabricDyeingOrders] = useRecoilState(fabricDyeingOrdersState)
+  const [fabricPurchaseOrders, setFabricPurchaseOrders] = useRecoilState(fabricPurchaseOrdersState)
 
-  console.log("start");
+  useEffect(() => {
+    router.push("/dashboard");
+  }, [router]);
+
 
   // users情報;
   useEffect(() => {
@@ -61,23 +71,10 @@ export default function Home() {
         querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
-        }))
+        } as UserType))
       )
     );
   }, [setUsers]);
-  // // users情報;
-  // useEffect(() => {
-  //   const usersRef = collection(db, "users");
-  //   const q = query(usersRef, orderBy("rank", "asc"));
-  //   getDocs(q).then((querySnapshot) => {
-  //     setUsers(
-  //       querySnapshot.docs.map((doc) => ({
-  //         ...doc.data(),
-  //         id: doc.id,
-  //       }))
-  //     );
-  //   });
-  // }, [setUsers]);
 
   // 未登録であればauthorityに登録;
   useEffect(() => {
@@ -110,7 +107,7 @@ export default function Home() {
         onSnapshot(q, (querySnap) =>
           setProducts(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc.id }))
+              .map((doc) => ({ ...doc.data(), id: doc.id } as ProductType))
               .sort(compareFunc)
           )
         );
@@ -135,7 +132,7 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setGrayFabrics(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType))
           )
         );
       } catch (err) {
@@ -156,7 +153,7 @@ export default function Home() {
         onSnapshot(q, (querySnap) =>
           setGrayFabricOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id }))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );
@@ -178,7 +175,7 @@ export default function Home() {
         onSnapshot(q, (querySnap) =>
           setFabricDyeingOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id }))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );
@@ -200,7 +197,7 @@ export default function Home() {
         onSnapshot(q, (querySnap) =>
           setFabricPurchaseOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id }))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );
@@ -218,7 +215,7 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setSuppliers(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as SupplierType))
           )
         );
       } catch (err) {
@@ -235,7 +232,7 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setStockPlaces(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType))
           )
         );
       } catch (err) {
@@ -301,123 +298,6 @@ export default function Home() {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="800px" my={6}>
-        <Flex mt={6} gap={6} flexDirection={{ base: "column", sm: "row" }}>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>キバタ仕掛件数</StatLabel>
-            <StatNumber fontSize="4xl">
-              {grayFabricOrders?.length}
-              <Box as="span" fontSize="sm" ml={1}>
-                件
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>生地仕掛件数</StatLabel>
-            <StatNumber fontSize="4xl">
-              {fabricDyeingOrders?.length}
-              <Box as="span" fontSize="sm" ml={1}>
-                件
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>入荷予定件数</StatLabel>
-            <StatNumber fontSize="4xl">
-              {fabricPurchaseOrders?.length}
-              <Box as="span" fontSize="sm" ml={1}>
-                件
-              </Box>
-            </StatNumber>
-          </Stat>
-        </Flex>
-        <Flex mt={6} gap={6} flexDirection={{ base: "column", sm: "row" }}>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>仕掛数量</StatLabel>
-            <StatNumber fontSize="4xl">
-              {totalProductsQuantity("wip").toFixed(2)}
-              <Box as="span" fontSize="sm" ml={1}>
-                m
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>仕掛金額</StatLabel>
-            <StatNumber fontSize="4xl">
-              {Number(totalProductsPrice("wip").toFixed()).toLocaleString()}
-              <Box as="span" fontSize="sm" ml={1}>
-                円
-              </Box>
-            </StatNumber>
-          </Stat>
-        </Flex>
-        <Flex mt={6} gap={6} flexDirection={{ base: "column", sm: "row" }}>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>外部在庫数量</StatLabel>
-            <StatNumber fontSize="4xl">
-              {totalProductsQuantity("externalStock").toFixed(2)}
-              <Box as="span" fontSize="sm" ml={1}>
-                m
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>外部在庫金額</StatLabel>
-            <StatNumber fontSize="4xl">
-              {Number(
-                totalProductsPrice("externalStock").toFixed()
-              ).toLocaleString()}
-              <Box as="span" fontSize="sm" ml={1}>
-                円
-              </Box>
-            </StatNumber>
-          </Stat>
-        </Flex>
-        <Flex mt={6} gap={6} flexDirection={{ base: "column", sm: "row" }}>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>入荷待ち数量</StatLabel>
-            <StatNumber fontSize="4xl">
-              {totalProductsQuantity("arrivingQuantity").toFixed(2)}
-              <Box as="span" fontSize="sm" ml={1}>
-                m
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>入荷待ち金額</StatLabel>
-            <StatNumber fontSize="4xl">
-              {Number(
-                totalProductsPrice("arrivingQuantity").toFixed()
-              ).toLocaleString()}
-              <Box as="span" fontSize="sm" ml={1}>
-                円
-              </Box>
-            </StatNumber>
-          </Stat>
-        </Flex>
-        <Flex mt={6} gap={6} flexDirection={{ base: "column", sm: "row" }}>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>在庫数量</StatLabel>
-            <StatNumber fontSize="4xl">
-              {totalProductsQuantity("tokushimaStock").toFixed(2)}
-              <Box as="span" fontSize="sm" ml={1}>
-                m
-              </Box>
-            </StatNumber>
-          </Stat>
-          <Stat p={6} bg="white" rounded="md" boxShadow="md">
-            <StatLabel>在庫金額</StatLabel>
-            <StatNumber fontSize="4xl">
-              {Number(
-                totalProductsPrice("tokushimaStock").toFixed()
-              ).toLocaleString()}
-              <Box as="span" fontSize="sm" ml={1}>
-                円
-              </Box>
-            </StatNumber>
-          </Stat>
-        </Flex>
-      </Container>
     </Box>
   );
 }

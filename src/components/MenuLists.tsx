@@ -81,7 +81,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     <Box overflow="auto" h="100%" py={6} pr={6}>
       <List my={2} spacing={1}>
         <ListItem fontSize="sm">
-          <Link href="/">トップページ</Link>
+          <Link href="/dashboard" onClick={() => onClose()}>トップページ</Link>
         </ListItem>
       </List>
       <Divider />
