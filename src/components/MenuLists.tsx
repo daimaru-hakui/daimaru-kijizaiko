@@ -1,7 +1,6 @@
 import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
-import OrderDrawer from "./products/_OrderDrawer";
 import { useRouter } from "next/router";
 import { useAuthManagement } from "../hooks/UseAuthManagement";
 
