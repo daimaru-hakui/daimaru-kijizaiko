@@ -127,9 +127,8 @@ export const useGetDisp = () => {
   // 徳島在庫数を取得
   const getTokushimaStock = (productId: string) => {
     const stock = products
-      .filter((product: any) => product.id === productId)
-      .map((product: any) => product.tokushimaStock);
-    return stock || 0;
+      .find((product: ProductType) => product.id === productId)
+    return stock?.tokushimaStock || 0;
   };
 
   return {

@@ -25,6 +25,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
+import { StockPlaceType } from "../../../types/StockPlaceType";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
@@ -165,7 +166,7 @@ const HistoryConfirmModal: NextPage<Props> = ({
                           onChange={(e) => handleInputChange(e)}
                         >
                           {stockPlaces?.map(
-                            (m: { id: number; name: string }) => (
+                            (m: StockPlaceType) => (
                               <option key={m.id} value={m.name}>
                                 {m.name}
                               </option>

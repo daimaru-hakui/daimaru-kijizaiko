@@ -19,6 +19,7 @@ import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
+import { StockPlaceType } from "../../../types/StockPlaceType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
@@ -124,7 +125,7 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
                 defaultValue="徳島工場"
                 onChange={handleInputChange}
               >
-                {stockPlaces?.map((m: { id: number; name: string }) => (
+                {stockPlaces?.map((m: StockPlaceType) => (
                   <option key={m.id} value={m.name}>
                     {m.name}
                   </option>
