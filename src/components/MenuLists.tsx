@@ -10,7 +10,7 @@ type Props = {
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
   const router = useRouter();
-  const { isAdminAuth, isAuth } = useAuthManagement();
+  const { isAdminAuth, isAuth, isAuths } = useAuthManagement();
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
