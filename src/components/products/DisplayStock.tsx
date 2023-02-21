@@ -3,13 +3,15 @@ import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  product: ProductType
+  product: ProductType;
 };
 
 const DisplayStock: NextPage<Props> = ({ product }) => {
   const grayFabrics = useRecoilValue(grayFabricsState);
+  const { mathRound2nd } = useUtil();
 
   const getGrayFabric = (grayFabricId: string, type: string) => {
     const result = grayFabrics.find(
@@ -28,7 +30,9 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
               <Text fontSize="sm">キバタ仕掛</Text>
               <Box>
                 <Box as="span" fontSize="2xl">
-                  {getGrayFabric(product.grayFabricId, "wip") || 0}
+                  {mathRound2nd(
+                    getGrayFabric(product.grayFabricId, "wip") || 0
+                  )}
                 </Box>
                 m
               </Box>
@@ -37,7 +41,9 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
               <Text fontSize="sm">キバタ在庫</Text>
               <Box>
                 <Box as="span" fontSize="2xl">
-                  {getGrayFabric(product.grayFabricId, "stock") || 0}
+                  {mathRound2nd(
+                    getGrayFabric(product.grayFabricId, "stock") || 0
+                  )}
                 </Box>
                 m
               </Box>
@@ -49,7 +55,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">生地仕掛</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.wip || 0}
+                {mathRound2nd(product?.wip) || 0}
               </Box>
               m
             </Box>
@@ -78,7 +84,7 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
             <Text fontSize="sm">徳島在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.tokushimaStock || 0}
+                {mathRound2nd(product?.tokushimaStock || 0)}
               </Box>
               m
             </Box>

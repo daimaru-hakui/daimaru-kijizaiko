@@ -30,7 +30,7 @@ const Products = () => {
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
-  const { mathRound } = useUtil();
+  const { mathRound2nd } = useUtil();
   const { isVisible, deleteProduct } = useProductFunc(null, null);
   const { isAdminAuth } = useAuthManagement();
   const { quantityValueBold, halfToFullChar } = useUtil();
@@ -154,13 +154,13 @@ const Products = () => {
                         isNumeric
                         fontWeight={quantityValueBold(product?.wip)}
                       >
-                        {mathRound(product?.wip || 0)}m
+                        {mathRound2nd(product?.wip || 0)}m
                       </Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.externalStock)}
                       >
-                        {mathRound(product?.externalStock || 0)}m
+                        {mathRound2nd(product?.externalStock || 0)}m
                       </Td>
                       <Td
                         isNumeric
@@ -168,13 +168,13 @@ const Products = () => {
                           product?.arrivingQuantity
                         )}
                       >
-                        {mathRound(product?.arrivingQuantity || 0)}m
+                        {mathRound2nd(product?.arrivingQuantity || 0)}m
                       </Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.tokushimaStock)}
                       >
-                        {mathRound(product?.tokushimaStock || 0)}m
+                        {mathRound2nd(product?.tokushimaStock || 0)}m
                       </Td>
                       <Td>{product.materialName}</Td>
                       <Td>
