@@ -27,7 +27,7 @@ type Props = {
 
 const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleInputChange } = UseInputSetting()
+  const { items, setItems, handleInputChange } = UseInputSetting();
 
   useEffect(() => {
     setItems(supplier);
@@ -59,7 +59,7 @@ const EditModal: NextPage<Props> = ({ supplier }) => {
 
   return (
     <>
-      <FaEdit cursor="pointer" size="20px" onClick={onOpen} />
+      <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
       <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

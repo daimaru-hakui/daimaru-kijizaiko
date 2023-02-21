@@ -97,6 +97,7 @@ const GrayFabrics = () => {
                     <Flex alignItems="center" gap={3}>
                       <GrayFabricEditModal grayFabric={fabric} />
                       <FaTrashAlt
+                        color="#444"
                         cursor="pointer"
                         onClick={() => deleteGrayFabric(fabric.id)}
                       />

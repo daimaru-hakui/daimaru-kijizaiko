@@ -37,7 +37,7 @@ const StockPlaces = () => {
   };
 
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container maxW="1200px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6}>
           <Flex justifyContent="space-between">
@@ -45,7 +45,9 @@ const StockPlaces = () => {
               送り先一覧
             </Box>
             <Link href="/settings/stock-places/new">
-              <Button>新規登録</Button>
+              <Button size="sm" colorScheme="facebook">
+                新規登録
+              </Button>
             </Link>
           </Flex>
           <Table mt={6} variant="simple" size="sm">
@@ -80,10 +82,11 @@ const StockPlaces = () => {
                     </Flex>
                   </Td>
                   <Td>
-                    <Flex alignItems="center" justifyContent="center" gap={2}>
+                    <Flex alignItems="center" justifyContent="center" gap={3}>
                       <EditModal stockPlace={stockPlace} />
                       {stockPlace?.id !== "ifk1EZX80Jecxy04fqxu" && (
                         <FaTrashAlt
+                          color="#444"
                           cursor="pointer"
                           onClick={() => deleteStockPlace(stockPlace.id)}
                         />

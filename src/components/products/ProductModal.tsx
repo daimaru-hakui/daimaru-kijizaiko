@@ -52,19 +52,26 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
 
   return (
     <>
-      <Button size="xs" variant="outline" colorScheme='facebook' onClick={onOpen}>
+      <Button
+        size="xs"
+        variant="outline"
+        colorScheme="facebook"
+        onClick={onOpen}
+      >
         詳細
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>生地詳細</ModalHeader>
+          <ModalHeader>
+            <Flex gap={3} alignItems="center">
+              生地詳細
+              <ProductEditModal product={product} />
+            </Flex>
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Container maxW="800px" p={6} bg="white" rounded="md">
-              <Flex justifyContent="flex-end">
-                <ProductEditModal product={product} />
-              </Flex>
               <Stack spacing={6} mt={6}>
                 <Box p={2} bg="#f4f4f4" textAlign="center">
                   {product?.productType === 1 ? "既製品" : "別注品"}
@@ -214,7 +221,7 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
           </ModalBody>
           <ModalFooter>
             <Button variant="outline" onClick={onClose}>
-              Close
+              閉じる
             </Button>
           </ModalFooter>
         </ModalContent>

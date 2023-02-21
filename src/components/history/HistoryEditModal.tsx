@@ -67,7 +67,7 @@ export const HistoryEditModal: NextPage<Props> = ({
 
   return (
     <>
-      <FaEdit cursor="pointer" onClick={onOpen} />
+      <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
 
       <Modal
         isOpen={isOpen}

@@ -27,7 +27,7 @@ const StockPlaceNew = () => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
-  const { items, setItems, handleInputChange } = UseInputSetting()
+  const { items, setItems, handleInputChange } = UseInputSetting();
   const [flag, setFlag] = useState(false);
 
   // 登録しているかのチェック
@@ -49,7 +49,9 @@ const StockPlaceNew = () => {
       const docsRef = collection(db, "stockPlaces");
       const querySnap = await getDocs(docsRef);
       setStockPlaces(
-        querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType))
+        querySnap.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType)
+        )
       );
     };
     getStockPlaces();
@@ -80,7 +82,7 @@ const StockPlaceNew = () => {
   };
 
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container
         maxW="800px"
         my={6}
@@ -94,7 +96,9 @@ const StockPlaceNew = () => {
             仕入先登録
           </Box>
           <Link href="/settings/stock-places/">
-            <Button>戻る</Button>
+            <Button size="sm" variant="outline">
+              戻る
+            </Button>
           </Link>
         </Flex>
         <Stack spacing={6} mt={6}>

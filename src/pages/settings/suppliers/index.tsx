@@ -38,7 +38,7 @@ const Suppliers = () => {
   };
 
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6}>
           <Flex justifyContent="space-between">
@@ -46,7 +46,9 @@ const Suppliers = () => {
               仕入先一覧
             </Box>
             <Link href="/settings/suppliers/new">
-              <Button>新規登録</Button>
+              <Button size="sm" colorScheme="facebook">
+                新規登録
+              </Button>
             </Link>
           </Flex>
           <Table mt={6} variant="simple" size="sm">
@@ -59,34 +61,33 @@ const Suppliers = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {suppliers?.map(
-                (supplier: SupplierType) => (
-                  <Tr key={supplier.id}>
-                    <Td>{supplier.name}</Td>
-                    <Td>{supplier.kana}</Td>
-                    <Td>
-                      <Flex gap={3}>
-                        <CommentModal
-                          id={supplier.id}
-                          comment={supplier.comment}
-                          collectionName="suppliers"
-                        />
-                        {supplier?.comment.slice(0, 10) +
-                          (supplier.comment.length >= 1 ? "..." : "")}
-                      </Flex>
-                    </Td>
-                    <Td>
-                      <Flex alignItems="center" justifyContent="center" gap={2}>
-                        <EditModal supplier={supplier} />
-                        <FaTrashAlt
-                          cursor="pointer"
-                          onClick={() => deleteSupplier(supplier.id)}
-                        />
-                      </Flex>
-                    </Td>
-                  </Tr>
-                )
-              )}
+              {suppliers?.map((supplier: SupplierType) => (
+                <Tr key={supplier.id}>
+                  <Td>{supplier.name}</Td>
+                  <Td>{supplier.kana}</Td>
+                  <Td>
+                    <Flex gap={3}>
+                      <CommentModal
+                        id={supplier.id}
+                        comment={supplier.comment}
+                        collectionName="suppliers"
+                      />
+                      {supplier?.comment.slice(0, 10) +
+                        (supplier.comment.length >= 1 ? "..." : "")}
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Flex alignItems="center" justifyContent="center" gap={3}>
+                      <EditModal supplier={supplier} />
+                      <FaTrashAlt
+                        color="#444"
+                        cursor="pointer"
+                        onClick={() => deleteSupplier(supplier.id)}
+                      />
+                    </Flex>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>

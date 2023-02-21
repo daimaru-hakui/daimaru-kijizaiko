@@ -476,7 +476,11 @@ const HistoryOrderTable: NextPage<Props> = ({
         onClick={() => onClickUpdate(history)}
       />
       {isAdminAuth() && (
-        <FaTrashAlt cursor="pointer" onClick={() => onClickDelete(history)} />
+        <FaTrashAlt
+          color="#444"
+          cursor="pointer"
+          onClick={() => onClickDelete(history)}
+        />
       )}
     </Flex>
   );

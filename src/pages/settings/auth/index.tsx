@@ -34,10 +34,10 @@ const Auth = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-          ({
-            ...doc.data(),
-            id: doc.id,
-          } as UserType)
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
         )
       );
     });
@@ -72,7 +72,7 @@ const Auth = () => {
   );
 
   return (
-    <Box w="100%" mt={12}>
+    <Box w="100%" mt={12} px={6}>
       <Container maxW="900px" my={6} rounded="md" bg="white" boxShadow="md">
         <TableContainer p={6} maxW="100%">
           <Box as="h2" fontSize="2xl">

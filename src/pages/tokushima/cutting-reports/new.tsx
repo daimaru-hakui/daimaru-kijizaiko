@@ -1,17 +1,19 @@
+import { Box, Container } from "@chakra-ui/react";
 import { useState } from "react";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportInputArea from "../../../components/tokushima/CuttingReportInputArea";
 import { useUtil } from "../../../hooks/UseUtil";
 
 const CuttingReportNew = () => {
-  const { getTodayDate } = useUtil()
+  const { getTodayDate } = useUtil();
 
   const [report, setReport] = useState({
-    itemType: "",
-    cuttingDate: getTodayDate(),
-    processNumber: "",
+    id: "",
     staff: "",
+    processNumber: "",
+    cuttingDate: getTodayDate(),
     itemName: "",
+    itemType: "",
     client: "",
     totalQuantity: 0,
     comment: "",
@@ -19,12 +21,23 @@ const CuttingReportNew = () => {
   } as CuttingReportType);
 
   return (
-    <CuttingReportInputArea
-      title="裁断報告書作成"
-      pageType="new"
-      report={report}
-      onClose={() => { }}
-    />
+    <Box w="100%" mt={12} px={6} rounded="md" boxShadow="md">
+      <Container
+        maxW="900px"
+        my={6}
+        p={6}
+        bg="white"
+        rounded="md"
+        boxShadow="md"
+      >
+        <CuttingReportInputArea
+          title="裁断報告書作成"
+          pageType="new"
+          report={report}
+          onClose={() => {}}
+        />
+      </Container>
+    </Box>
   );
 };
 

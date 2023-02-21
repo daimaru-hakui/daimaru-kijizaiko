@@ -2,10 +2,42 @@ import { useState } from "react";
 import { ProductType } from "../../types/FabricType";
 
 export const useInputProduct = () => {
-  const [items, setItems] = useState({} as ProductType);
+  const [items, setItems] = useState({
+    id: "",
+    productType: 0,
+    staff: "",
+    supplierId: "",
+    supplierName: "",
+    grayFabricId: "",
+    productNumber: "",
+    productNum: "",
+    productName: "",
+    colorNum: "",
+    colorName: "",
+    price: 0,
+    materialName: "",
+    materials: "",
+    fabricWidth: 0,
+    fabricWeight: 0,
+    fabricLength: 0,
+    features: [],
+    noteProduct: "",
+    noteFabric: "",
+    noteEtc: "",
+    wip: 0,
+    externalStock: 0,
+    arrivingQuantity: 0,
+    tokushimaStock: 0,
+    createUser: "",
+    updateUser: "",
+    createdAt: undefined,
+    updatedAt: undefined,
+  } as ProductType);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setItems({ ...items, [name]: value });
@@ -39,5 +71,12 @@ export const useInputProduct = () => {
     }
   };
 
-  return { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, handleCheckedChange };
+  return {
+    items,
+    setItems,
+    handleInputChange,
+    handleNumberChange,
+    handleRadioChange,
+    handleCheckedChange,
+  };
 };

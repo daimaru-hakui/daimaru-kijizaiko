@@ -91,153 +91,144 @@ const CuttingReportInputArea: NextPage<Props> = ({
   }, [items]);
 
   return (
-    <Box w="100%" mt={12}>
-      <Container
-        maxW="900px"
-        my={6}
-        p={6}
-        bg="white"
-        rounded="md"
-        boxShadow="md"
-      >
-        <Box as="h1" fontSize="2xl">
-          {title}
-        </Box>
-        <Stack spacing={6} mt={6}>
-          <RadioGroup
-            defaultValue="1"
-            value={String(items.itemType)}
-            onChange={(e) => handleRadioChange(e, "itemType")}
-          >
-            <Stack direction="row">
-              <Radio value="1">既製品</Radio>
-              <Radio value="2">別注品</Radio>
-            </Stack>
-          </RadioGroup>
-          <Flex gap={3} flexDirection={{ base: "column", md: "row" }}>
-            <Box w="full">
-              <Text fontWeight="bold">裁断日</Text>
-              <Input
-                mt={1}
-                type="date"
-                name="cuttingDate"
-                value={items.cuttingDate}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="full">
-              <Text fontWeight="bold">加工指示書NO.</Text>
-              <Input
-                mt={1}
-                type="text"
-                name="processNumber"
-                value={items.processNumber}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="full">
-              <Text fontWeight="bold">担当者</Text>
-              <Select
-                mt={1}
-                placeholder="担当者名を選択"
-                value={items.staff}
-                name="staff"
-                onChange={handleInputChange}
-              >
-                {users?.map((user: { id: string; name: string }) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </Select>
-            </Box>
-          </Flex>
-          <Box>
-            <Text fontWeight="bold">受託先名</Text>
-            <Input
-              mt={1}
-              type="text"
-              name="client"
-              value={items.client}
-              onChange={handleInputChange}
-            />
-          </Box>
-          <Box>
-            <Text fontWeight="bold">製品名</Text>
-            <Input
-              mt={1}
-              type="text"
-              name="itemName"
-              value={items.itemName}
-              onChange={handleInputChange}
-            />
-          </Box>
-          <Box>
-            <Text fontWeight="bold">明細</Text>
-            <Textarea
-              mt={1}
-              name="comment"
-              value={items.comment}
-              onChange={handleInputChange}
-            />
-          </Box>
-          <Flex gap={3}>
-            <Box>
-              <Text fontWeight="bold">総枚数</Text>
-              <NumberInput
-                mt={1}
-                name="totalQuantity"
-                defaultValue={0}
-                min={0}
-                max={10000}
-                value={items.totalQuantity}
-                onChange={(e) => handleNumberChange(e, "totalQuantity")}
-              >
-                <NumberInputField textAlign="right" />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </Box>
-          </Flex>
-
-          {items?.products?.map((product, index) => (
-            <FabricsUsedInput
-              key={index}
-              items={items}
-              setItems={setItems}
-              product={product as CuttingProductType}
-              rowIndex={index}
-              reportId={report.id}
-            />
-          ))}
-          <Flex justifyContent="center">
-            <Button leftIcon={<FaPlus />} p={2} mx="auto" onClick={addInput}>
-              追加
-            </Button>
-          </Flex>
-        </Stack>
-        <Button
-          w="full"
-          my={12}
-          colorScheme="facebook"
-          disabled={isValidate}
-          onClick={() => {
-            if (pageType === "new") {
-              addCuttingReport();
-            }
-            if (pageType === "edit") {
-              updateCuttingReport(report.id);
-              onClose();
-            }
-          }}
+    <>
+      <Box as="h1" fontSize="2xl">
+        {title}
+      </Box>
+      <Stack spacing={6} mt={6}>
+        <RadioGroup
+          defaultValue="1"
+          value={String(items.itemType)}
+          onChange={(e) => handleRadioChange(e, "itemType")}
         >
-          {pageType === "new" && "登録する"}
-          {pageType === "edit" && "更新する"}
-        </Button>
-      </Container>
-    </Box>
+          <Stack direction="row">
+            <Radio value="1">既製品</Radio>
+            <Radio value="2">別注品</Radio>
+          </Stack>
+        </RadioGroup>
+        <Flex gap={3} flexDirection={{ base: "column", md: "row" }}>
+          <Box w="full">
+            <Text fontWeight="bold">裁断日</Text>
+            <Input
+              mt={1}
+              type="date"
+              name="cuttingDate"
+              value={items.cuttingDate}
+              onChange={handleInputChange}
+            />
+          </Box>
+          <Box w="full">
+            <Text fontWeight="bold">加工指示書NO.</Text>
+            <Input
+              mt={1}
+              type="text"
+              name="processNumber"
+              value={items.processNumber}
+              onChange={handleInputChange}
+            />
+          </Box>
+          <Box w="full">
+            <Text fontWeight="bold">担当者</Text>
+            <Select
+              mt={1}
+              placeholder="担当者名を選択"
+              value={items.staff}
+              name="staff"
+              onChange={handleInputChange}
+            >
+              {users?.map((user: { id: string; name: string }) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </Flex>
+        <Box>
+          <Text fontWeight="bold">受託先名</Text>
+          <Input
+            mt={1}
+            type="text"
+            name="client"
+            value={items.client}
+            onChange={handleInputChange}
+          />
+        </Box>
+        <Box>
+          <Text fontWeight="bold">製品名</Text>
+          <Input
+            mt={1}
+            type="text"
+            name="itemName"
+            value={items.itemName}
+            onChange={handleInputChange}
+          />
+        </Box>
+        <Box>
+          <Text fontWeight="bold">明細</Text>
+          <Textarea
+            mt={1}
+            name="comment"
+            value={items.comment}
+            onChange={handleInputChange}
+          />
+        </Box>
+        <Flex gap={3}>
+          <Box>
+            <Text fontWeight="bold">総枚数</Text>
+            <NumberInput
+              mt={1}
+              name="totalQuantity"
+              defaultValue={0}
+              min={0}
+              max={10000}
+              value={items.totalQuantity}
+              onChange={(e) => handleNumberChange(e, "totalQuantity")}
+            >
+              <NumberInputField textAlign="right" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        </Flex>
+
+        {items?.products?.map((product, index) => (
+          <FabricsUsedInput
+            key={index}
+            items={items}
+            setItems={setItems}
+            product={product as CuttingProductType}
+            rowIndex={index}
+            reportId={report.id}
+          />
+        ))}
+        <Flex justifyContent="center">
+          <Button leftIcon={<FaPlus />} p={2} mx="auto" onClick={addInput}>
+            追加
+          </Button>
+        </Flex>
+      </Stack>
+      <Button
+        w="full"
+        my={12}
+        colorScheme="facebook"
+        disabled={isValidate}
+        onClick={() => {
+          if (pageType === "new") {
+            addCuttingReport();
+          }
+          if (pageType === "edit") {
+            updateCuttingReport(report.id);
+            onClose();
+          }
+        }}
+      >
+        {pageType === "new" && "登録する"}
+        {pageType === "edit" && "更新する"}
+      </Button>
+    </>
   );
 };
 

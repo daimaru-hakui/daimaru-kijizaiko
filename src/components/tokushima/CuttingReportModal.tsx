@@ -11,12 +11,10 @@ import {
   ModalOverlay,
   Stack,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
   Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
@@ -25,9 +23,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { productsState, usersState } from "../../../store";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
@@ -86,15 +82,21 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>
-              <Flex gap={6}>
-                <Box>
-                  <Text fontWeight="bold">裁断報告書</Text>
-                  <Box>No.{getSerialNumber(report.serialNumber)}</Box>
-                </Box>
-                <Box>
-                  <Text fontWeight="bold">裁断日</Text>
-                  <Box>{report.cuttingDate}</Box>
-                </Box>
+              <Flex
+                gap={6}
+                flexDirection={{ base: "column", md: "row" }}
+                justifyContent={{ base: "flex-start", md: "space-between" }}
+              >
+                <Flex gap={6} flex="1">
+                  <Box>
+                    <Text fontWeight="bold">裁断報告書</Text>
+                    <Box>No.{getSerialNumber(report.serialNumber)}</Box>
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold">裁断日</Text>
+                    <Box>{report.cuttingDate}</Box>
+                  </Box>
+                </Flex>
                 <Box>
                   <Text fontWeight="bold">担当者</Text>
                   <Box>{getUserName(report.staff)}</Box>
@@ -106,7 +108,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                 gap={6}
               >
                 <Stack spacing={6} w="full">
-                  <Flex gap={6}>
+                  <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
                     <Box>
                       <Text fontWeight="bold">加工指示書</Text>
                       <Box>No.{report.processNumber}</Box>
@@ -116,7 +118,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                       <Box>{report.client}</Box>
                     </Box>
                   </Flex>
-                  <Flex gap={6}>
+                  <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
                     <Box>
                       <Text fontWeight="bold">種別</Text>
                       <Box>{report.itemType === "1" ? "既製" : "別注"}</Box>
@@ -125,6 +127,8 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                       <Text fontWeight="bold">品名</Text>
                       <Box>{report.itemName}</Box>
                     </Box>
+                  </Flex>
+                  <Flex gap={6}>
                     <Box>
                       <Text fontWeight="bold">枚数</Text>
                       <Box textAlign="right">{report.totalQuantity}</Box>

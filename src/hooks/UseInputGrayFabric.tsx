@@ -1,11 +1,22 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { GrayFabricType } from "../../types/GrayFabricType";
 
 export const useInputGrayFabric = () => {
-    const [items, setItems] = useState({} as GrayFabricType);
+  const [items, setItems] = useState({
+    id: "",
+    supplierId: "",
+    productNumber: "",
+    productName: "",
+    price: 0,
+    comment: "",
+    wip: 0,
+    stock: 0,
+  } as GrayFabricType);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setItems({ ...items, [name]: value });
@@ -22,7 +33,7 @@ export const useInputGrayFabric = () => {
   };
 
   const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     if (e.target.checked) {
       setItems({
         ...items,
@@ -38,5 +49,12 @@ export const useInputGrayFabric = () => {
     }
   };
 
-  return { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, handleCheckedChange };
-}
+  return {
+    items,
+    setItems,
+    handleInputChange,
+    handleNumberChange,
+    handleRadioChange,
+    handleCheckedChange,
+  };
+};
