@@ -28,22 +28,24 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { productsState, usersState } from "../../../store";
-// import { CuttingProductType } from "../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
-// import { ProductType } from "../../../types/ProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import CuttingReportEditModal from "./CuttingReportEditModal";
 
 type Props = {
-  // report: CuttingReportType;
   reportId: string;
 };
 
 const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const products = useRecoilValue(productsState);
-  const users = useRecoilValue(usersState);
   const [report, setReport] = useState({} as CuttingReportType);
-  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisp()
+  const {
+    getSerialNumber,
+    getUserName,
+    getProductNumber,
+    getProductName,
+    getColorName,
+  } = useGetDisp();
 
   useEffect(() => {
     const getCuttingReport = async () => {
@@ -75,7 +77,12 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>裁断報告書</ModalHeader>
+          <ModalHeader>
+            <Flex alignItems="center" gap={3}>
+              裁断報告書 <CuttingReportEditModal reportId={reportId} />
+            </Flex>
+          </ModalHeader>
+
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>

@@ -38,21 +38,30 @@ const CuttingReportInputArea: NextPage<Props> = ({
   title,
   pageType,
   report,
-  onClose
+  onClose,
 }) => {
   const users = useRecoilValue(usersState);
   const [isValidate, setIsValidate] = useState(true);
-  const { items, setItems, handleInputChange, handleNumberChange, handleRadioChange } = useInputCuttingReport()
-  const { addInput, addCuttingReport, updateCuttingReport } = useCuttingReportFunc(items, setItems)
+  const {
+    items,
+    setItems,
+    handleInputChange,
+    handleNumberChange,
+    handleRadioChange,
+  } = useInputCuttingReport();
+  const { addInput, addCuttingReport, updateCuttingReport } =
+    useCuttingReportFunc(items, setItems);
 
   useEffect(() => {
-    setItems({ ...report })
+    setItems({ ...report });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [report])
+  }, [report]);
 
   useEffect(() => {
     const productNumberValidate = () => {
-      const array = items?.products?.map((product: CuttingProductType) => product.productId);
+      const array = items?.products?.map(
+        (product: CuttingProductType) => product.productId
+      );
       const setArray = new Set(array);
       if (array?.length === Array.from(setArray).length) {
         return false;
@@ -61,22 +70,36 @@ const CuttingReportInputArea: NextPage<Props> = ({
       }
     };
     const itemType = items.itemType === "" ? true : false;
-    const totalQuantity = items.totalQuantity === 0 ? true : false
-    const category = items?.products?.some((product) => (product?.category === ""))
-    const productId = items?.products?.some((product) => (product?.productId === ""))
-    const quantity = items?.products?.some((product) => (product?.quantity === 0))
+    const totalQuantity = items.totalQuantity === 0 ? true : false;
+    const category = items?.products?.some(
+      (product) => product?.category === ""
+    );
+    const productId = items?.products?.some(
+      (product) => product?.productId === ""
+    );
+    const quantity = items?.products?.some(
+      (product) => product?.quantity === 0
+    );
     setIsValidate(
       productNumberValidate() ||
-      itemType ||
-      totalQuantity ||
-      category ||
-      productId ||
-      quantity);
+        itemType ||
+        totalQuantity ||
+        category ||
+        productId ||
+        quantity
+    );
   }, [items]);
 
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="900px" my={6} p={6} bg="white" rounded="md">
+      <Container
+        maxW="900px"
+        my={6}
+        p={6}
+        bg="white"
+        rounded="md"
+        boxShadow="md"
+      >
         <Box as="h1" fontSize="2xl">
           {title}
         </Box>
@@ -204,17 +227,15 @@ const CuttingReportInputArea: NextPage<Props> = ({
             if (pageType === "new") {
               addCuttingReport();
             }
-            if (pageType === 'edit') {
+            if (pageType === "edit") {
               updateCuttingReport(report.id);
               onClose();
             }
           }}
         >
-          {pageType === 'new' && '登録する'}
-          {pageType === 'edit' && '更新する'}
+          {pageType === "new" && "登録する"}
+          {pageType === "edit" && "更新する"}
         </Button>
-
-
       </Container>
     </Box>
   );

@@ -44,14 +44,14 @@ type Props = {
   title: string;
   pageType: string;
   product: ProductType;
-  onClose: Function
+  onClose: Function;
 };
 
 const ProductInputArea: NextPage<Props> = ({
   title,
   pageType,
   product,
-  onClose
+  onClose,
 }) => {
   const productId = product.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
@@ -59,25 +59,29 @@ const ProductInputArea: NextPage<Props> = ({
   const suppliers = useRecoilValue(suppliersState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
-  const [products, setProducts] = useState([] as ProductType[])
-  const { items,
+  const [products, setProducts] = useState([] as ProductType[]);
+  const {
+    items,
     setItems,
     handleInputChange,
     handleNumberChange,
     handleRadioChange,
-    handleCheckedChange
+    handleCheckedChange,
   } = useInputProduct();
-  const { addProduct, updateProduct, onReset } = useProductFunc(items, setItems);
+  const { addProduct, updateProduct, onReset } = useProductFunc(
+    items,
+    setItems
+  );
   const { getMixed } = useGetDisp();
 
   useEffect(() => {
-    setItems({ ...product } as ProductType)
+    setItems({ ...product } as ProductType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product])
+  }, [product]);
 
   useEffect(() => {
     const getProducts = async () => {
-      const docsRef = collection(db, 'products');
+      const docsRef = collection(db, "products");
       const querysnap = await getDocs(docsRef);
       setProducts(
         querysnap.docs.map(
@@ -113,7 +117,14 @@ const ProductInputArea: NextPage<Props> = ({
 
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
+      <Container
+        maxW="800px"
+        my={6}
+        p={6}
+        bg="white"
+        rounded="md"
+        boxShadow="md"
+      >
         <Box as="h1" fontSize="2xl">
           {title}
         </Box>
@@ -498,18 +509,23 @@ const ProductInputArea: NextPage<Props> = ({
           )}
           {pageType === "edit" && (
             <Flex gap={3}>
-              <Button w="100%"
+              <Button
+                w="100%"
                 onClick={() => {
                   onReset(product);
-                  onClose()
-                }}>
+                  onClose();
+                }}
+              >
                 キャンセル
               </Button>
-              <Button w="100%" colorScheme="facebook"
+              <Button
+                w="100%"
+                colorScheme="facebook"
                 onClick={() => {
                   updateProduct(productId);
                   onClose();
-                }}>
+                }}
+              >
                 更新
               </Button>
             </Flex>

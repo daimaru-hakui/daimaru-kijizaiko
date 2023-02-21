@@ -5,7 +5,14 @@ import GrayFabricInputArea from "../../components/grayFabrics/GrayFabricInputAre
 const GrayFabricsNew = () => {
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="800px" my={6} p={6} bg="white" rounded="md">
+      <Container
+        maxW="800px"
+        my={6}
+        p={6}
+        bg="white"
+        rounded="md"
+        boxShadow="md"
+      >
         <Box as="h1" fontSize="2xl">
           キバタ登録
         </Box>
@@ -13,7 +20,7 @@ const GrayFabricsNew = () => {
           title="登録"
           grayFabric={{} as GrayFabricType}
           toggleSwitch="new"
-          onClose={()=>{}}
+          onClose={() => {}}
         />
       </Container>
     </Box>

@@ -28,59 +28,62 @@ import ProductSearchArea from "../../components/products/ProductSearchArea";
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
-  const [filterProducts, setFilterProducts] = useState([] as ProductType[])
+  const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
-  const { deleteProduct } = useProductFunc(null, null);
+  const { isVisible, deleteProduct } = useProductFunc(null, null);
   const { isAdminAuth } = useAuthManagement();
   const { quantityValueBold, halfToFullChar } = useUtil();
-  const [isVisible, setIsVisible] = useState(false);
-  const [search, setSearch] = useState({ productNumber: "", colorName: "", productName: "", materialName: "" } as ProductType)
+  const [search, setSearch] = useState({
+    productNumber: "",
+    colorName: "",
+    productName: "",
+    materialName: "",
+  } as ProductType);
 
   useEffect(() => {
     setFilterProducts(
-      products.filter((product: ProductType) =>
-        product.productNumber.includes(
-          halfToFullChar(search.productNumber.toUpperCase())
+      products
+        .filter((product: ProductType) =>
+          product.productNumber.includes(
+            halfToFullChar(search.productNumber.toUpperCase())
+          )
         )
-      ).filter((product: ProductType) => (
-        product.colorName.includes(search.colorName)
-      )).filter((product: ProductType) => (
-        product.productName.includes(search.productName)
-      )).filter((product: ProductType) => (
-        product.materialName.includes(search.materialName)
-      ))
+        .filter((product: ProductType) =>
+          product.colorName.includes(search.colorName)
+        )
+        .filter((product: ProductType) =>
+          product.productName.includes(search.productName)
+        )
+        .filter((product: ProductType) =>
+          product.materialName.includes(search.materialName)
+        )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, products]);
 
-  const toggleVisibility = () => {
-    window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);
-  };
-
-  const throttle = (fn: Function, interval: number) => {
-    let lastTime = Date.now() - interval
-    return function () {
-      if ((lastTime + interval) < Date.now()) {
-        lastTime = Date.now()
-        fn()
-      }
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener("scroll", throttle(toggleVisibility, 100));
-    return () => window.removeEventListener("scroll", toggleVisibility);
-  }, []);
-
   const elementFilterButton = () => (
     <Flex gap={3}>
       {products.length !== filterProducts.length && (
-        <Button size="sm" colorScheme="facebook" variant='outline' bg="white"
-          onClick={() => setSearch({ productNumber: "", colorName: "", productName: "", materialName: "" } as ProductType)}>解除</Button>
+        <Button
+          size="sm"
+          colorScheme="facebook"
+          variant="outline"
+          bg="white"
+          onClick={() =>
+            setSearch({
+              productNumber: "",
+              colorName: "",
+              productName: "",
+              materialName: "",
+            } as ProductType)
+          }
+        >
+          解除
+        </Button>
       )}
       <ProductSearchArea search={search} setSearch={setSearch} />
     </Flex>
-  )
+  );
 
   return (
     <>
@@ -203,8 +206,12 @@ const Products = () => {
                     </Tr>
                   ))}
                 </Tbody>
-                <TableCaption placement="top" textAlign="left" fontSize="sm">全{products.length}件中 {filterProducts.length}件表示</TableCaption>
-                <TableCaption textAlign="left" fontSize="sm">全{products.length}件中 {filterProducts.length}件表示</TableCaption>
+                <TableCaption placement="top" textAlign="left" fontSize="sm">
+                  全{products.length}件中 {filterProducts.length}件表示
+                </TableCaption>
+                <TableCaption textAlign="left" fontSize="sm">
+                  全{products.length}件中 {filterProducts.length}件表示
+                </TableCaption>
               </Table>
             </TableContainer>
           </Box>
