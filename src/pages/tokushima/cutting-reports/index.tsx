@@ -1,6 +1,5 @@
 import {
   Box,
-  Flex,
   Table,
   TableContainer,
   Tbody,
@@ -14,11 +13,10 @@ import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
-import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const CuttingReport = () => {
-  const { getSerialNumber, getUserName } = useGetDisp()
+  const { getSerialNumber, getUserName } = useGetDisp();
   const [cuttingReports, setCuttingReports] = useState(
     [] as CuttingReportType[]
   );
@@ -46,7 +44,7 @@ const CuttingReport = () => {
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} bg="white" boxShadow="md">
+      <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
         <TableContainer p={6} w="100%">
           <Box as="h2" fontSize="2xl">
             裁断報告書
@@ -62,7 +60,6 @@ const CuttingReport = () => {
                 <Th>受注先名</Th>
                 <Th>数量</Th>
                 <Th>担当者名</Th>
-                <Th w="full">編集</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -78,11 +75,6 @@ const CuttingReport = () => {
                   <Td>{report.client}</Td>
                   <Td isNumeric>{report.totalQuantity}</Td>
                   <Td>{getUserName(report.staff)}</Td>
-                  <Td>
-                    <Flex alignItems="center" gap={3}>
-                      <CuttingReportEditModal reportId={report.id} />
-                    </Flex>
-                  </Td>
                 </Tr>
               ))}
             </Tbody>

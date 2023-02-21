@@ -22,9 +22,11 @@ import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as GrayFabricType[]);
-  const { getSupplierName } = useGetDisp()
-  const {deleteGrayFabric} = useGrayFabricFunc(null ,null)
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
+    [] as GrayFabricType[]
+  );
+  const { getSupplierName } = useGetDisp();
+  const { deleteGrayFabric } = useGrayFabricFunc(null, null);
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {

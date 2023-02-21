@@ -11,15 +11,13 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
-import {
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import CuttingReportInputArea from "./CuttingReportInputArea";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
   reportId: string;
@@ -28,6 +26,7 @@ type Props = {
 const CuttingReportEditModal: NextPage<Props> = ({ reportId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [report, setReport] = useState({} as CuttingReportType);
+  const { isAuths } = useAuthManagement();
 
   useEffect(() => {
     const getCuttingReport = async () => {
@@ -40,8 +39,12 @@ const CuttingReportEditModal: NextPage<Props> = ({ reportId }) => {
 
   return (
     <>
-      <FaEdit onClick={onOpen} cursor="pointer" />
-
+      {/* <FaEdit onClick={onOpen} cursor="pointer" /> */}
+      {isAuths(["tokushima", "rd"]) && (
+        <Button size="xs" variant="outline" onClick={onOpen}>
+          編集
+        </Button>
+      )}
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>

@@ -9,8 +9,8 @@ type Props = {
   onClose: Function;
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
-  const router = useRouter()
-  const { isAdminAuth, isAuth } = useAuthManagement()
+  const router = useRouter();
+  const { isAdminAuth, isAuth } = useAuthManagement();
 
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
@@ -30,9 +30,13 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       title: "入荷予定一覧",
       link: "/tokushima/history/fabric-purchase",
     },
-    { id: 2, title: "裁断報告書一覧", link: "/tokushima/cutting-reports" },
-    { id: 3, title: "裁断報告書作成", link: "/tokushima/cutting-reports/new" },
-    { id: 4, title: "裁断生地履歴", link: "/tokushima/cutting-reports/history" },
+    {
+      id: 2,
+      title: "裁断生地履歴",
+      link: "/tokushima/cutting-reports/history",
+    },
+    { id: 3, title: "裁断報告書一覧", link: "/tokushima/cutting-reports" },
+    { id: 4, title: "裁断報告書作成", link: "/tokushima/cutting-reports/new" },
   ];
   const menu4 = [
     { id: 1, title: "仕入先", link: "/settings/suppliers" },
@@ -44,7 +48,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
   const menu7 = [
     { id: 1, title: "権限", link: "/settings/auth" },
-    { id: 2, title: "伝票NO.管理", link: "/serialnumbers" }
+    { id: 2, title: "伝票NO.管理", link: "/serialnumbers" },
   ];
 
   const elementMenuList = (
@@ -57,9 +61,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </Box>
       <List my={3} pl={3} spacing={1} fontSize="sm">
         {array.map((m, i: number) => (
-          <ListItem key={i} p={1} pl={2} rounded="base" bg={m?.link == router.pathname ? "blue.50" : "none"}
+          <ListItem
+            key={i}
+            p={1}
+            pl={2}
+            rounded="base"
+            bg={m?.link == router.pathname ? "blue.50" : "none"}
           >
-            <Link href={m.link} onClick={() => onClose()} >
+            <Link href={m.link} onClick={() => onClose()}>
               {m.title}
             </Link>
           </ListItem>
@@ -81,10 +90,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       {elementMenuList("生地", menu1)}
       {isAuth("rd") && elementMenuList("キバタ", menu2)}
       {isAuth("rd") && elementMenuList("調整", menu6)}
-      {isAuth("tokushima") &&
-        elementMenuList("徳島工場", menu3)}
-      {isAuth("accounting") &&
-        elementMenuList("経理部", menu5)}
+      {isAuth("tokushima") && elementMenuList("徳島工場", menu3)}
+      {isAuth("accounting") && elementMenuList("経理部", menu5)}
       {isAuth("rd") && elementMenuList("設定", menu4)}
       {isAdminAuth() && elementMenuList("管理者", menu7)}
     </Box>

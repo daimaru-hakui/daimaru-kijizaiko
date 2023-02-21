@@ -1,16 +1,28 @@
-import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { useGetDisp } from "./UseGetDisp";
 
-export const useProductFunc = (items: ProductType | null, setItems: Function | null) => {
+export const useProductFunc = (
+  items: ProductType | null,
+  setItems: Function | null
+) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
   const { getSupplierName } = useGetDisp();
+  const [isVisible, setIsVisible] = useState(false);
 
   const obj = {
     productType: items?.productType || 1,
@@ -61,7 +73,7 @@ export const useProductFunc = (items: ProductType | null, setItems: Function | n
       setLoading(false);
       router.push("/products");
     }
-  }
+  };
 
   const updateProduct = async (productId: string) => {
     const result = window.confirm("更新して宜しいでしょうか");
@@ -93,7 +105,7 @@ export const useProductFunc = (items: ProductType | null, setItems: Function | n
         arrivingQuantity: Number(items.arrivingQuantity),
         tokushimaStock: Number(items.tokushimaStock),
         updatedAt: serverTimestamp(),
-        updateUser: currentUser
+        updateUser: currentUser,
       });
     } catch (err) {
       console.log(err);
@@ -130,5 +142,31 @@ export const useProductFunc = (items: ProductType | null, setItems: Function | n
     setItems({ ...product });
   };
 
-  return { addProduct, updateProduct, updateAjustmentProduct, deleteProduct, onReset }
-}
+  const toggleVisibility = () => {
+    window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);
+  };
+
+  const throttle = (fn: Function, interval: number) => {
+    let lastTime = Date.now() - interval;
+    return function () {
+      if (lastTime + interval < Date.now()) {
+        lastTime = Date.now();
+        fn();
+      }
+    };
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", throttle(toggleVisibility, 100));
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  return {
+    addProduct,
+    updateProduct,
+    updateAjustmentProduct,
+    deleteProduct,
+    onReset,
+    isVisible,
+  };
+};

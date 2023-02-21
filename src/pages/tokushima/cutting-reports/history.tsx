@@ -17,7 +17,13 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const HistoryCutting = () => {
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
-  const { getSerialNumber, getUserName, getProductNumber, getProductName, getColorName } = useGetDisp()
+  const {
+    getSerialNumber,
+    getUserName,
+    getProductNumber,
+    getProductName,
+    getColorName,
+  } = useGetDisp();
 
   useEffect(() => {
     const getCuttingReports = () => {
@@ -48,7 +54,7 @@ const HistoryCutting = () => {
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} bg="white" boxShadow="md">
+      <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
         <TableContainer p={6} w="100%">
           <Box as="h2" fontSize="2xl">
             裁断生地一覧

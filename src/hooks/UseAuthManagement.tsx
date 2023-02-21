@@ -15,11 +15,20 @@ export const useAuthManagement = () => {
   };
 
   const isAuth = (prop: string) => {
-    const user = users.find((user: { uid: string }) => user.uid === currentUser);
+    const user = users.find(
+      (user: { uid: string }) => user.uid === currentUser
+    );
     if (!user) return false;
     return user[prop] ? true : false;
   };
 
-  return { isAdminAuth, isAuth }
+  const isAuths = (props: string[]) => {
+    const user = users.find(
+      (user: { uid: string }) => user.uid === currentUser
+    );
+    if (!user) return false;
+    return props.some((prop: string) => (user[prop] ? true : false));
+  };
 
-}
+  return { isAdminAuth, isAuth, isAuths };
+};
