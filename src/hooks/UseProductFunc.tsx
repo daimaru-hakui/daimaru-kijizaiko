@@ -13,6 +13,7 @@ import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { useGetDisp } from "./UseGetDisp";
+import { useUtil } from "./UseUtil";
 
 export const useProductFunc = (
   items: ProductType | null,
@@ -23,6 +24,7 @@ export const useProductFunc = (
   const currentUser = useRecoilValue(currentUserState);
   const { getSupplierName } = useGetDisp();
   const [isVisible, setIsVisible] = useState(false);
+  const { mathRound2nd } = useUtil();
 
   const obj = {
     productType: items?.productType || 1,
@@ -100,10 +102,10 @@ export const useProductFunc = (
       const docRef = doc(db, "products", productId);
       await updateDoc(docRef, {
         price: Number(items.price),
-        wip: Number(items.wip),
-        externalStock: Number(items.externalStock),
-        arrivingQuantity: Number(items.arrivingQuantity),
-        tokushimaStock: Number(items.tokushimaStock),
+        wip: mathRound2nd(Number(items.wip)),
+        externalStock: mathRound2nd(Number(items.externalStock)),
+        arrivingQuantity: mathRound2nd(Number(items.arrivingQuantity)),
+        tokushimaStock: mathRound2nd(Number(items.tokushimaStock)),
         updatedAt: serverTimestamp(),
         updateUser: currentUser,
       });
