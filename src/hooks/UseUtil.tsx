@@ -20,9 +20,9 @@ export const useUtil = () => {
     });
   }
 
-  const mathRound = (num: number) => {
+  const mathRound2nd = (num: number) => {
     return Math.round(num * 100) / 100;
   };
 
-  return { quantityValueBold, getTodayDate, halfToFullChar, mathRound };
+  return { quantityValueBold, getTodayDate, halfToFullChar, mathRound2nd };
 };
