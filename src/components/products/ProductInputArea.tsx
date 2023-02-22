@@ -114,7 +114,7 @@ const ProductInputArea: NextPage<Props> = ({
     const result = base?.includes(item);
     return result;
   };
-  console.log(items.materials);
+
   return (
     <>
       <Box as="h1" fontSize="2xl">

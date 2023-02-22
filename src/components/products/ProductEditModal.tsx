@@ -28,11 +28,16 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
   return (
     <>
       {(isAuths(["rd"]) || currentUser === product.createUser) && (
-        <Button size="xs" variant="outline" onClick={onOpen}>
+        <Button
+          size="xs"
+          variant="outline"
+          colorScheme="facebook"
+          onClick={onOpen}
+        >
           編集
         </Button>
       )}
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>編集</ModalHeader>
@@ -47,7 +52,7 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           </ModalBody>
           <ModalFooter>
             <Button variant="outline" onClick={onClose}>
-              Close
+              閉じる
             </Button>
           </ModalFooter>
         </ModalContent>
