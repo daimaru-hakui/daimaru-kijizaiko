@@ -221,7 +221,9 @@ export const FabricsUsedInput: NextPage<Props> = ({
           </Box>
           <Box w="full">
             <Text fontWeight="bold">
-              品名 {product.productId && `(在庫 ${maxLimitQuantity}m)`}
+              品名{" "}
+              {product.productId &&
+                `(在庫 ${Number(getTokushimaStock(product.productId))}m)`}
             </Text>
             <Select
               mt={1}
