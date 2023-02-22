@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState, loadingState } from "../../store";
+import { currentUserState, loadingState, productsState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
@@ -22,9 +22,11 @@ export const useProductFunc = (
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
-  const { getSupplierName } = useGetDisp();
-  const [isVisible, setIsVisible] = useState(false);
+  const products = useRecoilValue(productsState);
+  const { getUserName, getSupplierName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
+  const [isVisible, setIsVisible] = useState(false);
+  const [csvData, setCsvData] = useState([]);
 
   const obj = {
     productType: items?.productType || 1,
@@ -140,6 +142,52 @@ export const useProductFunc = (
   //   }
   // };
 
+  //CSV作成
+  useEffect(() => {
+    const headers = [
+      "担当",
+      "品番",
+      "色番",
+      "色",
+      "品名",
+      "単価",
+      "生地仕掛",
+      "外部在庫",
+      "入荷待ち",
+      "徳島在庫",
+      "組織名",
+      "混率",
+      "規格",
+      "機能性",
+    ];
+    let body = [];
+    body.push(headers);
+    products.forEach((product: ProductType) => {
+      body.push([
+        getUserName(product.staff),
+        product.productNum,
+        product.colorNum,
+        product.colorName,
+        product.productName,
+        product.price,
+        product.wip,
+        product.externalStock,
+        product.arrivingQuantity,
+        product.tokushimaStock,
+        product.materialName,
+        getMixed(product.materials),
+        getFabricStd(
+          product.fabricWidth,
+          product.fabricLength,
+          product.fabricWeight
+        ),
+        product.features,
+      ]);
+    });
+    setCsvData(body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
+
   const onReset = (product: ProductType) => {
     setItems({ ...product });
   };
@@ -169,6 +217,7 @@ export const useProductFunc = (
     updateAjustmentProduct,
     deleteProduct,
     onReset,
+    csvData,
     isVisible,
   };
 };

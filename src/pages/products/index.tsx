@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState, productsState } from "../../../store";
 import { FaTrashAlt } from "react-icons/fa";
+import { CSVLink } from "react-csv";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
@@ -31,9 +32,10 @@ const Products = () => {
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
-  const { isVisible, deleteProduct } = useProductFunc(null, null);
+  const { csvData, isVisible, deleteProduct } = useProductFunc(null, null);
   const { isAdminAuth } = useAuthManagement();
-  const { quantityValueBold, halfToFullChar } = useUtil();
+  const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
+
   const [search, setSearch] = useState({
     productNumber: "",
     colorName: "",
@@ -99,12 +101,23 @@ const Products = () => {
               justifyContent="space-between"
             >
               <Box as="h2" fontSize="2xl">
-                生地品番一覧
+                生地一覧
               </Box>
-              <Box style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
+
+              <Flex gap={3} style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
+                <Button size="sm" shadow="md">
+                  <CSVLink
+                    data={csvData}
+                    filename={`生地一覧_${getTodayDate()}`}
+                  >
+                    CSV
+                  </CSVLink>
+                </Button>
                 {elementFilterButton()}
-              </Box>
-              <Box
+              </Flex>
+
+              <Flex
+                gap={3}
                 transition="0.2s"
                 style={isVisible ? { opacity: 1 } : { opacity: 0 }}
                 position="fixed"
@@ -112,8 +125,11 @@ const Products = () => {
                 bottom="20px"
                 right={12}
               >
+                <Button size="sm" shadow="md">
+                  <CSVLink data={csvData}>CSV</CSVLink>
+                </Button>
                 {elementFilterButton()}
-              </Box>
+              </Flex>
             </Flex>
             <TableContainer p={6} w="100%">
               <Table variant="simple" size="sm">
@@ -178,7 +194,13 @@ const Products = () => {
                       </Td>
                       <Td>{product.materialName}</Td>
                       <Td>
-                        <Flex gap={1}>{getMixed(product.materials)}</Flex>
+                        <Flex gap={1}>
+                          {getMixed(product.materials).map(
+                            (material, index) => (
+                              <Text key={index}>{material}</Text>
+                            )
+                          )}
+                        </Flex>
                       </Td>
                       <Td>
                         <Flex>
@@ -191,7 +213,7 @@ const Products = () => {
                       </Td>
                       <Td>
                         <Flex gap={2}>
-                          {product?.features.map((f, index) => (
+                          {product.features.map((f, index) => (
                             <Text key={index}>{f}</Text>
                           ))}
                         </Flex>
