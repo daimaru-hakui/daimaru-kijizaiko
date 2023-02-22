@@ -51,6 +51,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
   const { halfToFullChar } = useUtil();
   const { getTokushimaStock } = useGetDisp();
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
+  const [maxLimitQuantity, setMaxLimitQuantity] = useState(0);
 
   useEffect(() => {
     setFilterProducts(
@@ -60,6 +61,16 @@ export const FabricsUsedInput: NextPage<Props> = ({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText, products]);
+
+  useEffect(() => {
+    const getQuantity = () => {
+      setMaxLimitQuantity(
+        Number(getTokushimaStock(product.productId)) + Number(product?.quantity)
+      );
+    };
+    getQuantity();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.productId]);
 
   const handleInputsChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -210,9 +221,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
           </Box>
           <Box w="full">
             <Text fontWeight="bold">
-              品名{" "}
-              {product.productId &&
-                `(在庫 ${getTokushimaStock(product.productId)}m)`}
+              品名 {product.productId && `(在庫 ${maxLimitQuantity}m)`}
             </Text>
             <Select
               mt={1}
@@ -242,7 +251,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
               min={0}
               max={
                 reportId
-                  ? getTokushimaStock(product.productId) + product?.quantity
+                  ? maxLimitQuantity
                   : getTokushimaStock(product.productId)
               }
               value={product?.quantity}

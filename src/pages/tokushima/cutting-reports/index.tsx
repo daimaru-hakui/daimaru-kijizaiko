@@ -24,30 +24,6 @@ const CuttingReport = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const { csvData, cuttingReports } = useCuttingReportFunc(null, null);
-  // const [cuttingReports, setCuttingReports] = useState(
-  //   [] as CuttingReportType[]
-  // );
-
-  // useEffect(() => {
-  //   const getCuttingReports = () => {
-  //     const q = query(
-  //       collection(db, "cuttingReports"),
-  //       orderBy("serialNumber", "desc")
-  //     );
-  //     try {
-  //       onSnapshot(q, (querySnap) =>
-  //         setCuttingReports(
-  //           querySnap.docs.map(
-  //             (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-  //           )
-  //         )
-  //       );
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   getCuttingReports();
-  // }, []);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
