@@ -27,11 +27,12 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
 
 type Props = {
+  title: string;
   reportId: string;
   report: CuttingReportType;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ reportId, report }) => {
+const CuttingReportModal: NextPage<Props> = ({ title, reportId, report }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc } = useCuttingReportFunc(null, null);
   const {
@@ -51,7 +52,7 @@ const CuttingReportModal: NextPage<Props> = ({ reportId, report }) => {
         colorScheme="facebook"
         onClick={onOpen}
       >
-        詳細
+        {title}
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">

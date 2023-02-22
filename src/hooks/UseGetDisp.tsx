@@ -75,35 +75,35 @@ export const useGetDisp = () => {
     const result = products.find(
       (product: ProductType) => product.id === productId
     );
-    return `${result?.productNumber}`;
+    return result?.productNumber || productId;
   };
 
   const getProductName = (productId: string) => {
     const result = products.find(
       (product: ProductType) => product.id === productId
     );
-    return `${result?.productName}`;
+    return result?.productName || productId;
   };
 
   const getColorName = (productId: string) => {
     const result = products.find(
       (product: ProductType) => product.id === productId
     );
-    return `${result?.colorName}`;
+    return result?.colorName || productId;
   };
 
-  const getGrayFabricNumber = (id: string) => {
+  const getGrayFabricNumber = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => id === grayFabric.id
+      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
     );
-    return `${grayFabric?.productNumber}`;
+    return grayFabric?.productNumber || grayFabricId;
   };
 
-  const getGrayFabricName = (id: string) => {
+  const getGrayFabricName = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => id === grayFabric.id
+      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
     );
-    return `${grayFabric?.productName}`;
+    return grayFabric?.productName || grayFabricId;
   };
 
   // キバタ在庫を取得

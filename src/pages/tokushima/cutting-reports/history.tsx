@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
+import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 
 const HistoryCutting = () => {
@@ -63,6 +64,7 @@ const HistoryCutting = () => {
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
+                <Th>詳細</Th>
                 <Th>裁断日</Th>
                 <Th>生地品番</Th>
                 <Th>色番</Th>
@@ -78,6 +80,13 @@ const HistoryCutting = () => {
             <Tbody>
               {cuttingList.map((list: any, index: number) => (
                 <Tr key={index}>
+                  <Td>
+                    <CuttingReportModal
+                      title="詳細"
+                      reportId={list.id}
+                      report={list}
+                    />
+                  </Td>
                   <Td>{list.cuttingDate}</Td>
                   <Td>{getProductNumber(list.productId)}</Td>
                   <Td>{getColorName(list.productId)}</Td>
