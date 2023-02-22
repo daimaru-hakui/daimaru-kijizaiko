@@ -20,6 +20,7 @@ import {
 import { NextPage } from "next";
 import { ProductType } from "../../../types/FabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
 import ProductEditModal from "./ProductEditModal";
 
 type Props = {
@@ -48,13 +49,14 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
       >
         詳細
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
             <Flex gap={3} alignItems="center">
               生地詳細
               <ProductEditModal product={product} />
+              <ProductCuttingHistoryModal productId={productId} />
             </Flex>
           </ModalHeader>
           <ModalCloseButton />
@@ -114,18 +116,22 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
                     </Box>
                   </Box>
                 )}
-
-                <Box flex={1} w="100%">
-                  <Text fontWeight="bold">備考（使用製品品番）</Text>
-                  <Textarea
-                    mt={1}
-                    name="noteProduct"
-                    defaultValue={product?.noteProduct}
-                  />
-                </Box>
-
-                <Divider />
-
+                {product?.noteProduct && (
+                  <>
+                    <Box flex={1} w="100%">
+                      <Text fontWeight="bold">備考（使用製品品番）</Text>
+                      <Box
+                        mt={1}
+                        p={3}
+                        rounded="md"
+                        border="1px"
+                        borderColor="gray.100"
+                      >
+                        {product?.noteProduct}
+                      </Box>
+                    </Box>
+                  </>
+                )}
                 <Flex
                   gap={6}
                   w="100%"
@@ -189,25 +195,36 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
                 <Box w="100%">
                   <Text fontWeight="bold">画像</Text>
                 </Box>
-                <Box flex={1} w="100%">
+                {product?.noteFabric && (
+                  <>
+                    <Box flex={1} w="100%">
+                      <Text fontWeight="bold">備考（生地の性質など）</Text>
+                      <Box
+                        mt={1}
+                        p={3}
+                        rounded="md"
+                        border="1px"
+                        borderColor="gray.100"
+                      >
+                        {product?.noteFabric}
+                      </Box>
+                    </Box>
+                  </>
+                )}
+                {product?.noteEtc && (
                   <Box flex={1} w="100%">
-                    <Text fontWeight="bold">備考（生地の性質など）</Text>
-                    <Textarea
+                    <Text fontWeight="bold">備考（その他）</Text>
+                    <Box
                       mt={1}
-                      name="noteProduct"
-                      defaultValue={product?.noteFabric}
-                    />
+                      p={3}
+                      rounded="md"
+                      border="1px"
+                      borderColor="gray.100"
+                    >
+                      {product?.noteEtc}
+                    </Box>
                   </Box>
-                </Box>
-                <Divider />
-                <Box flex={1} w="100%">
-                  <Text fontWeight="bold">備考（その他）</Text>
-                  <Textarea
-                    mt={1}
-                    name="noteProduct"
-                    defaultValue={product?.noteEtc}
-                  />
-                </Box>
+                )}
               </Stack>
             </Container>
           </ModalBody>

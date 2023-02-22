@@ -94,8 +94,7 @@ const Products = () => {
         <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
           <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
             <Flex
-              pt={6}
-              px={6}
+              p={6}
               gap={3}
               alignItems="center"
               justifyContent="space-between"
