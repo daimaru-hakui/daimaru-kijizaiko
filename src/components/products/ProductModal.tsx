@@ -17,21 +17,18 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { db } from "../../../firebase";
 import { ProductType } from "../../../types/FabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import ProductEditModal from "./ProductEditModal";
 
 type Props = {
   productId: string;
+  product: ProductType;
 };
 
-const ProductModal: NextPage<Props> = ({ productId }) => {
+const ProductModal: NextPage<Props> = ({ productId, product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [product, setProduct] = useState({} as ProductType);
   const {
     getUserName,
     getSupplierName,
@@ -40,15 +37,6 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
     getGrayFabricName,
     getGrayFabricNumber,
   } = useGetDisp();
-
-  useEffect(() => {
-    const getProduct = async () => {
-      const docsRef = doc(db, "products", productId);
-      const docSnap = await getDoc(docsRef);
-      setProduct({ ...docSnap.data(), id: docSnap.id } as ProductType);
-    };
-    getProduct();
-  }, [productId]);
 
   return (
     <>

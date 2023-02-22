@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  Flex,
   Table,
   TableContainer,
   Tbody,
@@ -10,45 +12,55 @@ import {
 } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 import { db } from "../../../../firebase";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
+import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
+import { useUtil } from "../../../hooks/UseUtil";
 
 const CuttingReport = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
-  const [cuttingReports, setCuttingReports] = useState(
-    [] as CuttingReportType[]
-  );
+  const { getTodayDate } = useUtil();
+  const { csvData, cuttingReports } = useCuttingReportFunc(null, null);
+  // const [cuttingReports, setCuttingReports] = useState(
+  //   [] as CuttingReportType[]
+  // );
 
-  useEffect(() => {
-    const getCuttingReports = () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("serialNumber", "desc")
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setCuttingReports(
-            querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-            )
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-  }, []);
+  // useEffect(() => {
+  //   const getCuttingReports = () => {
+  //     const q = query(
+  //       collection(db, "cuttingReports"),
+  //       orderBy("serialNumber", "desc")
+  //     );
+  //     try {
+  //       onSnapshot(q, (querySnap) =>
+  //         setCuttingReports(
+  //           querySnap.docs.map(
+  //             (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+  //           )
+  //         )
+  //       );
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   getCuttingReports();
+  // }, []);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
         <TableContainer p={6} w="100%">
-          <Box as="h2" fontSize="2xl">
-            裁断報告書
-          </Box>
+          <Flex alignItems="center" justifyContent="space-between">
+            <Box as="h2" fontSize="2xl">
+              裁断報告書
+            </Box>
+            <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
+              <Button size="sm">CSV</Button>
+            </CSVLink>
+          </Flex>
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
@@ -66,7 +78,7 @@ const CuttingReport = () => {
               {cuttingReports.map((report: CuttingReportType) => (
                 <Tr key={report.serialNumber}>
                   <Td>
-                    <CuttingReportModal reportId={report.id} />
+                    <CuttingReportModal reportId={report.id} report={report} />
                   </Td>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>
                   <Td>{report.cuttingDate}</Td>

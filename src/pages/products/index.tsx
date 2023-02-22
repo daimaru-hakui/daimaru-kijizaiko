@@ -157,7 +157,10 @@ const Products = () => {
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>
-                          <ProductModal productId={product.id} />
+                          <ProductModal
+                            productId={product.id}
+                            product={product}
+                          />
                           <OrderAreaModal product={product} buttonSize="xs" />
                         </Flex>
                       </Td>

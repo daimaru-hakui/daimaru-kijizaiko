@@ -1,14 +1,19 @@
 import {
   collection,
   doc,
+  onSnapshot,
+  orderBy,
+  query,
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { CuttingReportType } from "../../types/CuttingReportType";
+import { useGetDisp } from "./UseGetDisp";
 
 export const useCuttingReportFunc = (
   items: CuttingReportType | null,
@@ -17,7 +22,34 @@ export const useCuttingReportFunc = (
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
+  const [cuttingReports, setCuttingReports] = useState(
+    [] as CuttingReportType[]
+  );
+  const { getUserName, getProductNumber } = useGetDisp();
+  const [csvData, setCsvData] = useState([]);
 
+  useEffect(() => {
+    const getCuttingReports = () => {
+      const q = query(
+        collection(db, "cuttingReports"),
+        orderBy("serialNumber", "desc")
+      );
+      try {
+        onSnapshot(q, (querySnap) =>
+          setCuttingReports(
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+            )
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getCuttingReports();
+  }, []);
+
+  // 商品登録項目を追加
   const addInput = () => {
     setItems({
       ...items,
@@ -128,5 +160,59 @@ export const useCuttingReportFunc = (
     }
   };
 
-  return { addInput, calcScale, addCuttingReport, updateCuttingReport };
+  const scaleCalc = (meter: number, totalQuantity: number) => {
+    if (meter === 0 || totalQuantity === 0) return 0;
+    const value = meter / totalQuantity;
+    return value ? value.toFixed(2) : 0;
+  };
+
+  //CSV作成
+  useEffect(() => {
+    const headers = [
+      "伝票ナンバー",
+      "裁断日",
+      "担当者名",
+      "加工指示書No.",
+      "種別",
+      "品名",
+      "受注先名",
+      "数量",
+      "カテゴリー",
+      "生地品番",
+      "数量",
+      "用尺",
+    ];
+    let body = [];
+    body.push(headers);
+    cuttingReports.forEach((report: CuttingReportType) => {
+      report.products.forEach((product) => {
+        body.push([
+          report.serialNumber,
+          report.cuttingDate,
+          getUserName(report.staff),
+          String(report.processNumber && "No." + report.processNumber),
+          Number(report.itemType) === 1 ? "既製品" : "別注品",
+          report.itemName,
+          report.client,
+          report.totalQuantity,
+          product.category,
+          getProductNumber(product.productId),
+          product.quantity,
+          scaleCalc(product.quantity, report.totalQuantity),
+        ]);
+      });
+    });
+    setCsvData(body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cuttingReports]);
+
+  return {
+    cuttingReports,
+    addInput,
+    calcScale,
+    addCuttingReport,
+    updateCuttingReport,
+    scaleCalc,
+    csvData,
+  };
 };
