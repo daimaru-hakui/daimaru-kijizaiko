@@ -54,7 +54,11 @@ const CuttingReport = () => {
               {cuttingReports.map((report: CuttingReportType) => (
                 <Tr key={report.serialNumber}>
                   <Td>
-                    <CuttingReportModal reportId={report.id} report={report} />
+                    <CuttingReportModal
+                      title={"詳細"}
+                      reportId={report.id}
+                      report={report}
+                    />
                   </Td>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>
                   <Td>{report.cuttingDate}</Td>

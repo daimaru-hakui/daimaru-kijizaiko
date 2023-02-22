@@ -31,7 +31,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     },
     {
       id: 2,
-      title: "裁断生地履歴",
+      title: "裁断生地一覧",
       link: "/tokushima/cutting-reports/history",
     },
     { id: 3, title: "裁断報告書一覧", link: "/tokushima/cutting-reports" },
@@ -81,7 +81,9 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     <Box overflow="auto" h="100%" py={6} pr={6}>
       <List my={2} spacing={1}>
         <ListItem fontSize="sm">
-          <Link href="/dashboard" onClick={() => onClose()}>トップページ</Link>
+          <Link href="/dashboard" onClick={() => onClose()}>
+            トップページ
+          </Link>
         </ListItem>
       </List>
       <Divider />

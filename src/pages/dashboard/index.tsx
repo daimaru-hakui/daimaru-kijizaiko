@@ -90,7 +90,7 @@ const Dashboard = () => {
                 fontSize="4xl"
               />
               <StatCard
-                title="TOTAL在庫"
+                title="TOTAL金額"
                 quantity={Number(
                   getTotalProductsPrice([
                     "wip",
