@@ -20,21 +20,20 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { db } from "../../../firebase";
 import { CuttingReportType } from "../../../types/CuttingReportType";
+import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
 
 type Props = {
   reportId: string;
+  report: CuttingReportType;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
+const CuttingReportModal: NextPage<Props> = ({ reportId, report }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [report, setReport] = useState({} as CuttingReportType);
+  const { scaleCalc } = useCuttingReportFunc(null, null);
   const {
     getSerialNumber,
     getUserName,
@@ -42,21 +41,6 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
     getProductName,
     getColorName,
   } = useGetDisp();
-
-  useEffect(() => {
-    const getCuttingReport = async () => {
-      const docRef = doc(db, "cuttingReports", reportId);
-      const docSnap = await getDoc(docRef);
-      setReport({ ...docSnap.data() } as CuttingReportType);
-    };
-    getCuttingReport();
-  }, [isOpen, reportId]);
-
-  const scaleCalc = (meter: number, totalQuantity: number) => {
-    if (meter === 0 || totalQuantity === 0) return 0;
-    const value = meter / totalQuantity;
-    return value ? value.toFixed(2) : 0;
-  };
 
   return (
     <>
@@ -87,7 +71,11 @@ const CuttingReportModal: NextPage<Props> = ({ reportId }) => {
                 flexDirection={{ base: "column", md: "row" }}
                 justifyContent={{ base: "flex-start", md: "space-between" }}
               >
-                <Flex gap={6} flex="1">
+                <Flex
+                  gap={6}
+                  flex="1"
+                  flexDirection={{ base: "column", md: "row" }}
+                >
                   <Box>
                     <Text fontWeight="bold">裁断報告書</Text>
                     <Box>No.{getSerialNumber(report.serialNumber)}</Box>
