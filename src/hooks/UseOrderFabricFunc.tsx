@@ -1,4 +1,10 @@
-import { collection, doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useRouter } from "next/router";
 import { useRecoilValue } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState } from "../../store";
@@ -7,8 +13,13 @@ import { HistoryType } from "../../types/HistoryType";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 
-export const useOrderFabricFunc = (items: HistoryType, product: ProductType, orderType: string) => {
+export const useOrderFabricFunc = (
+  items: HistoryType,
+  product: ProductType,
+  orderType: string
+) => {
   const currentUser = useRecoilValue(currentUserState);
+  const router = useRouter();
   const { getSupplierName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const grayFabricId = product?.grayFabricId || "";
@@ -59,18 +70,19 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product does not exist!";
 
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber =
+          (await orderNumberDocSnap.data().serialNumber) + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
-        const stockGrayFabric = await grayFabricDocSnap.data().stock || 0;
+        const stockGrayFabric = (await grayFabricDocSnap.data().stock) || 0;
         const newStockGrayFabric = stockGrayFabric - Number(items?.quantity);
         transaction.update(grayFabricDocRef, {
           stock: newStockGrayFabric,
         });
 
-        const wipProduct = await productDocSnap.data().wip || 0;
+        const wipProduct = (await productDocSnap.data().wip) || 0;
         const newWipProduct = wipProduct + Number(items?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
@@ -85,6 +97,7 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
     } catch (err) {
       console.log(err);
     } finally {
+      router.push("/products/history/fabric-dyeing");
     }
   };
 
@@ -109,12 +122,13 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber =
+          (await orderNumberDocSnap.data().serialNumber) + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
-        const wipProduct = await productDocSnap.data().wip || 0;
+        const wipProduct = (await productDocSnap.data().wip) || 0;
         const newWipProduct = wipProduct + Number(items?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
@@ -129,6 +143,7 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
     } catch (err) {
       console.log(err);
     } finally {
+      router.push("/products/history/fabric-dyeing");
     }
   };
 
@@ -151,20 +166,23 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product document does not exist!";
 
-        const newSerialNumber = await orderNumberDocSnap.data().serialNumber + 1;
+        const newSerialNumber =
+          (await orderNumberDocSnap.data().serialNumber) + 1;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
 
         if (stockType === "stock") {
-          const externalStock = await productDocSnap.data().externalStock || 0;
+          const externalStock =
+            (await productDocSnap.data().externalStock) || 0;
           const newEternalStock = externalStock - Number(items?.quantity);
           transaction.update(productDocRef, {
             externalStock: newEternalStock,
           });
         }
 
-        const arrivingQuantity = await productDocSnap.data().arrivingQuantity || 0;
+        const arrivingQuantity =
+          (await productDocSnap.data().arrivingQuantity) || 0;
         const newArrivingQuantity = arrivingQuantity + Number(items?.quantity);
         transaction.update(productDocRef, {
           arrivingQuantity: newArrivingQuantity,
@@ -180,8 +198,14 @@ export const useOrderFabricFunc = (items: HistoryType, product: ProductType, ord
       });
     } catch (err) {
       console.log(err);
+    } finally {
+      router.push("/products/history/fabric-purchase");
     }
   };
 
-  return { orderFabricDyeingFromStock, orderFabricDyeingFromRanning, orderFabricPurchase }
-}
+  return {
+    orderFabricDyeingFromStock,
+    orderFabricDyeingFromRanning,
+    orderFabricPurchase,
+  };
+};
