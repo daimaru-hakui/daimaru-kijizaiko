@@ -44,7 +44,7 @@ import { StockPlaceType } from "../../types/StockPlaceType";
 
 export default function Home() {
   const [user] = useAuthState(auth);
-  const router = useRouter()
+  const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setUsers = useSetRecoilState(usersState);
   const [products, setProducts] = useRecoilState(productsState);
@@ -53,14 +53,19 @@ export default function Home() {
   const setStockPlaces = useSetRecoilState(stockPlacesState);
   const setMaterialNames = useSetRecoilState(materialNamesState);
   const setColors = useSetRecoilState(colorsState);
-  const [grayFabricOrders, setGrayFabricOrders] = useRecoilState(grayFabricOrdersState)
-  const [fabricDyeingOrders, setFabricDyeingOrders] = useRecoilState(fabricDyeingOrdersState)
-  const [fabricPurchaseOrders, setFabricPurchaseOrders] = useRecoilState(fabricPurchaseOrdersState)
+  const [grayFabricOrders, setGrayFabricOrders] = useRecoilState(
+    grayFabricOrdersState
+  );
+  const [fabricDyeingOrders, setFabricDyeingOrders] = useRecoilState(
+    fabricDyeingOrdersState
+  );
+  const [fabricPurchaseOrders, setFabricPurchaseOrders] = useRecoilState(
+    fabricPurchaseOrdersState
+  );
 
   useEffect(() => {
     router.push("/dashboard");
   }, [router]);
-
 
   // users情報;
   useEffect(() => {
@@ -68,10 +73,13 @@ export default function Home() {
     const q = query(usersRef, orderBy("rank", "asc"));
     onSnapshot(q, (querySnapshot) =>
       setUsers(
-        querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        } as UserType))
+        querySnapshot.docs.map(
+          (doc) =>
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
+        )
       )
     );
   }, [setUsers]);
@@ -132,7 +140,9 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setGrayFabrics(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType)
+            )
           )
         );
       } catch (err) {
@@ -215,7 +225,9 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setSuppliers(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as SupplierType))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as SupplierType)
+            )
           )
         );
       } catch (err) {
@@ -232,7 +244,9 @@ export default function Home() {
       try {
         onSnapshot(q, (querySnap) =>
           setStockPlaces(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType)
+            )
           )
         );
       } catch (err) {
@@ -275,21 +289,6 @@ export default function Home() {
     };
     getMaterialNames();
   }, [setMaterialNames]);
-
-  const totalProductsQuantity = (prop: string) => {
-    let total = 0;
-    products.forEach((product: ProductType) => {
-      total += product[prop];
-    });
-    return total;
-  };
-  const totalProductsPrice = (prop: string) => {
-    let total = 0;
-    products.forEach((product: ProductType) => {
-      total += product.price * product[prop];
-    });
-    return total;
-  };
 
   return (
     <Box w="100%" mt={12}>

@@ -31,10 +31,21 @@ export const useGetDisp = () => {
     const z = materials.z ? `指定外繊維${materials.z}% ` : "";
     const f = materials.f ? `複合繊維${materials.f}% ` : "";
     array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
+    return array.filter((item) => item);
+  };
 
-    return array
-      .filter((item) => item)
-      .map((item) => <Text key={item}>{item}</Text>);
+  // 規格の表示
+  const getFabricStd = (
+    fabricWidth: number,
+    fabricLength: number,
+    fabricWeight: number | null
+  ) => {
+    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
+    const length = fabricLength ? `長さ:${fabricLength}m` : "";
+    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
+    const mark = width && length ? "×" : "";
+    const space = weigth ? " " : "";
+    return width + mark + length + space + weigth;
   };
 
   const getSerialNumber = (serialNumber: number) => {
@@ -50,26 +61,6 @@ export const useGetDisp = () => {
       const user = users.find((user: { uid: string }) => userId === user.uid);
       return user?.name || "";
     }
-  };
-
-  // 規格の表示
-  const getFabricStd = (
-    fabricWidth: number,
-    fabricLength: number,
-    fabricWeight: number | null
-  ) => {
-    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
-    const length = fabricLength ? `長さ:${fabricLength}m` : "";
-    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
-    const mark = width && length ? "×" : "";
-    return (
-      <>
-        <Text>{width}</Text>
-        <Text>{mark}</Text>
-        <Text>{length}</Text>
-        <Text ml={3}>{weigth}</Text>
-      </>
-    );
   };
 
   // 仕入れ先の表示
@@ -126,8 +117,9 @@ export const useGetDisp = () => {
 
   // 徳島在庫数を取得
   const getTokushimaStock = (productId: string) => {
-    const stock = products
-      .find((product: ProductType) => product.id === productId)
+    const stock = products.find(
+      (product: ProductType) => product.id === productId
+    );
     return stock?.tokushimaStock || 0;
   };
 

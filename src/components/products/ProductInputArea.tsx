@@ -114,7 +114,7 @@ const ProductInputArea: NextPage<Props> = ({
     const result = base?.includes(item);
     return result;
   };
-
+  console.log(items.materials);
   return (
     <>
       <Box as="h1" fontSize="2xl">
@@ -398,7 +398,9 @@ const ProductInputArea: NextPage<Props> = ({
                   borderColor="gray.100"
                 >
                   <Stack spacing={3} w="100%">
-                    {getMixed(items.materials)}
+                    {getMixed(items.materials).map((material, index) => (
+                      <Text key={index}>{material}</Text>
+                    ))}
                   </Stack>
                 </Box>
               )}

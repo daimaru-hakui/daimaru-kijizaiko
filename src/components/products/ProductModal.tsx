@@ -175,7 +175,11 @@ const ProductModal: NextPage<Props> = ({ productId }) => {
                           borderColor="gray.100"
                         >
                           <Stack spacing={3} w="100%">
-                            {getMixed(product?.materials)}
+                            {getMixed(product.materials).map(
+                              (material, index) => (
+                                <Text key={index}>{material}</Text>
+                              )
+                            )}
                           </Stack>
                         </Box>
                       )}
