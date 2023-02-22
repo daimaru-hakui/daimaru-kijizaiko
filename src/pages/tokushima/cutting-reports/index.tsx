@@ -57,7 +57,7 @@ const CuttingReport = () => {
             <Box as="h2" fontSize="2xl">
               裁断報告書
             </Box>
-            <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
+            <CSVLink data={csvData} filename={`裁断報告書_${getTodayDate()}`}>
               <Button size="sm">CSV</Button>
             </CSVLink>
           </Flex>
