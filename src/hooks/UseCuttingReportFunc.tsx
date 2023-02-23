@@ -100,8 +100,14 @@ export const useCuttingReportFunc = (
           serialNumber: newSerialNumber,
         });
 
+        const products = items.products.map((product) => (
+          { ...product, quantity: Number(product.quantity) }
+        ))
+        const newItems = { ...items, products }
+
         transaction.set(cuttingReportDocRef, {
-          ...items,
+          ...newItems,
+          totalQuantity: Number(items.totalQuantity),
           serialNumber: newSerialNumber,
           createUser: currentUser,
           createdAt: serverTimestamp(),
@@ -148,9 +154,14 @@ export const useCuttingReportFunc = (
             });
           });
         });
+        const products = items.products.map((product) => (
+          { ...product, quantity: Number(product.quantity) }
+        ))
+        const newItems = { ...items, products }
 
         transaction.update(cuttingReportDocRef, {
-          ...items,
+          ...newItems,
+          totalQuantity: Number(items.totalQuantity),
         });
       });
     } catch (err) {

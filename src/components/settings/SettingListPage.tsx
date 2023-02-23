@@ -17,12 +17,14 @@ import { NextPage } from "next";
 import { db } from "../../../firebase";
 import SettingEditModal from "./SettingEditModal";
 import Link from "next/link";
+import { ColorType } from "../../../types/ColorType";
+import { MaterialNameType } from "../../../types/MaterialNameType";
 import { StockPlaceType } from "../../../types/StockPlaceType";
 
 type Props = {
   title: string;
   collectionName: string;
-  array: StockPlaceType[];
+  array: ColorType[] | MaterialNameType[];
   pathName: string;
 };
 

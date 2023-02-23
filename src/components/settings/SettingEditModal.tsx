@@ -19,7 +19,7 @@ import { StockPlaceType } from "../../../types/StockPlaceType";
 import { UseInputSetting } from "../../hooks/UseInputSetting";
 
 type Props = {
-  obj: StockPlaceType;
+  obj: StockPlaceType
   collectionName: string;
 };
 
@@ -28,7 +28,7 @@ const SettingEditModal: NextPage<Props> = ({ obj, collectionName }) => {
   const { items, setItems, handleInputChange } = UseInputSetting();
 
   useEffect(() => {
-    setItems({ ...obj });
+    setItems({ ...obj } as StockPlaceType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj]);
 

@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Flex,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -19,13 +20,16 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
+import { FaRegWindowClose } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { db } from "../../../firebase";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { CuttingReportType } from "../../../types/CuttingReportType";
+import { useRecoilValue } from "recoil";
+import { cuttingReportsState } from "../../../store";
+import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   productId: string;
@@ -33,9 +37,15 @@ type Props = {
 
 const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [cuttingReports, setCuttingReports] = useState(
-    [] as CuttingReportType[]
+  const [sumTotalQuantity, setSumTotalQuantity] = useState(0)
+  const { getTodayDate } = useUtil()
+  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE
+  const [startAt, setStartAt] = useState(INIT_DATE)
+  const [endAt, setEndAt] = useState(getTodayDate)
+  const [filterCuttingReports, setFilterCuttingReports] = useState(
+    [{ quantity: 0 }] as CuttingHistoryType[]
   );
+  const cuttingReports = useRecoilValue(cuttingReportsState)
   const {
     getUserName,
     getSerialNumber,
@@ -46,26 +56,37 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
 
   useEffect(() => {
     const getCuttingReports = async () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("serialNumber", "desc")
-      );
-      const snapShot = await getDocs(q);
-      setCuttingReports(
-        snapShot.docs
-          .map((doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType))
-          .map((cuttingReport: any) =>
+      setFilterCuttingReports(
+        cuttingReports
+          .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map((product: CuttingProductType) => ({
               ...cuttingReport,
               ...product,
-            }))
+              products: null
+            } as CuttingHistoryType))
           )
           .flat()
-          .filter((doc: { productId: string }) => doc.productId === productId)
+          .filter((report: { productId: string }) => report.productId === productId)
+          .filter((report: { cuttingDate: string }) =>
+          ((new Date(report.cuttingDate).getTime() >= new Date(startAt).getTime()) &&
+            (new Date(report.cuttingDate).getTime() <= new Date(endAt).getTime())))
       );
     };
     getCuttingReports();
-  }, [productId]);
+  }, [productId, cuttingReports, startAt, endAt]);
+
+  useEffect(() => {
+    let total = 0
+    filterCuttingReports?.forEach(
+      (report) => total += report.quantity);
+    setSumTotalQuantity(total);
+  }, [filterCuttingReports])
+
+  const onReset = () => {
+    setStartAt(INIT_DATE)
+    setEndAt(getTodayDate)
+  }
+
   return (
     <>
       <Button
@@ -83,12 +104,27 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
           <ModalHeader>裁断履歴</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Flex gap={3}>
-              <Text>{getProductNumber(productId)}</Text>
-              <Text>{getColorName(productId)}</Text>
-              <Text>{getProductName(productId)}</Text>
+            <Flex gap={3} px={3} justifyContent="space-between" flexDirection={{ base: "column", md: "row" }}>
+              <Flex gap={1} fontSize="xl" flexDirection={{ base: "column", md: "row" }}>
+                <Flex>
+                  <Text>{getProductNumber(productId)}</Text>
+                  <Text>{getColorName(productId)}</Text>
+                </Flex>
+                <Box>
+                  <Text>{getProductName(productId)}</Text>
+                </Box>
+              </Flex>
+              <Box fontSize="xl">合計 {sumTotalQuantity}m</Box>
             </Flex>
-            {cuttingReports.length ? (
+            <Box px={3}>
+              <Text mt={6} fontSize="sm">裁断期間</Text>
+              <Flex gap={2} maxW="350px" alignItems="center">
+                <Input size="sm" type="date" value={startAt} onChange={(e) => setStartAt(e.target.value)} />
+                <Input size="sm" type="date" value={endAt} onChange={(e) => setEndAt(e.target.value)} />
+                <FaRegWindowClose cursor="pointer" size="50px" color="#444" onClick={onReset} />
+              </Flex>
+            </Box>
+            {filterCuttingReports.length ? (
               <TableContainer mt={6}>
                 <Table size="sm">
                   <Thead>
@@ -104,9 +140,9 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
                   </Thead>
                   <Tbody>
                     <>
-                      {cuttingReports.map(
+                      {filterCuttingReports.map(
                         (
-                          report: CuttingReportType & { quantity: string },
+                          report: CuttingHistoryType & { quantity: number },
                           index
                         ) => (
                           <Tr key={index}>

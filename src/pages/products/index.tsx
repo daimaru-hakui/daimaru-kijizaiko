@@ -104,14 +104,14 @@ const Products = () => {
               </Box>
 
               <Flex gap={3} style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
-                <Button size="sm" shadow="md">
-                  <CSVLink
-                    data={csvData}
-                    filename={`生地一覧_${getTodayDate()}`}
-                  >
+                <CSVLink
+                  data={csvData}
+                  filename={`生地一覧_${getTodayDate()}`}
+                >
+                  <Button size="sm">
                     CSV
-                  </CSVLink>
-                </Button>
+                  </Button>
+                </CSVLink>
                 {elementFilterButton()}
               </Flex>
 
@@ -124,9 +124,11 @@ const Products = () => {
                 bottom="20px"
                 right={12}
               >
-                <Button size="sm" shadow="md">
-                  <CSVLink data={csvData}>CSV</CSVLink>
-                </Button>
+                <CSVLink data={csvData}>
+                  <Button size="sm">
+                    CSV
+                  </Button>
+                </CSVLink>
                 {elementFilterButton()}
               </Flex>
             </Flex>
@@ -241,7 +243,8 @@ const Products = () => {
             </TableContainer>
           </Box>
         </Box>
-      )}
+      )
+      }
     </>
   );
 };

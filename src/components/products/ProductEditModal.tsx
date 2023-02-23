@@ -37,7 +37,7 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
           編集
         </Button>
       )}
-      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>編集</ModalHeader>

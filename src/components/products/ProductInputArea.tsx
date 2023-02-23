@@ -32,8 +32,10 @@ import {
   suppliersState,
   usersState,
 } from "../../../store";
+import { ColorType } from "../../../types/ColorType";
 import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
+import { MaterialNameType } from "../../../types/MaterialNameType";
 import { SupplierType } from "../../../types/SupplierType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputProduct } from "../../hooks/UseInputProduct";
@@ -231,7 +233,7 @@ const ProductInputArea: NextPage<Props> = ({
               name="colorName"
               onChange={(e) => handleInputChange(e)}
             >
-              {colors?.map((c: { id: number; name: string }) => (
+              {colors?.map((c: ColorType) => (
                 <option key={c.id} value={c.name}>
                   {c.name}
                 </option>
@@ -325,7 +327,7 @@ const ProductInputArea: NextPage<Props> = ({
                 name="materialName"
                 onChange={(e) => handleInputChange(e)}
               >
-                {materialNames?.map((m: { id: number; name: string }) => (
+                {materialNames?.map((m: MaterialNameType) => (
                   <option key={m.id} value={m.name}>
                     {m.name}
                   </option>

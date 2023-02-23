@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ColorType } from "../../types/ColorType";
 import { StockPlaceType } from "../../types/StockPlaceType";
 import { SupplierType } from "../../types/SupplierType";
 

@@ -123,6 +123,13 @@ export const useGetDisp = () => {
     return stock?.tokushimaStock || 0;
   };
 
+  const getPrice = (productId: string) => {
+    const product = products.find(
+      (product: ProductType) => product.id === productId
+    );
+    return product?.price || 0;
+  }
+
   return {
     getSerialNumber,
     getUserName,
@@ -136,5 +143,6 @@ export const useGetDisp = () => {
     getGrayFabricNumber,
     getGrayFabricStock,
     getTokushimaStock,
+    getPrice
   };
 };

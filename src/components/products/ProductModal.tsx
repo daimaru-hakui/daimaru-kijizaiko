@@ -49,7 +49,7 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
       >
         詳細
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>

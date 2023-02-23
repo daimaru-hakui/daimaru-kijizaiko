@@ -13,7 +13,9 @@ import {
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
+import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
+import { cuttingReportsState } from "../../../../store";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
@@ -23,7 +25,8 @@ import { useUtil } from "../../../hooks/UseUtil";
 const CuttingReport = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
-  const { csvData, cuttingReports } = useCuttingReportFunc(null, null);
+  const { csvData } = useCuttingReportFunc(null, null);
+  const cuttingReports = useRecoilValue(cuttingReportsState)
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

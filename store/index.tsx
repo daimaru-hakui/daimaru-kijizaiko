@@ -1,7 +1,10 @@
 import { atom } from "recoil";
+import { ColorType } from "../types/ColorType";
+import { CuttingReportType } from "../types/CuttingReportType";
 import { ProductType } from "../types/FabricType";
 import { GrayFabricType } from "../types/GrayFabricType";
 import { HistoryType } from "../types/HistoryType";
+import { MaterialNameType } from "../types/MaterialNameType";
 import { StockPlaceType } from "../types/StockPlaceType";
 import { SupplierType } from "../types/SupplierType";
 import { UserType } from "../types/UserType";
@@ -46,6 +49,11 @@ export const fabricPurchaseOrdersState = atom<HistoryType[]>({
   default: []
 })
 
+export const cuttingReportsState = atom<CuttingReportType[]>({
+  key: "cuttingReportsState",
+  default: []
+})
+
 export const suppliersState = atom<SupplierType[]>({
   key: "suppliersState",
   default: [],
@@ -56,12 +64,12 @@ export const stockPlacesState = atom<StockPlaceType[]>({
   default: [],
 });
 
-export const colorsState = atom<any>({
+export const colorsState = atom<ColorType[]>({
   key: "colorsState",
   default: [],
 });
 
-export const materialNamesState = atom<any>({
+export const materialNamesState = atom<MaterialNameType[]>({
   key: "materialNamesState",
   default: [],
 });

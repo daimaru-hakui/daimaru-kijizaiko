@@ -4,7 +4,7 @@ import { Box, Button, Container, Flex, Input } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { auth } from "../../firebase/index";
+import { auth, db } from "../../firebase/index";
 import { currentUserState, loadingState } from "../../store";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -16,14 +16,15 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const setCurrentUser = useSetRecoilState(currentUserState);
+
 
   useLayoutEffect(() => {
     if (user) {
       setCurrentUser(user.uid);
       router.push("/");
     }
-  }, [user, router, setCurrentUser]);
+  }, [router, setCurrentUser, user]);
 
   // サインイン
   const signInUser = () => {
