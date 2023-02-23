@@ -88,13 +88,13 @@ const GrayFabricHistorys = () => {
             <TabPanel>
               <GrayFabricHistoryOrderTable
                 histories={historyOrders}
-                title="キバタ仕掛"
+                title="キバタ仕掛一覧"
               />
             </TabPanel>
             <TabPanel>
               <GrayFabricHistoryConfirmTable
                 histories={historyConfirms}
-                title="キバタ仕上り履歴"
+                title="キバタ発注履歴"
               />
             </TabPanel>
           </TabPanels>

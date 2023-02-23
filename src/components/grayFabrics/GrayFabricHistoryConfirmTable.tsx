@@ -71,7 +71,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        キバタ仕上り履歴
+        {title}
       </Box>
       {histories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">

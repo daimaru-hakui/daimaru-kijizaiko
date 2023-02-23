@@ -3,6 +3,8 @@ import {
   Container,
   Flex,
   Stat,
+  StatGroup,
+  StatHelpText,
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
@@ -13,6 +15,7 @@ import {
   fabricDyeingOrdersState,
   fabricPurchaseOrdersState,
   grayFabricOrdersState,
+  grayFabricsState,
   productsState,
 } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
@@ -23,6 +26,7 @@ import StatCard from "../../components/dashboard/StatCard";
 const Dashboard = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
+  const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
   const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
   const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
@@ -49,31 +53,58 @@ const Dashboard = () => {
   return (
     <>
       {currentUser && (
-
-        <Box w="100%" mt={12}>
-          <Container maxW="1200px" my={6}>
+        <Box w="100%" mt={12} px={{ base: 0, md: 3 }}>
+          <Container maxW="100%" my={6}>
             <Flex
-              mt={{ base: 3, md: 6 }}
               gap={{ base: 3, md: 6 }}
-              flexDirection={{ base: "row" }}>
-              <StatCard
-                title="キバタ仕掛"
-                quantity={grayFabricOrders?.length}
-                unit="件"
-                fontSize="3xl"
-              />
-              <StatCard
-                title="生地仕掛"
-                quantity={fabricDyeingOrders?.length}
-                unit="件"
-                fontSize="3xl"
-              />
-              <StatCard
-                title="入荷予定"
-                quantity={fabricPurchaseOrders?.length}
-                unit="件"
-                fontSize="3xl"
-              />
+              justifyContent="space-between"
+              flexDirection={{ base: "column", md: "row" }}>
+              <Flex
+                flex="1"
+                gap={{ base: 3, md: 6 }}
+                flexDirection={{ base: "row" }}
+              >
+                <StatGroup p={3} flex="1" gap={3} alignItems="center" bg="white" rounded="md" boxShadow="md">
+                  <Stat borderRight="1px" borderColor="gray.300">
+                    <StatLabel>キバタ登録件数</StatLabel>
+                    <StatNumber>{grayFabrics.length}
+                      <Box as="span" fontSize="sm" ml={1}>件</Box>
+                    </StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>生地登録件数</StatLabel>
+                    <StatNumber>{products.length}
+                      <Box as="span" fontSize="sm" ml={1}>件</Box>
+                    </StatNumber>
+                  </Stat>
+                </StatGroup>
+              </Flex>
+              <Flex
+                flex="1"
+                gap={{ base: 3, md: 6 }}
+                flexDirection={{ base: "row" }}
+              >
+                <StatGroup p={3} flex="1" gap={3} alignItems="center" bg="white" rounded="md" boxShadow="md">
+                  <Stat borderRight="1px" borderColor="gray.300">
+                    <StatLabel>キバタ仕掛</StatLabel>
+                    <StatNumber>{grayFabricOrders?.length}
+                      <Box as="span" fontSize="sm" ml={1}>件</Box>
+                    </StatNumber>
+                  </Stat>
+                  <Stat borderRight="1px" borderColor="gray.300">
+                    <StatLabel>生地仕掛</StatLabel>
+                    <StatNumber>{fabricDyeingOrders?.length}
+                      <Box as="span" fontSize="sm" ml={1}>件</Box>
+                    </StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>入荷予定</StatLabel>
+                    <StatNumber>{fabricPurchaseOrders?.length}
+                      <Box as="span" fontSize="sm" ml={1}>件</Box>
+                    </StatNumber>
+                  </Stat>
+                </StatGroup>
+              </Flex>
             </Flex>
 
             <Flex
@@ -82,25 +113,26 @@ const Dashboard = () => {
               flexDirection={{ base: "column", md: "row" }}>
               <StatCard
                 title="TOTAL数量"
-                quantity={getTotalProductsQuantity([
-                  "wip",
-                  "externalStock",
-                  "arrivingQuantity",
-                  "tokushimaStock",
-                ]).toFixed()}
+                quantity={
+                  Number(getTotalProductsQuantity([
+                    "wip",
+                    "externalStock",
+                    "arrivingQuantity",
+                    "tokushimaStock",
+                  ]).toFixed()).toLocaleString()}
                 unit="m"
                 fontSize="4xl"
               />
               <StatCard
                 title="TOTAL金額"
-                quantity={Number(
-                  getTotalProductsPrice([
+                quantity={
+                  Number(getTotalProductsPrice([
                     "wip",
                     "externalStock",
                     "arrivingQuantity",
                     "tokushimaStock",
                   ]).toFixed()
-                ).toLocaleString()}
+                  ).toLocaleString()}
                 unit="円"
                 fontSize="4xl"
               />
@@ -117,15 +149,20 @@ const Dashboard = () => {
                   flexDirection={{ base: "column", md: "row" }}>
                   <StatCard
                     title="仕掛数量"
-                    quantity={getTotalProductsQuantity(["wip"]).toFixed()}
+                    quantity={
+                      Number(getTotalProductsQuantity(["wip"])
+                        .toFixed())
+                        .toLocaleString()}
                     unit="m"
                     fontSize="3xl"
                   />
                   <StatCard
                     title="入荷予定数量"
-                    quantity={getTotalProductsQuantity([
-                      "arrivingQuantity",
-                    ]).toFixed()}
+                    quantity={
+                      Number(getTotalProductsQuantity([
+                        "arrivingQuantity",])
+                        .toFixed())
+                        .toLocaleString()}
                     unit="m"
                     fontSize="3xl"
                   />
@@ -135,17 +172,21 @@ const Dashboard = () => {
                   flexDirection={{ base: "column", md: "row" }}>
                   <StatCard
                     title="外部在庫数量"
-                    quantity={getTotalProductsQuantity([
-                      "externalStock",
-                    ]).toFixed()}
+                    quantity={
+                      Number(getTotalProductsQuantity([
+                        "externalStock",])
+                        .toFixed())
+                        .toLocaleString()}
                     unit="m"
                     fontSize="3xl"
                   />
                   <StatCard
                     title="徳島在庫数量"
-                    quantity={getTotalProductsQuantity([
-                      "tokushimaStock",
-                    ]).toFixed()}
+                    quantity={
+                      Number(getTotalProductsQuantity([
+                        "tokushimaStock",])
+                        .toFixed())
+                        .toLocaleString()}
                     unit="m"
                     fontSize="3xl"
                   />

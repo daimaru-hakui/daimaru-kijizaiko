@@ -14,13 +14,13 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: "生地の発注", link: "/products/order/new" },
-    { id: 3, title: "生地仕掛状況", link: "/products/history/fabric-dyeing" },
-    { id: 4, title: "購入状況", link: "/products/history/fabric-purchase" },
+    { id: 3, title: "生地仕掛一覧", link: "/products/history/fabric-dyeing" },
+    { id: 4, title: "入荷予定一覧", link: "/products/history/fabric-purchase" },
     { id: 5, title: "マスター登録", link: "/products/new" },
   ];
   const menu2 = [
     { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
-    { id: 2, title: "キバタ仕掛状況", link: "/gray-fabrics/history" },
+    { id: 2, title: "キバタ仕掛一覧", link: "/gray-fabrics/history" },
     { id: 3, title: "マスター登録", link: "/gray-fabrics/new" },
   ];
   const menu3 = [

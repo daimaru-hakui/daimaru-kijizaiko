@@ -127,9 +127,9 @@ const CuttingQuantityRanking = () => {
   };
 
   return (
-    <Box bg="white" w="100%" h="100%" rounded="md" shadow="md">
-      <Bar options={options} data={data} />
-    </Box>
+    <Box p={3} bg="white" w="100%" h="100%" rounded="md" shadow="md">
+      < Bar options={options} data={data} />
+    </Box >
   )
 }
 

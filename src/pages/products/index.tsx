@@ -98,6 +98,7 @@ const Products = () => {
               gap={3}
               alignItems="center"
               justifyContent="space-between"
+              flexDirection={{ base: "column", md: "row" }}
             >
               <Box as="h2" fontSize="2xl">
                 生地一覧
