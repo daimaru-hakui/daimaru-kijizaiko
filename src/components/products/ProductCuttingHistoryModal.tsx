@@ -38,7 +38,7 @@ type Props = {
 const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0)
-  const { getTodayDate } = useUtil()
+  const { getTodayDate, mathRound2nd } = useUtil()
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE
   const [startAt, setStartAt] = useState(INIT_DATE)
   const [endAt, setEndAt] = useState(getTodayDate)
@@ -114,7 +114,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
                   <Text>{getProductName(productId)}</Text>
                 </Box>
               </Flex>
-              <Box fontSize="xl">合計 {sumTotalQuantity}m</Box>
+              <Box fontSize="xl">合計 {mathRound2nd(sumTotalQuantity)}m</Box>
             </Flex>
             <Box px={3}>
               <Text mt={6} fontSize="sm">裁断期間</Text>

@@ -247,8 +247,7 @@ const Dashboard = () => {
             </Flex>
           </Container>
         </Box>
-      )
-      }
+      )}
     </>
   );
 };
