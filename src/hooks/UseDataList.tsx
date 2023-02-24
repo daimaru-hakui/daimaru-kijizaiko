@@ -20,6 +20,7 @@ import {
   currentUserState,
   cuttingReportsState,
   fabricDyeingOrdersState,
+  fabricPurchaseConfirmsState,
   fabricPurchaseOrdersState,
   grayFabricOrdersState,
   grayFabricsState,
@@ -52,16 +53,13 @@ export const useDataList = () => {
   const setStockPlaces = useSetRecoilState(stockPlacesState);
   const setMaterialNames = useSetRecoilState(materialNamesState);
   const setColors = useSetRecoilState(colorsState);
-  const setGrayFabricOrders = useSetRecoilState(
-    grayFabricOrdersState
+  const setGrayFabricOrders = useSetRecoilState(grayFabricOrdersState);
+  const setFabricDyeingOrders = useSetRecoilState(fabricDyeingOrdersState);
+  const setFabricPurchaseOrders = useSetRecoilState(fabricPurchaseOrdersState);
+  const setFabricPurchaseConfirms = useSetRecoilState(
+    fabricPurchaseConfirmsState
   );
-  const setFabricDyeingOrders = useSetRecoilState(
-    fabricDyeingOrdersState
-  );
-  const setFabricPurchaseOrders = useSetRecoilState(
-    fabricPurchaseOrdersState
-  );
-  const setCuttingReports = useSetRecoilState(cuttingReportsState)
+  const setCuttingReports = useSetRecoilState(cuttingReportsState);
 
   // users情報;
   useEffect(() => {
@@ -71,10 +69,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-          ({
-            ...doc.data(),
-            id: doc.id,
-          } as UserType)
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
         )
       )
     );
@@ -192,7 +190,7 @@ export const useDataList = () => {
     getFabricDyeingOrders();
   }, [setFabricDyeingOrders]);
 
-  // 生地発注履歴;
+  // 生地発注履歴（order）
   useEffect(() => {
     const getFabricPurchaseOrders = async () => {
       const q = query(
@@ -214,25 +212,50 @@ export const useDataList = () => {
     getFabricPurchaseOrders();
   }, [setFabricPurchaseOrders]);
 
+  // 生地発注履歴（confirm）
+  useEffect(() => {
+    const getFabricPurchaseConfirms = async () => {
+      const q = query(
+        collection(db, "historyFabricPurchaseConfirms"),
+        where("quantity", ">", 0)
+      );
+      try {
+        onSnapshot(q, (querySnap) =>
+          setFabricPurchaseConfirms(
+            querySnap.docs
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+              .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getFabricPurchaseConfirms();
+  }, [setFabricPurchaseConfirms]);
+
   // 裁断報告書　履歴;
   useEffect(() => {
     const getCuttingReports = async () => {
       const q = query(
         collection(db, "cuttingReports"),
-        orderBy("cuttingDate", "desc"), endAt(BASE_DATE)
+        orderBy("cuttingDate", "desc"),
+        endAt(BASE_DATE)
       );
       try {
         onSnapshot(q, (querySnap) =>
           setCuttingReports(
-            querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-            ).sort((a, b) => {
-              if (a.serialNumber > b.serialNumber) {
-                return -1;
-              }
-            }))
+            querySnap.docs
+              .map(
+                (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+              )
+              .sort((a, b) => {
+                if (a.serialNumber > b.serialNumber) {
+                  return -1;
+                }
+              })
+          )
         );
-
       } catch (err) {
         console.log(err);
       }
@@ -240,7 +263,6 @@ export const useDataList = () => {
     getCuttingReports();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setCuttingReports]);
-
 
   // 仕入先　情報;
   useEffect(() => {
@@ -287,7 +309,9 @@ export const useDataList = () => {
       try {
         onSnapshot(q, (querySnap) =>
           setColors(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as ColorType))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as ColorType)
+            )
           )
         );
       } catch (err) {
@@ -304,7 +328,9 @@ export const useDataList = () => {
       try {
         onSnapshot(q, (querySnap) =>
           setMaterialNames(
-            querySnap.docs.map((doc) => ({ ...doc.data(), id: doc.id } as MaterialNameType))
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as MaterialNameType)
+            )
           )
         );
       } catch (err) {
@@ -315,8 +341,8 @@ export const useDataList = () => {
   }, [setMaterialNames]);
 
   const start = () => {
-    return true
-  }
+    return true;
+  };
 
-  return { start }
-}
+  return { start };
+};

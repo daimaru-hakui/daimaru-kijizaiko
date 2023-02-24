@@ -36,23 +36,28 @@ export const grayFabricsState = atom<GrayFabricType[]>({
 
 export const grayFabricOrdersState = atom<HistoryType[]>({
   key: "grayFabricOrdersState",
-  default: []
-})
+  default: [],
+});
 
 export const fabricDyeingOrdersState = atom<HistoryType[]>({
   key: "fabricDyeingOrdersState",
-  default: []
-})
+  default: [],
+});
 
 export const fabricPurchaseOrdersState = atom<HistoryType[]>({
   key: "fabricPurchaseOrdersState",
-  default: []
-})
+  default: [],
+});
+
+export const fabricPurchaseConfirmsState = atom<HistoryType[]>({
+  key: "fabricPurchaseConfirmsState",
+  default: [],
+});
 
 export const cuttingReportsState = atom<CuttingReportType[]>({
   key: "cuttingReportsState",
-  default: []
-})
+  default: [],
+});
 
 export const suppliersState = atom<SupplierType[]>({
   key: "suppliersState",

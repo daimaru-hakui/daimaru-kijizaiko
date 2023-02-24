@@ -151,7 +151,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
             <Tr>
               <Th>発注NO.</Th>
               <Th>発注日</Th>
-              <Th>仕上日</Th>
+              <Th>入荷日</Th>
               <Th>担当者</Th>
               <Th>生地品番</Th>
               <Th>色</Th>
