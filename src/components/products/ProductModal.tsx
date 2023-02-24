@@ -22,6 +22,7 @@ import { ProductType } from "../../../types/FabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
 import ProductEditModal from "./ProductEditModal";
+import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
 
 type Props = {
   productId: string;
@@ -57,6 +58,7 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
               生地詳細
               <ProductEditModal product={product} />
               <ProductCuttingHistoryModal productId={productId} />
+              <ProductPurchaseHistoryModal productId={productId} />
             </Flex>
           </ModalHeader>
           <ModalCloseButton />

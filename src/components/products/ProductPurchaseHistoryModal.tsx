@@ -23,29 +23,27 @@ import {
 import { FaRegWindowClose } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
-import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { CuttingReportType } from "../../../types/CuttingReportType";
 import { useRecoilValue } from "recoil";
-import { cuttingReportsState } from "../../../store";
-import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
+import { fabricPurchaseConfirmsState } from "../../../store";
 import { useUtil } from "../../hooks/UseUtil";
+import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
   productId: string;
 };
 
-const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
+const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const { getTodayDate, mathRound2nd } = useUtil();
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
   const [startAt, setStartAt] = useState(INIT_DATE);
   const [endAt, setEndAt] = useState(getTodayDate);
-  const [filterCuttingReports, setFilterCuttingReports] = useState([
+  const [filterFabricPurchases, setFilterFabricPurchases] = useState([
     { quantity: 0 },
-  ] as CuttingHistoryType[]);
-  const cuttingReports = useRecoilValue(cuttingReportsState);
+  ] as HistoryType[]);
+  const fabricPurchases = useRecoilValue(fabricPurchaseConfirmsState);
   const {
     getUserName,
     getSerialNumber,
@@ -55,40 +53,29 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
   } = useGetDisp();
 
   useEffect(() => {
-    const getCuttingReports = async () => {
-      setFilterCuttingReports(
-        cuttingReports
-          .map((cuttingReport: CuttingReportType) =>
-            cuttingReport.products.map(
-              (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
-            )
-          )
-          .flat()
-          .filter(
-            (report: { productId: string }) => report.productId === productId
-          )
-          .filter(
-            (report: { cuttingDate: string }) =>
-              new Date(report.cuttingDate).getTime() >=
-                new Date(startAt).getTime() &&
-              new Date(report.cuttingDate).getTime() <=
-                new Date(endAt).getTime()
-          )
-      );
+    const getArray = async () => {
+      const filterArray = fabricPurchases
+        .filter((obj) => obj.productId === productId)
+        .filter(
+          (obj: { fixedAt: string }) =>
+            new Date(obj.fixedAt).getTime() >= new Date(startAt).getTime() &&
+            new Date(obj.fixedAt).getTime() <= new Date(endAt).getTime()
+        )
+        .sort((a, b) => {
+          if (a.fixedAt > b.fixedAt) {
+            return -1;
+          }
+        });
+      setFilterFabricPurchases(filterArray);
     };
-    getCuttingReports();
-  }, [productId, cuttingReports, startAt, endAt]);
+    getArray();
+  }, [productId, fabricPurchases, startAt, endAt]);
 
   useEffect(() => {
     let total = 0;
-    filterCuttingReports?.forEach((report) => (total += report.quantity));
+    filterFabricPurchases?.forEach((obj) => (total += obj.quantity));
     setSumTotalQuantity(total);
-  }, [filterCuttingReports]);
+  }, [filterFabricPurchases]);
 
   const onReset = () => {
     setStartAt(INIT_DATE);
@@ -98,13 +85,13 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
   return (
     <>
       <Button size="xs" colorScheme="facebook" onClick={onOpen}>
-        裁断履歴
+        購入履歴
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>裁断履歴</ModalHeader>
+          <ModalHeader>購入履歴</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex
@@ -153,35 +140,37 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
                 />
               </Flex>
             </Box>
-            {filterCuttingReports.length ? (
+            {filterFabricPurchases.length ? (
               <TableContainer mt={6}>
                 <Table size="sm">
                   <Thead>
                     <Tr>
-                      <Th>裁断日</Th>
-                      <Th>裁断報告書NO</Th>
-                      <Th>加工指示書NO</Th>
-                      <Th>商品</Th>
-                      <Th>受注先名</Th>
-                      <Th>担当社</Th>
-                      <Th>裁断数量</Th>
+                      <Th>発注No.</Th>
+                      <Th>入荷日</Th>
+                      <Th>担当者</Th>
+                      <Th>出荷先</Th>
+                      <Th>単価</Th>
+                      <Th>購入数量</Th>
+                      <Th>合計金額</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     <>
-                      {filterCuttingReports.map(
-                        (
-                          report: CuttingHistoryType & { quantity: number },
-                          index
-                        ) => (
+                      {filterFabricPurchases.map(
+                        (fabric: HistoryType & { quantity: number }, index) => (
                           <Tr key={index}>
-                            <Td>{report?.cuttingDate}</Td>
-                            <Td>{getSerialNumber(report?.serialNumber)}</Td>
-                            <Td>{report?.processNumber}</Td>
-                            <Td>{report?.itemName}</Td>
-                            <Td>{report?.client}</Td>
-                            <Td>{getUserName(report?.staff)}</Td>
-                            <Td isNumeric>{report?.quantity || 0}m</Td>
+                            <Td>{getSerialNumber(fabric?.serialNumber)}</Td>
+                            <Td>{fabric?.fixedAt}</Td>
+                            <Td>{getUserName(fabric?.createUser)}</Td>
+                            <Td>{fabric.stockPlace}</Td>
+                            <Td isNumeric>{fabric?.price || 0}円</Td>
+                            <Td isNumeric>{fabric?.quantity || 0}m</Td>
+                            <Td isNumeric>
+                              {Number(
+                                (fabric?.quantity * fabric?.price).toFixed()
+                              ).toLocaleString() || 0}
+                              円
+                            </Td>
                           </Tr>
                         )
                       )}
@@ -206,4 +195,4 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
   );
 };
 
-export default ProductCuttingHistoryModal;
+export default ProductPurchaseHistoryModal;
