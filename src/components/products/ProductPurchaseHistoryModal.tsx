@@ -117,7 +117,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId }) => {
             </Flex>
             <Box px={3}>
               <Text mt={6} fontSize="sm">
-                裁断期間
+                購入期間
               </Text>
               <Flex gap={2} maxW="350px" alignItems="center">
                 <Input
@@ -180,7 +180,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId }) => {
               </TableContainer>
             ) : (
               <Flex mt={6} justifyContent="center">
-                <Box>裁断履歴はありません。</Box>
+                <Box>購入履歴はありません。</Box>
               </Flex>
             )}
           </ModalBody>
