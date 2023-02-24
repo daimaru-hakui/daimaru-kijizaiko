@@ -34,6 +34,7 @@ type Props = {
   product: CuttingProductType;
   rowIndex: number;
   reportId: string;
+  setIsLimitQuantity: Function;
 };
 
 export const FabricsUsedInput: NextPage<Props> = ({
@@ -42,6 +43,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
   product,
   rowIndex,
   reportId,
+  setIsLimitQuantity,
 }) => {
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([]);
@@ -62,6 +64,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText, products]);
 
+  // 入力値の最大値をリミットにする
   useEffect(() => {
     const getQuantity = () => {
       setMaxLimitQuantity(
@@ -71,6 +74,23 @@ export const FabricsUsedInput: NextPage<Props> = ({
     getQuantity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.productId]);
+
+  //　在庫より入力値が大きい場合trueを返す
+  useEffect(() => {
+    const limit = reportId
+      ? maxLimitQuantity // 編集の場合　maxLimitQuantity
+      : getTokushimaStock(product.productId);
+    const result = limit < items.products[rowIndex].quantity ? true : false;
+    setIsLimitQuantity(result);
+  }, [
+    items.products,
+    reportId,
+    product.productId,
+    rowIndex,
+    maxLimitQuantity,
+    setIsLimitQuantity,
+    getTokushimaStock,
+  ]);
 
   const handleInputsChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -253,9 +273,19 @@ export const FabricsUsedInput: NextPage<Props> = ({
               min={0}
               max={
                 reportId
-                  ? maxLimitQuantity
-                  : getTokushimaStock(product.productId)
+                  ? maxLimitQuantity // 編集
+                  : getTokushimaStock(product.productId) //新規
               }
+              bg={
+                reportId
+                  ? maxLimitQuantity < product?.quantity // 編集
+                    ? "red.300"
+                    : ""
+                  : getTokushimaStock(product.productId) < product?.quantity //新規
+                  ? "red.300"
+                  : ""
+              }
+              rounded="md"
               value={product?.quantity}
               onChange={(e) => handleNumbersChange(e, "quantity", rowIndex)}
             >

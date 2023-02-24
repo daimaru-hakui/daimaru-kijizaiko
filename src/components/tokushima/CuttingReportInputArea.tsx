@@ -44,6 +44,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
   const users = useRecoilValue(usersState);
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
+  const [isLimitQuantity, setIsLimitQuantity] = useState(true);
   const {
     items,
     setItems,
@@ -84,7 +85,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
       (product) => product?.productId === ""
     );
     const quantity = items?.products?.some(
-      (product) => product?.quantity === 0
+      (product) => product?.quantity === 0 || String(product?.quantity) === "0"
     );
     setIsValidate(
       productNumberValidate() ||
@@ -208,6 +209,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
             product={product as CuttingProductType}
             rowIndex={index}
             reportId={report.id}
+            setIsLimitQuantity={setIsLimitQuantity}
           />
         ))}
         <Flex justifyContent="center">
@@ -220,7 +222,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
         w="full"
         my={12}
         colorScheme="facebook"
-        disabled={isValidate}
+        disabled={isValidate || isLimitQuantity}
         onClick={() => {
           if (pageType === "new") {
             addCuttingReport();
