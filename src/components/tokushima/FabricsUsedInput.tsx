@@ -151,11 +151,11 @@ export const FabricsUsedInput: NextPage<Props> = ({
 
     try {
       runTransaction(db, async (transaction) => {
-        const cuttingReportSnap = await getDoc(cuttingReportDocRef);
+        const cuttingReportSnap = await transaction.get(cuttingReportDocRef);
         if (!cuttingReportSnap.exists())
           throw "cuttingReportSnap does not exist!";
 
-        const productSnap = await getDoc(productDocRef);
+        const productSnap = await transaction.get(productDocRef);
         if (!productSnap.exists()) throw "productSnap does not exist!";
 
         let newArray = [];
