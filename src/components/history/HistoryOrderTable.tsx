@@ -10,7 +10,6 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import {
-  addDoc,
   collection,
   doc,
   runTransaction,
@@ -65,7 +64,7 @@ const HistoryOrderTable: NextPage<Props> = ({
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -106,7 +105,7 @@ const HistoryOrderTable: NextPage<Props> = ({
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -134,7 +133,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   const updateHistoryFabricDyeingOrderStock = async (history: HistoryType) => {
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -181,7 +180,7 @@ const HistoryOrderTable: NextPage<Props> = ({
     history: HistoryType
   ) => {
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricDyeingOrders", history.id);
+    const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -219,10 +218,8 @@ const HistoryOrderTable: NextPage<Props> = ({
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const orderHistoryDocRef = doc(db, "historyFabricDyeingOrders", history.id);
-    const confirmHistoryDocRef = doc(
-      collection(db, "historyFabricDyeingConfirms")
-    );
+    const orderHistoryDocRef = doc(db, "fabricDyeingOrders", history.id);
+    const confirmHistoryDocRef = doc(collection(db, "fabricDyeingConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -282,7 +279,7 @@ const HistoryOrderTable: NextPage<Props> = ({
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricPurchaseOrders", history.id);
+    const historyDocRef = doc(db, "fabricPurchaseOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -324,7 +321,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   //　購入状況　orderを編集（stock ranning共通）
   const updateHistoryFabricPurchaseOrder = async (history: HistoryType) => {
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricPurchaseOrders", history.id);
+    const historyDocRef = doc(db, "fabricPurchaseOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -383,14 +380,8 @@ const HistoryOrderTable: NextPage<Props> = ({
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const orderHistoryDocRef = doc(
-      db,
-      "historyFabricPurchaseOrders",
-      history.id
-    );
-    const confirmHistoryDocRef = doc(
-      collection(db, "historyFabricPurchaseConfirms")
-    );
+    const orderHistoryDocRef = doc(db, "fabricPurchaseOrders", history.id);
+    const confirmHistoryDocRef = doc(collection(db, "fabricPurchaseConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {

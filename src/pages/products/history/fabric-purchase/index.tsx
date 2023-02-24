@@ -13,7 +13,7 @@ const HistoryFabricPurchase = () => {
   useEffect(() => {
     const getHistoryOrders = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseOrders"),
+        collection(db, "fabricPurchaseOrders"),
         orderBy("createdAt", "desc")
       );
       try {
@@ -34,7 +34,7 @@ const HistoryFabricPurchase = () => {
   useEffect(() => {
     const getHistoryConfirms = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseConfirms"),
+        collection(db, "fabricPurchaseConfirms"),
         orderBy("createdAt", "desc")
       );
       try {

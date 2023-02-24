@@ -150,7 +150,7 @@ export const useDataList = () => {
   useEffect(() => {
     const getGrayFabricOrders = async () => {
       const q = query(
-        collection(db, "historyGrayFabricOrders"),
+        collection(db, "grayFabricOrders"),
         where("quantity", ">", 0)
       );
       try {
@@ -172,7 +172,7 @@ export const useDataList = () => {
   useEffect(() => {
     const getFabricDyeingOrders = async () => {
       const q = query(
-        collection(db, "historyFabricDyeingOrders"),
+        collection(db, "fabricDyeingOrders"),
         where("quantity", ">", 0)
       );
       try {
@@ -194,7 +194,7 @@ export const useDataList = () => {
   useEffect(() => {
     const getFabricPurchaseOrders = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseOrders"),
+        collection(db, "fabricPurchaseOrders"),
         where("quantity", ">", 0)
       );
       try {
@@ -216,7 +216,7 @@ export const useDataList = () => {
   useEffect(() => {
     const getFabricPurchaseConfirms = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseConfirms"),
+        collection(db, "fabricPurchaseConfirms"),
         where("quantity", ">", 0)
       );
       try {

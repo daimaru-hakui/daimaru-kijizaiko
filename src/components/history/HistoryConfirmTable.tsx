@@ -64,7 +64,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
 
   const updateHistoryFabricDyeingConfirm = async (history: HistoryType) => {
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricDyeingConfirms", history.id);
+    const historyDocRef = doc(db, "fabricDyeingConfirms", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -96,7 +96,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
 
   const updateHistoryFabricPurchaseConfirm = async (history: HistoryType) => {
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricPurchaseConfirms", history.id);
+    const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {

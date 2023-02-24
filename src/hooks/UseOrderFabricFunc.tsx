@@ -57,7 +57,7 @@ export const useOrderFabricFunc = (
     );
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabricId);
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
+    const historyDocRef = doc(collection(db, "fabricDyeingOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -112,7 +112,7 @@ export const useOrderFabricFunc = (
       "fabricDyeingOrderNumbers"
     );
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricDyeingOrders"));
+    const historyDocRef = doc(collection(db, "fabricDyeingOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -156,7 +156,7 @@ export const useOrderFabricFunc = (
       "fabricPurchaseOrderNumbers"
     );
     const productDocRef = doc(db, "products", productId);
-    const historyDocRef = doc(collection(db, "historyFabricPurchaseOrders"));
+    const historyDocRef = doc(collection(db, "fabricPurchaseOrders"));
 
     try {
       await runTransaction(db, async (transaction) => {

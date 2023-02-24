@@ -31,7 +31,7 @@ const GrayFabrics = () => {
   useEffect(() => {
     const getFilterGrayFabrics = async () => {
       setFilterGrayFabrics(
-        await grayFabrics.filter((fabric: GrayFabricType) =>
+        grayFabrics.filter((fabric: GrayFabricType) =>
           fabric.productNumber.includes("")
         )
       );

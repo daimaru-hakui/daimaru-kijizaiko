@@ -79,7 +79,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
       "grayFabricOrderNumbers"
     );
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
-    const orderHistoryRef = collection(db, "historyGrayFabricOrders");
+    const orderHistoryRef = collection(db, "grayFabricOrders");
 
     try {
       await runTransaction(db, async (transaction) => {

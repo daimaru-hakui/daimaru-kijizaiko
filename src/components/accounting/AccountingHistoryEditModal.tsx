@@ -42,8 +42,8 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
-  const { items, setItems, handleInputChange, handleNumberChange, onReset } = useInputHistory()
-
+  const { items, setItems, handleInputChange, handleNumberChange, onReset } =
+    useInputHistory();
 
   // 初期値をitemsに代入
   useEffect(() => {
@@ -51,9 +51,12 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
 
-  const updateHistoryAccountingOrder = async (history: HistoryType, items: HistoryType) => {
+  const updateHistoryAccountingOrder = async (
+    history: HistoryType,
+    items: HistoryType
+  ) => {
     const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "historyFabricPurchaseConfirms", history.id);
+    const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {

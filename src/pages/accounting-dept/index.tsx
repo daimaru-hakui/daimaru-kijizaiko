@@ -13,7 +13,7 @@ const AccountingDept = () => {
   useEffect(() => {
     const getHistoryOrders = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseConfirms"),
+        collection(db, "fabricPurchaseConfirms"),
         orderBy("fixedAt", "desc")
       );
       try {
@@ -34,7 +34,7 @@ const AccountingDept = () => {
   useEffect(() => {
     const getHistoryConfirms = async () => {
       const q = query(
-        collection(db, "historyFabricPurchaseConfirms"),
+        collection(db, "fabricPurchaseConfirms"),
         orderBy("fixedAt", "desc")
       );
       try {
