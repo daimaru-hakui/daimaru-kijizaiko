@@ -31,11 +31,9 @@ type Props = {
   history: HistoryType;
 };
 
-const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
-  history,
-}) => {
+const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({ history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleNumberChange, onReset } = useInputHistory()
+  const { items, setItems, handleNumberChange, onReset } = useInputHistory();
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
 
@@ -45,16 +43,15 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({
   }, [history, isOpen]);
 
   // 購入状況　確定処理
-  const confirmProcessingAccounting = async (history: HistoryType, items: HistoryType) => {
+  const confirmProcessingAccounting = async (
+    history: HistoryType,
+    items: HistoryType
+  ) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
     const productDocRef = doc(db, "products", history.productId);
-    const confirmHistoryDocRef = doc(
-      db,
-      "historyFabricPurchaseConfirms",
-      history.id
-    );
+    const confirmHistoryDocRef = doc(db, "fabricPurchaseConfirms", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {

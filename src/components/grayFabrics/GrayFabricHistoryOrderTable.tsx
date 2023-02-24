@@ -47,7 +47,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
-    const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
+    const orderHistoryRef = doc(db, "grayFabricOrders", history.id);
 
     try {
       await runTransaction(db, async (transaction) => {
@@ -72,7 +72,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
-    const historyDocRef = doc(db, "historyGrayFabricOrders", history.id);
+    const historyDocRef = doc(db, "grayFabricOrders", history.id);
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
@@ -109,10 +109,8 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history?.grayFabricId);
-    const orderHistoryRef = doc(db, "historyGrayFabricOrders", history.id);
-    const confirmHistoryDocRef = doc(
-      collection(db, "historyGrayFabricConfirms")
-    );
+    const orderHistoryRef = doc(db, "grayFabricOrders", history.id);
+    const confirmHistoryDocRef = doc(collection(db, "grayFabricConfirms"));
 
     try {
       await runTransaction(db, async (transaction) => {

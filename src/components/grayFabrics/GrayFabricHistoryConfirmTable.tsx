@@ -12,9 +12,7 @@ import {
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { NextPage } from "next";
 import { useState } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CommentModal from "../CommentModal";
@@ -30,15 +28,14 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
   title,
 }) => {
   const [items, setItems] = useState({} as HistoryType);
-  const { getSerialNumber, getUserName } = useGetDisp()
-
+  const { getSerialNumber, getUserName } = useGetDisp();
 
   const updateConfirmHistory = async (history: any) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
-    const historyDocRef = doc(db, "historyGrayFabricConfirms", history.id);
+    const historyDocRef = doc(db, "grayFabricConfirms", history.id);
     try {
       await runTransaction(db, async (transaction) => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
@@ -49,8 +46,9 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
         if (!historyDocSnap.exists()) throw "historyDocSnap does not exist!";
 
         const newStock =
-          await grayFabricDocSnap.data()?.stock - history.quantity + items.quantity ||
-          0;
+          (await grayFabricDocSnap.data()?.stock) -
+            history.quantity +
+            items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });

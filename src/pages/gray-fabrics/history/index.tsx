@@ -36,7 +36,7 @@ const GrayFabricHistorys = () => {
   useEffect(() => {
     const getGrayFabricOrders = async () => {
       const q = query(
-        collection(db, "historyGrayFabricOrders"),
+        collection(db, "grayFabricOrders"),
         where("quantity", ">", 0)
       );
       try {
@@ -58,7 +58,7 @@ const GrayFabricHistorys = () => {
   useEffect(() => {
     const getGrayFabricConfirms = async () => {
       const q = query(
-        collection(db, "historyGrayFabricConfirms"),
+        collection(db, "grayFabricConfirms"),
         orderBy("fixedAt", "desc")
       );
       try {
