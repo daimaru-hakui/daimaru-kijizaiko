@@ -25,20 +25,20 @@ import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
-import useSWR from 'swr'
 import ProductMenu from "../../components/products/ProductMenu";
+import useSWR from 'swr'
+import axios from "axios";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
+  // const [products, setProducts] = useState([] as ProductType[])
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProductFunc(null, null);
   const { isAdminAuth } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
-
-
   const [search, setSearch] = useState({
     productNumber: "",
     colorName: "",
@@ -46,24 +46,19 @@ const Products = () => {
     materialName: "",
   } as ProductType);
 
+  const fetcher = url => axios.get(url).then(res => res.data.props);
+  const { data, error, isLoading } = useSWR('/api/products', fetcher)
 
-  useEffect(() => {
-    const option = {
-      headers: {
-        method: "GET"
-      }
-    }
-    fetch('/api/products', option)
-      .then(res => res.json())
-      .then(data => console.log(data))
-  }, [])
+  // useEffect(() => {
+  //   axios.get('/api/products').then(res => setProducts(res.data.props));
+  // }, [setProducts])
 
-
+  console.log(data)
 
   useEffect(() => {
     setFilterProducts(
       products
-        .filter((product: ProductType) =>
+        ?.filter((product: ProductType) =>
           product.productNumber.includes(
             halfToFullChar(search.productNumber.toUpperCase())
           )
