@@ -25,11 +25,10 @@ import ProductEditModal from "./ProductEditModal";
 import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
 
 type Props = {
-  productId: string;
   product: ProductType;
 };
 
-const ProductModal: NextPage<Props> = ({ productId, product }) => {
+const ProductModal: NextPage<Props> = ({ product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     getUserName,
@@ -56,9 +55,9 @@ const ProductModal: NextPage<Props> = ({ productId, product }) => {
           <ModalHeader>
             <Flex gap={3} alignItems="center">
               生地詳細
-              <ProductEditModal product={product} />
-              <ProductCuttingHistoryModal productId={productId} />
-              <ProductPurchaseHistoryModal productId={productId} />
+              <ProductEditModal product={product} type="button" />
+              <ProductCuttingHistoryModal productId={product.id} type="button" />
+              <ProductPurchaseHistoryModal productId={product.id} type="button" />
             </Flex>
           </ModalHeader>
           <ModalCloseButton />

@@ -25,6 +25,8 @@ import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
+import useSWR from 'swr'
+import ProductMenu from "../../components/products/ProductMenu";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
@@ -36,12 +38,27 @@ const Products = () => {
   const { isAdminAuth } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
 
+
   const [search, setSearch] = useState({
     productNumber: "",
     colorName: "",
     productName: "",
     materialName: "",
   } as ProductType);
+
+
+  useEffect(() => {
+    const option = {
+      headers: {
+        method: "GET"
+      }
+    }
+    fetch('/api/products', option)
+      .then(res => res.json())
+      .then(data => console.log(data))
+  }, [])
+
+
 
   useEffect(() => {
     setFilterProducts(
@@ -159,10 +176,8 @@ const Products = () => {
                     <Tr key={product.id}>
                       <Td>
                         <Flex alignItems="center" gap={3}>
-                          <ProductModal
-                            productId={product.id}
-                            product={product}
-                          />
+                          <ProductMenu product={product} />
+                          <ProductModal product={product} />
                           <OrderAreaModal product={product} buttonSize="xs" />
                         </Flex>
                       </Td>

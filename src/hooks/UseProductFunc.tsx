@@ -24,7 +24,7 @@ export const useProductFunc = (
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
   const { getUserName, getSupplierName, getMixed, getFabricStd } = useGetDisp();
-  const { mathRound2nd } = useUtil();
+  const { mathRound2nd, getTodayDate } = useUtil();
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
@@ -119,28 +119,28 @@ export const useProductFunc = (
   };
 
   // 物理削除
-  const deleteProduct = async (productId: string) => {
-    const result = window.confirm("削除して宜しいでしょうか");
-    if (!result) return;
-    const docRef = doc(db, "products", productId);
-    await deleteDoc(docRef);
-  };
-
-  // 論理削除
-  // const deleteProduct = async (id: string) => {
+  // const deleteProduct = async (productId: string) => {
   //   const result = window.confirm("削除して宜しいでしょうか");
   //   if (!result) return;
-  //   try {
-  //     const docRef = doc(db, "products", `${id}`);
-
-  //     await updateDoc(docRef, {
-  //       deletedAt: serverTimestamp(),
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   } finally {
-  //   }
+  //   const docRef = doc(db, "products", productId);
+  //   await deleteDoc(docRef);
   // };
+
+  // 論理削除
+  const deleteProduct = async (id: string) => {
+    const result = window.confirm("削除して宜しいでしょうか");
+    if (!result) return;
+    try {
+      const docRef = doc(db, "products", id);
+
+      await updateDoc(docRef, {
+        deletedAt: getTodayDate(),
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
 
   //CSV作成
   useEffect(() => {

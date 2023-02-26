@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Modal,
   ModalBody,
@@ -18,9 +19,10 @@ import ProductInputArea from "./ProductInputArea";
 
 type Props = {
   product: ProductType;
+  type: string | null
 };
 
-const ProductEditModal: NextPage<Props> = ({ product }) => {
+const ProductEditModal: NextPage<Props> = ({ product, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuths } = useAuthManagement();
   const currentUser = useRecoilValue(currentUserState);
@@ -28,14 +30,20 @@ const ProductEditModal: NextPage<Props> = ({ product }) => {
   return (
     <>
       {(isAuths(["rd"]) || currentUser === product.createUser) && (
-        <Button
-          size="xs"
-          variant="outline"
-          colorScheme="facebook"
-          onClick={onOpen}
-        >
-          編集
-        </Button>
+        type === "button" ? (
+          <Button
+            size="xs"
+            variant="outline"
+            colorScheme="facebook"
+            onClick={onOpen}
+          >
+            編集
+          </Button>
+        ) : (
+          <Box w="full" onClick={onOpen}>
+            編集
+          </Box>
+        )
       )}
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />

@@ -31,9 +31,10 @@ import { HistoryType } from "../../../types/HistoryType";
 
 type Props = {
   productId: string;
+  type: string | null;
 };
 
-const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId }) => {
+const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const { getTodayDate, mathRound2nd } = useUtil();
@@ -84,9 +85,15 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId }) => {
 
   return (
     <>
-      <Button size="xs" colorScheme="facebook" onClick={onOpen}>
-        購入履歴
-      </Button>
+      {type === "button" ? (
+        <Button size="xs" colorScheme="facebook" onClick={onOpen}>
+          購入履歴
+        </Button>
+      ) : (
+        <Box w="full" onClick={onOpen}>
+          購入履歴
+        </Box>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />

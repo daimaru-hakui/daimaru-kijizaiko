@@ -33,9 +33,10 @@ import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   productId: string;
+  type: string | null;
 };
 
-const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
+const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const { getTodayDate, mathRound2nd } = useUtil();
@@ -61,11 +62,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
             )
           )
           .flat()
@@ -75,10 +76,14 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
           .filter(
             (report: { cuttingDate: string }) =>
               new Date(report.cuttingDate).getTime() >=
-                new Date(startAt).getTime() &&
+              new Date(startAt).getTime() &&
               new Date(report.cuttingDate).getTime() <=
-                new Date(endAt).getTime()
-          )
+              new Date(endAt).getTime()
+          ).sort((a, b) => {
+            if (a.cuttingDate > b.cuttingDate) {
+              return -1;
+            }
+          })
       );
     };
     getCuttingReports();
@@ -97,9 +102,15 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId }) => {
 
   return (
     <>
-      <Button size="xs" colorScheme="facebook" onClick={onOpen}>
-        裁断履歴
-      </Button>
+      {type === "button" ? (
+        <Button size="xs" colorScheme="facebook" onClick={onOpen}>
+          購入履歴
+        </Button>
+      ) : (
+        <Box w="full" onClick={onOpen}>
+          裁断履歴
+        </Box>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />

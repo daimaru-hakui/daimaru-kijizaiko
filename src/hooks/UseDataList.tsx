@@ -69,10 +69,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as UserType)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as UserType)
         )
       )
     );
@@ -102,8 +102,8 @@ export const useDataList = () => {
     const getProducts = async () => {
       const q = query(
         collection(db, "products"),
-        // where("deletedAt", "==", "")
-        orderBy("productNumber", "asc")
+        where("deletedAt", "==", ""),
+        // orderBy("productNumber", "asc")
       );
       try {
         onSnapshot(q, (querySnap) =>
@@ -121,7 +121,9 @@ export const useDataList = () => {
   }, [setProducts]);
 
   function compareFunc(a: any, b: any) {
-    return a.productNumber - b.productNumber;
+    if (a.productNumber < b.productNumber) {
+      return -1
+    }
   }
 
   // キバタ情報;
