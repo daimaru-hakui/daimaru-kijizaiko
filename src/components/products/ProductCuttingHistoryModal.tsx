@@ -62,11 +62,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
+                ({
+                  ...cuttingReport,
+                  ...product,
+                  products: null,
+                } as CuttingHistoryType)
             )
           )
           .flat()
@@ -76,10 +76,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .filter(
             (report: { cuttingDate: string }) =>
               new Date(report.cuttingDate).getTime() >=
-              new Date(startAt).getTime() &&
+                new Date(startAt).getTime() &&
               new Date(report.cuttingDate).getTime() <=
-              new Date(endAt).getTime()
-          ).sort((a, b) => {
+                new Date(endAt).getTime()
+          )
+          .sort((a, b) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -104,7 +105,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     <>
       {type === "button" ? (
         <Button size="xs" colorScheme="facebook" onClick={onOpen}>
-          購入履歴
+          裁断履歴
         </Button>
       ) : (
         <Box w="full" onClick={onOpen}>
