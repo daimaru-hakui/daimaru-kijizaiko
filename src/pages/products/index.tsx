@@ -26,13 +26,12 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
-import useSWR from 'swr'
+import useSWR from "swr";
 import axios from "axios";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
-  // const [products, setProducts] = useState([] as ProductType[])
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
@@ -46,14 +45,13 @@ const Products = () => {
     materialName: "",
   } as ProductType);
 
-  const fetcher = url => axios.get(url).then(res => res.data.props);
-  const { data, error, isLoading } = useSWR('/api/products', fetcher)
+  // const [apiUrl, setApiUrl] = useState("/api/products");
+  // const fetcher = (url) => axios.get(url).then((res) => res.data.props);
+  // const { data, error, isLoading } = useSWR(apiUrl, fetcher);
 
   // useEffect(() => {
-  //   axios.get('/api/products').then(res => setProducts(res.data.props));
-  // }, [setProducts])
-
-  console.log(data)
+  //   setApiUrl("/api/products");
+  // }, [data, search]);
 
   useEffect(() => {
     setFilterProducts(
@@ -117,13 +115,8 @@ const Products = () => {
               </Box>
 
               <Flex gap={3} style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
-                <CSVLink
-                  data={csvData}
-                  filename={`生地一覧_${getTodayDate()}`}
-                >
-                  <Button size="sm">
-                    CSV
-                  </Button>
+                <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
+                  <Button size="sm">CSV</Button>
                 </CSVLink>
                 {elementFilterButton()}
               </Flex>
@@ -138,9 +131,7 @@ const Products = () => {
                 right={12}
               >
                 <CSVLink data={csvData}>
-                  <Button size="sm">
-                    CSV
-                  </Button>
+                  <Button size="sm">CSV</Button>
                 </CSVLink>
                 {elementFilterButton()}
               </Flex>
@@ -254,8 +245,7 @@ const Products = () => {
             </TableContainer>
           </Box>
         </Box>
-      )
-      }
+      )}
     </>
   );
 };
