@@ -47,8 +47,8 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
 
         const newStock =
           (await grayFabricDocSnap.data()?.stock) -
-            history.quantity +
-            items.quantity || 0;
+          history.quantity +
+          items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
@@ -116,6 +116,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
                     items={items}
                     setItems={setItems}
                     onClick={updateConfirmHistory}
+                    orderType=""
                   />
                 </Td>
               </Tr>

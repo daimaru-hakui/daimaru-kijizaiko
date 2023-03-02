@@ -47,7 +47,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
 
   useEffect(() => {
     const newHistorys = histories?.filter(
-      (history: { quantity: number }) => history.quantity > 0
+      (history: { quantity: number; }) => history.quantity > 0
     );
     setFilterHistories(newHistorys);
   }, [histories]);
@@ -57,7 +57,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
     if (userId === "R&D") {
       return "R&D";
     } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
+      const user = users.find((user: { uid: string; }) => userId === user.uid);
       return user?.name;
     }
   };
@@ -201,6 +201,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
                           updateHistoryFabricPurchaseConfirm(history);
                         }
                       }}
+                      orderType=""
                     />
                   ) : (
                     "金額確認済"
