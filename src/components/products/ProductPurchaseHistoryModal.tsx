@@ -24,10 +24,10 @@ import { FaRegWindowClose } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useRecoilValue } from "recoil";
-import { fabricPurchaseConfirmsState } from "../../../store";
 import { useUtil } from "../../hooks/UseUtil";
 import { HistoryType } from "../../../types/HistoryType";
+import { db } from "../../../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 type Props = {
   productId: string;
@@ -40,11 +40,10 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { getTodayDate, mathRound2nd } = useUtil();
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
   const [startAt, setStartAt] = useState(INIT_DATE);
-  const [endAt, setEndAt] = useState(getTodayDate);
+  const [endAt, setEndAt] = useState(getTodayDate());
   const [filterFabricPurchases, setFilterFabricPurchases] = useState([
     { quantity: 0 },
   ] as HistoryType[]);
-  const fabricPurchases = useRecoilValue(fabricPurchaseConfirmsState);
   const {
     getUserName,
     getSerialNumber,
@@ -55,12 +54,17 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = fabricPurchases
-        .filter((obj) => obj.productId === productId)
+      // const date = getTodayDate();
+      const q = query(collection(db, "fabricPurchaseConfirms"),
+        where('productId', '==', productId));
+      const snapshot = await getDocs(q);
+      const filterArray = snapshot.docs.map((doc) => (
+        { ...doc.data(), id: doc.id } as HistoryType
+      ))
         .filter(
-          (obj: { fixedAt: string }) =>
+          (obj: { fixedAt: string; }) =>
             new Date(obj.fixedAt).getTime() >= new Date(startAt).getTime() &&
-            new Date(obj.fixedAt).getTime() <= new Date(endAt).getTime()
+            new Date(obj.fixedAt).getTime() <= (new Date(endAt).getTime())
         )
         .sort((a, b) => {
           if (a.fixedAt > b.fixedAt) {
@@ -70,7 +74,8 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
       setFilterFabricPurchases(filterArray);
     };
     getArray();
-  }, [productId, fabricPurchases, startAt, endAt]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId, startAt, endAt]);
 
   useEffect(() => {
     let total = 0;
@@ -164,7 +169,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   <Tbody>
                     <>
                       {filterFabricPurchases.map(
-                        (fabric: HistoryType & { quantity: number }, index) => (
+                        (fabric: HistoryType & { quantity: number; }, index) => (
                           <Tr key={index}>
                             <Td>{getSerialNumber(fabric?.serialNumber)}</Td>
                             <Td>{fabric?.fixedAt}</Td>

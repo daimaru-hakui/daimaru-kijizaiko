@@ -10,7 +10,9 @@ export const useUtil = () => {
     let monthStr = "0" + month;
     monthStr = monthStr.slice(-2);
     const day = date.getDate();
-    return `${year}-${monthStr}-${day}`;
+    let dayStr = "0" + day;
+    dayStr = dayStr.slice(-2);
+    return `${year}-${monthStr}-${dayStr}`;
   };
 
   // 半角から全角

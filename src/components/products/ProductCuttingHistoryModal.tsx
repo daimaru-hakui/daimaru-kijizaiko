@@ -26,10 +26,10 @@ import { NextPage } from "next";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { CuttingReportType } from "../../../types/CuttingReportType";
-import { useRecoilValue } from "recoil";
-import { cuttingReportsState } from "../../../store";
 import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
+import { collection, endAt, getDocs, orderBy, query, startAt } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 type Props = {
   productId: string;
@@ -41,12 +41,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const { getTodayDate, mathRound2nd } = useUtil();
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
-  const [startAt, setStartAt] = useState(INIT_DATE);
-  const [endAt, setEndAt] = useState(getTodayDate);
+  const [startDay, setStartDay] = useState(INIT_DATE);
+  const [endDay, setEndDay] = useState(getTodayDate());
   const [filterCuttingReports, setFilterCuttingReports] = useState([
     { quantity: 0 },
   ] as CuttingHistoryType[]);
-  const cuttingReports = useRecoilValue(cuttingReportsState);
   const {
     getUserName,
     getSerialNumber,
@@ -57,28 +56,29 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getCuttingReports = async () => {
+      const q = query(collection(db, "cuttingReports"),
+        orderBy('cuttingDate'),
+        startAt(startDay),
+        endAt(endDay));
+      const snapshot = await getDocs(q);
+
       setFilterCuttingReports(
-        cuttingReports
+        snapshot.docs.map((doc) => (
+          { ...doc.data(), id: doc.id }
+        ))
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string }) => report.productId === productId
-          )
-          .filter(
-            (report: { cuttingDate: string }) =>
-              new Date(report.cuttingDate).getTime() >=
-                new Date(startAt).getTime() &&
-              new Date(report.cuttingDate).getTime() <=
-                new Date(endAt).getTime()
+            (report: { productId: string; }) => report.productId === productId
           )
           .sort((a, b) => {
             if (a.cuttingDate > b.cuttingDate) {
@@ -88,7 +88,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
       );
     };
     getCuttingReports();
-  }, [productId, cuttingReports, startAt, endAt]);
+  }, [productId, startDay, endDay]);
 
   useEffect(() => {
     let total = 0;
@@ -97,8 +97,8 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   }, [filterCuttingReports]);
 
   const onReset = () => {
-    setStartAt(INIT_DATE);
-    setEndAt(getTodayDate);
+    setStartDay(INIT_DATE);
+    setEndDay(getTodayDate());
   };
 
   return (
@@ -148,14 +148,14 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                 <Input
                   size="sm"
                   type="date"
-                  value={startAt}
-                  onChange={(e) => setStartAt(e.target.value)}
+                  value={startDay}
+                  onChange={(e) => setStartDay(e.target.value)}
                 />
                 <Input
                   size="sm"
                   type="date"
-                  value={endAt}
-                  onChange={(e) => setEndAt(e.target.value)}
+                  value={endDay}
+                  onChange={(e) => setEndDay(e.target.value)}
                 />
                 <FaRegWindowClose
                   cursor="pointer"
@@ -183,7 +183,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                     <>
                       {filterCuttingReports.map(
                         (
-                          report: CuttingHistoryType & { quantity: number },
+                          report: CuttingHistoryType & { quantity: number; },
                           index
                         ) => (
                           <Tr key={index}>

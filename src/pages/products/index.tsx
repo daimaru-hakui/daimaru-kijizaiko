@@ -26,12 +26,13 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
-import useSWR from "swr";
-import axios from "axios";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
+  // const [products, setProducts] = useState([] as ProductType[]);
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
@@ -45,13 +46,29 @@ const Products = () => {
     materialName: "",
   } as ProductType);
 
-  // const [apiUrl, setApiUrl] = useState("/api/products");
-  // const fetcher = (url) => axios.get(url).then((res) => res.data.props);
-  // const { data, error, isLoading } = useSWR(apiUrl, fetcher);
-
   // useEffect(() => {
-  //   setApiUrl("/api/products");
-  // }, [data, search]);
+  //   const getProducts = async () => {
+  //     const q = query(
+  //       collection(db, "products"),
+  //       where("deletedAt", "==", ""),
+  //     );
+  //     try {
+  //       onSnapshot(q, (querySnap) =>
+  //         setProducts(
+  //           querySnap.docs
+  //             .map((doc) => ({ ...doc.data(), id: doc.id } as ProductType))
+  //             .sort((a: any, b: any) => {
+  //               if (a.productNumber < b.productNumber) {
+  //                 return - 1;
+  //               }
+  //             }
+  //             )));
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   getProducts();
+  // }, [setProducts]);
 
   useEffect(() => {
     setFilterProducts(

@@ -5,9 +5,9 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState } from "../../store";
+import { currentUserState, loadingState } from "../../store";
 import { ProductType } from "../../types/FabricType";
 import { HistoryType } from "../../types/HistoryType";
 import { useGetDisp } from "./UseGetDisp";
@@ -19,6 +19,7 @@ export const useOrderFabricFunc = (
   orderType: string
 ) => {
   const currentUser = useRecoilValue(currentUserState);
+  const setLoading = useSetRecoilState(loadingState);
   const router = useRouter();
   const { getSupplierName } = useGetDisp();
   const { getTodayDate } = useUtil();
@@ -49,6 +50,7 @@ export const useOrderFabricFunc = (
   const orderFabricDyeingFromStock = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
+    setLoading(true);
 
     const orderNumberDocRef = doc(
       db,
@@ -97,6 +99,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
+      setLoading(false);
       router.push("/products/history/fabric-dyeing");
     }
   };
@@ -105,6 +108,7 @@ export const useOrderFabricFunc = (
   const orderFabricDyeingFromRanning = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
+    setLoading(true);
 
     const orderNumberDocRef = doc(
       db,
@@ -143,6 +147,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
+      setLoading(false);
       router.push("/products/history/fabric-dyeing");
     }
   };
@@ -150,6 +155,8 @@ export const useOrderFabricFunc = (
   const orderFabricPurchase = async (stockType: string) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
+    setLoading(true);
+
     const orderNumberDocRef = doc(
       db,
       "serialNumbers",
@@ -199,6 +206,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
+      setLoading(false);
       router.push("/products/history/fabric-purchase");
     }
   };

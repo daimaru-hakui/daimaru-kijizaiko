@@ -31,14 +31,16 @@ type Props = {
   onClick: Function;
   items: any;
   setItems: Function;
+  orderType: string;
 };
 
 export const HistoryEditModal: NextPage<Props> = ({
   history,
   type,
+  onClick,
   items,
   setItems,
-  onClick,
+  orderType
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -140,7 +142,7 @@ export const HistoryEditModal: NextPage<Props> = ({
               </Box>
               {type === "order" && (
                 <Box w="100%">
-                  <Text>仕上予定日</Text>
+                  <Text>{orderType === "purchase" ? "入荷予定" : "仕上予定日"}</Text>
                   <Input
                     type="date"
                     mt={1}

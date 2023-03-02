@@ -52,7 +52,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(
-      (history: { quantity: number }) => history.quantity > 0
+      (history: { quantity: number; }) => history.quantity > 0
     );
     setFilterHistories(newHistorys);
   }, [histories]);
@@ -228,8 +228,8 @@ const HistoryOrderTable: NextPage<Props> = ({
 
         const newWip =
           (await productDocSnap.data()?.wip) -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
 
         const newStock =
           (await productDocSnap.data()?.externalStock) + items.quantity || 0;
@@ -390,8 +390,8 @@ const HistoryOrderTable: NextPage<Props> = ({
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === HOUSE_FACTORY) {
@@ -462,9 +462,10 @@ const HistoryOrderTable: NextPage<Props> = ({
       <HistoryEditModal
         history={history}
         type="order"
+        onClick={() => onClickUpdate(history)}
         items={items}
         setItems={setItems}
-        onClick={() => onClickUpdate(history)}
+        orderType={orderType}
       />
       {isAdminAuth() && (
         <FaTrashAlt
@@ -488,7 +489,7 @@ const HistoryOrderTable: NextPage<Props> = ({
               <Th>確定</Th>
               <Th>発注NO.</Th>
               <Th>発注日</Th>
-              <Th>仕上予定日</Th>
+              <Th>{orderType === "purchase" ? "入荷予定" : "仕上予定日"}</Th>
               <Th>担当者</Th>
               <Th>品番</Th>
               <Th>色</Th>

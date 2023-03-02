@@ -1,22 +1,31 @@
 import {
   Box,
+  Flex,
+  Input,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { FaRegWindowClose } from "react-icons/fa";
+import { collection, endAt, onSnapshot, orderBy, query, startAt } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
+import { useUtil } from "../../../hooks/UseUtil";
 
 const HistoryCutting = () => {
+  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
+  const { getTodayDate } = useUtil();
+  const [startDay, setStartDay] = useState(INIT_DATE);
+  const [endDay, setEndDay] = useState(getTodayDate());
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
   const {
     getSerialNumber,
@@ -30,7 +39,9 @@ const HistoryCutting = () => {
     const getCuttingReports = () => {
       const q = query(
         collection(db, "cuttingReports"),
-        orderBy("cuttingDate", "desc")
+        orderBy("cuttingDate"),
+        startAt(startDay),
+        endAt(endDay)
       );
       try {
         onSnapshot(q, (querySnap) =>
@@ -51,16 +62,45 @@ const HistoryCutting = () => {
       }
     };
     getCuttingReports();
-  }, []);
+  }, [startDay, endDay]);
+
+  const onReset = () => {
+    setStartDay(INIT_DATE);
+    setEndDay(getTodayDate());
+  };
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
-        <TableContainer p={6} w="100%">
-          <Box as="h2" fontSize="2xl">
-            裁断生地一覧
-          </Box>
-
+      <Box w="100%" my={6} p={6} bg="white" boxShadow="md" rounded="md">
+        <Box as="h2" fontSize="2xl">
+          裁断生地一覧
+        </Box>
+        <Box px={3}>
+          <Text mt={6} fontSize="sm">
+            裁断期間
+          </Text>
+          <Flex gap={2} maxW="350px" alignItems="center">
+            <Input
+              size="sm"
+              type="date"
+              value={startDay}
+              onChange={(e) => setStartDay(e.target.value)}
+            />
+            <Input
+              size="sm"
+              type="date"
+              value={endDay}
+              onChange={(e) => setEndDay(e.target.value)}
+            />
+            <FaRegWindowClose
+              cursor="pointer"
+              size="50px"
+              color="#444"
+              onClick={onReset}
+            />
+          </Flex>
+        </Box>
+        <TableContainer p={3} w="100%">
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>

@@ -42,9 +42,7 @@ import { ColorType } from "../../types/ColorType";
 import { MaterialNameType } from "../../types/MaterialNameType";
 
 export const useDataList = () => {
-  const BASE_DATE = process.env.NEXT_PUBLIC_BASE_DATE || "";
   const [user] = useAuthState(auth);
-  const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setUsers = useSetRecoilState(usersState);
   const [products, setProducts] = useRecoilState(productsState);
@@ -59,7 +57,7 @@ export const useDataList = () => {
   const setFabricPurchaseConfirms = useSetRecoilState(
     fabricPurchaseConfirmsState
   );
-  const setCuttingReports = useSetRecoilState(cuttingReportsState);
+
 
   // users情報;
   useEffect(() => {
@@ -103,7 +101,6 @@ export const useDataList = () => {
       const q = query(
         collection(db, "products"),
         where("deletedAt", "==", ""),
-        // orderBy("productNumber", "asc")
       );
       try {
         onSnapshot(q, (querySnap) =>
@@ -122,7 +119,7 @@ export const useDataList = () => {
 
   function compareFunc(a: any, b: any) {
     if (a.productNumber < b.productNumber) {
-      return -1
+      return -1;
     }
   }
 
@@ -236,35 +233,35 @@ export const useDataList = () => {
     getFabricPurchaseConfirms();
   }, [setFabricPurchaseConfirms]);
 
-  // 裁断報告書　履歴;
-  useEffect(() => {
-    const getCuttingReports = async () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("cuttingDate", "desc"),
-        endAt(BASE_DATE)
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setCuttingReports(
-            querySnap.docs
-              .map(
-                (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-              )
-              .sort((a, b) => {
-                if (a.serialNumber > b.serialNumber) {
-                  return -1;
-                }
-              })
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setCuttingReports]);
+  // // 裁断報告書　履歴;
+  // useEffect(() => {
+  //   const getCuttingReports = async () => {
+  //     const q = query(
+  //       collection(db, "cuttingReports"),
+  //       orderBy("cuttingDate", "desc"),
+  //       endAt(BASE_DATE)
+  //     );
+  //     try {
+  //       onSnapshot(q, (querySnap) =>
+  //         setCuttingReports(
+  //           querySnap.docs
+  //             .map(
+  //               (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+  //             )
+  //             .sort((a, b) => {
+  //               if (a.serialNumber > b.serialNumber) {
+  //                 return -1;
+  //               }
+  //             })
+  //         )
+  //       );
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   getCuttingReports();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [setCuttingReports]);
 
   // 仕入先　情報;
   useEffect(() => {

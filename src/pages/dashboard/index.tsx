@@ -264,8 +264,9 @@ const Dashboard = () => {
                   />
                   <StatCard
                     title="入荷予定金額"
-                    quantity={getTotalProductsPrice(["arrivingQuantity"])
-                      .toFixed()
+                    quantity={Number(
+                      getTotalProductsPrice(["arrivingQuantity"])
+                        .toFixed())
                       .toLocaleString()}
                     unit="円"
                     fontSize="3xl"
