@@ -20,7 +20,7 @@ export const useAPI = (url: string, limit: number) => {
         },
       })
       .then((res) => res.data);
-  const { data } = useSWR(url, fetcher);
+  const { data, isLoading } = useSWR(url, fetcher);
   const { mutate } = useSWRConfig();
 
   const onReset = () => {
@@ -29,5 +29,5 @@ export const useAPI = (url: string, limit: number) => {
     setLimitNum(limit);
   };
 
-  return { data, mutate, startDay, setStartDay, endDay, setEndDay, onReset, limitNum, setLimitNum };
+  return { data, mutate, startDay, setStartDay, endDay, setEndDay, onReset, limitNum, setLimitNum, isLoading };
 };

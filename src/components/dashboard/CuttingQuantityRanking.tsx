@@ -9,8 +9,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { useRecoilValue } from "recoil";
-import { cuttingReportsState } from "../../../store";
 import { Box } from "@chakra-ui/react";
 import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { CuttingReportType } from "../../../types/CuttingReportType";
@@ -31,7 +29,6 @@ type Props = {
   data: any;
   startDay: string;
   endDay: string;
-  mutate: Function;
   rankingNumber: number;
 };
 
@@ -39,15 +36,12 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   data,
   startDay,
   endDay,
-  mutate,
   rankingNumber,
 }) => {
-  const cuttingReports = useRecoilValue(cuttingReportsState);
   const { getProductNumber, getColorName, getPrice } = useGetDisp();
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);
-  mutate("/api/ranking");
 
   useEffect(() => {
     const getArray = async () => {

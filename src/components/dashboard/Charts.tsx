@@ -6,12 +6,15 @@ import PurchasePriceRanking from './PurchasePriceRanking';
 import PurchaseQuantityRanking from './PurchaseQuantityRanking';
 import { FaRegWindowClose } from "react-icons/fa";
 import { useAPI } from '../../hooks/UseAPI';
+import { useSetRecoilState } from 'recoil';
+import { loadingState } from '../../../store';
 
 
 const Charts = () => {
-  const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, onReset } =
+  const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, onReset, isLoading } =
     useAPI("/api/ranking", 5);
-
+  const setLoading = useSetRecoilState(loadingState);
+  setLoading(isLoading);
   return (
     <>
       <Flex
@@ -80,7 +83,6 @@ const Charts = () => {
           data={data}
           startDay={startDay}
           endDay={endDay}
-          mutate={mutate}
           rankingNumber={limitNum}
         />
         <CuttingPriceRanking
@@ -104,14 +106,12 @@ const Charts = () => {
           data={data}
           startDay={startDay}
           endDay={endDay}
-          mutate={mutate}
           rankingNumber={limitNum}
         />
         <PurchasePriceRanking
           data={data}
           startDay={startDay}
           endDay={endDay}
-          mutate={mutate}
           rankingNumber={limitNum}
         />
       </Flex>

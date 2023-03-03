@@ -33,7 +33,6 @@ const CuttingReport = () => {
     useAPI("/api/cutting-reports", 5);
   mutate("/api/cutting-reports");
 
-  console.log(data?.count);
 
   useEffect(() => {
     setCuttingReports(data?.contents);

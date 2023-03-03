@@ -9,12 +9,9 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { useRecoilValue } from "recoil";
-import { fabricPurchaseConfirmsState } from "../../../store";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
-import { HistoryType } from "../../../types/HistoryType";
 
 ChartJS.register(
   CategoryScale,
@@ -29,7 +26,6 @@ type Props = {
   data: any;
   startDay: string;
   endDay: string;
-  mutate: Function;
   rankingNumber: number;
 };
 
@@ -37,15 +33,12 @@ const PurchaseQuantityRanking: NextPage<Props> = ({
   data,
   startDay,
   endDay,
-  mutate,
   rankingNumber,
 }) => {
-  const fabricPurchaseConfirms = useRecoilValue(fabricPurchaseConfirmsState);
-  const { getProductNumber, getColorName, getPrice } = useGetDisp();
+  const { getProductNumber, getColorName } = useGetDisp();
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0 },
   ]);
-  mutate("/api/ranking");
 
   useEffect(() => {
     const getArray = async () => {

@@ -17,7 +17,6 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
-import { useAPI } from "../../hooks/UseAPI";
 
 ChartJS.register(
   CategoryScale,
