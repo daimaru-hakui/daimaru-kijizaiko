@@ -57,7 +57,8 @@ export const useDataList = () => {
   const setFabricPurchaseConfirms = useSetRecoilState(
     fabricPurchaseConfirmsState
   );
-
+  const setCuttingReports = useSetRecoilState(cuttingReportsState);
+  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
 
   // users情報;
   useEffect(() => {
@@ -67,10 +68,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-          ({
-            ...doc.data(),
-            id: doc.id,
-          } as UserType)
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
         )
       )
     );
@@ -98,10 +99,7 @@ export const useDataList = () => {
   // products情報;
   useEffect(() => {
     const getProducts = async () => {
-      const q = query(
-        collection(db, "products"),
-        where("deletedAt", "==", ""),
-      );
+      const q = query(collection(db, "products"), where("deletedAt", "==", ""));
       try {
         onSnapshot(q, (querySnap) =>
           setProducts(
@@ -233,35 +231,35 @@ export const useDataList = () => {
     getFabricPurchaseConfirms();
   }, [setFabricPurchaseConfirms]);
 
-  // // 裁断報告書　履歴;
-  // useEffect(() => {
-  //   const getCuttingReports = async () => {
-  //     const q = query(
-  //       collection(db, "cuttingReports"),
-  //       orderBy("cuttingDate", "desc"),
-  //       endAt(BASE_DATE)
-  //     );
-  //     try {
-  //       onSnapshot(q, (querySnap) =>
-  //         setCuttingReports(
-  //           querySnap.docs
-  //             .map(
-  //               (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-  //             )
-  //             .sort((a, b) => {
-  //               if (a.serialNumber > b.serialNumber) {
-  //                 return -1;
-  //               }
-  //             })
-  //         )
-  //       );
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   getCuttingReports();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [setCuttingReports]);
+  // 裁断報告書　履歴;
+  useEffect(() => {
+    const getCuttingReports = async () => {
+      const q = query(
+        collection(db, "cuttingReports"),
+        orderBy("cuttingDate", "desc"),
+        endAt(INIT_DATE)
+      );
+      try {
+        onSnapshot(q, (querySnap) =>
+          setCuttingReports(
+            querySnap.docs
+              .map(
+                (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+              )
+              .sort((a, b) => {
+                if (a.serialNumber > b.serialNumber) {
+                  return -1;
+                }
+              })
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getCuttingReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setCuttingReports]);
 
   // 仕入先　情報;
   useEffect(() => {
