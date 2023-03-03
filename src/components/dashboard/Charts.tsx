@@ -9,12 +9,14 @@ import { useAPI } from '../../hooks/UseAPI';
 import { useSetRecoilState } from 'recoil';
 import { loadingState } from '../../../store';
 
-
 const Charts = () => {
-  const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, onReset, isLoading } =
+  const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, isLoading, onReset } =
     useAPI("/api/ranking", 5);
   const setLoading = useSetRecoilState(loadingState);
   setLoading(isLoading);
+  mutate("/api/ranking");
+
+
   return (
     <>
       <Flex
@@ -91,6 +93,7 @@ const Charts = () => {
           endDay={endDay}
           mutate={mutate}
           rankingNumber={limitNum}
+
         />
       </Flex>
       <Flex
