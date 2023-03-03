@@ -123,7 +123,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
         )}`
     );
 
-  const data = {
+  const dataList = {
     labels: labels,
     datasets: [
       {
@@ -139,7 +139,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
 
   return (
     <Box p={3} w="100%" h="100%" rounded="md">
-      <Bar options={options} data={data} />
+      <Bar options={options} data={dataList} />
     </Box>
   );
 };

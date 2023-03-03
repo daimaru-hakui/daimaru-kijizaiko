@@ -13,60 +13,31 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { FaRegWindowClose } from "react-icons/fa";
-import { collection, endAt, onSnapshot, orderBy, query, startAt } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
-import { db } from "../../../../firebase";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
+import { useCuttingReportAPI } from "../../../hooks/UseCuttingReportAPI";
 
 const CuttingReport = () => {
-  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
   const { getTodayDate } = useUtil();
-  const [startDay, setStartDay] = useState(INIT_DATE);
-  const [endDay, setEndDay] = useState(getTodayDate());
   const { getSerialNumber, getUserName } = useGetDisp();
   const { csvData } = useCuttingReportFunc(null, null);
-  const [cuttingReports, setCuttingReports] = useState([] as CuttingReportType[]);
+  const [cuttingReports, setCuttingReports] = useState(
+    [] as CuttingReportType[]
+  );
+  const { data, mutate, startDay, setStartDay, endDay, setEndDay, onReset } =
+    useCuttingReportAPI("/api/cutting-reports");
 
-  // 裁断報告書　履歴;
+  mutate("/api/cutting-reports");
+
   useEffect(() => {
-    const getCuttingReports = async () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("cuttingDate"),
-        startAt(startDay),
-        endAt(endDay)
-      );
-      try {
-        onSnapshot(q, (querysnap) =>
-          setCuttingReports(
-            querysnap.docs
-              .map(
-                (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-              )
-              .sort((a, b) => {
-                if (a.serialNumber > b.serialNumber) {
-                  return -1;
-                }
-              })
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startDay, endDay]);
-
-  const onReset = () => {
-    setStartDay(INIT_DATE);
-    setEndDay(getTodayDate());
-  };
+    setCuttingReports(data?.contents);
+    console.log(data?.contents);
+  }, [startDay, endDay, data]);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -100,7 +71,7 @@ const CuttingReport = () => {
               cursor="pointer"
               size="50px"
               color="#444"
-              onClick={onReset}
+              onClick={() => onReset()}
             />
           </Flex>
         </Box>
@@ -119,7 +90,7 @@ const CuttingReport = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {cuttingReports.map((report: CuttingReportType) => (
+              {cuttingReports?.map((report: CuttingReportType) => (
                 <Tr key={report.serialNumber}>
                   <Td>
                     <CuttingReportModal
