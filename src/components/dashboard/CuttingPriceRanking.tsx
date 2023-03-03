@@ -29,16 +29,13 @@ type Props = {
   data: any;
   startDay: string;
   endDay: string;
-  mutate: Function;
   rankingNumber: number;
-
 };
 
 const CuttingPriceRanking: NextPage<Props> = ({
   data,
   startDay,
   endDay,
-  mutate,
   rankingNumber,
 }) => {
   const { getProductNumber, getColorName, getPrice } = useGetDisp();
@@ -46,9 +43,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
     { productId: "", quantity: 0, price: 0 },
   ]);
 
-
   useEffect(() => {
-    mutate("/api/ranking");
     const getArray = async () => {
 
       const filterArray = data?.cuttingReports?.map((obj: CuttingReportType) =>

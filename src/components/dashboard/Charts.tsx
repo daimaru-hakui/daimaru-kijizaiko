@@ -1,22 +1,20 @@
 import { Box, Flex, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CuttingPriceRanking from './CuttingPriceRanking';
 import CuttingQuantityRanking from './CuttingQuantityRanking';
 import PurchasePriceRanking from './PurchasePriceRanking';
 import PurchaseQuantityRanking from './PurchaseQuantityRanking';
 import { FaRegWindowClose } from "react-icons/fa";
 import { useAPI } from '../../hooks/UseAPI';
-import { useSetRecoilState } from 'recoil';
-import { loadingState } from '../../../store';
 
 const Charts = () => {
   const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, isLoading, onReset } =
     useAPI("/api/ranking", 5);
-  const setLoading = useSetRecoilState(loadingState);
-  setLoading(isLoading);
-  mutate("/api/ranking");
 
-
+  useEffect(() => {
+    mutate("/api/ranking");
+  }, [limitNum, startDay, endDay, mutate]);
+  console.log('graph');
   return (
     <>
       <Flex
@@ -91,7 +89,6 @@ const Charts = () => {
           data={data}
           startDay={startDay}
           endDay={endDay}
-          mutate={mutate}
           rankingNumber={limitNum}
 
         />
