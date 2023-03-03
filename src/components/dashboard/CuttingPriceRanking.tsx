@@ -17,6 +17,7 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
+import { useAPI } from "../../hooks/UseAPI";
 
 ChartJS.register(
   CategoryScale,
@@ -28,14 +29,18 @@ ChartJS.register(
 );
 
 type Props = {
-  startAt: string;
-  endAt: string;
+  data: any;
+  startDay: string;
+  endDay: string;
+  mutate: Function;
   rankingNumber: number;
 };
 
 const CuttingPriceRanking: NextPage<Props> = ({
-  startAt,
-  endAt,
+  data,
+  startDay,
+  endDay,
+  mutate,
   rankingNumber,
 }) => {
   const cuttingReports = useRecoilValue(cuttingReportsState);
@@ -43,29 +48,23 @@ const CuttingPriceRanking: NextPage<Props> = ({
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);
+  mutate("/api/ranking");
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = cuttingReports
-        .map((obj: CuttingReportType) =>
-          obj.products.map(
-            (product: CuttingProductType) =>
-              ({
-                ...obj,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
-          )
-        )
-        .flat()
-        .filter(
-          (obj: { cuttingDate: string }) =>
-            new Date(obj.cuttingDate).getTime() >=
-              new Date(startAt).getTime() &&
-            new Date(obj.cuttingDate).getTime() <= new Date(endAt).getTime()
-        );
 
-      const ProductIds = filterArray.map((obj) => obj.productId);
+      const filterArray = data?.cuttingReports?.map((obj: CuttingReportType) =>
+        obj.products.map(
+          (product: CuttingProductType) =>
+          ({
+            ...obj,
+            ...product,
+            products: null,
+          } as CuttingHistoryType)
+        )
+      ).flat();
+
+      const ProductIds = filterArray?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
@@ -77,7 +76,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
         let sum = 0;
         let productId = "";
         let price = 0;
-        reports?.forEach((report: { productId: string; quantity: number }) => {
+        reports?.forEach((report: { productId: string; quantity: number; }) => {
           sum += report.quantity;
           productId = report.productId;
           price += report.quantity * getPrice(report.productId);
@@ -93,7 +92,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cuttingReports, startAt, endAt]);
+  }, [data, rankingNumber, startDay, endDay]);
 
   const options = {
     indexAxis: "y" as const,
@@ -117,7 +116,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string }) =>
+      (ranking: { productId: string; }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -130,7 +129,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
         label: "使用金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((price: { price: number }) => price.price.toFixed()),
+          ?.map((price: { price: number; }) => price.price.toFixed()),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
       },

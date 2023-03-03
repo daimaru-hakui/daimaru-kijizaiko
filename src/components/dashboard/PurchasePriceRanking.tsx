@@ -25,14 +25,17 @@ ChartJS.register(
 );
 
 type Props = {
-  startAt: string;
-  endAt: string;
+  data: any;
+  startDay: string;
+  endDay: string;
+  mutate: Function;
   rankingNumber: number;
 };
-
 const PurchasePriceRanking: NextPage<Props> = ({
-  startAt,
-  endAt,
+  data,
+  startDay,
+  endDay,
+  mutate,
   rankingNumber,
 }) => {
   const fabricPurchaseConfirms = useRecoilValue(fabricPurchaseConfirmsState);
@@ -40,24 +43,19 @@ const PurchasePriceRanking: NextPage<Props> = ({
   const [chartDataList, setChartDataList] = useState([
     { productId: "", price: 0 },
   ]);
+  mutate("/api/ranking");
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = fabricPurchaseConfirms.filter(
-        (obj: { fixedAt: string }) =>
-          new Date(obj.fixedAt).getTime() >= new Date(startAt).getTime() &&
-          new Date(obj.fixedAt).getTime() <= new Date(endAt).getTime()
-      );
-
-      const ProductIds = filterArray.map((obj) => obj.productId);
+      const ProductIds = data?.fabricPurchaseConfirms?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
         let sum = 0;
         let productId = "";
-        filterArray.forEach(
-          (obj: { productId: string; quantity: number; price: number }) => {
+        data?.fabricPurchaseConfirms?.forEach(
+          (obj: { productId: string; quantity: number; price: number; }) => {
             if (obj.productId === header) {
               sum += obj.price * obj.quantity;
               productId = obj.productId;
@@ -76,7 +74,7 @@ const PurchasePriceRanking: NextPage<Props> = ({
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fabricPurchaseConfirms, startAt, endAt]);
+  }, [data, rankingNumber, startDay, endDay]);
 
   const options = {
     indexAxis: "y" as const,
@@ -100,20 +98,20 @@ const PurchasePriceRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string }) =>
+      (ranking: { productId: string; }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
     );
 
-  const data = {
+  const dataList = {
     labels: labels,
     datasets: [
       {
         label: "購入金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((price: { price: number }) => price.price.toFixed()),
+          ?.map((price: { price: number; }) => price.price.toFixed()),
         borderColor: "rgba(255, 206, 86, 1)",
         backgroundColor: "rgba(255, 206, 86, 0.5)",
       },
@@ -122,7 +120,7 @@ const PurchasePriceRanking: NextPage<Props> = ({
 
   return (
     <Box p={3} w="100%" h="100%" rounded="md">
-      <Bar options={options} data={data} />
+      <Bar options={options} data={dataList} />
     </Box>
   );
 };

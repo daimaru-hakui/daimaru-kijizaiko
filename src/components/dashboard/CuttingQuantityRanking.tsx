@@ -28,14 +28,18 @@ ChartJS.register(
 );
 
 type Props = {
-  startAt: string;
-  endAt: string;
+  data: any;
+  startDay: string;
+  endDay: string;
+  mutate: Function;
   rankingNumber: number;
 };
 
 const CuttingQuantityRanking: NextPage<Props> = ({
-  startAt,
-  endAt,
+  data,
+  startDay,
+  endDay,
+  mutate,
   rankingNumber,
 }) => {
   const cuttingReports = useRecoilValue(cuttingReportsState);
@@ -43,29 +47,23 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);
+  mutate("/api/ranking");
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = cuttingReports
+      const filterArray = data?.cuttingReports
         .map((obj: CuttingReportType) =>
           obj.products.map(
             (product: CuttingProductType) =>
-              ({
-                ...obj,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
+            ({
+              ...obj,
+              ...product,
+              products: null,
+            } as CuttingHistoryType)
           )
-        )
-        .flat()
-        .filter(
-          (obj: { cuttingDate: string }) =>
-            new Date(obj.cuttingDate).getTime() >=
-              new Date(startAt).getTime() &&
-            new Date(obj.cuttingDate).getTime() <= new Date(endAt).getTime()
-        );
+        ).flat();
 
-      const ProductIds = filterArray.map((obj) => obj.productId);
+      const ProductIds = filterArray?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
@@ -76,7 +74,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
       const newArray = newFilterArray.map((obj: any) => {
         let sum = 0;
         let productId = "";
-        obj?.forEach((report: { productId: string; quantity: number }) => {
+        obj?.forEach((report: { productId: string; quantity: number; }) => {
           sum += report.quantity;
           productId = report.productId;
         });
@@ -92,7 +90,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cuttingReports, startAt, endAt]);
+  }, [data, rankingNumber, startDay, endDay]);
 
   const options = {
     indexAxis: "y" as const,
@@ -116,20 +114,20 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string }) =>
+      (ranking: { productId: string; }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
     );
 
-  const data = {
+  const dataList = {
     labels,
     datasets: [
       {
         label: "使用数量（ｍ）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { quantity: number }) => ranking.quantity),
+          ?.map((ranking: { quantity: number; }) => ranking.quantity),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
@@ -138,7 +136,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
 
   return (
     <Box p={3} bg="white" w="100%" h="100%" rounded="md">
-      <Bar options={options} data={data} />
+      <Bar options={options} data={dataList} />
     </Box>
   );
 };

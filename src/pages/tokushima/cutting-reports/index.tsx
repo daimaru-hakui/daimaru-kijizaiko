@@ -20,7 +20,7 @@ import CuttingReportModal from "../../../components/tokushima/CuttingReportModal
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
-import { useCuttingReportAPI } from "../../../hooks/UseCuttingReportAPI";
+import { useAPI } from "../../../hooks/UseAPI";
 
 const CuttingReport = () => {
   const { getTodayDate } = useUtil();
@@ -30,9 +30,10 @@ const CuttingReport = () => {
     [] as CuttingReportType[]
   );
   const { data, mutate, startDay, setStartDay, endDay, setEndDay, onReset } =
-    useCuttingReportAPI("/api/cutting-reports");
-
+    useAPI("/api/cutting-reports", 5);
   mutate("/api/cutting-reports");
+
+  console.log(data?.count);
 
   useEffect(() => {
     setCuttingReports(data?.contents);

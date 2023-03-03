@@ -2,20 +2,15 @@ import {
   Box,
   Container,
   Flex,
-  Heading,
-  Input,
+
   Stat,
   StatGroup,
   StatLabel,
   StatNumber,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
+
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { FaRegWindowClose } from "react-icons/fa";
+
 import { useRecoilValue } from "recoil";
 import {
   currentUserState,
@@ -26,20 +21,11 @@ import {
   productsState,
 } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
-import CuttingPriceRanking from "../../components/dashboard/CuttingPriceRanking";
-import CuttingQuantityRanking from "../../components/dashboard/CuttingQuantityRanking";
-import PurchasePriceRanking from "../../components/dashboard/PurchasePriceRanking";
-import PurchaseQuantityRanking from "../../components/dashboard/PurchaseQuantityRanking";
+import Charts from "../../components/dashboard/Charts";
 import StatCard from "../../components/dashboard/StatCard";
-import { useUtil } from "../../hooks/UseUtil";
 
 const Dashboard = () => {
   const currentUser = useRecoilValue(currentUserState);
-  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
-  const { getTodayDate } = useUtil();
-  const [startAt, setStartAt] = useState(INIT_DATE);
-  const [endAt, setEndAt] = useState(getTodayDate);
-  const [rankingNumber, setRankingNumber] = useState(5);
   const products = useRecoilValue(productsState);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
@@ -63,12 +49,6 @@ const Dashboard = () => {
       });
     });
     return total;
-  };
-
-  const onReset = () => {
-    setStartAt(INIT_DATE);
-    setEndAt(getTodayDate);
-    setRankingNumber(5);
   };
 
   return (
@@ -295,99 +275,8 @@ const Dashboard = () => {
                 </Flex>
               </Flex>
             </Flex>
-            <Flex
-              p={6}
-              mt={{ base: 3, md: 6 }}
-              gap={{ base: 3, md: 3 }}
-              flexDirection={{ base: "column", md: "row" }}
-              rounded="md"
-              shadow="md"
-              bg="white"
-            >
-              <Box>
-                <Heading as="h4" fontSize="md">
-                  期間を選択（グラフ）
-                </Heading>
-                <Flex mt={3} gap={3} alignItems="center">
-                  <Input
-                    type="date"
-                    value={startAt}
-                    onChange={(e) => setStartAt(e.target.value)}
-                  />
-                  <Input
-                    type="date"
-                    value={endAt}
-                    onChange={(e) => setEndAt(e.target.value)}
-                  />
-                </Flex>
-              </Box>
-              <Box>
-                <Heading as="h4" fontSize="md">
-                  件数（グラフ）
-                </Heading>
-                <Flex mt={3} gap={3} alignItems="center">
-                  <NumberInput
-                    w={{ base: "full", md: "80px" }}
-                    min={1}
-                    max={100}
-                    value={rankingNumber}
-                    onChange={(e) => setRankingNumber(Number(e))}
-                  >
-                    <NumberInputField textAlign="right" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                  <FaRegWindowClose
-                    cursor="pointer"
-                    size="25px"
-                    color="#444"
-                    onClick={onReset}
-                  />
-                </Flex>
-              </Box>
-            </Flex>
-            <Flex
-              rounded="md"
-              shadow="md"
-              bg="white"
-              mt={{ base: 3, md: 6 }}
-              gap={{ base: 3, md: 6 }}
-              justifyContent="center"
-              flexDirection={{ base: "column", md: "row" }}
-            >
-              <CuttingQuantityRanking
-                startAt={startAt}
-                endAt={endAt}
-                rankingNumber={rankingNumber}
-              />
-              <CuttingPriceRanking
-                startAt={startAt}
-                endAt={endAt}
-                rankingNumber={rankingNumber}
-              />
-            </Flex>
-            <Flex
-              rounded="md"
-              shadow="md"
-              bg="white"
-              mt={{ base: 3, md: 6 }}
-              gap={{ base: 3, md: 6 }}
-              justifyContent="center"
-              flexDirection={{ base: "column", md: "row" }}
-            >
-              <PurchaseQuantityRanking
-                startAt={startAt}
-                endAt={endAt}
-                rankingNumber={rankingNumber}
-              />
-              <PurchasePriceRanking
-                startAt={startAt}
-                endAt={endAt}
-                rankingNumber={rankingNumber}
-              />
-            </Flex>
+            <Charts />
+
           </Container>
         </Box>
       )}
