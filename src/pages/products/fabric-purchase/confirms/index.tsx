@@ -14,9 +14,7 @@ const FabricPurchaseConfirms = () => {
           <Link href="/products/fabric-purchase/orders">
             <Button size="sm" >仕掛履歴</Button>
           </Link>
-          <Link href="/products/fabric-purchase/confirms">
-            <Button size="sm" colorScheme='facebook'>購入履歴</Button>
-          </Link>
+          <Button size="sm" colorScheme='facebook'>購入履歴</Button>
         </Flex>
 
         <HistoryConfirmTable

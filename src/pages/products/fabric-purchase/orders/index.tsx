@@ -11,9 +11,7 @@ const FabricPurchaseOrders = () => {
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
         <Flex gap={3} p={3}>
-          <Link href="/products/fabric-purchase/orders">
-            <Button size="sm" colorScheme='facebook'>仕掛履歴</Button>
-          </Link>
+          <Button size="sm" colorScheme='facebook'>仕掛履歴</Button>
           <Link href="/products/fabric-purchase/confirms">
             <Button size="sm" >購入履歴</Button>
           </Link>
