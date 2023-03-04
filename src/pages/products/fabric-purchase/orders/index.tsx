@@ -12,9 +12,9 @@ const FabricPurchaseOrders = () => {
       <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
         <Flex gap={3} p={3}>
           <Button size="sm" colorScheme='facebook'>仕掛履歴</Button>
-          <Link href="/products/fabric-purchase/confirms">
+          {/* <Link href="/products/fabric-purchase/confirms">
             <Button size="sm" >購入履歴</Button>
-          </Link>
+          </Link> */}
         </Flex>
         <HistoryOrderTable
           histories={data?.contents}
