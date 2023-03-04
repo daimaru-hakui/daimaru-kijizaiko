@@ -6,7 +6,7 @@ import HistoryOrderTable from "../../../../components/history/HistoryOrderTable"
 import HistoryConfirmTable from "../../../../components/history/HistoryConfirmTable";
 import { HistoryType } from "../../../../../types/HistoryType";
 
-const HistoryFabricDyeings = () => {
+const FabricDyeingsOrders = () => {
   const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
   const [historyConfirms, setHistoryConfirms] = useState([] as HistoryType[]);
 
@@ -83,4 +83,4 @@ const HistoryFabricDyeings = () => {
   );
 };
 
-export default HistoryFabricDyeings;
+export default FabricDyeingsOrders;

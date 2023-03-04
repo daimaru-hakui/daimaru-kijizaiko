@@ -14,7 +14,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: "生地の発注", link: "/products/order/new" },
-    { id: 3, title: "生地仕掛一覧", link: "/products/history/fabric-dyeing" },
+    { id: 3, title: "生地仕掛一覧", link: "/products/fabric-dyeing/orders" },
     { id: 4, title: "入荷予定一覧", link: "/products/fabric-purchase/orders" },
     { id: 5, title: "マスター登録", link: "/products/new" },
   ];
