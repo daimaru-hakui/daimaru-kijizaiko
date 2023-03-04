@@ -31,7 +31,8 @@ type Props = {
   onClick: Function;
   items: any;
   setItems: Function;
-  orderType: string;
+  orderType?: string;
+  mutate?: Function;
 };
 
 export const HistoryEditModal: NextPage<Props> = ({
@@ -40,9 +41,11 @@ export const HistoryEditModal: NextPage<Props> = ({
   onClick,
   items,
   setItems,
-  orderType
+  orderType,
+  mutate
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  mutate("/api/fabric-purchase-confirms");
 
   // 初期値をitemsに代入
   useEffect(() => {

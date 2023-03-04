@@ -28,8 +28,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
-import { collection, endAt, getDocs, orderBy, query, startAt } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { useAPI } from "../../hooks/UseAPI";
 
 type Props = {
   productId: string;
@@ -37,15 +36,12 @@ type Props = {
 };
 
 const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
-  const { getTodayDate, mathRound2nd } = useUtil();
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
+  const { getTodayDate, mathRound2nd } = useUtil();
   const [startDay, setStartDay] = useState(INIT_DATE);
   const [endDay, setEndDay] = useState(getTodayDate());
-  const [filterCuttingReports, setFilterCuttingReports] = useState([
-    { quantity: 0 },
-  ] as CuttingHistoryType[]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const {
     getUserName,
     getSerialNumber,
@@ -53,34 +49,31 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
+  const { data } = useAPI("/api/cutting-reports");
+  const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
 
   useEffect(() => {
     const getCuttingReports = async () => {
-      const q = query(collection(db, "cuttingReports"),
-        orderBy('cuttingDate'),
-        startAt(startDay),
-        endAt(endDay));
-      const snapshot = await getDocs(q);
-
-      setFilterCuttingReports(
-        snapshot.docs.map((doc) => (
-          { ...doc.data(), id: doc.id }
-        ))
-          .map((cuttingReport: CuttingReportType) =>
-            cuttingReport.products.map(
-              (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
-            )
+      setCuttingList(
+        data?.contents.map((cuttingReport: CuttingReportType) =>
+          cuttingReport.products.map(
+            (product: CuttingProductType) =>
+            ({
+              ...cuttingReport,
+              ...product,
+              products: null,
+            } as CuttingHistoryType)
           )
+        )
           .flat()
           .filter(
             (report: { productId: string; }) => report.productId === productId
           )
-          .sort((a, b) => {
+          .filter((obj: CuttingReportType) => (
+            new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
+            new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime())
+          )
+          .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -88,13 +81,13 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
       );
     };
     getCuttingReports();
-  }, [productId, startDay, endDay]);
+  }, [data, productId, startDay, endDay]);
 
   useEffect(() => {
     let total = 0;
-    filterCuttingReports?.forEach((report) => (total += report.quantity));
+    cuttingList?.forEach((report) => (total += report.quantity));
     setSumTotalQuantity(total);
-  }, [filterCuttingReports]);
+  }, [cuttingList]);
 
   const onReset = () => {
     setStartDay(INIT_DATE);
@@ -113,7 +106,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
         </Box>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="5xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>裁断履歴</ModalHeader>
@@ -165,7 +158,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                 />
               </Flex>
             </Box>
-            {filterCuttingReports.length ? (
+            {cuttingList?.length ? (
               <TableContainer mt={6}>
                 <Table size="sm">
                   <Thead>
@@ -181,7 +174,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   </Thead>
                   <Tbody>
                     <>
-                      {filterCuttingReports.map(
+                      {cuttingList.map(
                         (
                           report: CuttingHistoryType & { quantity: number; },
                           index

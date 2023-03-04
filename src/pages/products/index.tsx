@@ -26,8 +26,6 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "../../../firebase";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
@@ -45,30 +43,6 @@ const Products = () => {
     productName: "",
     materialName: "",
   } as ProductType);
-
-  // useEffect(() => {
-  //   const getProducts = async () => {
-  //     const q = query(
-  //       collection(db, "products"),
-  //       where("deletedAt", "==", ""),
-  //     );
-  //     try {
-  //       onSnapshot(q, (querySnap) =>
-  //         setProducts(
-  //           querySnap.docs
-  //             .map((doc) => ({ ...doc.data(), id: doc.id } as ProductType))
-  //             .sort((a: any, b: any) => {
-  //               if (a.productNumber < b.productNumber) {
-  //                 return - 1;
-  //               }
-  //             }
-  //             )));
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   getProducts();
-  // }, [setProducts]);
 
   useEffect(() => {
     setFilterProducts(

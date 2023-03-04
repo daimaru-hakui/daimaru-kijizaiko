@@ -12,13 +12,9 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     if (process.env.BACKEND_API_KEY) {
-      const {startDay,endDay,limitNum} = req.query
       const docsRef = await db
         .collection("fabricPurchaseConfirms")
-        .orderBy("fixedAt")
-        .startAt(startDay)
-        .endAt(endDay)
-        .limit(Number(limitNum))
+        .orderBy("fixedAt",'desc')
         .get();
       const snapshot = docsRef.docs.map(
         (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)

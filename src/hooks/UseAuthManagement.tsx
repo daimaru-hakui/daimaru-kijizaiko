@@ -9,6 +9,7 @@ export const useAuthManagement = () => {
     const array = [
       "fgzmLExAiAcFcikzqHpqe7avIfu2",
       "EE7aC3Q3O8Q7dB7sKlFXqfQaZO22",
+      'B6W7Ux55Ffbsyf9hc7RoTsVtOln1'
     ];
     const result = array.includes(currentUser);
     return result;
@@ -16,7 +17,7 @@ export const useAuthManagement = () => {
 
   const isAuth = (prop: string) => {
     const user = users.find(
-      (user: { uid: string }) => user.uid === currentUser
+      (user: { uid: string; }) => user.uid === currentUser
     );
     if (!user) return false;
     return user[prop] ? true : false;
@@ -24,7 +25,7 @@ export const useAuthManagement = () => {
 
   const isAuths = (props: string[]) => {
     const user = users.find(
-      (user: { uid: string }) => user.uid === currentUser
+      (user: { uid: string; }) => user.uid === currentUser
     );
     if (!user) return false;
     return props.some((prop: string) => (user[prop] ? true : false));

@@ -10,7 +10,6 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FaEdit } from "react-icons/fa";
 import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -21,12 +20,14 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
   reportId: string;
+  mutate: Function;
 };
 
-const CuttingReportEditModal: NextPage<Props> = ({ reportId }) => {
+const CuttingReportEditModal: NextPage<Props> = ({ reportId, mutate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [report, setReport] = useState({} as CuttingReportType);
   const { isAuths } = useAuthManagement();
+  mutate("/api/cutting-reports");
 
   useEffect(() => {
     const getCuttingReport = async () => {

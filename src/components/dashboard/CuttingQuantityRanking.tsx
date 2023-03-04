@@ -26,7 +26,7 @@ ChartJS.register(
 );
 
 type Props = {
-  data: any;
+  data: CuttingReportType[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
@@ -44,38 +44,34 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   ]);
 
   useEffect(() => {
-    const getArray = async () => {
-      const filterArray = data?.cuttingReports
-        .map((obj: CuttingReportType) =>
-          obj.products.map(
-            (product: CuttingProductType) =>
-            ({
-              ...obj,
-              ...product,
-              products: null,
-            } as CuttingHistoryType)
-          )
-        ).flat();
+    const getArray = () => {
+      const filterArray = data?.map((obj: CuttingReportType) => obj.products.map(
+        (product: CuttingProductType) => (
+          {
+            ...obj,
+            ...product,
+            products: null,
+          } as CuttingHistoryType)
+      )
+      ).flat().filter((obj) => (
+        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
+        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime())
+      );
 
-      const ProductIds = filterArray?.map((obj) => obj.productId);
+      const ProductIds = filterArray?.map((obj: { productId: string; }) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
-      const newFilterArray = headers.map((header: any) =>
-        filterArray.filter((obj: any) => header === obj.productId)
-      );
-
-      const newArray = newFilterArray.map((obj: any) => {
+      const newArray = headers.map((header: any) => {
         let sum = 0;
-        let productId = "";
-        obj?.forEach((report: { productId: string; quantity: number; }) => {
-          sum += report.quantity;
-          productId = report.productId;
+        filterArray?.forEach((obj: { productId: string; quantity: number; }) => {
+          if (obj.productId === header) {
+            sum += obj.quantity;
+          }
         });
-        return { productId, quantity: sum, price: getPrice(productId) };
+        return { productId: header, quantity: sum };
       });
-
-      const result = newArray.sort((a, b) => {
+      const result: any = newArray.sort((a, b) => {
         if (a.quantity > b.quantity) {
           return -1;
         }
@@ -129,7 +125,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   };
 
   return (
-    <Box p={3} bg="white" w="100%" h="100%" rounded="md">
+    <Box p={3} w="100%" h="100%" rounded="md">
       <Bar options={options} data={dataList} />
     </Box>
   );

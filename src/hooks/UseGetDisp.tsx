@@ -58,7 +58,7 @@ export const useGetDisp = () => {
     if (userId === "R&D") {
       return "R&D";
     } else {
-      const user = users.find((user: { uid: string }) => userId === user.uid);
+      const user = users.find((user: { uid: string; }) => userId === user.uid);
       return user?.name || "";
     }
   };
@@ -66,9 +66,9 @@ export const useGetDisp = () => {
   // 仕入れ先の表示
   const getSupplierName = (supplierId: string) => {
     const supplier = suppliers.find(
-      (supplier: { id: string }) => supplier.id === supplierId
+      (supplier: { id: string; }) => supplier.id === supplierId
     );
-    return supplier?.name;
+    return supplier?.name || "";
   };
 
   const getProductNumber = (productId: string) => {
@@ -82,7 +82,7 @@ export const useGetDisp = () => {
     const result = products.find(
       (product: ProductType) => product.id === productId
     );
-    return result?.productName || productId;
+    return result?.productName || "";
   };
 
   const getColorName = (productId: string) => {
@@ -94,14 +94,14 @@ export const useGetDisp = () => {
 
   const getGrayFabricNumber = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
+      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productNumber || grayFabricId;
   };
 
   const getGrayFabricName = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
+      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productName || grayFabricId;
   };
@@ -109,7 +109,7 @@ export const useGetDisp = () => {
   // キバタ在庫を取得
   const getGrayFabricStock = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
+      (grayFabric: { id: string; }) => grayFabric.id === grayFabricId
     );
     const stock = grayFabric?.stock || 0;
     return stock;
@@ -128,7 +128,7 @@ export const useGetDisp = () => {
       (product: ProductType) => product.id === productId
     );
     return product?.price || 0;
-  }
+  };
 
   return {
     getSerialNumber,

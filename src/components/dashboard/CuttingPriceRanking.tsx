@@ -26,7 +26,7 @@ ChartJS.register(
 );
 
 type Props = {
-  data: any;
+  data: CuttingReportType[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
@@ -44,39 +44,36 @@ const CuttingPriceRanking: NextPage<Props> = ({
   ]);
 
   useEffect(() => {
-    const getArray = async () => {
-
-      const filterArray = data?.cuttingReports?.map((obj: CuttingReportType) =>
-        obj.products.map(
-          (product: CuttingProductType) =>
-          ({
+    const getArray = () => {
+      const filterArray = data?.map((obj: CuttingReportType) => obj.products.map(
+        (product: CuttingProductType) => (
+          {
             ...obj,
             ...product,
+            price: getPrice(product.productId),
             products: null,
-          } as CuttingHistoryType)
-        )
-      ).flat();
+          } as CuttingHistoryType & { price: number; })
+      )
+      ).flat().filter((obj) => (
+        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
+        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime())
+      );
 
-      const ProductIds = filterArray?.map((obj) => obj.productId);
+      const ProductIds = filterArray?.map((obj: { productId: string; }) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
-      const newFilterArray = headers.map((header: any) =>
-        filterArray.filter((report: any) => header === report.productId)
-      );
-
-      const newArray = newFilterArray.map((reports: any) => {
+      const newArray = headers.map((header: string) => {
         let sum = 0;
-        let productId = "";
-        let price = 0;
-        reports?.forEach((report: { productId: string; quantity: number; }) => {
-          sum += report.quantity;
-          productId = report.productId;
-          price += report.quantity * getPrice(report.productId);
+        filterArray?.forEach((obj: { productId: string; quantity: number; price: number; }) => {
+          if (obj.productId === header) {
+            sum += obj.quantity * (obj.price || getPrice(header));
+          }
         });
-        return { productId, quantity: sum, price };
+        return { productId: header, price: sum };
       });
-      const result = newArray.sort((a, b) => {
+      console.log(newArray);
+      const result: any = newArray.sort((a, b) => {
         if (a.price > b.price) {
           return -1;
         }
@@ -122,7 +119,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
         label: "使用金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((price: { price: number; }) => price.price.toFixed()),
+          ?.map((ranking: { price: number; }) => ranking.price.toFixed()),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
       },

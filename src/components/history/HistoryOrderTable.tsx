@@ -52,7 +52,7 @@ const HistoryOrderTable: NextPage<Props> = ({
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = histories?.filter(
-      (history: { quantity: number; }) => history.quantity > 0
+      (history: { quantity: number; }) => history.quantity //後ほどフィルターを作る
     );
     setFilterHistories(newHistorys);
   }, [histories]);

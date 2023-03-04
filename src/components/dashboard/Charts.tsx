@@ -1,20 +1,37 @@
-import { Box, Flex, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from '@chakra-ui/react';
-import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Flex,
+  Heading,
+  Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper
+} from '@chakra-ui/react';
+import React, { useState } from 'react';
 import CuttingPriceRanking from './CuttingPriceRanking';
 import CuttingQuantityRanking from './CuttingQuantityRanking';
 import PurchasePriceRanking from './PurchasePriceRanking';
 import PurchaseQuantityRanking from './PurchaseQuantityRanking';
 import { FaRegWindowClose } from "react-icons/fa";
 import { useAPI } from '../../hooks/UseAPI';
+import { useUtil } from '../../hooks/UseUtil';
 
 const Charts = () => {
-  const { data, mutate, startDay, setStartDay, endDay, setEndDay, limitNum, setLimitNum, isLoading, onReset } =
-    useAPI("/api/ranking", 5);
+  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
+  const { getTodayDate } = useUtil();
+  const [startDay, setStartDay] = useState(INIT_DATE);
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [limitNum, setLimitNum] = useState(5);
+  const { data, mutate } = useAPI("/api/ranking");
+  // mutate("/api/ranking");
+  const onReset = () => {
+    setStartDay(INIT_DATE);
+    setEndDay(getTodayDate());
+    setLimitNum(5);
+  };
 
-  useEffect(() => {
-    mutate("/api/ranking");
-  }, [limitNum, startDay, endDay, mutate]);
-  console.log('graph');
   return (
     <>
       <Flex
@@ -80,13 +97,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <CuttingQuantityRanking
-          data={data}
+          data={data?.cuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <CuttingPriceRanking
-          data={data}
+          data={data?.cuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
@@ -103,13 +120,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <PurchaseQuantityRanking
-          data={data}
+          data={data?.fabricPurchaseConfirms}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <PurchasePriceRanking
-          data={data}
+          data={data?.fabricPurchaseConfirms}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}

@@ -12,6 +12,7 @@ import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
+import { HistoryType } from "../../../types/HistoryType";
 
 ChartJS.register(
   CategoryScale,
@@ -43,20 +44,22 @@ const PurchaseQuantityRanking: NextPage<Props> = ({
   useEffect(() => {
     const getArray = async () => {
 
-      const ProductIds = data?.fabricPurchaseConfirms.map((obj) => obj.productId);
+      const ProductIds = data?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
+        const filterData = data?.filter((obj: HistoryType) => (
+          new Date(startDay).getTime() < new Date(obj.fixedAt).getTime() &&
+          new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()));
+
         let sum = 0;
-        let productId = "";
-        data?.fabricPurchaseConfirms.forEach((obj: { productId: string; quantity: number; }) => {
+        filterData.forEach((obj: { productId: string; quantity: number; }) => {
           if (obj.productId === header) {
             sum += obj.quantity;
-            productId = obj.productId;
           }
         });
-        return { productId, quantity: sum };
+        return { productId: header, quantity: sum };
       });
 
       const result = newArray.sort((a, b) => {

@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -13,6 +14,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { CuttingReportType } from "../../types/CuttingReportType";
+import { useAPI } from "./UseAPI";
 import { useGetDisp } from "./UseGetDisp";
 
 export const useCuttingReportFunc = (
@@ -22,32 +24,9 @@ export const useCuttingReportFunc = (
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
-  const [cuttingReports, setCuttingReports] = useState(
-    [] as CuttingReportType[]
-  );
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-
-  useEffect(() => {
-    const getCuttingReports = () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("serialNumber", "desc")
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setCuttingReports(
-            querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-            )
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-  }, []);
+  const { data, mutate } = useAPI("/api/cutting-reports");
 
   // 商品登録項目を追加
   const addInput = () => {
@@ -76,7 +55,7 @@ export const useCuttingReportFunc = (
     const cuttingReportDocRef = doc(collection(db, "cuttingReports"));
 
     try {
-      runTransaction(db, async (transaction) => {
+      await runTransaction(db, async (transaction) => {
         const serialNumberDocSnap = await transaction.get(serialNumberDocRef);
         if (!serialNumberDocSnap.exists())
           throw "serialNumberDocSnap does not exist!";
@@ -102,8 +81,8 @@ export const useCuttingReportFunc = (
 
         const products = items.products.map((product) => (
           { ...product, quantity: Number(product.quantity) }
-        ))
-        const newItems = { ...items, products }
+        ));
+        const newItems = { ...items, products };
 
         transaction.set(cuttingReportDocRef, {
           ...newItems,
@@ -114,11 +93,11 @@ export const useCuttingReportFunc = (
           updatedAt: serverTimestamp(),
         });
       });
-      router.push("/tokushima/cutting-reports");
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
+      await router.push("/tokushima/cutting-reports");
     }
   };
 
@@ -156,8 +135,8 @@ export const useCuttingReportFunc = (
         });
         const products = items.products.map((product) => (
           { ...product, quantity: Number(product.quantity) }
-        ))
-        const newItems = { ...items, products }
+        ));
+        const newItems = { ...items, products };
 
         transaction.update(cuttingReportDocRef, {
           ...newItems,
@@ -169,6 +148,21 @@ export const useCuttingReportFunc = (
     } finally {
       setLoading(false);
     }
+  };
+
+  const deleteCuttingReport = async (reportId: string) => {
+    const result = window.confirm('削除して宜しいでしょうか');
+    if (!result) return;
+    try {
+
+      const docRef = doc(db, 'cuttingReports', reportId);
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await router.push("/tokushima/cutting-reports");
+    }
+
   };
 
   const scaleCalc = (meter: number, totalQuantity: number) => {
@@ -195,7 +189,7 @@ export const useCuttingReportFunc = (
     ];
     let body = [];
     body.push(headers);
-    cuttingReports.forEach((report: CuttingReportType) => {
+    data?.contents?.forEach((report: CuttingReportType) => {
       report.products.forEach((product) => {
         body.push([
           report.serialNumber,
@@ -215,14 +209,14 @@ export const useCuttingReportFunc = (
     });
     setCsvData(body);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cuttingReports]);
+  }, [mutate, data]);
 
   return {
-    cuttingReports,
     addInput,
     calcScale,
     addCuttingReport,
     updateCuttingReport,
+    deleteCuttingReport,
     scaleCalc,
     csvData,
   };

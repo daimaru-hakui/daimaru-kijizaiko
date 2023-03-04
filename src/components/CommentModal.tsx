@@ -20,11 +20,13 @@ type Props = {
   id: string;
   comment: string;
   collectionName: string;
+  mutate?: Function;
 };
 
-const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
+const CommentModal: NextPage<Props> = ({ id, comment, collectionName, mutate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState(comment);
+  mutate("/api/fabric-purchase-confirms");
 
   useEffect(() => {
     setNewComment(comment);

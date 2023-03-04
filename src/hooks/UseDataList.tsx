@@ -18,7 +18,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import {
   colorsState,
   currentUserState,
-  cuttingReportsState,
   fabricDyeingOrdersState,
   fabricPurchaseConfirmsState,
   fabricPurchaseOrdersState,
@@ -37,7 +36,6 @@ import { HistoryType } from "../../types/HistoryType";
 import { GrayFabricType } from "../../types/GrayFabricType";
 import { UserType } from "../../types/UserType";
 import { StockPlaceType } from "../../types/StockPlaceType";
-import { CuttingReportType } from "../../types/CuttingReportType";
 import { ColorType } from "../../types/ColorType";
 import { MaterialNameType } from "../../types/MaterialNameType";
 
@@ -57,7 +55,6 @@ export const useDataList = () => {
   const setFabricPurchaseConfirms = useSetRecoilState(
     fabricPurchaseConfirmsState
   );
-  const setCuttingReports = useSetRecoilState(cuttingReportsState);
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
 
   // users情報;
@@ -68,10 +65,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as UserType)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as UserType)
         )
       )
     );
@@ -230,36 +227,6 @@ export const useDataList = () => {
     };
     getFabricPurchaseConfirms();
   }, [setFabricPurchaseConfirms]);
-
-  // 裁断報告書　履歴;
-  useEffect(() => {
-    const getCuttingReports = async () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("cuttingDate", "desc"),
-        endAt(INIT_DATE)
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setCuttingReports(
-            querySnap.docs
-              .map(
-                (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
-              )
-              .sort((a, b) => {
-                if (a.serialNumber > b.serialNumber) {
-                  return -1;
-                }
-              })
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setCuttingReports]);
 
   // 仕入先　情報;
   useEffect(() => {

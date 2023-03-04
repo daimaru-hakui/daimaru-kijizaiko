@@ -12,9 +12,9 @@ import {
 import { doc, runTransaction } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState, usersState } from "../../../store";
+import { currentUserState, loadingState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
@@ -24,14 +24,17 @@ type Props = {
   histories: HistoryType[];
   title: string;
   orderType: string;
+  mutate?: Function;
 };
 
 const HistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
   orderType,
+  mutate
 }) => {
   const HOUSE_FACTORY = "徳島工場";
+  const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
@@ -97,7 +100,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
   const updateHistoryFabricPurchaseConfirm = async (history: HistoryType) => {
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
-
+    setLoading(true);
     try {
       await runTransaction(db, async (transaction) => {
         const productDocSnap = await transaction.get(productDocRef);
@@ -125,6 +128,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
     } catch (err) {
       console.log(err);
     } finally {
+      setLoading(false);
     }
   };
 
@@ -134,6 +138,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
         id={history.id}
         comment={history.comment}
         collectionName={collectionName}
+        mutate={mutate}
       />
       {history?.comment.slice(0, 20) +
         (history.comment.length >= 1 ? "..." : "")}
@@ -182,9 +187,9 @@ const HistoryConfirmTable: NextPage<Props> = ({
                 )}
                 <Td w="100%">
                   {history.orderType === "dyeing" &&
-                    elementComment(history, "historyFabricDyeingConfirms")}
+                    elementComment(history, "fabricDyeingConfirms")}
                   {history.orderType === "purchase" &&
-                    elementComment(history, "historyFabricPurchaseConfirms")}
+                    elementComment(history, "fabricPurchaseConfirms")}
                 </Td>
                 <Td>
                   {history.accounting !== true ? (
@@ -202,6 +207,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
                         }
                       }}
                       orderType=""
+                      mutate={mutate}
                     />
                   ) : (
                     "金額確認済"

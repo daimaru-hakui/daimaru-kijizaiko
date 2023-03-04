@@ -7,7 +7,6 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -23,21 +22,33 @@ import { useUtil } from "../../../hooks/UseUtil";
 import { useAPI } from "../../../hooks/UseAPI";
 
 const CuttingReport = () => {
+  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
   const { getTodayDate } = useUtil();
-  const { getSerialNumber, getUserName } = useGetDisp();
-  const { csvData } = useCuttingReportFunc(null, null);
+  const [startDay, setStartDay] = useState(INIT_DATE);
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const { data, mutate } = useAPI("/api/cutting-reports");
   const [cuttingReports, setCuttingReports] = useState(
     [] as CuttingReportType[]
   );
-  const { data, mutate, startDay, setStartDay, endDay, setEndDay, onReset } =
-    useAPI("/api/cutting-reports", 5);
+  const { getSerialNumber, getUserName } = useGetDisp();
+  const { csvData } = useCuttingReportFunc(null, null);
+
   mutate("/api/cutting-reports");
-
-
   useEffect(() => {
-    setCuttingReports(data?.contents);
+    setCuttingReports(
+      data?.contents?.filter((obj: CuttingReportType) => (
+        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
+        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()))
+        .sort((a: CuttingReportType, b: CuttingReportType) =>
+          (a.serialNumber > b.serialNumber) && - 1
+        ));
     console.log(data?.contents);
-  }, [startDay, endDay, data]);
+  }, [startDay, endDay, data, mutate]);
+
+  const onReset = () => {
+    setStartDay(INIT_DATE);
+    setEndDay(getTodayDate());
+  };
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -50,31 +61,26 @@ const CuttingReport = () => {
             <Button size="sm">CSV</Button>
           </CSVLink>
         </Flex>
-        <Box px={3}>
-          <Text mt={6} fontSize="sm">
-            裁断期間
-          </Text>
-          <Flex gap={2} maxW="350px" alignItems="center">
-            <Input
-              size="sm"
-              type="date"
-              value={startDay}
-              onChange={(e) => setStartDay(e.target.value)}
-            />
-            <Input
-              size="sm"
-              type="date"
-              value={endDay}
-              onChange={(e) => setEndDay(e.target.value)}
-            />
-            <FaRegWindowClose
-              cursor="pointer"
-              size="50px"
-              color="#444"
-              onClick={() => onReset()}
-            />
-          </Flex>
-        </Box>
+        <Flex gap={2} maxW="350px" alignItems="center">
+          <Input
+            size="sm"
+            type="date"
+            value={startDay}
+            onChange={(e) => setStartDay(e.target.value)}
+          />
+          <Input
+            size="sm"
+            type="date"
+            value={endDay}
+            onChange={(e) => setEndDay(e.target.value)}
+          />
+          <FaRegWindowClose
+            cursor="pointer"
+            size="50px"
+            color="#444"
+            onClick={onReset}
+          />
+        </Flex>
         <TableContainer p={3} w="100%">
           <Table mt={6} variant="simple" size="sm">
             <Thead>
@@ -95,8 +101,8 @@ const CuttingReport = () => {
                   <Td>
                     <CuttingReportModal
                       title={"詳細"}
-                      reportId={report.id}
                       report={report}
+                      mutate={mutate}
                     />
                   </Td>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>

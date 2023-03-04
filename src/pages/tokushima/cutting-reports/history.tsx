@@ -12,13 +12,13 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { FaRegWindowClose } from "react-icons/fa";
-import { collection, endAt, onSnapshot, orderBy, query, startAt } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../../../../firebase";
 import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
+import { useAPI } from "../../../hooks/UseAPI";
+import { CuttingHistoryType } from "../../../../types/CuttingHistoryType";
 import { useUtil } from "../../../hooks/UseUtil";
 
 const HistoryCutting = () => {
@@ -26,7 +26,6 @@ const HistoryCutting = () => {
   const { getTodayDate } = useUtil();
   const [startDay, setStartDay] = useState(INIT_DATE);
   const [endDay, setEndDay] = useState(getTodayDate());
-  const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
   const {
     getSerialNumber,
     getUserName,
@@ -34,35 +33,30 @@ const HistoryCutting = () => {
     getProductName,
     getColorName,
   } = useGetDisp();
+  const { data, mutate } = useAPI("/api/cutting-reports");
+  // mutate("/api/cutting-reports");
+  const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   useEffect(() => {
-    const getCuttingReports = () => {
-      const q = query(
-        collection(db, "cuttingReports"),
-        orderBy("cuttingDate"),
-        startAt(startDay),
-        endAt(endDay)
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setCuttingList(
-            querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc.id }))
-              .map((cuttingReport: any) =>
-                cuttingReport.products.map((product: CuttingProductType) => ({
-                  ...cuttingReport,
-                  ...product,
-                }))
-              )
-              .flat()
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getCuttingReports();
-  }, [startDay, endDay]);
+    setCuttingList(data?.contents?.map((cuttingReport: CuttingReportType) =>
+      cuttingReport?.products.map(
+        (product: CuttingProductType) =>
+        ({
+          ...cuttingReport,
+          ...product,
+          // products: null,
+        } as CuttingHistoryType)
+      )
+    )
+      .flat().filter((obj: CuttingReportType) => (
+        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
+        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()))
+      .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
+        if (a.cuttingDate > b.cuttingDate) {
+          return -1;
+        }
+      }));
+  }, [startDay, endDay, data, mutate]);
 
   const onReset = () => {
     setStartDay(INIT_DATE);
@@ -118,13 +112,13 @@ const HistoryCutting = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {cuttingList.map((list: any, index: number) => (
+              {cuttingList?.map((list: any, index: number) => (
                 <Tr key={index}>
                   <Td>
                     <CuttingReportModal
                       title="詳細"
-                      reportId={list.id}
                       report={list}
+                      mutate={mutate}
                     />
                   </Td>
                   <Td>{list.cuttingDate}</Td>

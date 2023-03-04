@@ -1,6 +1,5 @@
 import { atom } from "recoil";
 import { ColorType } from "../types/ColorType";
-import { CuttingReportType } from "../types/CuttingReportType";
 import { ProductType } from "../types/FabricType";
 import { GrayFabricType } from "../types/GrayFabricType";
 import { HistoryType } from "../types/HistoryType";
@@ -51,11 +50,6 @@ export const fabricPurchaseOrdersState = atom<HistoryType[]>({
 
 export const fabricPurchaseConfirmsState = atom<HistoryType[]>({
   key: "fabricPurchaseConfirmsState",
-  default: [],
-});
-
-export const cuttingReportsState = atom<CuttingReportType[]>({
-  key: "cuttingReportsState",
   default: [],
 });
 

@@ -32,7 +32,7 @@ type Props = {
   title: string;
   pageType: string;
   report: CuttingReportType;
-  onClose: Function;
+  onClose?: Function;
 };
 
 const CuttingReportInputArea: NextPage<Props> = ({
@@ -89,11 +89,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-        itemType ||
-        totalQuantity ||
-        category ||
-        productId ||
-        quantity
+      itemType ||
+      totalQuantity ||
+      category ||
+      productId ||
+      quantity
     );
   }, [items]);
 
@@ -143,7 +143,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {filterUsers?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user: { id: string; name: string; }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>

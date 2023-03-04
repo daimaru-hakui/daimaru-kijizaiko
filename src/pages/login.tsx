@@ -18,9 +18,8 @@ const Login = () => {
   });
   const setCurrentUser = useSetRecoilState(currentUserState);
 
-
-  useLayoutEffect(() => {
-    if (user) {
+  useEffect(() => {
+    if (user?.uid) {
       setCurrentUser(user.uid);
       router.push("/");
     }

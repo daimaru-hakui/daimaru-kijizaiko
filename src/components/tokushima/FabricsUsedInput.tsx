@@ -174,7 +174,6 @@ export const FabricsUsedInput: NextPage<Props> = ({
       });
     } catch (err) {
       console.log(err);
-      window.alert("登録失敗");
     } finally {
       setLoading(false);
     }
@@ -282,8 +281,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
                     ? "red.300"
                     : ""
                   : getTokushimaStock(product.productId) < product?.quantity //新規
-                  ? "red.300"
-                  : ""
+                    ? "red.300"
+                    : ""
               }
               rounded="md"
               value={product?.quantity}

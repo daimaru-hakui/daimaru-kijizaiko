@@ -28,13 +28,13 @@ import CuttingReportEditModal from "./CuttingReportEditModal";
 
 type Props = {
   title: string;
-  reportId: string;
   report: CuttingReportType;
+  mutate?: Function;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ title, reportId, report }) => {
+const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { scaleCalc } = useCuttingReportFunc(null, null);
+  const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
   const {
     getSerialNumber,
     getUserName,
@@ -60,7 +60,19 @@ const CuttingReportModal: NextPage<Props> = ({ title, reportId, report }) => {
         <ModalContent>
           <ModalHeader>
             <Flex alignItems="center" gap={3}>
-              裁断報告書 <CuttingReportEditModal reportId={reportId} />
+              裁断報告書 <CuttingReportEditModal reportId={report.id} mutate={mutate} />
+              {report?.products?.length === 0 && (
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  variant="outline"
+                  cursor="pointer"
+                  onClick={() => {
+                    deleteCuttingReport(report.id);
+                  }}>
+                  削除
+                </Button>
+              )}
             </Flex>
           </ModalHeader>
 
