@@ -1,4 +1,4 @@
-import { Box, Divider, List, ListItem } from "@chakra-ui/react";
+import { Box, Button, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -83,6 +83,9 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         <ListItem fontSize="sm">
           <Link href="/dashboard" onClick={() => onClose()}>
             トップページ
+          </Link>
+          <Link href="/products/fabric-purchase/orders">
+            <Button size="sm" >仕掛履歴</Button>
           </Link>
         </ListItem>
       </List>
