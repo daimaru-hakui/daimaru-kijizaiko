@@ -84,9 +84,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
           <Link href="/dashboard" onClick={() => onClose()}>
             トップページ
           </Link>
-          <Link href="/products/fabric-purchase/orders">
-            <Button size="sm" >仕掛履歴</Button>
-          </Link>
+
         </ListItem>
       </List>
       <Divider />

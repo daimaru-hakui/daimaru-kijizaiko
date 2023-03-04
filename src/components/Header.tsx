@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { MdOutlineSettings } from "react-icons/md";
 import { useRouter } from "next/router";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { auth } from "../../firebase";
 import { currentUserState, usersState } from "../../store";
@@ -23,7 +23,7 @@ const Header = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const users = useRecoilValue(usersState);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (currentUser === "") {
       router.push("/login");
     }
@@ -32,7 +32,7 @@ const Header = () => {
   // 担当者名の表示
   const displayStaff = (id: string) => {
     const user = users?.find(
-      (user: { id: string; name: string }) => id === user.id
+      (user: { id: string; name: string; }) => id === user.id
     );
     return user?.name;
   };
