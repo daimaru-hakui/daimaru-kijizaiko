@@ -12,19 +12,27 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     if (process.env.BACKEND_API_KEY) {
-      const query = db
+      const querySnapshot = await db
         .collection("fabricDyeingOrders")
-        .where("quantity", '>', 0);
-      query.onSnapshot(querySnapshot => {
-        const snapshot = querySnapshot.docs.map(
-          (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
-        );
-        return res.status(200).json({ contents: snapshot });
-      });
+        .where("quantity", '>', 0).get();
+      const snapshot = querySnapshot.docs.map(
+        (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+      );
+      return res.status(200).json({ contents: snapshot });
+
+      // const query = db
+      //   .collection("fabricDyeingOrders")
+      //   .where("quantity", '>', 0);
+      // query.onSnapshot(querySnapshot => {
+      //   const snapshot = querySnapshot.docs.map(
+      //     (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+      //   );
+      //   return res.status(200).json({ contents: snapshot });
+      // });
     }
   } else {
     return res.status(405).json("error");
   }
 }
-  
+
 
