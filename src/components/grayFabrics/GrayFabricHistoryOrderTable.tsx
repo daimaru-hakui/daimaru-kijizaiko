@@ -24,7 +24,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, suppliersState, usersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import HistoryOrderToConfirmModal from "../history/HistoryOrderToConfirmModal";
+import HistoryOrderToConfirmModal from "../history/OrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";

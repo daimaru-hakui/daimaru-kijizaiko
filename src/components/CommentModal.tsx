@@ -20,6 +20,7 @@ type Props = {
   id: string;
   comment: string;
   collectionName: string;
+  mutate?: Function;
 };
 
 const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
@@ -31,18 +32,18 @@ const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
     setNewComment(comment);
   }, [comment]);
 
-  const updateComment = async (collectionName: string, docId: string) => {
-    const commentRef = doc(db, collectionName, docId);
-    try {
-      await updateDoc(commentRef, {
-        comment: newComment,
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      onClose();
-    }
-  };
+  // const updateComment = async (collectionName: string, docId: string) => {
+  //   const commentRef = doc(db, collectionName, docId);
+  //   try {
+  //     await updateDoc(commentRef, {
+  //       comment: newComment,
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //     onClose();
+  //   }
+  // };
 
   return (
     <>

@@ -100,7 +100,7 @@ export const useOrderFabricFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/history/fabric-dyeing");
+      router.push("/products/fabric-dyeing/orders");
     }
   };
 
@@ -148,7 +148,7 @@ export const useOrderFabricFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/history/fabric-dyeing");
+      router.push("/products/fabric-dyeing/orders");
     }
   };
 
@@ -207,7 +207,7 @@ export const useOrderFabricFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/history/fabric-purchase");
+      router.push("/products/fabric-purchase/orders");
     }
   };
 

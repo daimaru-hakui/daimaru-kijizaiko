@@ -35,7 +35,7 @@ type Props = {
   onClick: Function;
 };
 
-const HistoryConfirmModal: NextPage<Props> = ({
+const OrderToConfirmModal: NextPage<Props> = ({
   history,
   items,
   setItems,
@@ -270,4 +270,4 @@ const HistoryConfirmModal: NextPage<Props> = ({
   );
 };
 
-export default HistoryConfirmModal;
+export default OrderToConfirmModal;

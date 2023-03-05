@@ -32,8 +32,6 @@ const HistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
   orderType,
-  mutate,
-  url
 }) => {
   const HOUSE_FACTORY = "徳島工場";
   const setLoading = useSetRecoilState(loadingState);
@@ -208,7 +206,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
                         }
                       }}
                       orderType=""
-                      mutate={mutate}
+
                     />
                   ) : (
                     "金額確認済"

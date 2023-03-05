@@ -22,7 +22,7 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, usersState } from "../../../store";
 import { HistoryEditModal } from "./HistoryEditModal";
-import HistoryOrderToConfirmModal from "./HistoryOrderToConfirmModal";
+import HistoryOrderToConfirmModal from "./OrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
 import { useGetDisp } from "../../hooks/UseGetDisp";

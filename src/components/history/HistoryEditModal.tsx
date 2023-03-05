@@ -45,7 +45,6 @@ export const HistoryEditModal: NextPage<Props> = ({
   mutate
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  mutate("/api/fabric-purchase-confirms");
 
   // 初期値をitemsに代入
   useEffect(() => {
