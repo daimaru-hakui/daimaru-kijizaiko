@@ -10,25 +10,18 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
-import { NextPage } from "next";
 import { useState } from "react";
 import { db } from "../../../firebase";
 import { HistoryType } from "../../../types/HistoryType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
+import useSWR from "swr";
 
-type Props = {
-  histories: HistoryType[];
-  title: string;
-};
-
-const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
-  histories,
-  title,
-}) => {
+const GrayFabricConfirmTable = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
+  const { data, mutate, isLoading } = useSWR("/api/gray-fabric-confirms");
 
   const updateConfirmHistory = async (history: any) => {
     const result = window.confirm("更新して宜しいでしょうか");
@@ -63,15 +56,17 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
       });
     } catch (err) {
       console.log(err);
+    } finally {
+      mutate({ ...data });
     }
   };
 
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        {title}
+        キバタ発注履歴
       </Box>
-      {histories?.length > 0 ? (
+      {data?.contents?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -88,7 +83,7 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
             </Tr>
           </Thead>
           <Tbody>
-            {histories?.map((history: any) => (
+            {data?.contents?.map((history: any) => (
               <Tr key={history.id}>
                 <Td>{getSerialNumber(history.serialNumber)}</Td>
                 <Td>{history.orderedAt}</Td>
@@ -130,4 +125,4 @@ const GrayFabricHistoryConfirmTable: NextPage<Props> = ({
   );
 };
 
-export default GrayFabricHistoryConfirmTable;
+export default GrayFabricConfirmTable;

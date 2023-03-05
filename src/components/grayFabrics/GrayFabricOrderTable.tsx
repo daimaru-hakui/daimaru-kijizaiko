@@ -29,17 +29,14 @@ import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
+import useSWR from "swr";
 
-type Props = {
-  histories: HistoryType[];
-  title: string;
-};
-
-const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
+const GrayFabricOrderTable = () => {
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
+  const { data, mutate, isLoading } = useSWR("/api/gray-fabric-orders");
 
   // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
@@ -64,6 +61,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     } catch (e) {
       console.error(e);
     } finally {
+      mutate({ ...data });
     }
   };
 
@@ -100,6 +98,8 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
       });
     } catch (err) {
       console.log(err);
+    } finally {
+      mutate({ ...data });
     }
   };
 
@@ -154,15 +154,16 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     } catch (e) {
       console.error(e);
     } finally {
+      mutate({ ...data });
     }
   };
 
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        {title}
+        キバタ仕掛一覧
       </Box>
-      {histories?.length > 0 ? (
+      {data?.contents.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -180,7 +181,7 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {histories?.map((history: any) => (
+            {data?.contents.map((history: any) => (
               <Tr key={history.id}>
                 <Td>
                   <HistoryOrderToConfirmModal
@@ -237,4 +238,4 @@ const GrayFabricHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   );
 };
 
-export default GrayFabricHistoryOrderTable;
+export default GrayFabricOrderTable;

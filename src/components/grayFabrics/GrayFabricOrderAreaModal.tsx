@@ -72,22 +72,17 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
   const orderGrayFabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-
-    const orderNumberDocRef = doc(
-      db,
-      "serialNumbers",
-      "grayFabricOrderNumbers"
-    );
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
+    const orderNumberDocRef = doc(db, "serialNumbers", "grayFabricOrderNumbers");
     const orderHistoryRef = collection(db, "grayFabricOrders");
 
     try {
       await runTransaction(db, async (transaction) => {
         const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
-        if (!orderNumberDocSnap.exists()) throw "Document does not exist!";
+        if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
 
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "Document does not exist!";
+        if (!grayFabricDocSnap.exists()) throw "grayFabricOrders does not exist!";
 
         const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {
@@ -119,7 +114,7 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     } catch (e) {
       console.error(e);
     } finally {
-      router.push("/gray-fabrics/history");
+      router.push("/gray-fabrics/orders");
       onClose();
     }
   };
