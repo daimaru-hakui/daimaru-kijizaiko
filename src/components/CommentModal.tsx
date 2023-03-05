@@ -20,14 +20,12 @@ type Props = {
   id: string;
   comment: string;
   collectionName: string;
-  mutate?: Function;
-  url?: string;
 };
 
-const CommentModal: NextPage<Props> = ({ id, comment, collectionName, mutate, url }) => {
+const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newComment, setNewComment] = useState(comment);
-  mutate(url);
+
 
   useEffect(() => {
     setNewComment(comment);
@@ -86,13 +84,13 @@ const CommentModal: NextPage<Props> = ({ id, comment, collectionName, mutate, ur
             >
               閉じる
             </Button>
-            <Button
+            {/* <Button
               colorScheme="blue"
               disabled={newComment === comment}
               onClick={() => updateComment(collectionName, id)}
             >
               更新
-            </Button>
+            </Button> */}
           </ModalFooter>
         </ModalContent>
       </Modal>
