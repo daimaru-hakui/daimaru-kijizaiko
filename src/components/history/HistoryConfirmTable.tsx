@@ -140,8 +140,6 @@ const HistoryConfirmTable: NextPage<Props> = ({
         id={history.id}
         comment={history.comment}
         collectionName={collectionName}
-        mutate={mutate}
-        url={url}
       />
       {history?.comment.slice(0, 20) +
         (history.comment.length >= 1 ? "..." : "")}
