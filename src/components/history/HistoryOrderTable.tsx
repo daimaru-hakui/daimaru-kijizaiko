@@ -33,8 +33,6 @@ type Props = {
   histories: HistoryType[];
   title: string;
   orderType: string;
-  mutate: Function;
-  url: string;
 };
 
 const HistoryOrderTable: NextPage<Props> = ({
