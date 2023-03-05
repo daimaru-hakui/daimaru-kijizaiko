@@ -19,17 +19,18 @@ import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import { useAPI } from "../../../hooks/UseAPI";
-import { useRouter } from "next/router";
+import useSWR from "swr";
 
-const FabricPurchaseConfirmTable: NextPage = () => {
-  const HOUSE_FACTORY = "徳島工場";
-  const router = useRouter();
+type Props = {
+  HOUSE_FACTORY?: string;
+};
+
+const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
-  const { getSerialNumber } = useGetDisp();
+  const { getSerialNumber, getUserName } = useGetDisp();
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,
@@ -38,30 +39,34 @@ const FabricPurchaseConfirmTable: NextPage = () => {
     comment: "",
     fixedAt: "",
   });
-  const { data, mutate } = useAPI("/api/fabric-purchase-confirms");
-  mutate("/api/fabric-purchase-confirms");
+  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
 
+  // 数量０のデータを非表示
   useEffect(() => {
-    const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history.quantity > 0
-    );
-    setFilterHistories(newHistorys);
-  }, [data]);
-
-  // 担当者の表示
-  const getUserName = (userId: string) => {
-    if (userId === "R&D") {
-      return "R&D";
+    data?.contents?.sort(
+      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
+        (a.serialNumber > b.serialNumber) && - 1);
+    if (HOUSE_FACTORY) {
+      const newHistorys = data?.contents?.filter(
+        (history: HistoryType) => {
+          if (history.stockPlace === HOUSE_FACTORY) {
+            return history;
+          }
+        }
+      );
+      setFilterHistories(newHistorys);
     } else {
-      const user = users.find((user: { uid: string; }) => userId === user.uid);
-      return user?.name;
+      const newHistorys = data?.contents?.filter(
+        (history: HistoryType) => history
+      );
+      setFilterHistories(newHistorys);
     }
-  };
+  }, [data, HOUSE_FACTORY]);
 
-  const updateHistoryFabricPurchaseConfirm = async (history: HistoryType) => {
+  const updateFabricPurchaseConfirm = async (history: HistoryType) => {
+    setLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
-    setLoading(true);
     try {
       await runTransaction(db, async (transaction) => {
         const productDocSnap = await transaction.get(productDocRef);
@@ -89,8 +94,8 @@ const FabricPurchaseConfirmTable: NextPage = () => {
     } catch (err) {
       console.log(err);
     } finally {
+      mutate({ ...data });
       setLoading(false);
-      router.push("/products/fabric-purchase/confirms");
     }
   };
 
@@ -100,7 +105,6 @@ const FabricPurchaseConfirmTable: NextPage = () => {
         id={history.id}
         comment={history.comment}
         collectionName={collectionName}
-        mutate={mutate}
       />
       {history?.comment.slice(0, 20) +
         (history.comment.length >= 1 ? "..." : "")}
@@ -110,7 +114,7 @@ const FabricPurchaseConfirmTable: NextPage = () => {
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        購入履歴
+        入荷履歴
       </Box>
       {filterHistories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
@@ -156,10 +160,8 @@ const FabricPurchaseConfirmTable: NextPage = () => {
                       items={items}
                       setItems={setItems}
                       onClick={() => {
-                        updateHistoryFabricPurchaseConfirm(history);
+                        updateFabricPurchaseConfirm(history);
                       }}
-                      orderType=""
-                      mutate={mutate}
                     />
                   ) : (
                     "金額確認済"

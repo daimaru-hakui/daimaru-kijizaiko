@@ -6,6 +6,11 @@ import Layout from "../components/Layout";
 import { RecoilRoot } from "recoil";
 import theme from "../components/theme";
 import Head from "next/head";
+import { SWRConfig } from "swr";
+import axios from "axios";
+
+const fetcher = (url: string) =>
+  axios.get(url).then((res) => res.data);
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -13,9 +18,11 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head><title>大丸白衣 生地在庫アプリ</title></Head>
       <ChakraProvider theme={theme}>
         <RecoilRoot>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <SWRConfig value={{ fetcher }}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </SWRConfig>
         </RecoilRoot>
       </ChakraProvider>
     </>

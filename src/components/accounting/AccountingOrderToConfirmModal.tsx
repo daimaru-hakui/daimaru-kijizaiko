@@ -26,16 +26,20 @@ import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { HistoryType } from "../../../types/HistoryType";
 import { useInputHistory } from "../../hooks/UseInputHistory";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 
 type Props = {
   history: HistoryType;
 };
 
-const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({ history }) => {
+const AccountingOrderToConfirmModal: NextPage<Props> = ({ history }) => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { items, setItems, handleNumberChange, onReset } = useInputHistory();
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";
+  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
 
   useEffect(() => {
     setItems({ ...history });
@@ -60,15 +64,15 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({ history }) => {
 
         if (history.stockPlace === HOUSE_FACTORY) {
           const stock = productDocSnap.data().tokushimaStock || 0;
-          const newStock = stock - history.quantity + items.quantity;
+          const newStock = stock - history.quantity + Number(items.quantity);
           transaction.update(productDocRef, {
             tokushimaStock: newStock,
           });
         }
 
         transaction.update(confirmHistoryDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           updateUser: currentUser,
           updatedAt: serverTimestamp(),
           accounting: true,
@@ -77,6 +81,8 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({ history }) => {
     } catch (e) {
       console.error(e);
     } finally {
+      mutate("/api/fabric-purchase-confirms");
+      router.push('/accounting-dept/confirms');
     }
   };
 
@@ -184,4 +190,4 @@ const AccountingHistoryOrderToConfirmModal: NextPage<Props> = ({ history }) => {
   );
 };
 
-export default AccountingHistoryOrderToConfirmModal;
+export default AccountingOrderToConfirmModal;

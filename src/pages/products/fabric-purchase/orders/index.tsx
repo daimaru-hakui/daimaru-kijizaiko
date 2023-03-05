@@ -9,7 +9,7 @@ const FabricPurchaseOrders = () => {
         <Flex gap={3} p={3}>
           <Button size="sm" colorScheme='facebook'>入荷予定</Button>
           <Link href="/products/fabric-purchase/confirms">
-            <Button size="sm" >購入履歴</Button>
+            <Button size="sm" >入荷履歴</Button>
           </Link>
         </Flex>
         <FabricPurchaseOrderTable />

@@ -23,15 +23,14 @@ import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
-import { useAPI } from "../../../hooks/UseAPI";
 import { currentUserState, loadingState, usersState } from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 
 const FabricDyeingOrderTable = () => {
-  const HOUSE_FACTORY = "徳島工場";
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState<any>();
@@ -40,9 +39,8 @@ const FabricDyeingOrderTable = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth } = useAuthManagement();
-  const { getTodayDate, mathRound2nd } = useUtil();
-  const { data, mutate } = useAPI("/api/fabric-dyeing-orders");
-  mutate("/api/fabric-dyeing-orders");
+  const { getTodayDate } = useUtil();
+  const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -92,8 +90,9 @@ const FabricDyeingOrderTable = () => {
     } finally {
     }
   };
+
   // 生地仕掛状況　Orderを削除  type ranning
-  const deleteHistoryFabricDyeingOrderRanning = async (
+  const deleteFabricDyeingOrderRanning = async (
     history: HistoryType
   ) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -125,7 +124,8 @@ const FabricDyeingOrderTable = () => {
   };
 
   //　生地仕掛状況　Order　編集（Stock在庫）
-  const updateHistoryFabricDyeingOrderStock = async (history: HistoryType) => {
+  const updateFabricDyeingOrderStock = async (history: HistoryType) => {
+    setLoading(true);
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -164,16 +164,16 @@ const FabricDyeingOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/fabric-dyeing/orders");
     }
   };
 
   //　生地仕掛状況　Order　編集（ranning在庫）
-  const updateHistoryFabricDyeingOrderRanning = async (
+  const updateFabricDyeingOrderRanning = async (
     history: HistoryType
   ) => {
     setLoading(true);
@@ -204,11 +204,11 @@ const FabricDyeingOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/fabric-dyeing/orders");
     }
   };
 
@@ -216,6 +216,7 @@ const FabricDyeingOrderTable = () => {
   const confirmProcessingFabricDyeing = async (history: HistoryType) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
+    setLoading(true);
 
     const productDocRef = doc(db, "products", history.productId);
     const orderHistoryDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -270,74 +271,8 @@ const FabricDyeingOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-    }
-  };
-
-
-  // 購入状況　確定処理
-  const confirmProcessingFabricPurchase = async (history: HistoryType) => {
-    const result = window.confirm("確定して宜しいでしょうか");
-    if (!result) return;
-
-    const productDocRef = doc(db, "products", history.productId);
-    const orderHistoryDocRef = doc(db, "fabricPurchaseOrders", history.id);
-    const confirmHistoryDocRef = doc(collection(db, "fabricPurchaseConfirms"));
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product does not exist!!";
-
-        const newArrivingQuantity =
-          (await productDocSnap.data()?.arrivingQuantity) -
-          history.quantity +
-          items.remainingOrder || 0;
-
-        let newTokushimaStock = 0;
-        if (items.stockPlace === HOUSE_FACTORY) {
-          newTokushimaStock =
-            (await productDocSnap.data()?.tokushimaStock) + items.quantity || 0;
-        }
-
-        transaction.update(productDocRef, {
-          arrivingQuantity: mathRound2nd(newArrivingQuantity),
-          tokushimaStock: mathRound2nd(newTokushimaStock),
-        });
-
-        transaction.update(orderHistoryDocRef, {
-          quantity: items.remainingOrder,
-          orderedAt: items.orderedAt || getTodayDate(),
-          scheduledAt: items.scheduledAt || getTodayDate(),
-          comment: items.comment,
-          updateUser: currentUser,
-          updatedAt: serverTimestamp(),
-        });
-
-        transaction.set(confirmHistoryDocRef, {
-          serialNumber: history.serialNumber,
-          orderType: history.orderType,
-          grayFabricId: history.grayFabricId,
-          productId: history.productId,
-          productNumber: history.productNumber,
-          productName: history.productName,
-          colorName: history.colorName,
-          supplierId: history.supplierId,
-          supplierName: history.supplierName,
-          price: history.price,
-          quantity: items.quantity,
-          stockPlace: items.stockPlace,
-          comment: items.comment,
-          orderedAt: items.orderedAt || history.orderedAt,
-          fixedAt: items.fixedAt || getTodayDate(),
-          createUser: currentUser,
-          updateUser: currentUser,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
+      setLoading(false);
+      router.push('/products/fabric-dyeing/confirms');
     }
   };
 
@@ -366,7 +301,6 @@ const FabricDyeingOrderTable = () => {
         items={items}
         setItems={setItems}
         orderType="dyeing"
-        mutate={mutate}
       />
       {isAdminAuth() && (
         <FaTrashAlt
@@ -381,7 +315,7 @@ const FabricDyeingOrderTable = () => {
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        生地仕掛一覧
+        染色仕掛中
       </Box>
       {filterHistories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
@@ -437,14 +371,14 @@ const FabricDyeingOrderTable = () => {
                         {history.stockType === "stock" &&
                           elmentEditDelete(
                             history,
-                            updateHistoryFabricDyeingOrderStock,
+                            updateFabricDyeingOrderStock,
                             deleteHistoryFabricDyeingOrderStock
                           )}
                         {history.stockType === "ranning" &&
                           elmentEditDelete(
                             history,
-                            updateHistoryFabricDyeingOrderRanning,
-                            deleteHistoryFabricDyeingOrderRanning
+                            updateFabricDyeingOrderRanning,
+                            deleteFabricDyeingOrderRanning
                           )}
                       </>
                     )}

@@ -32,7 +32,6 @@ type Props = {
   items: any;
   setItems: Function;
   orderType?: string;
-  mutate?: Function;
 };
 
 export const HistoryEditModal: NextPage<Props> = ({
@@ -42,7 +41,7 @@ export const HistoryEditModal: NextPage<Props> = ({
   items,
   setItems,
   orderType,
-  mutate
+
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 

@@ -21,20 +21,23 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
+import { useState, useEffect } from "react";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
+import useSWR from 'swr';
 
 type Props = {
   title: string;
   report: CuttingReportType;
-  mutate?: Function;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
+const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
+  const { data } = useSWR('/api/cutting-reports');
+  const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {
     getSerialNumber,
     getUserName,
@@ -42,6 +45,12 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
     getProductName,
     getColorName,
   } = useGetDisp();
+
+  useEffect(() => {
+    setFilterReport(data?.contents.find((value: CuttingReportType) => (
+      value.id === report.id
+    )));
+  }, [report.id, data]);
 
   return (
     <>
@@ -60,8 +69,8 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
         <ModalContent>
           <ModalHeader>
             <Flex alignItems="center" gap={3}>
-              裁断報告書 <CuttingReportEditModal reportId={report.id} mutate={mutate} />
-              {report?.products?.length === 0 && (
+              裁断報告書 <CuttingReportEditModal report={filterReport} />
+              {filterReport?.products?.length === 0 && (
                 <Button
                   size="xs"
                   colorScheme="red"
@@ -91,16 +100,16 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
                 >
                   <Box>
                     <Text fontWeight="bold">裁断報告書</Text>
-                    <Box>No.{getSerialNumber(report.serialNumber)}</Box>
+                    <Box>No.{getSerialNumber(filterReport.serialNumber)}</Box>
                   </Box>
                   <Box>
                     <Text fontWeight="bold">裁断日</Text>
-                    <Box>{report.cuttingDate}</Box>
+                    <Box>{filterReport.cuttingDate}</Box>
                   </Box>
                 </Flex>
                 <Box>
                   <Text fontWeight="bold">担当者</Text>
-                  <Box>{getUserName(report.staff)}</Box>
+                  <Box>{getUserName(filterReport.staff)}</Box>
                 </Box>
               </Flex>
               <Flex
@@ -112,31 +121,31 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
                   <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
                     <Box>
                       <Text fontWeight="bold">加工指示書</Text>
-                      <Box>No.{report.processNumber}</Box>
+                      <Box>No.{filterReport.processNumber}</Box>
                     </Box>
                     <Box>
                       <Text fontWeight="bold">受注先名</Text>
-                      <Box>{report.client}</Box>
+                      <Box>{filterReport.client}</Box>
                     </Box>
                   </Flex>
                   <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
                     <Box>
                       <Text fontWeight="bold">種別</Text>
-                      <Box>{report.itemType === "1" ? "既製" : "別注"}</Box>
+                      <Box>{filterReport.itemType === "1" ? "既製" : "別注"}</Box>
                     </Box>
                     <Box>
                       <Text fontWeight="bold">品名</Text>
-                      <Box>{report.itemName}</Box>
+                      <Box>{filterReport.itemName}</Box>
                     </Box>
                   </Flex>
                   <Flex gap={6}>
                     <Box>
                       <Text fontWeight="bold">枚数</Text>
-                      <Box textAlign="right">{report.totalQuantity}</Box>
+                      <Box textAlign="right">{filterReport.totalQuantity}</Box>
                     </Box>
                   </Flex>
                 </Stack>
-                {report.comment && (
+                {filterReport.comment && (
                   <Box w="full">
                     <Text fontWeight="bold">明細・備考</Text>
                     <Box
@@ -146,7 +155,7 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
                       border="1px"
                       borderColor="gray.100"
                     >
-                      {report.comment}
+                      {filterReport.comment}
                     </Box>
                   </Box>
                 )}
@@ -165,7 +174,7 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {report.products?.map((product: any) => (
+                    {filterReport.products?.map((product: any) => (
                       <Tr key={product.productId}>
                         <Td>{product.category}</Td>
                         <Td>{getProductNumber(product.productId)}</Td>
@@ -173,7 +182,7 @@ const CuttingReportModal: NextPage<Props> = ({ title, report, mutate }) => {
                         <Td>{getProductName(product.productId)}</Td>
                         <Td isNumeric>{product.quantity}m</Td>
                         <Td isNumeric>
-                          {scaleCalc(product.quantity, report.totalQuantity)}m
+                          {scaleCalc(product.quantity, filterReport.totalQuantity)}m
                         </Td>
                       </Tr>
                     ))}

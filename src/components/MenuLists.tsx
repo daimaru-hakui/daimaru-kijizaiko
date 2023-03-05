@@ -14,9 +14,11 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const menu1 = [
     { id: 1, title: "生地一覧", link: "/products" },
     { id: 2, title: "生地の発注", link: "/products/order/new" },
-    { id: 3, title: "生地仕掛一覧", link: "/products/fabric-dyeing/orders" },
-    { id: 4, title: "入荷予定一覧", link: "/products/fabric-purchase/orders" },
-    { id: 5, title: "マスター登録", link: "/products/new" },
+    { id: 3, title: "染色仕掛一覧", link: "/products/fabric-dyeing/orders" },
+    { id: 4, title: "染色履歴一覧", link: "/products/fabric-dyeing/confirms" },
+    { id: 5, title: "入荷予定一覧", link: "/products/fabric-purchase/orders" },
+    { id: 6, title: "入荷履歴一覧", link: "/products/fabric-purchase/confirms" },
+    { id: 7, title: "マスター登録", link: "/products/new" },
   ];
   const menu2 = [
     { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
@@ -27,7 +29,12 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     {
       id: 1,
       title: "入荷予定一覧",
-      link: "/tokushima/history/fabric-purchase",
+      link: "/tokushima/fabric-purchase/orders",
+    },
+    {
+      id: 1,
+      title: "入荷履歴一覧",
+      link: "/tokushima/fabric-purchase/confirms",
     },
     {
       id: 2,
@@ -43,7 +50,10 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 3, title: "色", link: "/settings/colors" },
     { id: 4, title: "組織名", link: "/settings/material-names" },
   ];
-  const menu5 = [{ id: 1, title: "金額確認", link: "/accounting-dept" }];
+  const menu5 = [
+    { id: 1, title: "金額確認", link: "/accounting-dept/orders" },
+    { id: 2, title: "処理済み", link: "/accounting-dept/confirms" }
+  ];
   const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
   const menu7 = [
     { id: 1, title: "権限", link: "/settings/auth" },

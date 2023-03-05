@@ -2,9 +2,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  onSnapshot,
-  orderBy,
-  query,
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
@@ -14,8 +11,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { CuttingReportType } from "../../types/CuttingReportType";
-import { useAPI } from "./UseAPI";
 import { useGetDisp } from "./UseGetDisp";
+import useSWR from "swr";
 
 export const useCuttingReportFunc = (
   items: CuttingReportType | null,
@@ -26,7 +23,7 @@ export const useCuttingReportFunc = (
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useAPI("/api/cutting-reports");
+  const { data, mutate } = useSWR("/api/cutting-reports");
 
   // 商品登録項目を追加
   const addInput = () => {
@@ -51,6 +48,7 @@ export const useCuttingReportFunc = (
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
+
     const serialNumberDocRef = doc(db, "serialNumbers", "cuttingReportNumbers");
     const cuttingReportDocRef = doc(collection(db, "cuttingReports"));
 
@@ -97,6 +95,7 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
+      mutate({ ...data });
       await router.push("/tokushima/cutting-reports");
     }
   };
@@ -106,6 +105,7 @@ export const useCuttingReportFunc = (
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
+
     const cuttingReportDocRef = doc(db, "cuttingReports", reportId);
     const productsRef = collection(db, "products");
     try {
@@ -147,6 +147,7 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
+      mutate({ ...data });
     }
   };
 
@@ -154,9 +155,9 @@ export const useCuttingReportFunc = (
     const result = window.confirm('削除して宜しいでしょうか');
     if (!result) return;
     try {
-
       const docRef = doc(db, 'cuttingReports', reportId);
       await deleteDoc(docRef);
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
@@ -209,7 +210,7 @@ export const useCuttingReportFunc = (
     });
     setCsvData(body);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mutate, data]);
+  }, [data]);
 
   return {
     addInput,

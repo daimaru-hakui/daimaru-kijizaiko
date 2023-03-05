@@ -17,9 +17,9 @@ import { CuttingProductType } from "../../../../types/CuttingProductType";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
-import { useAPI } from "../../../hooks/UseAPI";
 import { CuttingHistoryType } from "../../../../types/CuttingHistoryType";
 import { useUtil } from "../../../hooks/UseUtil";
+import useSWR from "swr";
 
 const HistoryCutting = () => {
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
@@ -33,8 +33,7 @@ const HistoryCutting = () => {
     getProductName,
     getColorName,
   } = useGetDisp();
-  const { data, mutate } = useAPI("/api/cutting-reports");
-  // mutate("/api/cutting-reports");
+  const { data } = useSWR("/api/cutting-reports");
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const HistoryCutting = () => {
           return -1;
         }
       }));
-  }, [startDay, endDay, data, mutate]);
+  }, [startDay, endDay, data]);
 
   const onReset = () => {
     setStartDay(INIT_DATE);
@@ -118,7 +117,6 @@ const HistoryCutting = () => {
                     <CuttingReportModal
                       title="詳細"
                       report={list}
-                      mutate={mutate}
                     />
                   </Td>
                   <Td>{list.cuttingDate}</Td>

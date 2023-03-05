@@ -16,10 +16,10 @@ import { currentUserState, loadingState, usersState } from "../../../../store";
 import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
-import { useAPI } from "../../../hooks/UseAPI";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 
 
 const FabricDyeingConfirmTable = () => {
@@ -37,18 +37,17 @@ const FabricDyeingConfirmTable = () => {
     comment: "",
     fixedAt: "",
   });
-  const { data, mutate } = useAPI("/api/fabric-dyeing-confirms");
-  mutate("/api/fabric-dyeing-confirms");
+  const { data, mutate, isLoading } = useSWR("/api/fabric-dyeing-confirms");
 
   useEffect(() => {
-    const newHistorys = data?.contenst?.filter(
-      (history: { quantity: number; }) => history.quantity > 0
+    const newHistorys = data?.contents?.filter(
+      (history: { quantity: number; }) => history
     );
     setFilterHistories(newHistorys);
   }, [data]);
 
 
-  const updateHistoryFabricDyeingConfirm = async (history: HistoryType) => {
+  const updateFabricDyeingConfirm = async (history: HistoryType) => {
     setLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingConfirms", history.id);
@@ -74,11 +73,11 @@ const FabricDyeingConfirmTable = () => {
           updateUser: currentUser,
         });
       });
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/fabric-dyeing/confirms");
     }
   };
 
@@ -140,9 +139,8 @@ const FabricDyeingConfirmTable = () => {
                       type="confirm"
                       items={items}
                       setItems={setItems}
-                      onClick={() => updateHistoryFabricDyeingConfirm(history)}
+                      onClick={() => updateFabricDyeingConfirm(history)}
                       orderType=""
-                      mutate={mutate}
                     />
                   ) : (
                     "金額確認済"

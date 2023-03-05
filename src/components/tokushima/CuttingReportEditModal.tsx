@@ -10,37 +10,23 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, getDoc } from "firebase/firestore";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { db } from "../../../firebase";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import CuttingReportInputArea from "./CuttingReportInputArea";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import useSWR from "swr";
 
 type Props = {
-  reportId: string;
-  mutate: Function;
+  report: CuttingReportType;
 };
 
-const CuttingReportEditModal: NextPage<Props> = ({ reportId, mutate }) => {
+const CuttingReportEditModal: NextPage<Props> = ({ report }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [report, setReport] = useState({} as CuttingReportType);
   const { isAuths } = useAuthManagement();
-  mutate("/api/cutting-reports");
-
-  useEffect(() => {
-    const getCuttingReport = async () => {
-      const docRef = doc(db, "cuttingReports", reportId);
-      const docSnap = await getDoc(docRef);
-      setReport({ ...docSnap.data(), id: docSnap.id } as CuttingReportType);
-    };
-    getCuttingReport();
-  }, [isOpen, reportId]);
-
+  const { data, mutate } = useSWR("/api/cutting-reports");
+  mutate({ ...data });
   return (
     <>
-      {/* <FaEdit onClick={onOpen} cursor="pointer" /> */}
       {isAuths(["tokushima", "rd"]) && (
         <Button
           size="xs"

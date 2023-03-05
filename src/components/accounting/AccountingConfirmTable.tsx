@@ -11,32 +11,26 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { currentUserState, usersState } from "../../../store";
 import CommentModal from "../CommentModal";
 import { HistoryType } from "../../../types/HistoryType";
-import { AccountingHistoryEditModal } from "./AccountingHistoryEditModal";
-import AccountingHistoryOrderToConfirmModal from "./AccountingHistoryOrderToConfirmModal";
+import { AccountingEditModal } from "./AccountingEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import useSWR from "swr";
 
-type Props = {
-  histories: HistoryType[];
-  title: string;
-};
-
-const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
-
-  const [filterHistories, setFilterHistories] = useState<any>();
-  const { getUserName, getSerialNumber } = useGetDisp()
+const AccountingConfirmTable = () => {
+  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+  const { getUserName, getSerialNumber } = useGetDisp();
+  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
 
   // 数量０のデータを非表示
   useEffect(() => {
-    const newHistorys = histories?.filter(
+    const newHistorys = data?.contents?.filter(
       (history: HistoryType) =>
-        history.accounting !== true && history.quantity !== 0
+        history.accounting === true && history
     );
     setFilterHistories(newHistorys);
-  }, [histories]);
+  }, [data]);
+
 
   const elementComment = (history: HistoryType, collectionName: string) => (
     <Flex gap={3}>
@@ -50,29 +44,27 @@ const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
     </Flex>
   );
 
-  const elmentEdit = (
-    history: HistoryType,
-  ) => (
+  const elmentEdit = (history: HistoryType) => (
     <Flex gap={3}>
-      <AccountingHistoryEditModal
+      <AccountingEditModal
         type="order"
-        history={history} />
+        history={history}
+      />
     </Flex>
   );
 
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
-        {title}
+        処理済み
       </Box>
       {filterHistories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
-              <Th>確定</Th>
               <Th>発注NO.</Th>
               <Th>発注日</Th>
-              <Th>仕上日</Th>
+              <Th>入荷日</Th>
               <Th>担当者</Th>
               <Th>品番</Th>
               <Th>色</Th>
@@ -88,9 +80,6 @@ const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
           <Tbody>
             {filterHistories?.map((history: HistoryType) => (
               <Tr key={history.id}>
-                <Td>
-                  <AccountingHistoryOrderToConfirmModal history={history} />
-                </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
                 <Td>{history?.fixedAt}</Td>
@@ -107,7 +96,7 @@ const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
                 )}
                 <Td>{history?.stockPlace}</Td>
                 <Td w="100%" textAlign="center">
-                  {elementComment(history, "historyFabricPurchaseConfirms")}
+                  {elementComment(history, "fabricPurchaseConfirms")}
                 </Td>
                 <Td>
                   <Flex gap={3}>
@@ -125,4 +114,4 @@ const AccountingHistoryOrderTable: NextPage<Props> = ({ histories, title }) => {
   );
 };
 
-export default AccountingHistoryOrderTable;
+export default AccountingConfirmTable;

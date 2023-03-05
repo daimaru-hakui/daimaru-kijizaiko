@@ -163,48 +163,48 @@ export const useDataList = () => {
   }, [setGrayFabricOrders]);
 
   // 生地発注履歴;
-  useEffect(() => {
-    const getFabricDyeingOrders = async () => {
-      const q = query(
-        collection(db, "fabricDyeingOrders"),
-        where("quantity", ">", 0)
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setFabricDyeingOrders(
-            querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
-              .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getFabricDyeingOrders();
-  }, [setFabricDyeingOrders]);
+  // useEffect(() => {
+  //   const getFabricDyeingOrders = async () => {
+  //     const q = query(
+  //       collection(db, "fabricDyeingOrders"),
+  //       where("quantity", ">", 0)
+  //     );
+  //     try {
+  //       onSnapshot(q, (querySnap) =>
+  //         setFabricDyeingOrders(
+  //           querySnap.docs
+  //             .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+  //             .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
+  //         )
+  //       );
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   getFabricDyeingOrders();
+  // }, [setFabricDyeingOrders]);
 
   // 生地発注履歴（order）
-  useEffect(() => {
-    const getFabricPurchaseOrders = async () => {
-      const q = query(
-        collection(db, "fabricPurchaseOrders"),
-        where("quantity", ">", 0)
-      );
-      try {
-        onSnapshot(q, (querySnap) =>
-          setFabricPurchaseOrders(
-            querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
-              .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getFabricPurchaseOrders();
-  }, [setFabricPurchaseOrders]);
+  // useEffect(() => {
+  //   const getFabricPurchaseOrders = async () => {
+  //     const q = query(
+  //       collection(db, "fabricPurchaseOrders"),
+  //       where("quantity", ">", 0)
+  //     );
+  //     try {
+  //       onSnapshot(q, (querySnap) =>
+  //         setFabricPurchaseOrders(
+  //           querySnap.docs
+  //             .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+  //             .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
+  //         )
+  //       );
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   getFabricPurchaseOrders();
+  // }, [setFabricPurchaseOrders]);
 
   // 生地発注履歴（confirm）
   // useEffect(() => {

@@ -15,8 +15,8 @@ import CuttingQuantityRanking from './CuttingQuantityRanking';
 import PurchasePriceRanking from './PurchasePriceRanking';
 import PurchaseQuantityRanking from './PurchaseQuantityRanking';
 import { FaRegWindowClose } from "react-icons/fa";
-import { useAPI } from '../../hooks/UseAPI';
 import { useUtil } from '../../hooks/UseUtil';
+import useSWR from 'swr';
 
 const Charts = () => {
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
@@ -24,8 +24,8 @@ const Charts = () => {
   const [startDay, setStartDay] = useState(INIT_DATE);
   const [endDay, setEndDay] = useState(getTodayDate());
   const [limitNum, setLimitNum] = useState(5);
-  const { data, mutate } = useAPI("/api/ranking");
-  // mutate("/api/ranking");
+  const { data } = useSWR('api/ranking');
+
   const onReset = () => {
     setStartDay(INIT_DATE);
     setEndDay(getTodayDate());

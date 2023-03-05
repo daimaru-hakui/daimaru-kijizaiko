@@ -28,7 +28,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
-import { useAPI } from "../../hooks/UseAPI";
+import useSWR from 'swr';
 
 type Props = {
   productId: string;
@@ -49,7 +49,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
-  const { data } = useAPI("/api/cutting-reports");
+  const { data } = useSWR("/api/cutting-reports");
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Input,
   NumberDecrementStepper,
@@ -96,6 +95,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
       quantity
     );
   }, [items]);
+
 
   return (
     <>

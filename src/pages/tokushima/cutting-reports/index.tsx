@@ -19,21 +19,20 @@ import CuttingReportModal from "../../../components/tokushima/CuttingReportModal
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
-import { useAPI } from "../../../hooks/UseAPI";
+import useSWR from "swr";
 
 const CuttingReport = () => {
   const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
   const { getTodayDate } = useUtil();
   const [startDay, setStartDay] = useState(INIT_DATE);
   const [endDay, setEndDay] = useState(getTodayDate());
-  const { data, mutate } = useAPI("/api/cutting-reports");
   const [cuttingReports, setCuttingReports] = useState(
     [] as CuttingReportType[]
   );
   const { getSerialNumber, getUserName } = useGetDisp();
   const { csvData } = useCuttingReportFunc(null, null);
+  const { data } = useSWR("/api/cutting-reports");
 
-  mutate("/api/cutting-reports");
   useEffect(() => {
     setCuttingReports(
       data?.contents?.filter((obj: CuttingReportType) => (
@@ -42,8 +41,7 @@ const CuttingReport = () => {
         .sort((a: CuttingReportType, b: CuttingReportType) =>
           (a.serialNumber > b.serialNumber) && - 1
         ));
-    console.log(data?.contents);
-  }, [startDay, endDay, data, mutate]);
+  }, [startDay, endDay, data]);
 
   const onReset = () => {
     setStartDay(INIT_DATE);
@@ -102,7 +100,6 @@ const CuttingReport = () => {
                     <CuttingReportModal
                       title={"詳細"}
                       report={report}
-                      mutate={mutate}
                     />
                   </Td>
                   <Td>{getSerialNumber(report.serialNumber)}</Td>

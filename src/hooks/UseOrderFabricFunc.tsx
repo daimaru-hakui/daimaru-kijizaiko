@@ -12,6 +12,7 @@ import { ProductType } from "../../types/FabricType";
 import { HistoryType } from "../../types/HistoryType";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
+import useSWR from 'swr';
 
 export const useOrderFabricFunc = (
   items: HistoryType,
@@ -25,6 +26,7 @@ export const useOrderFabricFunc = (
   const { getTodayDate } = useUtil();
   const grayFabricId = product?.grayFabricId || "";
   const productId = product?.id || "";
+  // const { data } = useSWR();
 
   const Obj = {
     stockType: items.stockType,

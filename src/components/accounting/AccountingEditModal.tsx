@@ -29,13 +29,14 @@ import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import { useInputHistory } from "../../hooks/UseInputHistory";
+import useSWR from "swr";
 
 type Props = {
   type: string;
   history: HistoryType;
 };
 
-export const AccountingHistoryEditModal: NextPage<Props> = ({
+export const AccountingEditModal: NextPage<Props> = ({
   type,
   history,
 }) => {
@@ -44,6 +45,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
   const HOUSE_FACTORY = "徳島工場";
   const { items, setItems, handleInputChange, handleNumberChange, onReset } =
     useInputHistory();
+  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
 
   // 初期値をitemsに代入
   useEffect(() => {
@@ -68,15 +70,15 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
 
         if (history.stockPlace === HOUSE_FACTORY) {
           const stock = productDocSnap.data().tokushimaStock || 0;
-          const newStock = stock - history.quantity + items.quantity;
+          const newStock = stock - history.quantity + Number(items.quantity);
           transaction.update(productDocRef, {
-            tokushimaStock: newStock,
+            tokushimaStock: Number(newStock),
           });
         }
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           fixedAt: items.fixedAt,
           comment: items.comment,
           updateUser: currentUser,
@@ -85,6 +87,7 @@ export const AccountingHistoryEditModal: NextPage<Props> = ({
     } catch (err) {
       console.log(err);
     } finally {
+      mutate({ ...data });
     }
   };
 

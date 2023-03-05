@@ -27,11 +27,15 @@ import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
-import { useAPI } from "../../../hooks/UseAPI";
 import { useRouter } from "next/router";
+import useSWR from "swr";
+import { NextPage } from "next";
 
-const FabricPurchaseOrderTable = () => {
-  const HOUSE_FACTORY = "徳島工場";
+type Props = {
+  HOUSE_FACTORY?: string;
+};
+
+const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState<any>();
@@ -41,20 +45,31 @@ const FabricPurchaseOrderTable = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth } = useAuthManagement();
   const { getTodayDate, mathRound2nd } = useUtil();
-  const { data, mutate } = useAPI("/api/fabric-purchase-orders");
-  mutate("/api/fabric-purchase-orders");
+  const { data, mutate } = useSWR("/api/fabric-purchase-orders");
 
   // 数量０のデータを非表示
   useEffect(() => {
-    const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history.quantity //後ほどフィルターを作る
-    );
-    setFilterHistories(newHistorys);
-  }, [data]);
+    data?.contents?.sort(
+      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
+        (a.serialNumber > b.serialNumber) && - 1);
+    if (HOUSE_FACTORY) {
+      const newHistorys = data?.contents?.filter(
+        (history: HistoryType) => (
+          (history.stockPlace === HOUSE_FACTORY) && history
+        )
+      );
+      setFilterHistories(newHistorys);
+    } else {
+      const newHistorys = data?.contents?.filter(
+        (history: HistoryType) => history
+      );
+      setFilterHistories(newHistorys);
+    }
+  }, [data, HOUSE_FACTORY]);
 
 
   // 購入状況　orderを削除（stock ranning共通）
-  const deleteHistoryFabricPurchaseOrder = async (history: any) => {
+  const deleteFabricPurchaseOrder = async (history: any) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -92,6 +107,7 @@ const FabricPurchaseOrderTable = () => {
 
         transaction.delete(historyDocRef);
       });
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
@@ -99,7 +115,7 @@ const FabricPurchaseOrderTable = () => {
   };
 
   //　購入状況　orderを編集（stock ranning共通）
-  const updateHistoryFabricPurchaseOrder = async (history: HistoryType) => {
+  const updateFabricPurchaseOrder = async (history: HistoryType) => {
     setLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseOrders", history.id);
@@ -148,11 +164,11 @@ const FabricPurchaseOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
+      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/fabric-purchase/orders");
     }
   };
 
@@ -220,7 +236,7 @@ const FabricPurchaseOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-      router;
+      router.push('/products/fabric-purchase/confirms');
     }
   };
 
@@ -248,7 +264,6 @@ const FabricPurchaseOrderTable = () => {
         onClick={() => onClickUpdate(history)}
         items={items}
         setItems={setItems}
-        mutate={mutate}
       />
       {isAdminAuth() && (
         <FaTrashAlt
@@ -312,15 +327,15 @@ const FabricPurchaseOrderTable = () => {
                 )}
                 <Td>{history?.stockPlace}</Td>
                 <Td w="100%" textAlign="center">
-                  {elementComment(history, "historyFabricDyeingOrders")}
+                  {elementComment(history, "fabricDyeingOrders")}
                 </Td>
                 <Td>
                   <Flex gap={3}>
                     {history.orderType === "purchase" &&
                       elmentEditDelete(
                         history,
-                        updateHistoryFabricPurchaseOrder,
-                        deleteHistoryFabricPurchaseOrder
+                        updateFabricPurchaseOrder,
+                        deleteFabricPurchaseOrder
                       )}
                   </Flex>
                 </Td>

@@ -3,8 +3,10 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import { HistoryType } from "../../../types/HistoryType";
-import AccountingHistoryConfirmTable from "../../components/accounting/AccountingHistoryConfirmTable";
-import AccountingHistoryOrderTable from "../../components/accounting/AccountingHistoryOrderTable";
+import AccountingConfirmTable from "../../components/accounting/AccountingConfirmTable";
+import AccountingHistoryConfirmTable from "../../components/accounting/AccountingConfirmTable";
+import AccountingOrderTable from "../../components/accounting/AccountingOrderTable";
+import AccountingHistoryOrderTable from "../../components/accounting/AccountingOrderTable";
 
 const AccountingDept = () => {
   const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
@@ -62,15 +64,14 @@ const AccountingDept = () => {
 
           <TabPanels>
             <TabPanel>
-              <AccountingHistoryOrderTable
-                histories={historyOrders}
-                title="金額未チェック"
+              <AccountingOrderTable
+
+
               />
             </TabPanel>
             <TabPanel>
-              <AccountingHistoryConfirmTable
-                histories={historyConfirms}
-                title="金額チェック済み"
+              <AccountingConfirmTable
+
               />
             </TabPanel>
           </TabPanels>

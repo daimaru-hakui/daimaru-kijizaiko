@@ -161,8 +161,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
                           mt={1}
                           name="stockPlace"
                           placeholder="送り先を選択してください"
-                          value={items.stockPlace || history.stockPlace}
-                          defaultValue="徳島工場"
+                          value={"徳島工場" || items.stockPlace || history.stockPlace}
                           onChange={(e) => handleInputChange(e)}
                         >
                           {stockPlaces?.map(
