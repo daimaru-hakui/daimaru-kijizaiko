@@ -14,14 +14,20 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     if (process.env.BACKEND_API_KEY) {
-      const query = db.collection("cuttingReports").orderBy("cuttingDate",'desc')
-      query.onSnapshot(querySnapshot => {
-       const contents = querySnapshot.docs.map((doc) => (
-          ({ ...doc.data(), id: doc.id } as CuttingReportType)
-        ))
-        return res.status(200).json({ contents });
-      } ) 
-     
+      const querySnapshot = await db.collection("cuttingReports").orderBy("cuttingDate", 'desc').get();
+      const contents = querySnapshot.docs.flatMap((doc) => (
+        ({ ...doc.data(), id: doc.id } as CuttingReportType)
+      ));
+      return res.status(200).json({ contents });
+
+      // const query = db.collection("cuttingReports").orderBy("cuttingDate",'desc')
+      // query.onSnapshot(querySnapshot => {
+      //  const contents = querySnapshot.docs.map((doc) => (
+      //     ({ ...doc.data(), id: doc.id } as CuttingReportType)
+      //   ))
+      //   return res.status(200).json({ contents });
+      // } ) 
+
     } else {
       return res.status(405).json("error");
     }
