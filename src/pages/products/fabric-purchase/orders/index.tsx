@@ -20,6 +20,8 @@ const FabricPurchaseOrders = () => {
           histories={data?.contents}
           title="仕掛履歴"
           orderType="purchase"
+          mutate={mutate}
+          url="/api/fabric-purchase-orders"
         />
       </Box >
     </Box >

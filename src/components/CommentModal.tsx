@@ -21,12 +21,13 @@ type Props = {
   comment: string;
   collectionName: string;
   mutate?: Function;
+  url?: string;
 };
 
-const CommentModal: NextPage<Props> = ({ id, comment, collectionName, mutate }) => {
+const CommentModal: NextPage<Props> = ({ id, comment, collectionName, mutate, url }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newComment, setNewComment] = useState(comment);
-  mutate("/api/fabric-purchase-confirms");
+  mutate(url);
 
   useEffect(() => {
     setNewComment(comment);

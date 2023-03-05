@@ -25,13 +25,15 @@ type Props = {
   title: string;
   orderType: string;
   mutate?: Function;
+  url?: string;
 };
 
 const HistoryConfirmTable: NextPage<Props> = ({
   histories,
   title,
   orderType,
-  mutate
+  mutate,
+  url
 }) => {
   const HOUSE_FACTORY = "徳島工場";
   const setLoading = useSetRecoilState(loadingState);
@@ -139,6 +141,7 @@ const HistoryConfirmTable: NextPage<Props> = ({
         comment={history.comment}
         collectionName={collectionName}
         mutate={mutate}
+        url={url}
       />
       {history?.comment.slice(0, 20) +
         (history.comment.length >= 1 ? "..." : "")}
