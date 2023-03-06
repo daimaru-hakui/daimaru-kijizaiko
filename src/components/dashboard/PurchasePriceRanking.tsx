@@ -56,7 +56,6 @@ const PurchasePriceRanking: NextPage<Props> = ({
           (obj: { productId: string; quantity: number; price: number; }) => {
             if (obj.productId === header) {
               sum += obj.price * obj.quantity;
-
             }
           }
         );

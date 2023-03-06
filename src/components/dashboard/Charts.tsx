@@ -24,7 +24,9 @@ const Charts = () => {
   const [startDay, setStartDay] = useState(INIT_DATE);
   const [endDay, setEndDay] = useState(getTodayDate());
   const [limitNum, setLimitNum] = useState(5);
-  const { data } = useSWR('api/ranking');
+  // const { data } = useSWR('/api/ranking');
+  const { data: cuttingReports } = useSWR('/api/cutting-reports');
+  const { data: fabricPurchaseConfirms } = useSWR("/api/fabric-purchase-confirms");
 
   const onReset = () => {
     setStartDay(INIT_DATE);
@@ -97,13 +99,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <CuttingQuantityRanking
-          data={data?.cuttingReports}
+          data={cuttingReports?.contents}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <CuttingPriceRanking
-          data={data?.cuttingReports}
+          data={cuttingReports?.contents}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
@@ -120,13 +122,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <PurchaseQuantityRanking
-          data={data?.fabricPurchaseConfirms}
+          data={fabricPurchaseConfirms?.contents}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <PurchasePriceRanking
-          data={data?.fabricPurchaseConfirms}
+          data={fabricPurchaseConfirms?.contents}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}

@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState, loadingState, usersState } from "../../../../store";
+import { currentUserState, fabricPurchaseOrdersState, loadingState, usersState } from "../../../../store";
 import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
@@ -38,7 +38,6 @@ type Props = {
 const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
-  const [filterHistories, setFilterHistories] = useState<any>();
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
@@ -46,26 +45,28 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const { isAdminAuth } = useAuthManagement();
   const { getTodayDate, mathRound2nd } = useUtil();
   const { data, mutate } = useSWR("/api/fabric-purchase-orders");
+  const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
+  const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState([] as HistoryType[]);
+  const STOCK_PLACE = "徳島工場";
 
   // 数量０のデータを非表示
   useEffect(() => {
-    data?.contents?.sort(
-      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
-        (a.serialNumber > b.serialNumber) && - 1);
     if (HOUSE_FACTORY) {
-      const newHistorys = data?.contents?.filter(
+      const newHistorys = fabricPurchaseOrders?.filter(
         (history: HistoryType) => (
           (history.stockPlace === HOUSE_FACTORY) && history
         )
       );
-      setFilterHistories(newHistorys);
+      setFilterFabricPurchaseOrders(newHistorys);
     } else {
-      const newHistorys = data?.contents?.filter(
+      const newHistorys = fabricPurchaseOrders?.filter(
         (history: HistoryType) => history
       );
-      setFilterHistories(newHistorys);
+      setFilterFabricPurchaseOrders(newHistorys.sort(
+        (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
+          (a.serialNumber > b.serialNumber) && - 1));
     }
-  }, [data, HOUSE_FACTORY]);
+  }, [fabricPurchaseOrders, HOUSE_FACTORY]);
 
 
   // 購入状況　orderを削除（stock ranning共通）
@@ -107,7 +108,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         transaction.delete(historyDocRef);
       });
-      mutate({ ...data });
+
     } catch (err) {
       console.log(err);
     } finally {
@@ -164,7 +165,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           updatedAt: serverTimestamp(),
         });
       });
-      mutate({ ...data });
+
     } catch (err) {
       console.log(err);
     } finally {
@@ -192,7 +193,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
-        if (items.stockPlace === HOUSE_FACTORY) {
+        if (items.stockPlace === STOCK_PLACE) {
           newTokushimaStock =
             (await productDocSnap.data()?.tokushimaStock) + items.quantity || 0;
         }
@@ -280,7 +281,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       <Box as="h2" fontSize="2xl">
         入荷予定一覧
       </Box>
-      {filterHistories?.length > 0 ? (
+      {filterFabricPurchaseOrders?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -301,7 +302,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistories?.map((history: HistoryType) => (
+            {filterFabricPurchaseOrders?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
                   <OrderToConfirmModal

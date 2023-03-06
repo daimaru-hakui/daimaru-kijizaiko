@@ -15,6 +15,8 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
+import { ProductType } from "../../../types/FabricType";
+import useSWRImmutable from 'swr/immutable';
 
 ChartJS.register(
   CategoryScale,
@@ -38,19 +40,27 @@ const CuttingPriceRanking: NextPage<Props> = ({
   endDay,
   rankingNumber,
 }) => {
-  const { getProductNumber, getColorName, getPrice } = useGetDisp();
+  const { getProductNumber, getColorName } = useGetDisp();
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);
+  const { data: products } = useSWRImmutable("/api/products");
 
   useEffect(() => {
-    const getArray = () => {
+    const getPrice = (productId: string) => {
+      const product = products?.contents.find(
+        (product: ProductType) => product.id === productId
+      );
+      return product?.price || 0;
+    };
+
+    const getArray = async () => {
       const filterArray = data?.map((obj: CuttingReportType) => obj.products.map(
         (product: CuttingProductType) => (
           {
             ...obj,
             ...product,
-            price: getPrice(product.productId),
+            price: getPrice(product?.productId) || 0,
             products: null,
           } as CuttingHistoryType & { price: number; })
       )
@@ -67,12 +77,12 @@ const CuttingPriceRanking: NextPage<Props> = ({
         let sum = 0;
         filterArray?.forEach((obj: { productId: string; quantity: number; price: number; }) => {
           if (obj.productId === header) {
-            sum += obj.quantity * (obj.price || getPrice(header));
+            sum += obj.quantity * (obj.price || getPrice(header) || 0);
           }
         });
         return { productId: header, price: sum };
       });
-      console.log(newArray);
+
       const result: any = newArray.sort((a, b) => {
         if (a.price > b.price) {
           return -1;
@@ -82,7 +92,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, rankingNumber, startDay, endDay]);
+  }, [data, rankingNumber, startDay, endDay, products]);
 
   const options = {
     indexAxis: "y" as const,

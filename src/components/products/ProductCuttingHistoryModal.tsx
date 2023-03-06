@@ -29,6 +29,7 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 type Props = {
   productId: string;
@@ -49,7 +50,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
-  const { data } = useSWR("/api/cutting-reports");
+  const { data } = useSWRImmutable("/api/cutting-reports");
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
 
   useEffect(() => {

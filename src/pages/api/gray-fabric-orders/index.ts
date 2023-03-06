@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data | string>
 ) {
-  if (process.env.BACKEND_API_KEY !== "daimaru-kijizaiko")
+ if (req.query.API_KEY !== process.env.BACKEND_API_KEY)
     return res.status(405).json("error");
   if (req.method === "GET") {
     const querySnapshot = await db

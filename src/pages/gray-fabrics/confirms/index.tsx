@@ -4,7 +4,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import GrayFabricOrderTable from "../../../components/grayFabrics/GrayFabricOrderTable";
+import GrayFabricConfirmTable from "../../../components/grayFabrics/GrayFabricConfirmTable";
 
 const GrayFabricHistoryConfirms = () => {
 
@@ -17,7 +17,7 @@ const GrayFabricHistoryConfirms = () => {
           </Link>
           <Button size="sm" colorScheme='facebook' >履歴</Button>
         </Flex>
-        <GrayFabricOrderTable />
+        <GrayFabricConfirmTable />
       </Box >
     </Box >
   );

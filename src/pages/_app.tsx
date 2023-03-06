@@ -10,7 +10,7 @@ import { SWRConfig } from "swr";
 import axios from "axios";
 
 const fetcher = (url: string) =>
-  axios.get(url).then((res) => res.data);
+  axios.get(url, { params: { API_KEY: process.env.NEXT_PUBLIC_API_KEY } }).then((res) => res.data);
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

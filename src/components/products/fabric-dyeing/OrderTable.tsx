@@ -23,7 +23,7 @@ import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
-import { currentUserState, loadingState, usersState } from "../../../../store";
+import { currentUserState, fabricDyeingOrdersState, loadingState, usersState } from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
@@ -33,7 +33,6 @@ import useSWR from "swr";
 const FabricDyeingOrderTable = () => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
-  const [filterHistories, setFilterHistories] = useState<any>();
   const currentUser = useRecoilValue(currentUserState);
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
@@ -41,17 +40,19 @@ const FabricDyeingOrderTable = () => {
   const { isAdminAuth } = useAuthManagement();
   const { getTodayDate } = useUtil();
   const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
+  const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
+  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<any>();
 
   // 数量０のデータを非表示
   useEffect(() => {
-    const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history.quantity //後ほどフィルターを作る
+    const newFabricDyeingOrders = fabricDyeingOrders.filter(
+      (history: { quantity: number; }) => history.quantity > 0 && history //後ほどフィルターを作る
     );
-    setFilterHistories(newHistorys);
-  }, [data]);
+    setFilterfabricDyeingOrders(newFabricDyeingOrders);
+  }, [fabricDyeingOrders]);
 
   // 生地仕掛状況　Orderを削除 type stock
-  const deleteHistoryFabricDyeingOrderStock = async (history: any) => {
+  const deleteFabricDyeingOrderStock = async (history: any) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -164,7 +165,7 @@ const FabricDyeingOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
-      mutate({ ...data });
+
     } catch (err) {
       console.log(err);
     } finally {
@@ -204,7 +205,6 @@ const FabricDyeingOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
-      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
@@ -317,7 +317,7 @@ const FabricDyeingOrderTable = () => {
       <Box as="h2" fontSize="2xl">
         染色仕掛中
       </Box>
-      {filterHistories?.length > 0 ? (
+      {filterfabricDyeingOrders?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -337,7 +337,7 @@ const FabricDyeingOrderTable = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistories?.map((history: HistoryType) => (
+            {filterfabricDyeingOrders?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
                   <OrderToConfirmModal
@@ -372,7 +372,7 @@ const FabricDyeingOrderTable = () => {
                           elmentEditDelete(
                             history,
                             updateFabricDyeingOrderStock,
-                            deleteHistoryFabricDyeingOrderStock
+                            deleteFabricDyeingOrderStock
                           )}
                         {history.stockType === "ranning" &&
                           elmentEditDelete(

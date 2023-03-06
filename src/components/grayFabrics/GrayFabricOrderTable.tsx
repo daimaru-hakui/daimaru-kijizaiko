@@ -10,19 +10,17 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
-import { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState, suppliersState, usersState } from "../../../store";
+import { currentUserState, grayFabricOrdersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
 import HistoryOrderToConfirmModal from "../history/OrderToConfirmModal";
 import CommentModal from "../CommentModal";
@@ -36,7 +34,17 @@ const GrayFabricOrderTable = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
-  const { data, mutate, isLoading } = useSWR("/api/gray-fabric-orders");
+  // const { data, mutate, isLoading } = useSWR("/api/gray-fabric-orders");
+  const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as HistoryType[]);
+
+  useEffect(() => {
+    const newGrayFabrics = grayFabricOrders.filter((grayFabric) => (
+      grayFabric.quantity > 0 && grayFabric
+    ));
+    setFilterGrayFabrics(newGrayFabrics);
+  }, [grayFabricOrders]);
+
 
   // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
@@ -61,7 +69,7 @@ const GrayFabricOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-      mutate({ ...data });
+
     }
   };
 
@@ -99,7 +107,7 @@ const GrayFabricOrderTable = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      mutate({ ...data });
+
     }
   };
 
@@ -154,7 +162,7 @@ const GrayFabricOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-      mutate({ ...data });
+
     }
   };
 
@@ -163,7 +171,7 @@ const GrayFabricOrderTable = () => {
       <Box as="h2" fontSize="2xl">
         キバタ仕掛一覧
       </Box>
-      {data?.contents.length > 0 ? (
+      {filterGrayFabrics.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -181,7 +189,7 @@ const GrayFabricOrderTable = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.contents.map((history: any) => (
+            {filterGrayFabrics.map((history: any) => (
               <Tr key={history.id}>
                 <Td>
                   <HistoryOrderToConfirmModal

@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Button, Container, Flex, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 import { collection, doc, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebase';
@@ -7,9 +7,9 @@ import { useGetDisp } from '../../hooks/UseGetDisp';
 
 
 const SerialNumbers = () => {
-  const [serialNumbers, setSerialNumber] = useState([])
-  const [date, setDate] = useState("")
-  const { getSerialNumber } = useGetDisp()
+  const [serialNumbers, setSerialNumber] = useState([]);
+  const [date, setDate] = useState("");
+  const { getSerialNumber } = useGetDisp();
 
   // 仕入先　情報;
   useEffect(() => {
@@ -27,16 +27,6 @@ const SerialNumbers = () => {
     };
     getSerialNumbers();
   }, []);
-
-  const updateBaseDate = async () => {
-    const result = window.confirm('更新しますか？');
-    if (!result) return;
-    const docRef = doc(db, "baseDates", "4G2bDxwF5XyKYqDpR6v8");
-    await updateDoc(docRef, {
-      baseDate: date
-    });
-  }
-
 
   return (
     <Box w="100%" mt={12}>
@@ -62,16 +52,10 @@ const SerialNumbers = () => {
             </Tbody>
           </Table>
         </TableContainer>
-        <Box p={6}>
-          <Text>基準日</Text>
-          <Flex gap={3}>
-            {/* <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            <Button onClick={updateBaseDate}>送信</Button> */}
-          </Flex>
-        </Box>
+
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default SerialNumbers
+export default SerialNumbers;

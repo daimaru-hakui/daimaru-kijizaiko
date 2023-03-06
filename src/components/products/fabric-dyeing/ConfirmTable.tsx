@@ -41,7 +41,7 @@ const FabricDyeingConfirmTable = () => {
 
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history
+      (history: { quantity: number; }) => history.quantity > 0 && history
     );
     setFilterHistories(newHistorys);
   }, [data]);

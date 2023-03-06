@@ -100,7 +100,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
         </Box>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="5xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>購入履歴</ModalHeader>
