@@ -1,14 +1,26 @@
-import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { GrayFabricType } from "../../types/GrayFabricType";
+import { useUtil } from "./UseUtil";
 
-export const useGrayFabricFunc = (items: GrayFabricType | null, setItems: Function | null) => {
+export const useGrayFabricFunc = (
+  items: GrayFabricType | null,
+  setItems: Function | null
+) => {
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const router = useRouter();
+  const { mathRound2nd, getTodayDate } = useUtil();
 
   const addGrayFabric = async () => {
     const result = window.confirm("登録して宜しいでしょうか。");
@@ -74,9 +86,33 @@ export const useGrayFabricFunc = (items: GrayFabricType | null, setItems: Functi
     await deleteDoc(docRef);
   };
 
-  const reset = (grayFabric: GrayFabricType) => {
+  const onReset = (grayFabric: GrayFabricType) => {
     setItems(grayFabric);
   };
 
-  return { addGrayFabric, updateGrayFabric, deleteGrayFabric, reset }
-}
+  const updateAjustmentGrayFabric = async (grayFabricId: string) => {
+    setLoading(true);
+    try {
+      const docRef = doc(db, "grayFabrics", grayFabricId);
+      await updateDoc(docRef, {
+        price: Number(items.price),
+        wip: mathRound2nd(Number(items.wip)),
+        stock: mathRound2nd(Number(items.stock)),
+        updatedAt: serverTimestamp(),
+        updateUser: currentUser,
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    addGrayFabric,
+    updateGrayFabric,
+    deleteGrayFabric,
+    updateAjustmentGrayFabric,
+    onReset,
+  };
+};

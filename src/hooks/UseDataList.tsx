@@ -140,7 +140,7 @@ export const useDataList = () => {
     getGrayfabrics();
   }, [setGrayFabrics]);
 
-  // キバタ発注履歴;
+  // キバタ発注履歴（order）
   useEffect(() => {
     const getGrayFabricOrders = async () => {
       const q = query(
@@ -162,7 +162,7 @@ export const useDataList = () => {
     getGrayFabricOrders();
   }, [setGrayFabricOrders]);
 
-  // 生地発注履歴;
+  // 生地染色発注履歴（order）
   useEffect(() => {
     const getFabricDyeingOrders = async () => {
       const q = query(
@@ -184,7 +184,7 @@ export const useDataList = () => {
     getFabricDyeingOrders();
   }, [setFabricDyeingOrders]);
 
-  // 生地発注履歴（order）
+  // 生地k購入履歴（order）
   useEffect(() => {
     const getFabricPurchaseOrders = async () => {
       const q = query(

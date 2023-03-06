@@ -17,7 +17,11 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     { id: 3, title: "染色仕掛一覧", link: "/products/fabric-dyeing/orders" },
     { id: 4, title: "染色履歴一覧", link: "/products/fabric-dyeing/confirms" },
     { id: 5, title: "入荷予定一覧", link: "/products/fabric-purchase/orders" },
-    { id: 6, title: "入荷履歴一覧", link: "/products/fabric-purchase/confirms" },
+    {
+      id: 6,
+      title: "入荷履歴一覧",
+      link: "/products/fabric-purchase/confirms",
+    },
     { id: 7, title: "マスター登録", link: "/products/new" },
   ];
   const menu2 = [
@@ -53,9 +57,12 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   ];
   const menu5 = [
     { id: 1, title: "金額確認", link: "/accounting-dept/orders" },
-    { id: 2, title: "処理済み", link: "/accounting-dept/confirms" }
+    { id: 2, title: "処理済み", link: "/accounting-dept/confirms" },
   ];
-  const menu6 = [{ id: 1, title: "在庫数量調整", link: "/adjustment" }];
+  const menu6 = [
+    { id: 1, title: "生地在庫調整", link: "/adjustment/products" },
+    { id: 2, title: "キバタ在庫調整", link: "/adjustment/gray-fabrics" },
+  ];
   const menu7 = [
     { id: 1, title: "権限", link: "/settings/auth" },
     { id: 2, title: "伝票NO.管理", link: "/serialnumbers" },
@@ -63,7 +70,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
 
   const elementMenuList = (
     title: string,
-    array: { title: any; link: string; }[]
+    array: { title: any; link: string }[]
   ) => (
     <>
       <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
@@ -95,7 +102,6 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
           <Link href="/dashboard" onClick={() => onClose()}>
             トップページ
           </Link>
-
         </ListItem>
       </List>
       <Divider />
