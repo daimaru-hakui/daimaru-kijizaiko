@@ -2,8 +2,6 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,7 +30,7 @@ import useSWRImmutable from "swr/immutable";
 
 type Props = {
   productId: string;
-  type: string | null;
+  type?: string | null;
 };
 
 const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
@@ -49,7 +47,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
-  const { startDay, endDay, handleInputChange, onSearch, items } = useSearch();
+  const { startDay, endDay, SearchElement } = useSearch();
   const { data } = useSWRImmutable(
     `/api/fabric-purchase-confirms/${startDay}/${endDay}`
   );
@@ -119,40 +117,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   flexDirection={{ base: "column", md: "row" }}
                   justifyContent="space-between"
                 >
-                  <Box>
-                    <Heading as="h4" fontSize="md">
-                      期間を選択（グラフ）
-                    </Heading>
-                    <Flex
-                      mt={3}
-                      gap={3}
-                      alignItems="center"
-                      flexDirection={{ base: "column", md: "row" }}
-                    >
-                      <Flex gap={3} w={{ base: "full", md: "350px" }}>
-                        <Input
-                          type="date"
-                          name="start"
-                          value={items.start}
-                          onChange={handleInputChange}
-                        />
-                        <Input
-                          type="date"
-                          name="end"
-                          value={items.end}
-                          onChange={handleInputChange}
-                        />
-                      </Flex>
-                      <Button
-                        w={{ base: "full", md: "80px" }}
-                        px={6}
-                        colorScheme="facebook"
-                        onClick={onSearch}
-                      >
-                        検索
-                      </Button>
-                    </Flex>
-                  </Box>
+                  <SearchElement />
                 </Flex>
               </Box>
               {filterFabricPurchases?.length ? (
