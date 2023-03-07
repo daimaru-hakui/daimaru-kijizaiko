@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Heading,
   Input,
@@ -7,32 +8,25 @@ import {
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
-  NumberInputStepper
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import CuttingPriceRanking from './CuttingPriceRanking';
-import CuttingQuantityRanking from './CuttingQuantityRanking';
-import PurchasePriceRanking from './PurchasePriceRanking';
-import PurchaseQuantityRanking from './PurchaseQuantityRanking';
-import { FaRegWindowClose } from "react-icons/fa";
-import { useUtil } from '../../hooks/UseUtil';
-import useSWR from 'swr';
+  NumberInputStepper,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import CuttingPriceRanking from "./CuttingPriceRanking";
+import CuttingQuantityRanking from "./CuttingQuantityRanking";
+import PurchasePriceRanking from "./PurchasePriceRanking";
+import PurchaseQuantityRanking from "./PurchaseQuantityRanking";
+import useSWRImmutable from "swr/immutable";
+import useSearch from "../../hooks/UseSearch";
 
 const Charts = () => {
-  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
-  const { getTodayDate } = useUtil();
-  const [startDay, setStartDay] = useState(INIT_DATE);
-  const [endDay, setEndDay] = useState(getTodayDate());
   const [limitNum, setLimitNum] = useState(5);
-  // const { data } = useSWR('/api/ranking');
-  const { data: cuttingReports } = useSWR('/api/cutting-reports');
-  const { data: fabricPurchaseConfirms } = useSWR("/api/fabric-purchase-confirms");
-
-  const onReset = () => {
-    setStartDay(INIT_DATE);
-    setEndDay(getTodayDate());
-    setLimitNum(5);
-  };
+  const { startDay, endDay, handleInputChange, onSearch, items } = useSearch();
+  const { data: cuttingReports } = useSWRImmutable(
+    `/api/cutting-reports/${startDay}/${endDay}`
+  );
+  const { data: fabricPurchaseConfirms } = useSWRImmutable(
+    `/api/fabric-purchase-confirms/${startDay}/${endDay}`
+  );
 
   return (
     <>
@@ -41,6 +35,7 @@ const Charts = () => {
         mt={{ base: 3, md: 6 }}
         gap={{ base: 3, md: 3 }}
         flexDirection={{ base: "column", md: "row" }}
+        justifyContent="space-between"
         rounded="md"
         shadow="md"
         bg="white"
@@ -52,19 +47,24 @@ const Charts = () => {
           <Flex mt={3} gap={3} alignItems="center">
             <Input
               type="date"
-              value={startDay}
-              onChange={(e) => setStartDay(e.target.value)}
+              name="start"
+              value={items.start}
+              onChange={handleInputChange}
             />
             <Input
               type="date"
-              value={endDay}
-              onChange={(e) => setEndDay(e.target.value)}
+              name="end"
+              value={items.end}
+              onChange={handleInputChange}
             />
+            <Button px={6} colorScheme="facebook" onClick={onSearch}>
+              検索
+            </Button>
           </Flex>
         </Box>
         <Box>
           <Heading as="h4" fontSize="md">
-            件数（グラフ）
+            件数
           </Heading>
           <Flex mt={3} gap={3} alignItems="center">
             <NumberInput
@@ -80,12 +80,6 @@ const Charts = () => {
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
-            <FaRegWindowClose
-              cursor="pointer"
-              size="25px"
-              color="#444"
-              onClick={onReset}
-            />
           </Flex>
         </Box>
       </Flex>
@@ -109,7 +103,6 @@ const Charts = () => {
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
-
         />
       </Flex>
       <Flex

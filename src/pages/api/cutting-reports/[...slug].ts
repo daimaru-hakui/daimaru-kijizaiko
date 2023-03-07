@@ -15,9 +15,14 @@ export default async function handler(
     return res.status(405).json("error");
   }
   if (req.method === "GET") {
+    const { slug } = req.query;
+    const startDay = slug[0] || process.env.NEXT_PUBLIC_BASE_DATE;
+    const endDay = slug[1];
     const querySnapshot = await db
       .collection("cuttingReports")
-      .orderBy("cuttingDate", "desc")
+      .orderBy("cuttingDate")
+      .startAt(startDay)
+      .endAt(endDay)
       .get();
     const contents = querySnapshot.docs.flatMap(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)

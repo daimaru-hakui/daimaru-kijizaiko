@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { HistoryType } from "../../../../types/HistoryType";
 
 type Data = {
-  contents: CuttingReportType[];
+  contents: HistoryType[];
   count?: FirebaseFirestore.AggregateField<number>;
 };
 
@@ -15,12 +15,19 @@ export default async function handler(
     return res.status(405).json("error");
   }
   if (req.method === "GET") {
+    const { slug } = req.query;
+    const startDay = slug[0] || process.env.NEXT_PUBLIC_BASE_DATE;
+    const endDay = slug[1];
+
     const querySnapshot = await db
-      .collection("cuttingReports")
-      .orderBy("cuttingDate", "desc")
+      .collection("fabricPurchaseConfirms")
+      .orderBy("fixedAt")
+      .startAt(startDay)
+      .endAt(endDay)
       .get();
+
     const contents = querySnapshot.docs.flatMap(
-      (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
+      (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
     );
     return res.status(200).json({ contents });
   }
