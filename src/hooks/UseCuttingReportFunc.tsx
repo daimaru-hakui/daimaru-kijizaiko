@@ -98,7 +98,6 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      mutate({ ...data });
       await router.push("/tokushima/cutting-reports");
     }
   };
@@ -151,7 +150,7 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      await mutate({ ...data });
+      // await mutate({ ...data });
       await router.push("/tokushima/cutting-reports");
     }
   };
@@ -162,10 +161,10 @@ export const useCuttingReportFunc = (
     try {
       const docRef = doc(db, "cuttingReports", reportId);
       await deleteDoc(docRef);
-      mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
+      // await mutate({ ...data });
       await router.push("/tokushima/cutting-reports");
     }
   };

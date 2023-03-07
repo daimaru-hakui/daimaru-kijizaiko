@@ -26,7 +26,7 @@ import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
 import { UserType } from "../../../types/UserType";
-import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 
 type Props = {
   title: string;
@@ -46,7 +46,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
   endDay,
 }) => {
   const users = useRecoilValue(usersState);
-  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}`);
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
@@ -94,11 +94,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-        itemType ||
-        totalQuantity ||
-        category ||
-        productId ||
-        quantity
+      itemType ||
+      totalQuantity ||
+      category ||
+      productId ||
+      quantity
     );
   }, [items]);
 
@@ -148,7 +148,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {filterUsers?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user: { id: string; name: string; }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>
@@ -234,7 +234,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
           }
           if (pageType === "edit") {
             await updateCuttingReport(report.id);
-            mutate({ ...data });
+            await mutate({ ...data });
             await onClose();
           }
         }}

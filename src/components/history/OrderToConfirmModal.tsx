@@ -47,7 +47,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
   const { getTodayDate } = useUtil();
 
   useEffect(() => {
-    setItems({ ...history });
+    setItems({ ...history, remainingOrder: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
 
@@ -71,12 +71,14 @@ const OrderToConfirmModal: NextPage<Props> = ({
   };
 
   const remainingOrderReset = () => {
+    const quantity = history.quantity - items.quantity;
+    const remainingOrder = quantity < 0 ? 0 : quantity;
     setItems({
       ...items,
-      remainingOrder: history.quantity - items.quantity,
+      remainingOrder
     });
   };
-
+  console.log(items);
   return (
     <>
       <Button
@@ -130,7 +132,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
                       <NumberInput
                         mt={1}
                         name="quantity"
-                        defaultValue={0}
+                        // defaultValue={0}
                         min={0}
                         max={100000}
                         value={items.quantity}
@@ -183,7 +185,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
                       <NumberInput
                         mt={1}
                         name="remainingOrder"
-                        defaultValue={history.quantity - items.quantity}
+                        // defaultValue={history.quantity - items.quantity}
                         min={0}
                         max={10000}
                         value={items.remainingOrder}

@@ -41,7 +41,7 @@ const CuttingReportModal: NextPage<Props> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
-  const { data } = useSWRImmutable(
+  const { data, mutate } = useSWRImmutable(
     `/api/cutting-reports/${startDay}/${endDay}`
   );
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
@@ -87,8 +87,10 @@ const CuttingReportModal: NextPage<Props> = ({
                   colorScheme="red"
                   variant="outline"
                   cursor="pointer"
-                  onClick={() => {
-                    deleteCuttingReport(reportId);
+                  onClick={async () => {
+                    await deleteCuttingReport(reportId);
+                    await mutate({ ...data });
+                    onClose();
                   }}
                 >
                   削除

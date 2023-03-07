@@ -38,7 +38,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   endDay,
   rankingNumber,
 }) => {
-  const { getProductNumber, getColorName, getPrice } = useGetDisp();
+  const { getProductNumber, getColorName } = useGetDisp();
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);

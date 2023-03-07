@@ -54,7 +54,9 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = data?.contents.sort((a, b) => {
+      const filterArray = data?.contents.filter((content: HistoryType) => (
+        content.productId === productId && content
+      )).sort((a, b) => {
         if (a.fixedAt > b.fixedAt) {
           return -1;
         }
@@ -138,7 +140,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number },
+                            fabric: HistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

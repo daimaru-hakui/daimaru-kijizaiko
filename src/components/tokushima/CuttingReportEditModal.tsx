@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Modal,
   ModalBody,
@@ -14,7 +13,7 @@ import { NextPage } from "next";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import CuttingReportInputArea from "./CuttingReportInputArea";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 
 type Props = {
   report: CuttingReportType;
@@ -29,7 +28,7 @@ const CuttingReportEditModal: NextPage<Props> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuths } = useAuthManagement();
-  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}`);
 
   return (
     <>
@@ -63,8 +62,8 @@ const CuttingReportEditModal: NextPage<Props> = ({
               variant="outline"
               mr={3}
               onClick={() => {
-                mutate({ ...data });
                 onClose();
+                mutate({ ...data });
               }}
             >
               閉じる

@@ -27,6 +27,7 @@ export default async function handler(
     const contents = querySnapshot.docs.flatMap(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
     );
+    console.log(startDay)
     return res.status(200).json({ contents });
   }
 }

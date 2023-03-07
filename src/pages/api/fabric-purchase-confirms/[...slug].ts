@@ -21,6 +21,7 @@ export default async function handler(
 
     const querySnapshot = await db
       .collection("fabricPurchaseConfirms")
+      // .where("quantity",">" ,0)
       .orderBy("fixedAt")
       .startAt(startDay)
       .endAt(endDay)

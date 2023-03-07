@@ -1,6 +1,7 @@
 import {
   Box,
   Flex,
+  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -20,6 +21,7 @@ import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import useSWR from "swr";
+import useSearch from "../../../hooks/UseSearch";
 
 type Props = {
   HOUSE_FACTORY?: string;
@@ -39,7 +41,8 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
     comment: "",
     fixedAt: "",
   });
-  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
+  const { SearchElement, startDay, endDay } = useSearch();
+  const { data, mutate, isLoading } = useSWR(`/api/fabric-purchase-confirms/${startDay}/${endDay}`);
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -112,69 +115,74 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   );
 
   return (
-    <TableContainer p={6} w="100%">
-      <Box as="h2" fontSize="2xl">
-        入荷履歴
-      </Box>
-      {filterHistories?.length > 0 ? (
-        <Table mt={6} variant="simple" size="sm">
-          <Thead>
-            <Tr>
-              <Th>発注NO.</Th>
-              <Th>発注日</Th>
-              <Th>入荷日</Th>
-              <Th>担当者</Th>
-              <Th>生地品番</Th>
-              <Th>色</Th>
-              <Th>品名</Th>
-              <Th>数量</Th>
-              <Th>単価</Th>
-              <Th>金額</Th>
-              <Th>出荷先</Th>
-              <Th>コメント</Th>
-              <Th>編集</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {filterHistories?.map((history: HistoryType) => (
-              <Tr key={history.id}>
-                <Td>{getSerialNumber(history?.serialNumber)}</Td>
-                <Td>{history?.orderedAt}</Td>
-                <Td>{history?.fixedAt}</Td>
-                <Td>{getUserName(history.createUser)}</Td>
-                <Td>{history.productNumber}</Td>
-                <Td>{history.colorName}</Td>
-                <Td>{history.productName}</Td>
-                <Td>{history?.quantity}m</Td>
-                <Td>{history?.price}円</Td>
-                <Td>{history?.quantity * history?.price}円</Td>
-                <Td>{history?.stockPlace}</Td>
-                <Td w="100%">
-                  {elementComment(history, "fabricPurchaseConfirms")}
-                </Td>
-                <Td>
-                  {history.accounting !== true ? (
-                    <HistoryEditModal
-                      history={history}
-                      type="confirm"
-                      items={items}
-                      setItems={setItems}
-                      onClick={() => {
-                        updateFabricPurchaseConfirm(history);
-                      }}
-                    />
-                  ) : (
-                    "金額確認済"
-                  )}
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      ) : (
-        <Box textAlign="center">現在登録された情報はありません。</Box>
-      )}
-    </TableContainer>
+    <Box w="100%" my={6} p={6} >
+      <Stack spacing={8}>
+        <Box as="h2" fontSize="2xl">
+          入荷履歴
+        </Box>
+        <SearchElement />
+        <TableContainer w="100%">
+          {filterHistories?.length > 0 ? (
+            <Table variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>発注NO.</Th>
+                  <Th>発注日</Th>
+                  <Th>入荷日</Th>
+                  <Th>担当者</Th>
+                  <Th>生地品番</Th>
+                  <Th>色</Th>
+                  <Th>品名</Th>
+                  <Th>数量</Th>
+                  <Th>単価</Th>
+                  <Th>金額</Th>
+                  <Th>出荷先</Th>
+                  <Th>コメント</Th>
+                  <Th>編集</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {filterHistories?.map((history: HistoryType) => (
+                  <Tr key={history.id}>
+                    <Td>{getSerialNumber(history?.serialNumber)}</Td>
+                    <Td>{history?.orderedAt}</Td>
+                    <Td>{history?.fixedAt}</Td>
+                    <Td>{getUserName(history.createUser)}</Td>
+                    <Td>{history.productNumber}</Td>
+                    <Td>{history.colorName}</Td>
+                    <Td>{history.productName}</Td>
+                    <Td isNumeric>{history?.quantity.toLocaleString()}m</Td>
+                    <Td isNumeric>{history?.price.toLocaleString()}円</Td>
+                    <Td isNumeric>{(history?.quantity * history?.price).toLocaleString()}円</Td>
+                    <Td>{history?.stockPlace}</Td>
+                    <Td w="100%">
+                      {elementComment(history, "fabricPurchaseConfirms")}
+                    </Td>
+                    <Td>
+                      {history.accounting !== true ? (
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => {
+                            updateFabricPurchaseConfirm(history);
+                          }}
+                        />
+                      ) : (
+                        "金額確認済"
+                      )}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          ) : (
+            <Box mt={6} textAlign="center">現在登録された情報はありません。</Box>
+          )}
+        </TableContainer>
+      </Stack>
+    </Box>
   );
 };
 
