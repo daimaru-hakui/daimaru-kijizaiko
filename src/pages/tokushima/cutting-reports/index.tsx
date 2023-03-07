@@ -34,7 +34,7 @@ const CuttingReport = () => {
 
   useEffect(() => {
     setCuttingReports(
-      data?.contents.sort(
+      data?.contents?.sort(
         (a: CuttingReportType, b: CuttingReportType) =>
           a.serialNumber > b.serialNumber && -1
       )
@@ -75,8 +75,7 @@ const CuttingReport = () => {
                   <Tr key={report.serialNumber}>
                     <Td>
                       <CuttingReportModal
-                        title={"詳細"}
-                        report={report}
+                        reportId={report.id}
                         startDay={startDay}
                         endDay={endDay}
                       />

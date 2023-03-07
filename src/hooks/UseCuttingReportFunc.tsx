@@ -151,7 +151,8 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      mutate({ ...data });
+      await mutate({ ...data });
+      await router.push("/tokushima/cutting-reports");
     }
   };
 

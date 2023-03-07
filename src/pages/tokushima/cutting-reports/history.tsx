@@ -85,7 +85,11 @@ const HistoryCutting = () => {
                     <Td>
                       <Flex alignItems="center" gap={3}>
                         <CuttingProductMenu productId={list.productId} />{" "}
-                        <CuttingReportModal title="詳細" report={list} />
+                        <CuttingReportModal
+                          reportId={list.id}
+                          startDay={startDay}
+                          endDay={endDay}
+                        />
                       </Flex>
                     </Td>
                     <Td>{list.cuttingDate}</Td>

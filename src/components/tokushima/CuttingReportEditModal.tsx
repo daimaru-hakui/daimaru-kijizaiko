@@ -30,7 +30,7 @@ const CuttingReportEditModal: NextPage<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuths } = useAuthManagement();
   const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
-  mutate({ ...data });
+
   return (
     <>
       {isAuths(["tokushima", "rd"]) && (
@@ -43,14 +43,7 @@ const CuttingReportEditModal: NextPage<Props> = ({
           編集
         </Button>
       )}
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          mutate({ ...data });
-        }}
-        size="3xl"
-      >
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>裁断報告書</ModalHeader>
@@ -66,7 +59,14 @@ const CuttingReportEditModal: NextPage<Props> = ({
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
+            <Button
+              variant="outline"
+              mr={3}
+              onClick={() => {
+                mutate({ ...data });
+                onClose();
+              }}
+            >
               閉じる
             </Button>
           </ModalFooter>

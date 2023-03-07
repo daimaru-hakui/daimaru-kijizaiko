@@ -26,6 +26,7 @@ import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
 import { UserType } from "../../../types/UserType";
+import useSWR from "swr";
 
 type Props = {
   title: string;
@@ -45,6 +46,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
   endDay,
 }) => {
   const users = useRecoilValue(usersState);
+  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
@@ -226,13 +228,14 @@ const CuttingReportInputArea: NextPage<Props> = ({
         my={12}
         colorScheme="facebook"
         disabled={isValidate || isLimitQuantity}
-        onClick={() => {
+        onClick={async () => {
           if (pageType === "new") {
             addCuttingReport();
           }
           if (pageType === "edit") {
-            updateCuttingReport(report.id);
-            onClose();
+            await updateCuttingReport(report.id);
+            mutate({ ...data });
+            await onClose();
           }
         }}
       >
