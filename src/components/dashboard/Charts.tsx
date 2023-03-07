@@ -1,9 +1,7 @@
 import {
   Box,
-  Button,
   Flex,
   Heading,
-  Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -20,7 +18,7 @@ import useSearch from "../../hooks/UseSearch";
 
 const Charts = () => {
   const [limitNum, setLimitNum] = useState(5);
-  const { startDay, endDay, handleInputChange, onSearch, items } = useSearch();
+  const { startDay, endDay, SearchElement } = useSearch();
   const { data: cuttingReports } = useSWRImmutable(
     `/api/cutting-reports/${startDay}/${endDay}`
   );
@@ -40,28 +38,7 @@ const Charts = () => {
         shadow="md"
         bg="white"
       >
-        <Box>
-          <Heading as="h4" fontSize="md">
-            期間を選択（グラフ）
-          </Heading>
-          <Flex mt={3} gap={3} alignItems="center">
-            <Input
-              type="date"
-              name="start"
-              value={items.start}
-              onChange={handleInputChange}
-            />
-            <Input
-              type="date"
-              name="end"
-              value={items.end}
-              onChange={handleInputChange}
-            />
-            <Button px={6} colorScheme="facebook" onClick={onSearch}>
-              検索
-            </Button>
-          </Flex>
-        </Box>
+        <SearchElement />
         <Box>
           <Heading as="h4" fontSize="md">
             件数

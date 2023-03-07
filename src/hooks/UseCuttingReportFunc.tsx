@@ -16,14 +16,16 @@ import useSWR from "swr";
 
 export const useCuttingReportFunc = (
   items: CuttingReportType | null,
-  setItems: Function | null
+  setItems: Function | null,
+  startDay?: string,
+  endDay?: string
 ) => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWR("/api/cutting-reports");
+  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
 
   // 商品登録項目を追加
   const addInput = () => {
@@ -77,9 +79,10 @@ export const useCuttingReportFunc = (
           serialNumber: newSerialNumber,
         });
 
-        const products = items.products.map((product) => (
-          { ...product, quantity: Number(product.quantity) }
-        ));
+        const products = items.products.map((product) => ({
+          ...product,
+          quantity: Number(product.quantity),
+        }));
         const newItems = { ...items, products };
 
         transaction.set(cuttingReportDocRef, {
@@ -133,9 +136,10 @@ export const useCuttingReportFunc = (
             });
           });
         });
-        const products = items.products.map((product) => (
-          { ...product, quantity: Number(product.quantity) }
-        ));
+        const products = items.products.map((product) => ({
+          ...product,
+          quantity: Number(product.quantity),
+        }));
         const newItems = { ...items, products };
 
         transaction.update(cuttingReportDocRef, {
@@ -152,10 +156,10 @@ export const useCuttingReportFunc = (
   };
 
   const deleteCuttingReport = async (reportId: string) => {
-    const result = window.confirm('削除して宜しいでしょうか');
+    const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
     try {
-      const docRef = doc(db, 'cuttingReports', reportId);
+      const docRef = doc(db, "cuttingReports", reportId);
       await deleteDoc(docRef);
       mutate({ ...data });
     } catch (err) {
@@ -163,7 +167,6 @@ export const useCuttingReportFunc = (
     } finally {
       await router.push("/tokushima/cutting-reports");
     }
-
   };
 
   const scaleCalc = (meter: number, totalQuantity: number) => {

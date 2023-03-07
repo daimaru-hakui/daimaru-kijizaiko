@@ -26,17 +26,24 @@ import { CuttingReportType } from "../../../types/CuttingReportType";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
-import useSWR from 'swr';
+import useSWR from "swr";
 
 type Props = {
   title: string;
   report: CuttingReportType;
+  startDay: string;
+  endDay: string;
 };
 
-const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
+const CuttingReportModal: NextPage<Props> = ({
+  title,
+  report,
+  startDay,
+  endDay,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
-  const { data } = useSWR('/api/cutting-reports');
+  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {
     getSerialNumber,
@@ -47,16 +54,15 @@ const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
   } = useGetDisp();
 
   useEffect(() => {
-    setFilterReport(data?.contents.find((value: CuttingReportType) => (
-      value.id === report.id
-    )));
+    setFilterReport(
+      data?.contents.find((value: CuttingReportType) => value.id === report.id)
+    );
   }, [report.id, data]);
 
   return (
     <>
       <Button
         size="xs"
-        mt={1}
         variant="outline"
         colorScheme="facebook"
         onClick={onOpen}
@@ -69,7 +75,12 @@ const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
         <ModalContent>
           <ModalHeader>
             <Flex alignItems="center" gap={3}>
-              裁断報告書 <CuttingReportEditModal report={filterReport} />
+              裁断報告書
+              <CuttingReportEditModal
+                report={filterReport}
+                startDay={startDay}
+                endDay={endDay}
+              />
               {filterReport?.products?.length === 0 && (
                 <Button
                   size="xs"
@@ -78,7 +89,8 @@ const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
                   cursor="pointer"
                   onClick={() => {
                     deleteCuttingReport(report.id);
-                  }}>
+                  }}
+                >
                   削除
                 </Button>
               )}
@@ -131,7 +143,9 @@ const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
                   <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
                     <Box>
                       <Text fontWeight="bold">種別</Text>
-                      <Box>{filterReport.itemType === "1" ? "既製" : "別注"}</Box>
+                      <Box>
+                        {filterReport.itemType === "1" ? "既製" : "別注"}
+                      </Box>
                     </Box>
                     <Box>
                       <Text fontWeight="bold">品名</Text>
@@ -182,7 +196,11 @@ const CuttingReportModal: NextPage<Props> = ({ title, report }) => {
                         <Td>{getProductName(product.productId)}</Td>
                         <Td isNumeric>{product.quantity}m</Td>
                         <Td isNumeric>
-                          {scaleCalc(product.quantity, filterReport.totalQuantity)}m
+                          {scaleCalc(
+                            product.quantity,
+                            filterReport.totalQuantity
+                          )}
+                          m
                         </Td>
                       </Tr>
                     ))}

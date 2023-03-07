@@ -32,6 +32,8 @@ type Props = {
   pageType: string;
   report: CuttingReportType;
   onClose?: Function;
+  startDay?: string;
+  endDay?: string;
 };
 
 const CuttingReportInputArea: NextPage<Props> = ({
@@ -39,6 +41,8 @@ const CuttingReportInputArea: NextPage<Props> = ({
   pageType,
   report,
   onClose,
+  startDay,
+  endDay,
 }) => {
   const users = useRecoilValue(usersState);
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
@@ -52,7 +56,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
     handleRadioChange,
   } = useInputCuttingReport();
   const { addInput, addCuttingReport, updateCuttingReport } =
-    useCuttingReportFunc(items, setItems);
+    useCuttingReportFunc(items, setItems, startDay, endDay);
 
   useEffect(() => {
     setItems({ ...report });
@@ -88,14 +92,13 @@ const CuttingReportInputArea: NextPage<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-      itemType ||
-      totalQuantity ||
-      category ||
-      productId ||
-      quantity
+        itemType ||
+        totalQuantity ||
+        category ||
+        productId ||
+        quantity
     );
   }, [items]);
-
 
   return (
     <>
@@ -143,7 +146,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {filterUsers?.map((user: { id: string; name: string; }) => (
+              {filterUsers?.map((user: { id: string; name: string }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>

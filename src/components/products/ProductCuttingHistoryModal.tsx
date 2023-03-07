@@ -2,8 +2,6 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -22,7 +20,6 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FaRegWindowClose } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { CuttingProductType } from "../../../types/CuttingProductType";
@@ -35,14 +32,14 @@ import useSearch from "../../hooks/UseSearch";
 
 type Props = {
   productId: string;
-  type: string | null;
+  type?: string | null;
 };
 
 const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mathRound2nd } = useUtil();
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
-  const { startDay, endDay, handleInputChange, onSearch, items } = useSearch();
+  const { startDay, endDay, SearchElement } = useSearch();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const {
     getUserName,
@@ -141,40 +138,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   flexDirection={{ base: "column", md: "row" }}
                   justifyContent="space-between"
                 >
-                  <Box>
-                    <Heading as="h4" fontSize="md">
-                      期間を選択（グラフ）
-                    </Heading>
-                    <Flex
-                      mt={3}
-                      gap={3}
-                      alignItems="center"
-                      flexDirection={{ base: "column", md: "row" }}
-                    >
-                      <Flex gap={3} w={{ base: "full", md: "350px" }}>
-                        <Input
-                          type="date"
-                          name="start"
-                          value={items.start}
-                          onChange={handleInputChange}
-                        />
-                        <Input
-                          type="date"
-                          name="end"
-                          value={items.end}
-                          onChange={handleInputChange}
-                        />
-                      </Flex>
-                      <Button
-                        w={{ base: "full", md: "80px" }}
-                        px={6}
-                        colorScheme="facebook"
-                        onClick={onSearch}
-                      >
-                        検索
-                      </Button>
-                    </Flex>
-                  </Box>
+                  <SearchElement />
                 </Flex>
               </Box>
               {cuttingList?.length ? (
