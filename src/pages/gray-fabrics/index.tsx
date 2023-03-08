@@ -73,14 +73,14 @@ const GrayFabrics = () => {
                     fontSize="md"
                     fontWeight={fabric.wip > 0 ? "bold" : "normal"}
                   >
-                    {fabric.wip || 0}m
+                    {fabric.wip.toLocaleString() || 0}m
                   </Td>
                   <Td
                     isNumeric
                     fontSize="md"
                     fontWeight={fabric.stock > 0 ? "bold" : "normal"}
                   >
-                    {fabric.stock || 0}m
+                    {fabric.stock.toLocaleString() || 0}m
                   </Td>
                   <Td w="100%">
                     <Flex gap={3}>

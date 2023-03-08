@@ -19,7 +19,12 @@ import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState, fabricPurchaseOrdersState, loadingState, usersState } from "../../../../store";
+import {
+  currentUserState,
+  fabricPurchaseOrdersState,
+  loadingState,
+  usersState,
+} from "../../../../store";
 import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
@@ -46,28 +51,31 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const { getTodayDate, mathRound2nd } = useUtil();
   const { data, mutate } = useSWR("/api/fabric-purchase-orders");
   const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
-  const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState([] as HistoryType[]);
+  const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState(
+    [] as HistoryType[]
+  );
   const STOCK_PLACE = "徳島工場";
 
   // 数量０のデータを非表示
   useEffect(() => {
     if (HOUSE_FACTORY) {
       const newHistorys = fabricPurchaseOrders?.filter(
-        (history: HistoryType) => (
-          (history.stockPlace === HOUSE_FACTORY) && history
-        )
+        (history: HistoryType) =>
+          history.stockPlace === HOUSE_FACTORY && history
       );
       setFilterFabricPurchaseOrders(newHistorys);
     } else {
       const newHistorys = fabricPurchaseOrders?.filter(
         (history: HistoryType) => history
       );
-      setFilterFabricPurchaseOrders(newHistorys.sort(
-        (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
-          (a.serialNumber > b.serialNumber) && - 1));
+      setFilterFabricPurchaseOrders(
+        newHistorys.sort(
+          (a: { serialNumber: number }, b: { serialNumber: number }) =>
+            a.serialNumber > b.serialNumber && -1
+        )
+      );
     }
   }, [fabricPurchaseOrders, HOUSE_FACTORY]);
-
 
   // 購入状況　orderを削除（stock ranning共通）
   const deleteFabricPurchaseOrder = async (history: any) => {
@@ -108,7 +116,6 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         transaction.delete(historyDocRef);
       });
-
     } catch (err) {
       console.log(err);
     } finally {
@@ -165,7 +172,6 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           updatedAt: serverTimestamp(),
         });
       });
-
     } catch (err) {
       console.log(err);
     } finally {
@@ -189,8 +195,8 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-          history.quantity +
-          items.remainingOrder || 0;
+            history.quantity +
+            items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
@@ -237,7 +243,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
     } catch (e) {
       console.error(e);
     } finally {
-      router.push('/products/fabric-purchase/confirms');
+      router.push("/products/fabric-purchase/confirms");
     }
   };
 
@@ -319,11 +325,13 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
-                <Td>{history?.quantity}m</Td>
+                <Td>{history?.quantity.toLocaleString()}m</Td>
                 {history.price && (
                   <>
-                    <Td>{history?.price}円</Td>
-                    <Td>{history?.quantity * history?.price}円</Td>
+                    <Td>{history?.price.toLocaleString()}円</Td>
+                    <Td>
+                      {(history?.quantity * history?.price).toLocaleString()}円
+                    </Td>
                   </>
                 )}
                 <Td>{history?.stockPlace}</Td>

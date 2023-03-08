@@ -23,7 +23,12 @@ import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
-import { currentUserState, fabricDyeingOrdersState, loadingState, usersState } from "../../../../store";
+import {
+  currentUserState,
+  fabricDyeingOrdersState,
+  loadingState,
+  usersState,
+} from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
@@ -41,12 +46,13 @@ const FabricDyeingOrderTable = () => {
   const { getTodayDate } = useUtil();
   const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
   const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
-  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<any>();
+  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] =
+    useState<any>();
 
   // 数量０のデータを非表示
   useEffect(() => {
     const newFabricDyeingOrders = fabricDyeingOrders.filter(
-      (history: { quantity: number; }) => history.quantity > 0 && history //後ほどフィルターを作る
+      (history: { quantity: number }) => history.quantity > 0 && history //後ほどフィルターを作る
     );
     setFilterfabricDyeingOrders(newFabricDyeingOrders);
   }, [fabricDyeingOrders]);
@@ -93,9 +99,7 @@ const FabricDyeingOrderTable = () => {
   };
 
   // 生地仕掛状況　Orderを削除  type ranning
-  const deleteFabricDyeingOrderRanning = async (
-    history: HistoryType
-  ) => {
+  const deleteFabricDyeingOrderRanning = async (history: HistoryType) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -165,7 +169,6 @@ const FabricDyeingOrderTable = () => {
           updatedAt: serverTimestamp(),
         });
       });
-
     } catch (err) {
       console.log(err);
     } finally {
@@ -174,9 +177,7 @@ const FabricDyeingOrderTable = () => {
   };
 
   //　生地仕掛状況　Order　編集（ranning在庫）
-  const updateFabricDyeingOrderRanning = async (
-    history: HistoryType
-  ) => {
+  const updateFabricDyeingOrderRanning = async (history: HistoryType) => {
     setLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -229,8 +230,8 @@ const FabricDyeingOrderTable = () => {
 
         const newWip =
           (await productDocSnap.data()?.wip) -
-          history.quantity +
-          items.remainingOrder || 0;
+            history.quantity +
+            items.remainingOrder || 0;
 
         const newStock =
           (await productDocSnap.data()?.externalStock) + items.quantity || 0;
@@ -272,7 +273,7 @@ const FabricDyeingOrderTable = () => {
       console.error(e);
     } finally {
       setLoading(false);
-      router.push('/products/fabric-dyeing/confirms');
+      router.push("/products/fabric-dyeing/confirms");
     }
   };
 
@@ -354,11 +355,13 @@ const FabricDyeingOrderTable = () => {
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
-                <Td>{history?.quantity}m</Td>
+                <Td>{history?.quantity.toLocaleString()}m</Td>
                 {history.price && (
                   <>
-                    <Td>{history?.price}円</Td>
-                    <Td>{history?.quantity * history?.price}円</Td>
+                    <Td>{history?.price.toLocaleString()}円</Td>
+                    <Td>
+                      {(history?.quantity * history?.price).toLocaleString()}円
+                    </Td>
                   </>
                 )}
                 <Td w="100%" textAlign="center">
