@@ -162,18 +162,21 @@ const Products = () => {
                       <Td>{product.productNumber}</Td>
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
-                      <Td isNumeric>{product.price}円</Td>
+                      <Td isNumeric>{product.price.toLocaleString()}円</Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.wip)}
                       >
-                        {mathRound2nd(product?.wip || 0)}m
+                        {mathRound2nd(product?.wip || 0).toLocaleString()}m
                       </Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.externalStock)}
                       >
-                        {mathRound2nd(product?.externalStock || 0)}m
+                        {mathRound2nd(
+                          product?.externalStock || 0
+                        ).toLocaleString()}
+                        m
                       </Td>
                       <Td
                         isNumeric
@@ -181,13 +184,19 @@ const Products = () => {
                           product?.arrivingQuantity
                         )}
                       >
-                        {mathRound2nd(product?.arrivingQuantity || 0)}m
+                        {mathRound2nd(
+                          product?.arrivingQuantity || 0
+                        ).toLocaleString()}
+                        m
                       </Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.tokushimaStock)}
                       >
-                        {mathRound2nd(product?.tokushimaStock || 0)}m
+                        {mathRound2nd(
+                          product?.tokushimaStock || 0
+                        ).toLocaleString()}
+                        m
                       </Td>
                       <Td>{product.materialName}</Td>
                       <Td>
