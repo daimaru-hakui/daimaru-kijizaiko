@@ -28,9 +28,10 @@ export const useGetDisp = () => {
     const ac = materials.ac ? `アクリル${materials.ac}% ` : "";
     const cu = materials.cu ? `キュプラ${materials.cu}% ` : "";
     const si = materials.si ? `シルク${materials.si}% ` : "";
+    const as = materials.as ? `アセテート${materials.as}% ` : "";
     const z = materials.z ? `指定外繊維${materials.z}% ` : "";
     const f = materials.f ? `複合繊維${materials.f}% ` : "";
-    array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
+    array.push(t, c, n, r, h, pu, w, ac, cu, si, as, z, f);
     return array.filter((item) => item);
   };
 
@@ -58,7 +59,7 @@ export const useGetDisp = () => {
     if (userId === "R&D") {
       return "R&D";
     } else {
-      const user = users.find((user: { uid: string; }) => userId === user.uid);
+      const user = users.find((user: { uid: string }) => userId === user.uid);
       return user?.name || "";
     }
   };
@@ -66,7 +67,7 @@ export const useGetDisp = () => {
   // 仕入れ先の表示
   const getSupplierName = (supplierId: string) => {
     const supplier = suppliers.find(
-      (supplier: { id: string; }) => supplier.id === supplierId
+      (supplier: { id: string }) => supplier.id === supplierId
     );
     return supplier?.name || "";
   };
@@ -94,14 +95,14 @@ export const useGetDisp = () => {
 
   const getGrayFabricNumber = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
+      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productNumber || grayFabricId;
   };
 
   const getGrayFabricName = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
+      (grayFabric: { id: string }) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productName || grayFabricId;
   };
@@ -109,7 +110,7 @@ export const useGetDisp = () => {
   // キバタ在庫を取得
   const getGrayFabricStock = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabric.id === grayFabricId
+      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
     );
     const stock = grayFabric?.stock || 0;
     return stock;
@@ -143,6 +144,6 @@ export const useGetDisp = () => {
     getGrayFabricNumber,
     getGrayFabricStock,
     getTokushimaStock,
-    getPrice
+    getPrice,
   };
 };
