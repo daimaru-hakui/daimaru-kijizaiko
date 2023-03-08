@@ -41,7 +41,6 @@ const MaterialsModal: NextPage<Props> = ({ items, setItems }) => {
     { id: "ac", name: "アクリル" },
     { id: "cu", name: "キュプラ" },
     { id: "si", name: "シルク" },
-    { id: "as", name: "アセテート" },
     { id: "z", name: "指定外繊維" },
     { id: "f", name: "複合繊維" },
   ];
