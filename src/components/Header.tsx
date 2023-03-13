@@ -73,7 +73,7 @@ const Header = () => {
               </Link>
               <Flex alignItems="center" gap={3}>
                 <Box>
-                  <Text fontSize="sm">{displayStaff(currentUser)}</Text>
+                  <Text fontSize="sm" display={{ base: "none", "2xl": "block" }}>{displayStaff(currentUser)}</Text>
                 </Box>
                 <Menu>
                   <MenuButton

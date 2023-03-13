@@ -19,15 +19,16 @@ import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import { useRouter } from "next/router";
 import useSWR from "swr";
 import useSearch from "../../../hooks/UseSearch";
+import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 
 
 const FabricDyeingConfirmTable = () => {
   const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const users = useRecoilValue(usersState);
+  const { isAdminAuth, isAuths } = useAuthManagement();
   const currentUser = useRecoilValue(currentUserState);
   const { getSerialNumber, getUserName } = useGetDisp();
   const [items, setItems] = useState({
@@ -140,7 +141,7 @@ const FabricDyeingConfirmTable = () => {
                       {elementComment(history, "fabricDyeingConfirms")}
                     </Td>
                     <Td>
-                      {history.accounting !== true ? (
+                      {(isAuths(['rd']) || history?.createUser === currentUser) && (
                         <HistoryEditModal
                           history={history}
                           type="confirm"
@@ -149,8 +150,6 @@ const FabricDyeingConfirmTable = () => {
                           onClick={() => updateFabricDyeingConfirm(history)}
                           orderType=""
                         />
-                      ) : (
-                        "金額確認済"
                       )}
                     </Td>
                   </Tr>

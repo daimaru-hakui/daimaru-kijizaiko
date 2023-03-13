@@ -11,88 +11,20 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const router = useRouter();
   const { isAdminAuth, isAuth, isAuths } = useAuthManagement();
 
-  const menu1 = [
-    { id: 1, title: "生地一覧", link: "/products" },
-    { id: 2, title: "生地の発注", link: "/products/order/new" },
-    { id: 3, title: "染色仕掛一覧", link: "/products/fabric-dyeing/orders" },
-    { id: 4, title: "染色履歴一覧", link: "/products/fabric-dyeing/confirms" },
-    { id: 5, title: "入荷予定一覧", link: "/products/fabric-purchase/orders" },
-    {
-      id: 6,
-      title: "入荷履歴一覧",
-      link: "/products/fabric-purchase/confirms",
-    },
-    { id: 7, title: "マスター登録", link: "/products/new" },
-  ];
-  const menu2 = [
-    { id: 1, title: "キバタ一覧", link: "/gray-fabrics" },
-    { id: 2, title: "キバタ仕掛一覧", link: "/gray-fabrics/orders" },
-    { id: 3, title: "キバタ仕掛履歴", link: "/gray-fabrics/confirms" },
-    { id: 4, title: "マスター登録", link: "/gray-fabrics/new" },
-  ];
-  const menu3 = [
-    {
-      id: 1,
-      title: "入荷予定一覧",
-      link: "/tokushima/fabric-purchase/orders",
-    },
-    {
-      id: 1,
-      title: "入荷履歴一覧",
-      link: "/tokushima/fabric-purchase/confirms",
-    },
-    {
-      id: 2,
-      title: "裁断生地一覧",
-      link: "/tokushima/cutting-reports/history",
-    },
-    { id: 3, title: "裁断報告書一覧", link: "/tokushima/cutting-reports" },
-    { id: 4, title: "裁断報告書作成", link: "/tokushima/cutting-reports/new" },
-  ];
-  const menu4 = [
-    { id: 1, title: "仕入先", link: "/settings/suppliers" },
-    { id: 2, title: "送り先", link: "/settings/stock-places" },
-    { id: 3, title: "色", link: "/settings/colors" },
-    { id: 4, title: "組織名", link: "/settings/material-names" },
-  ];
-  const menu5 = [
-    { id: 1, title: "金額確認", link: "/accounting-dept/orders" },
-    { id: 2, title: "処理済み", link: "/accounting-dept/confirms" },
-  ];
-  const menu6 = [
-    { id: 1, title: "生地在庫調整", link: "/adjustment/products" },
-    { id: 2, title: "キバタ在庫調整", link: "/adjustment/gray-fabrics" },
-  ];
-  const menu7 = [
-    { id: 1, title: "権限", link: "/settings/auth" },
-    { id: 2, title: "伝票NO.管理", link: "/serialnumbers" },
-  ];
 
-  const elementMenuList = (
-    title: string,
-    array: { title: any; link: string }[]
-  ) => (
-    <>
-      <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+
+
+  const menuItemEL = (title: string, link: string) => (
+    <ListItem
+      p={1}
+      pl={2}
+      rounded="base"
+      bg={link == router.pathname ? "blue.50" : "none"}
+    >
+      <Link href={link} onClick={() => onClose()}>
         {title}
-      </Box>
-      <List my={3} pl={3} spacing={1} fontSize="sm">
-        {array.map((m, i: number) => (
-          <ListItem
-            key={i}
-            p={1}
-            pl={2}
-            rounded="base"
-            bg={m?.link == router.pathname ? "blue.50" : "none"}
-          >
-            <Link href={m.link} onClick={() => onClose()}>
-              {m.title}
-            </Link>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-    </>
+      </Link>
+    </ListItem>
   );
 
   return (
@@ -105,14 +37,95 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         </ListItem>
       </List>
       <Divider />
+      <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+        生地
+      </Box>
+      <List my={3} pl={3} spacing={1} fontSize="sm">
+        {menuItemEL('生地一覧', "/products")}
+        {menuItemEL('生地の発注', "/products/order/new")}
+        {menuItemEL("染色仕掛一覧", "/products/fabric-dyeing/orders")}
+        {menuItemEL("染色履歴一覧", "/products/fabric-dyeing/confirms")}
+        {menuItemEL("入荷予定一覧", "/products/fabric-purchase/orders")}
+        {menuItemEL("入荷履歴一覧", "/products/fabric-purchase/confirms")}
+        {menuItemEL("マスター登録", "/products/new")}
+      </List>
+      <Divider />
 
-      {elementMenuList("生地", menu1)}
-      {isAuth("rd") && elementMenuList("キバタ", menu2)}
-      {isAuth("rd") && elementMenuList("調整", menu6)}
-      {isAuth("tokushima") && elementMenuList("徳島工場", menu3)}
-      {isAuth("accounting") && elementMenuList("経理部", menu5)}
-      {isAuth("rd") && elementMenuList("設定", menu4)}
-      {isAdminAuth() && elementMenuList("管理者", menu7)}
+      {isAuths(['rd', 'sales']) && (
+        <>
+          <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+            キバタ
+          </Box>
+          <List my={3} pl={3} spacing={1} fontSize="sm">
+            {isAuths(['rd', 'sales']) && menuItemEL("キバタ一覧", "/gray-fabrics")}
+            {isAuths(['rd', 'sales']) && menuItemEL("キバタ仕掛一覧", "/gray-fabrics/orders")}
+            {isAuths(['rd', 'sales']) && menuItemEL("キバタ仕掛履歴", "/gray-fabrics/confirms")}
+            {isAuths(['rd']) && menuItemEL("マスター登録", "/gray-fabrics/new")}
+          </List>
+          <Divider />
+        </>
+      )}
+
+      <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+        徳島工場
+      </Box>
+      <List my={3} pl={3} spacing={1} fontSize="sm">
+        {isAuths(['tokushima', 'rd']) && menuItemEL("入荷予定一覧", "/tokushima/fabric-purchase/orders")}
+        {isAuths(['tokushima', 'rd']) && menuItemEL("入荷履歴一覧", "/tokushima/fabric-purchase/confirms")}
+        {menuItemEL("裁断生地一覧", "/tokushima/cutting-reports/history")}
+        {menuItemEL("裁断報告書一覧", "/tokushima/cutting-reports")}
+        {isAuths(['tokushima', 'rd']) && menuItemEL("裁断報告書作成", "/tokushima/cutting-reports/new")}
+      </List>
+      <Divider />
+
+      {isAuths(["accounting"]) && (
+        <>
+          <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+            経理
+          </Box>
+          <List my={3} pl={3} spacing={1} fontSize="sm">
+            {isAuths(["accounting"]) && menuItemEL("金額確認", "/accounting-dept/orders")}
+            {isAuths(["accounting"]) && menuItemEL("処理済み", "/accounting-dept/confirms")}
+          </List>
+          <Divider />
+        </>
+      )}
+
+
+      {isAuths["rd"] && (
+        <>
+          <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+            調整
+          </Box>
+          <List my={3} pl={3} spacing={1} fontSize="sm">
+            {menuItemEL("生地在庫調整", "/adjustment/products")}
+            {menuItemEL("キバタ在庫調整", "/adjustment/gray-fabrics")}
+          </List>
+          <Divider />
+          <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+            設定
+          </Box>
+          <List my={3} pl={3} spacing={1} fontSize="sm">
+            {menuItemEL("仕入先", "/settings/suppliers")}
+            {menuItemEL("送り先", "/settings/stock-places")}
+            {menuItemEL("色", "/settings/colors")}
+            {menuItemEL("組織名", "/settings/material-names")}
+          </List>
+          <Divider />
+        </>
+      )}
+      {isAdminAuth() && (
+        <>
+          <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
+            権限
+          </Box>
+          <List my={3} pl={3} spacing={1} fontSize="sm">
+            {menuItemEL("権限", "/settings/auth")}
+            {menuItemEL("伝票NO.管理", "/serialnumbers")}
+          </List>
+          <Divider />
+        </>
+      )}
     </Box>
   );
 };

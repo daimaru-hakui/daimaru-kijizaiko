@@ -22,6 +22,7 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import useSWR from "swr";
 import useSearch from "../../../hooks/UseSearch";
+import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 
 type Props = {
   HOUSE_FACTORY?: string;
@@ -33,6 +34,8 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
   const { getSerialNumber, getUserName } = useGetDisp();
+  const { isAuths } = useAuthManagement();
+
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,
@@ -160,15 +163,17 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                     </Td>
                     <Td>
                       {history.accounting !== true ? (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={() => {
-                            updateFabricPurchaseConfirm(history);
-                          }}
-                        />
+                        (isAuths(['rd']) || history?.createUser === currentUser) && (
+                          <HistoryEditModal
+                            history={history}
+                            type="confirm"
+                            items={items}
+                            setItems={setItems}
+                            onClick={() => {
+                              updateFabricPurchaseConfirm(history);
+                            }}
+                          />
+                        )
                       ) : (
                         "金額確認済"
                       )}

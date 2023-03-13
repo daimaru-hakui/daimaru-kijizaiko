@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Table,
   TableContainer,
@@ -47,9 +48,9 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { isAdminAuth } = useAuthManagement();
+  const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate, mathRound2nd } = useUtil();
-  const { data, mutate } = useSWR("/api/fabric-purchase-orders");
+  // const { data, mutate } = useSWR("/api/fabric-purchase-orders");
   const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
   const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState(
     [] as HistoryType[]
@@ -70,7 +71,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       );
       setFilterFabricPurchaseOrders(
         newHistorys.sort(
-          (a: { serialNumber: number }, b: { serialNumber: number }) =>
+          (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
             a.serialNumber > b.serialNumber && -1
         )
       );
@@ -195,8 +196,8 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
@@ -311,12 +312,14 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
             {filterFabricPurchaseOrders?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
-                  <OrderToConfirmModal
-                    history={history}
-                    items={items}
-                    setItems={setItems}
-                    onClick={() => confirmProcessingFabricPurchase(history)}
-                  />
+                  {(isAuths(['rd']) || history.createUser === currentUser) ? (
+                    <OrderToConfirmModal
+                      history={history}
+                      items={items}
+                      setItems={setItems}
+                      onClick={() => confirmProcessingFabricPurchase(history)}
+                    />
+                  ) : (<Button size="xs" disabled={true}>入荷確定</Button>)}
                 </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
@@ -339,14 +342,16 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   {elementComment(history, "fabricDyeingOrders")}
                 </Td>
                 <Td>
-                  <Flex gap={3}>
-                    {history.orderType === "purchase" &&
-                      elmentEditDelete(
-                        history,
-                        updateFabricPurchaseOrder,
-                        deleteFabricPurchaseOrder
-                      )}
-                  </Flex>
+                  {(isAuths(['rd']) || history?.createUser === currentUser) && (
+                    <Flex gap={3}>
+                      {history.orderType === "purchase" &&
+                        elmentEditDelete(
+                          history,
+                          updateFabricPurchaseOrder,
+                          deleteFabricPurchaseOrder
+                        )}
+                    </Flex>
+                  )}
                 </Td>
               </Tr>
             ))}

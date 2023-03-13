@@ -27,21 +27,20 @@ const CuttingReportEditModal: NextPage<Props> = ({
   endDay,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isAuths } = useAuthManagement();
   const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}`);
 
   return (
     <>
-      {isAuths(["tokushima", "rd"]) && (
-        <Button
-          size="xs"
-          variant="outline"
-          colorScheme="facebook"
-          onClick={onOpen}
-        >
-          編集
-        </Button>
-      )}
+
+      <Button
+        size="xs"
+        variant="outline"
+        colorScheme="facebook"
+        onClick={onOpen}
+      >
+        編集
+      </Button>
+
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>

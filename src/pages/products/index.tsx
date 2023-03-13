@@ -35,7 +35,7 @@ const Products = () => {
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProductFunc(null, null);
-  const { isAdminAuth } = useAuthManagement();
+  const { isAuths } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
   const [search, setSearch] = useState({
     productNumber: "",
@@ -145,7 +145,7 @@ const Products = () => {
                     <Th>混率</Th>
                     <Th>規格</Th>
                     <Th>機能性</Th>
-                    {isAdminAuth() && <Th>削除</Th>}
+                    <Th>削除</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -225,12 +225,12 @@ const Products = () => {
                         </Flex>
                       </Td>
                       <Td>
-                        {isAdminAuth() && (
+                        {(isAuths(['rd']) || product?.createUser === currentUser) ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}
                           />
-                        )}
+                        ) : ("")}
                       </Td>
                     </Tr>
                   ))}

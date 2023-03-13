@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Table,
   TableContainer,
@@ -42,9 +43,9 @@ const FabricDyeingOrderTable = () => {
   const users = useRecoilValue(usersState);
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { isAdminAuth } = useAuthManagement();
+  const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate } = useUtil();
-  const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
+  // const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
   const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
   const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] =
     useState<any>();
@@ -52,7 +53,7 @@ const FabricDyeingOrderTable = () => {
   // 数量０のデータを非表示
   useEffect(() => {
     const newFabricDyeingOrders = fabricDyeingOrders.filter(
-      (history: { quantity: number }) => history.quantity > 0 && history //後ほどフィルターを作る
+      (history: { quantity: number; }) => history.quantity > 0 && history //後ほどフィルターを作る
     );
     setFilterfabricDyeingOrders(newFabricDyeingOrders);
   }, [fabricDyeingOrders]);
@@ -230,8 +231,8 @@ const FabricDyeingOrderTable = () => {
 
         const newWip =
           (await productDocSnap.data()?.wip) -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
 
         const newStock =
           (await productDocSnap.data()?.externalStock) + items.quantity || 0;
@@ -341,12 +342,14 @@ const FabricDyeingOrderTable = () => {
             {filterfabricDyeingOrders?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
-                  <OrderToConfirmModal
-                    history={history}
-                    items={items}
-                    setItems={setItems}
-                    onClick={() => confirmProcessingFabricDyeing(history)}
-                  />
+                  {(isAuths(['rd']) || history.createUser === currentUser) ? (
+                    <OrderToConfirmModal
+                      history={history}
+                      items={items}
+                      setItems={setItems}
+                      onClick={() => confirmProcessingFabricDyeing(history)}
+                    />
+                  ) : (<Button size="xs" disabled={true}>確定</Button>)}
                 </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
@@ -369,21 +372,23 @@ const FabricDyeingOrderTable = () => {
                 </Td>
                 <Td>
                   <Flex gap={3}>
-                    {history.orderType === "dyeing" && (
-                      <>
-                        {history.stockType === "stock" &&
-                          elmentEditDelete(
-                            history,
-                            updateFabricDyeingOrderStock,
-                            deleteFabricDyeingOrderStock
-                          )}
-                        {history.stockType === "ranning" &&
-                          elmentEditDelete(
-                            history,
-                            updateFabricDyeingOrderRanning,
-                            deleteFabricDyeingOrderRanning
-                          )}
-                      </>
+                    {(isAuths(['rd']) || history?.createUser === currentUser) && (
+                      history.orderType === "dyeing" && (
+                        <>
+                          {history.stockType === "stock" &&
+                            elmentEditDelete(
+                              history,
+                              updateFabricDyeingOrderStock,
+                              deleteFabricDyeingOrderStock
+                            )}
+                          {history.stockType === "ranning" &&
+                            elmentEditDelete(
+                              history,
+                              updateFabricDyeingOrderRanning,
+                              deleteFabricDyeingOrderRanning
+                            )}
+                        </>
+                      )
                     )}
                   </Flex>
                 </Td>

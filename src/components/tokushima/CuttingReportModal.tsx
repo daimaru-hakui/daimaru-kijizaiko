@@ -27,6 +27,7 @@ import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
 import useSWRImmutable from "swr/immutable";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
   reportId: string;
@@ -41,6 +42,7 @@ const CuttingReportModal: NextPage<Props> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
+  const { isAuths } = useAuthManagement();
   const { data, mutate } = useSWRImmutable(
     `/api/cutting-reports/${startDay}/${endDay}`
   );
@@ -76,25 +78,29 @@ const CuttingReportModal: NextPage<Props> = ({
           <ModalHeader>
             <Flex alignItems="center" gap={3}>
               裁断報告書
-              <CuttingReportEditModal
-                report={filterReport}
-                startDay={startDay}
-                endDay={endDay}
-              />
-              {filterReport?.products?.length === 0 && (
-                <Button
-                  size="xs"
-                  colorScheme="red"
-                  variant="outline"
-                  cursor="pointer"
-                  onClick={async () => {
-                    await deleteCuttingReport(reportId);
-                    await mutate({ ...data });
-                    onClose();
-                  }}
-                >
-                  削除
-                </Button>
+              {isAuths(["tokushima", "rd"]) && (
+                <>
+                  <CuttingReportEditModal
+                    report={filterReport}
+                    startDay={startDay}
+                    endDay={endDay}
+                  />
+                  {filterReport?.products?.length === 0 && (
+                    <Button
+                      size="xs"
+                      colorScheme="red"
+                      variant="outline"
+                      cursor="pointer"
+                      onClick={async () => {
+                        await deleteCuttingReport(reportId);
+                        await mutate({ ...data });
+                        onClose();
+                      }}
+                    >
+                      削除
+                    </Button>
+                  )}
+                </>
               )}
             </Flex>
           </ModalHeader>

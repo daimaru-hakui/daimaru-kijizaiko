@@ -19,6 +19,7 @@ import { CuttingHistoryType } from "../../../../types/CuttingHistoryType";
 import useSWR from "swr";
 import useSearch from "../../../hooks/UseSearch";
 import CuttingProductMenu from "../../../components/tokushima/CuttingProductMenu";
+import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 
 const HistoryCutting = () => {
   const {
@@ -28,6 +29,7 @@ const HistoryCutting = () => {
     getProductName,
     getColorName,
   } = useGetDisp();
+  const { scaleCalc } = useCuttingReportFunc(null, null);
   const { startDay, endDay, SearchElement } = useSearch();
   const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
@@ -38,15 +40,15 @@ const HistoryCutting = () => {
         ?.map((cuttingReport: CuttingReportType) =>
           cuttingReport?.products.map(
             (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                // products: null,
-              } as CuttingHistoryType)
+            ({
+              ...cuttingReport,
+              ...product,
+              // products: null,
+            } as CuttingHistoryType)
           )
         )
         .flat()
-        .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
+        .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
           if (a.cuttingDate > b.cuttingDate) {
             return -1;
           }
@@ -76,6 +78,8 @@ const HistoryCutting = () => {
                   <Th>加工指示書NO</Th>
                   <Th>受注先名</Th>
                   <Th>製品名</Th>
+                  <Th>数量</Th>
+                  <Th>用尺</Th>
                   <Th>担当者名</Th>
                 </Tr>
               </Thead>
@@ -101,6 +105,8 @@ const HistoryCutting = () => {
                     <Td>{list.processNumber}</Td>
                     <Td>{list.client}</Td>
                     <Td>{list.itemName}</Td>
+                    <Td isNumeric>{list.totalQuantity}</Td>
+                    <Td isNumeric>{scaleCalc(list.quantity, list.totalQuantity)}m</Td>
                     <Td>{getUserName(list.staff)}</Td>
                     <Td></Td>
                   </Tr>
