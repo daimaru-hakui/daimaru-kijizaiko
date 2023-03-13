@@ -31,7 +31,7 @@ export const useGetDisp = () => {
     const as = materials.as ? `アセテート${materials.as}% ` : "";
     const z = materials.z ? `指定外繊維${materials.z}% ` : "";
     const f = materials.f ? `複合繊維${materials.f}% ` : "";
-    array.push(t, c, n, r, h, pu, w, ac, cu, si, z, f);
+    array.push(t, c, n, r, h, pu, w, ac, cu, si, as, z, f);
     return array.filter((item) => item);
   };
 
