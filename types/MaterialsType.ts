@@ -9,6 +9,7 @@ export type MaterialsType = {
   ac: string;
   cu: string;
   si: string;
+  as: string;
   z: string;
   f: string;
-}
+};
