@@ -12,16 +12,19 @@ import {
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { grayFabricsState } from "../../../store";
+import { currentUserState, grayFabricsState } from "../../../store";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 const GrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
+  const currentUser = useRecoilValue(currentUserState);
+  const { isAuths } = useAuthManagement();
   const [filterGrayFabrics, setFilterGrayFabrics] = useState(
     [] as GrayFabricType[]
   );
@@ -94,14 +97,17 @@ const GrayFabrics = () => {
                     </Flex>
                   </Td>
                   <Td>
-                    <Flex alignItems="center" gap={3}>
-                      <GrayFabricEditModal grayFabric={fabric} />
-                      <FaTrashAlt
-                        color="#444"
-                        cursor="pointer"
-                        onClick={() => deleteGrayFabric(fabric.id)}
-                      />
-                    </Flex>
+                    {(isAuths(["rd"]) ||
+                      fabric?.createUser === currentUser) && (
+                      <Flex alignItems="center" gap={3}>
+                        <GrayFabricEditModal grayFabric={fabric} />
+                        <FaTrashAlt
+                          color="#444"
+                          cursor="pointer"
+                          onClick={() => deleteGrayFabric(fabric.id)}
+                        />
+                      </Flex>
+                    )}
                   </Td>
                 </Tr>
               ))}

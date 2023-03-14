@@ -17,10 +17,15 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import useSWR from "swr";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../../store";
 
 const GrayFabricConfirmTable = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
+  const currentUser = useRecoilValue(currentUserState);
+  const { isAuths } = useAuthManagement();
   const { data, mutate, isLoading } = useSWR("/api/gray-fabric-confirms");
 
   const updateConfirmHistory = async (history: any) => {
@@ -40,8 +45,8 @@ const GrayFabricConfirmTable = () => {
 
         const newStock =
           (await grayFabricDocSnap.data()?.stock) -
-          history.quantity +
-          items.quantity || 0;
+            history.quantity +
+            items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
@@ -60,7 +65,6 @@ const GrayFabricConfirmTable = () => {
       mutate({ ...data });
     }
   };
-
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
@@ -105,14 +109,16 @@ const GrayFabricConfirmTable = () => {
                   </Flex>
                 </Td>
                 <Td>
-                  <HistoryEditModal
-                    history={history}
-                    type="confirm"
-                    items={items}
-                    setItems={setItems}
-                    onClick={updateConfirmHistory}
-                    orderType=""
-                  />
+                  {(isAuths(["rd"]) || history.createUser === currentUser) && (
+                    <HistoryEditModal
+                      history={history}
+                      type="confirm"
+                      items={items}
+                      setItems={setItems}
+                      onClick={updateConfirmHistory}
+                      orderType=""
+                    />
+                  )}
                 </Td>
               </Tr>
             ))}

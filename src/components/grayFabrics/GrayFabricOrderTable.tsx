@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Table,
   TableContainer,
@@ -22,29 +23,32 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, grayFabricOrdersState } from "../../../store";
 import { HistoryType } from "../../../types/HistoryType";
-import HistoryOrderToConfirmModal from "../history/OrderToConfirmModal";
+import OrderToConfirmModal from "../history/OrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWR from "swr";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 const GrayFabricOrderTable = () => {
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
+  const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
   // const { data, mutate, isLoading } = useSWR("/api/gray-fabric-orders");
   const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as HistoryType[]);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
+    [] as HistoryType[]
+  );
 
   useEffect(() => {
-    const newGrayFabrics = grayFabricOrders.filter((grayFabric) => (
-      grayFabric.quantity > 0 && grayFabric
-    ));
+    const newGrayFabrics = grayFabricOrders.filter(
+      (grayFabric) => grayFabric.quantity > 0 && grayFabric
+    );
     setFilterGrayFabrics(newGrayFabrics);
   }, [grayFabricOrders]);
-
 
   // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: any) => {
@@ -69,7 +73,6 @@ const GrayFabricOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-
     }
   };
 
@@ -89,8 +92,8 @@ const GrayFabricOrderTable = () => {
 
         const newWip =
           (await grayFabricDocSnap.data()?.wip) -
-          history.quantity +
-          items.quantity || 0;
+            history.quantity +
+            items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -107,7 +110,6 @@ const GrayFabricOrderTable = () => {
     } catch (err) {
       console.log(err);
     } finally {
-
     }
   };
 
@@ -127,8 +129,8 @@ const GrayFabricOrderTable = () => {
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
-          history.quantity +
-          items.remainingOrder || 0;
+            history.quantity +
+            items.remainingOrder || 0;
         const newStock = grayFabricDocSnap.data()?.stock + items.quantity || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
@@ -162,10 +164,8 @@ const GrayFabricOrderTable = () => {
     } catch (e) {
       console.error(e);
     } finally {
-
     }
   };
-
   return (
     <TableContainer p={6} w="100%">
       <Box as="h2" fontSize="2xl">
@@ -192,12 +192,18 @@ const GrayFabricOrderTable = () => {
             {filterGrayFabrics.map((history: any) => (
               <Tr key={history.id}>
                 <Td>
-                  <HistoryOrderToConfirmModal
-                    history={history}
-                    items={items}
-                    setItems={setItems}
-                    onClick={confirmProcessing}
-                  />
+                  {isAuths(["rd"]) || history.createUser === currentUser ? (
+                    <OrderToConfirmModal
+                      history={history}
+                      items={items}
+                      setItems={setItems}
+                      onClick={confirmProcessing}
+                    />
+                  ) : (
+                    <Button size="xs" disabled={true}>
+                      確定
+                    </Button>
+                  )}
                 </Td>
                 <Td>{getSerialNumber(history.serialNumber)}</Td>
                 <Td>{history.orderedAt}</Td>
@@ -219,21 +225,24 @@ const GrayFabricOrderTable = () => {
                   </Flex>
                 </Td>
                 <Td>
-                  <Flex alignItems="center" gap={3}>
-                    <HistoryEditModal
-                      history={history}
-                      type="order"
-                      items={items}
-                      setItems={setItems}
-                      onClick={updateOrderHistory}
-                      orderType=""
-                    />
-                    <FaTrashAlt
-                      color="#444"
-                      cursor="pointer"
-                      onClick={() => deleteGrayFabricOrder(history)}
-                    />
-                  </Flex>
+                  {isAuths(["rd"]) ||
+                    (history.createUser === currentUser && (
+                      <Flex alignItems="center" gap={3}>
+                        <HistoryEditModal
+                          history={history}
+                          type="order"
+                          items={items}
+                          setItems={setItems}
+                          onClick={updateOrderHistory}
+                          orderType=""
+                        />
+                        <FaTrashAlt
+                          color="#444"
+                          cursor="pointer"
+                          onClick={() => deleteGrayFabricOrder(history)}
+                        />
+                      </Flex>
+                    ))}
                 </Td>
               </Tr>
             ))}
