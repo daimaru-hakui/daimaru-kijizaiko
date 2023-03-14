@@ -7,4 +7,5 @@ export type GrayFabricType = {
   comment: string;
   wip: number;
   stock: number;
+  createUser: string;
 };

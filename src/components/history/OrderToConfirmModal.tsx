@@ -75,10 +75,10 @@ const OrderToConfirmModal: NextPage<Props> = ({
     const remainingOrder = quantity < 0 ? 0 : quantity;
     setItems({
       ...items,
-      remainingOrder
+      remainingOrder,
     });
   };
-  console.log(items);
+
   return (
     <>
       <Button
@@ -163,16 +163,16 @@ const OrderToConfirmModal: NextPage<Props> = ({
                           mt={1}
                           name="stockPlace"
                           placeholder="送り先を選択してください"
-                          value={"徳島工場" || items.stockPlace || history.stockPlace}
+                          value={
+                            "徳島工場" || items.stockPlace || history.stockPlace
+                          }
                           onChange={(e) => handleInputChange(e)}
                         >
-                          {stockPlaces?.map(
-                            (m: StockPlaceType) => (
-                              <option key={m.id} value={m.name}>
-                                {m.name}
-                              </option>
-                            )
-                          )}
+                          {stockPlaces?.map((m: StockPlaceType) => (
+                            <option key={m.id} value={m.name}>
+                              {m.name}
+                            </option>
+                          ))}
                         </Select>
                       </Box>
                     )}

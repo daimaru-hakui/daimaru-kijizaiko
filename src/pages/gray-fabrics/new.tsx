@@ -13,6 +13,7 @@ const GrayFabricsNew = () => {
     comment: "",
     wip: 0,
     stock: 0,
+    createUser: "",
   });
   return (
     <Box w="100%" mt={12} px={6}>
