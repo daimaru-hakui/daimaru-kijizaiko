@@ -11,9 +11,6 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
   const router = useRouter();
   const { isAdminAuth, isAuth, isAuths } = useAuthManagement();
 
-
-
-
   const menuItemEL = (title: string, link: string) => (
     <ListItem
       p={1}
@@ -41,8 +38,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         生地
       </Box>
       <List my={3} pl={3} spacing={1} fontSize="sm">
-        {menuItemEL('生地一覧', "/products")}
-        {menuItemEL('生地の発注', "/products/order/new")}
+        {menuItemEL("生地一覧", "/products")}
+        {menuItemEL("生地の発注", "/products/order/new")}
         {menuItemEL("染色仕掛一覧", "/products/fabric-dyeing/orders")}
         {menuItemEL("染色履歴一覧", "/products/fabric-dyeing/confirms")}
         {menuItemEL("入荷予定一覧", "/products/fabric-purchase/orders")}
@@ -51,16 +48,19 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </List>
       <Divider />
 
-      {isAuths(['rd', 'sales']) && (
+      {isAuths(["rd", "sales"]) && (
         <>
           <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
             キバタ
           </Box>
           <List my={3} pl={3} spacing={1} fontSize="sm">
-            {isAuths(['rd', 'sales']) && menuItemEL("キバタ一覧", "/gray-fabrics")}
-            {isAuths(['rd', 'sales']) && menuItemEL("キバタ仕掛一覧", "/gray-fabrics/orders")}
-            {isAuths(['rd', 'sales']) && menuItemEL("キバタ仕掛履歴", "/gray-fabrics/confirms")}
-            {isAuths(['rd']) && menuItemEL("マスター登録", "/gray-fabrics/new")}
+            {isAuths(["rd", "sales"]) &&
+              menuItemEL("キバタ一覧", "/gray-fabrics")}
+            {isAuths(["rd", "sales"]) &&
+              menuItemEL("キバタ仕掛一覧", "/gray-fabrics/orders")}
+            {isAuths(["rd", "sales"]) &&
+              menuItemEL("キバタ仕掛履歴", "/gray-fabrics/confirms")}
+            {isAuths(["rd"]) && menuItemEL("マスター登録", "/gray-fabrics/new")}
           </List>
           <Divider />
         </>
@@ -70,11 +70,14 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
         徳島工場
       </Box>
       <List my={3} pl={3} spacing={1} fontSize="sm">
-        {isAuths(['tokushima', 'rd']) && menuItemEL("入荷予定一覧", "/tokushima/fabric-purchase/orders")}
-        {isAuths(['tokushima', 'rd']) && menuItemEL("入荷履歴一覧", "/tokushima/fabric-purchase/confirms")}
+        {isAuths(["tokushima", "rd"]) &&
+          menuItemEL("入荷予定一覧", "/tokushima/fabric-purchase/orders")}
+        {isAuths(["tokushima", "rd"]) &&
+          menuItemEL("入荷履歴一覧", "/tokushima/fabric-purchase/confirms")}
         {menuItemEL("裁断生地一覧", "/tokushima/cutting-reports/history")}
         {menuItemEL("裁断報告書一覧", "/tokushima/cutting-reports")}
-        {isAuths(['tokushima', 'rd']) && menuItemEL("裁断報告書作成", "/tokushima/cutting-reports/new")}
+        {isAuths(["tokushima", "rd"]) &&
+          menuItemEL("裁断報告書作成", "/tokushima/cutting-reports/new")}
       </List>
       <Divider />
 
@@ -84,15 +87,16 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
             経理
           </Box>
           <List my={3} pl={3} spacing={1} fontSize="sm">
-            {isAuths(["accounting"]) && menuItemEL("金額確認", "/accounting-dept/orders")}
-            {isAuths(["accounting"]) && menuItemEL("処理済み", "/accounting-dept/confirms")}
+            {isAuths(["accounting"]) &&
+              menuItemEL("金額確認", "/accounting-dept/orders")}
+            {isAuths(["accounting"]) &&
+              menuItemEL("処理済み", "/accounting-dept/confirms")}
           </List>
           <Divider />
         </>
       )}
 
-
-      {isAuths["rd"] && (
+      {isAuths(["rd"]) && (
         <>
           <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
             調整
