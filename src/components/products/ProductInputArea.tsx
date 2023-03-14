@@ -37,6 +37,7 @@ import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { MaterialNameType } from "../../../types/MaterialNameType";
 import { SupplierType } from "../../../types/SupplierType";
+import { UserType } from "../../../types/UserType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputProduct } from "../../hooks/UseInputProduct";
 import { useProductFunc } from "../../hooks/UseProductFunc";
@@ -58,6 +59,7 @@ const ProductInputArea: NextPage<Props> = ({
   const productId = product.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
+  const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const suppliers = useRecoilValue(suppliersState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
@@ -93,6 +95,10 @@ const ProductInputArea: NextPage<Props> = ({
     };
     getProducts();
   }, []);
+
+  useEffect(() => {
+    setFilterUsers(users.filter((user: UserType) => user.sales));
+  }, [users]);
 
   // 必須項目を入力しているかをチェック
   const requiredInput = () => {
@@ -150,7 +156,7 @@ const ProductInputArea: NextPage<Props> = ({
               name="staff"
               onChange={(e) => handleInputChange(e)}
             >
-              {users?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user: { id: string; name: string }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>
@@ -203,7 +209,7 @@ const ProductInputArea: NextPage<Props> = ({
               mt={1}
               name="productNum"
               type="text"
-              placeholder="例）M2000 "
+              placeholder="例）M2000 ハイフンなし "
               value={items.productNum}
               onChange={handleInputChange}
             />

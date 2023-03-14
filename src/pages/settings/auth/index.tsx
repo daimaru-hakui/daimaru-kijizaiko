@@ -87,7 +87,7 @@ const Auth = () => {
                 <Th>営業</Th>
                 <Th>経理</Th>
                 <Th>徳島工場</Th>
-                <Th>入力権限</Th>
+
                 <Th>編集</Th>
               </Tr>
             </Thead>
@@ -100,7 +100,6 @@ const Auth = () => {
                   <Td>{elementAuthButton(user, "sales")}</Td>
                   <Td>{elementAuthButton(user, "accounting")}</Td>
                   <Td>{elementAuthButton(user, "tokushima")}</Td>
-                  <Td>{elementAuthButton(user, "order")}</Td>
                   <Td>
                     <EditModal uid={user.uid} />
                   </Td>
