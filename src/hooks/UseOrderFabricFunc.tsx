@@ -13,6 +13,8 @@ import { HistoryType } from "../../types/HistoryType";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 import useSWR from 'swr';
+import { useState } from "react";
+import SerialNumbers from "../pages/serialnumbers";
 
 export const useOrderFabricFunc = (
   items: HistoryType,
@@ -27,6 +29,7 @@ export const useOrderFabricFunc = (
   const grayFabricId = product?.grayFabricId || "";
   const productId = product?.id || "";
   // const { data } = useSWR();
+  const [result, setResult] = useState<any>();
 
   const Obj = {
     stockType: items.stockType,
@@ -166,9 +169,9 @@ export const useOrderFabricFunc = (
     );
     const productDocRef = doc(db, "products", productId);
     const historyDocRef = doc(collection(db, "fabricPurchaseOrders"));
-
+    let serialNumber = "";
     try {
-      await runTransaction(db, async (transaction) => {
+      const a = await runTransaction(db, async (transaction) => {
         const orderNumberDocSnap = await transaction.get(orderNumberDocRef);
         if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
 
@@ -177,6 +180,7 @@ export const useOrderFabricFunc = (
 
         const newSerialNumber =
           (await orderNumberDocSnap.data().serialNumber) + 1;
+        serialNumber = newSerialNumber;
         transaction.update(orderNumberDocRef, {
           serialNumber: newSerialNumber,
         });
@@ -209,7 +213,15 @@ export const useOrderFabricFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/products/fabric-purchase/orders");
+      // router.push("/products/fabric-purchase/orders");
+      router.push({
+        pathname: `/complete/${productId}`,
+        query: {
+          productId: productId,
+          quantity: items.quantity,
+          serialNumber
+        }
+      });
     }
   };
 
