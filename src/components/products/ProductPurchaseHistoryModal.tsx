@@ -69,7 +69,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     let total = 0;
-    filterFabricPurchases?.forEach((obj) => (total += obj.quantity));
+    filterFabricPurchases?.forEach((obj) => (total += Number(obj.price) * Number(obj.quantity)));
     setSumTotalQuantity(total);
   }, [filterFabricPurchases]);
 
@@ -111,7 +111,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                     <Text>{getProductName(productId)}</Text>
                   </Box>
                 </Flex>
-                <Box fontSize="xl">合計 {mathRound2nd(sumTotalQuantity)}m</Box>
+                <Box fontSize="xl">合計 {mathRound2nd(sumTotalQuantity).toLocaleString()}円</Box>
               </Flex>
               <Box px={3}>
                 <Flex
