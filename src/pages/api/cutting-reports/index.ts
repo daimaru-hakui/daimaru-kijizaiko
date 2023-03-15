@@ -2,6 +2,18 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 
+const getTodayDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  let monthStr = "0" + month;
+  monthStr = monthStr.slice(-2);
+  const day = date.getDate();
+  let dayStr = "0" + day;
+  dayStr = dayStr.slice(-2);
+  return `${year}-${monthStr}-${dayStr}`;
+};
+
 type Data = {
   contents: CuttingReportType[];
   count?: FirebaseFirestore.AggregateField<number>;
@@ -18,6 +30,8 @@ export default async function handler(
     const querySnapshot = await db
       .collection("cuttingReports")
       .orderBy("cuttingDate", "desc")
+      .startAt(getTodayDate())
+      .endAt(getTodayDate())
       .get();
     const contents = querySnapshot.docs.flatMap(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
