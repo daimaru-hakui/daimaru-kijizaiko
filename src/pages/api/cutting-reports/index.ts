@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { UserType } from "../../../../types/UserType";
 
 const getTodayDate = () => {
   const date = new Date();
@@ -27,15 +28,29 @@ export default async function handler(
     return res.status(405).json("error");
   }
   if (req.method === "GET") {
+    const usersSnapshot = await db.collection("users").get();
+    const users = usersSnapshot.docs.map(
+      (doc) =>
+        ({
+          ...doc.data(),
+          id: doc.id,
+        } as UserType)
+    );
+
     const querySnapshot = await db
       .collection("cuttingReports")
-      .orderBy("cuttingDate", "desc")
+      .orderBy("createdAt", "desc")
       .startAt(getTodayDate())
       .endAt(getTodayDate())
       .get();
-    const contents = querySnapshot.docs.flatMap(
+
+    const reports = querySnapshot.docs.map(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
     );
+    const contents = reports.map((content) => {
+      const user = users.find((user: UserType) => user.uid === content.staff);
+      return { ...content, username: user.name };
+    });
     return res.status(200).json({ contents });
   }
 }

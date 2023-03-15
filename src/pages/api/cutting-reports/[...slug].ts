@@ -24,10 +24,10 @@ export default async function handler(
       .startAt(startDay)
       .endAt(endDay)
       .get();
-    const contents = querySnapshot.docs.flatMap(
+    const contents = querySnapshot.docs.map(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
     );
-    console.log(startDay)
+    console.log(startDay);
     return res.status(200).json({ contents });
   }
 }
