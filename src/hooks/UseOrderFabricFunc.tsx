@@ -14,7 +14,6 @@ import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 import useSWR from 'swr';
 import { useState } from "react";
-import SerialNumbers from "../pages/serialnumbers";
 
 export const useOrderFabricFunc = (
   items: HistoryType,
@@ -24,7 +23,7 @@ export const useOrderFabricFunc = (
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const router = useRouter();
-  const { getSupplierName } = useGetDisp();
+  const { getSupplierName, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const grayFabricId = product?.grayFabricId || "";
   const productId = product?.id || "";
@@ -217,9 +216,11 @@ export const useOrderFabricFunc = (
       router.push({
         pathname: `/complete/${productId}`,
         query: {
-          productId: productId,
-          quantity: items.quantity,
-          serialNumber
+          productId: productId || "",
+          quantity: items.quantity || 0,
+          serialNumber,
+          stockPlace: items.stockPlace || "徳島工場",
+          createUser: getUserName(currentUser)
         }
       });
     }

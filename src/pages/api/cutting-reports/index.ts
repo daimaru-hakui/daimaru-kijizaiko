@@ -26,9 +26,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data | string>
 ) {
-  if (req.query.API_KEY !== process.env.BACKEND_API_KEY) {
-    return res.status(405).json("error");
-  }
+  // if (req.query.API_KEY !== process.env.BACKEND_API_KEY) {
+  //   return res.status(405).json("error");
+  // }
   if (req.method === "GET") {
     const usersSnapshot = await db.collection("users").get();
     const users = usersSnapshot.docs.map(
@@ -43,7 +43,7 @@ export default async function handler(
       .collection("cuttingReports")
       .orderBy("createdAt", "desc")
       .startAt(getTodayDate())
-      .endAt(new Date(Number(new Date(getTodayDate()).getTime()) - days))
+      .endAt(new Date(Number(new Date().getTime()) - days))
       .get();
 
     const reports = querySnapshot.docs.map(

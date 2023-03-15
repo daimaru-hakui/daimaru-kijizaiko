@@ -164,13 +164,13 @@ const OrderToConfirmModal: NextPage<Props> = ({
                           name="stockPlace"
                           placeholder="送り先を選択してください"
                           value={
-                            "徳島工場" || items.stockPlace || history.stockPlace
+                            items.stockPlace || history.stockPlace
                           }
                           onChange={(e) => handleInputChange(e)}
                         >
-                          {stockPlaces?.map((m: StockPlaceType) => (
-                            <option key={m.id} value={m.name}>
-                              {m.name}
+                          {stockPlaces?.map((place: StockPlaceType) => (
+                            <option key={place.id} value={place.name}>
+                              {place.name}
                             </option>
                           ))}
                         </Select>
@@ -181,7 +181,9 @@ const OrderToConfirmModal: NextPage<Props> = ({
                 {status === 2 && (
                   <>
                     <Box w="100%">
-                      <Text>残数量(m)</Text>
+                      <Text>残数量(m)
+                        <Box as="span" ml={3} color="red">※生地の残数を入力してください</Box>
+                      </Text>
                       <NumberInput
                         mt={1}
                         name="remainingOrder"
@@ -202,7 +204,9 @@ const OrderToConfirmModal: NextPage<Props> = ({
                     </Box>
                     {items.remainingOrder > 0 && (
                       <Box w="100%" mt={3}>
-                        <Text>予定納期</Text>
+                        <Text>予定納期
+                          <Box as="span" ml={3} color="red">※残数の予定納期を入力してください</Box>
+                        </Text>
                         <Input
                           type="date"
                           mt={1}
