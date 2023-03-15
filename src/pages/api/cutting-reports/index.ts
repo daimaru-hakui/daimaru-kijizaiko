@@ -15,6 +15,8 @@ const getTodayDate = () => {
   return `${year}-${monthStr}-${dayStr}`;
 };
 
+const days = 1000 * 60 * 60 * 24;
+
 type Data = {
   contents: CuttingReportType[];
   count?: FirebaseFirestore.AggregateField<number>;
@@ -41,7 +43,7 @@ export default async function handler(
       .collection("cuttingReports")
       .orderBy("createdAt", "desc")
       .startAt(getTodayDate())
-      .endAt(getTodayDate())
+      .endAt(new Date(Number(new Date(getTodayDate()).getTime()) - days))
       .get();
 
     const reports = querySnapshot.docs.map(
