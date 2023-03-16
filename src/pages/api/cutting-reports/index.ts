@@ -15,7 +15,7 @@ const getTodayDate = () => {
   return `${year}-${monthStr}-${dayStr}`;
 };
 
-const days = 1000 * 60 * 60 * 24;
+const days = 1000 * 60 * 60 * 12;
 
 type Data = {
   contents: CuttingReportType[];
@@ -26,9 +26,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data | string>
 ) {
-  // if (req.query.API_KEY !== process.env.BACKEND_API_KEY) {
-  //   return res.status(405).json("error");
-  // }
+  if (req.query.API_KEY !== process.env.BACKEND_API_KEY) {
+    return res.status(405).json("error");
+  }
   if (req.method === "GET") {
     const usersSnapshot = await db.collection("users").get();
     const users = usersSnapshot.docs.map(

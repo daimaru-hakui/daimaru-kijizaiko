@@ -143,6 +143,8 @@ export const useCuttingReportFunc = (
 
         transaction.update(cuttingReportDocRef, {
           ...newItems,
+          createdAt: cuttingReportDoc.data()?.createdAt,
+          updatedAt: serverTimestamp(),
           totalQuantity: Number(items.totalQuantity),
         });
       });
