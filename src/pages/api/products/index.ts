@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
 import { ProductType } from "../../../../types/FabricType";
-import { HistoryType } from "../../../../types/HistoryType";
 
 type Data = {
   contents: ProductType[];
