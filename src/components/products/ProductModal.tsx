@@ -56,8 +56,14 @@ const ProductModal: NextPage<Props> = ({ product }) => {
             <Flex gap={3} alignItems="center">
               生地詳細
               <ProductEditModal product={product} type="button" />
-              <ProductCuttingHistoryModal productId={product.id} type="button" />
-              <ProductPurchaseHistoryModal productId={product.id} type="button" />
+              <ProductCuttingHistoryModal
+                productId={product.id}
+                type="button"
+              />
+              <ProductPurchaseHistoryModal
+                productId={product.id}
+                type="button"
+              />
             </Flex>
           </ModalHeader>
           <ModalCloseButton />
@@ -127,6 +133,7 @@ const ProductModal: NextPage<Props> = ({ product }) => {
                         rounded="md"
                         border="1px"
                         borderColor="gray.100"
+                        whiteSpace="pre-wrap"
                       >
                         {product?.noteProduct}
                       </Box>
