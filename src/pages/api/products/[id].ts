@@ -1,10 +1,9 @@
-import { firestore } from "firebase-admin";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
 import { ProductType } from "../../../../types/FabricType";
 
 type Data = {
-  contents: ProductType[];
+  content: ProductType;
 };
 
 export default async function handler(
@@ -15,14 +14,8 @@ export default async function handler(
     return res.status(405).json("error");
   if (req.method === "GET") {
     const { id } = req.query;
-    const querySnapshot = await db
-      .collection("products")
-      .where("deletedAt", "==", "")
-      .where(firestore.FieldPath.documentId(), "==", id)
-      .get();
-    const contents = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as ProductType)
-    );
-    return res.status(200).json({ contents });
+    const querySnapshot = await db.collection("products").doc(`${id}`).get();
+    const content = { ...querySnapshot.data() } as ProductType;
+    return res.status(200).json({ content });
   }
 }
