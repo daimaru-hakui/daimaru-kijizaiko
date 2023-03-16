@@ -54,13 +54,15 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = data?.contents.filter((content: HistoryType) => (
-        content.productId === productId && content
-      )).sort((a, b) => {
-        if (a.fixedAt > b.fixedAt) {
-          return -1;
-        }
-      });
+      const filterArray = data?.contents
+        .filter(
+          (content: HistoryType) => content.productId === productId && content
+        )
+        .sort((a, b) => {
+          if (a.fixedAt > b.fixedAt) {
+            return -1;
+          }
+        });
       setFilterFabricPurchases(filterArray);
     };
     getArray();
@@ -69,7 +71,9 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     let total = 0;
-    filterFabricPurchases?.forEach((obj) => (total += Number(obj.price) * Number(obj.quantity)));
+    filterFabricPurchases?.forEach(
+      (obj) => (total += Number(obj.price) * Number(obj.quantity))
+    );
     setSumTotalQuantity(total);
   }, [filterFabricPurchases]);
 
@@ -85,7 +89,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
         </Box>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>購入履歴</ModalHeader>
@@ -111,7 +115,9 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                     <Text>{getProductName(productId)}</Text>
                   </Box>
                 </Flex>
-                <Box fontSize="xl">合計 {mathRound2nd(sumTotalQuantity).toLocaleString()}円</Box>
+                <Box fontSize="xl">
+                  合計 {mathRound2nd(sumTotalQuantity).toLocaleString()}円
+                </Box>
               </Flex>
               <Box px={3}>
                 <Flex
@@ -140,7 +146,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number; },
+                            fabric: HistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>

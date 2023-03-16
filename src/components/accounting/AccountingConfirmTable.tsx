@@ -25,12 +25,10 @@ const AccountingConfirmTable = () => {
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: HistoryType) =>
-        history.accounting === true && history
+      (history: HistoryType) => history.accounting === true && history
     );
     setFilterHistories(newHistorys);
   }, [data]);
-
 
   const elementComment = (history: HistoryType, collectionName: string) => (
     <Flex gap={3}>
@@ -46,10 +44,7 @@ const AccountingConfirmTable = () => {
 
   const elmentEdit = (history: HistoryType) => (
     <Flex gap={3}>
-      <AccountingEditModal
-        type="order"
-        history={history}
-      />
+      <AccountingEditModal type="order" history={history} />
     </Flex>
   );
 
@@ -87,11 +82,13 @@ const AccountingConfirmTable = () => {
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
-                <Td>{history?.quantity}m</Td>
+                <Td>{history?.quantity.toLocaleString()}m</Td>
                 {history.price && (
                   <>
-                    <Td>{history?.price}円</Td>
-                    <Td>{history?.quantity * history?.price}円</Td>
+                    <Td>{history?.price.toLocaleString()}円</Td>
+                    <Td>
+                      {(history?.quantity * history?.price).toLocaleString()}円
+                    </Td>
                   </>
                 )}
                 <Td>{history?.stockPlace}</Td>
@@ -99,9 +96,7 @@ const AccountingConfirmTable = () => {
                   {elementComment(history, "fabricPurchaseConfirms")}
                 </Td>
                 <Td>
-                  <Flex gap={3}>
-                    {elmentEdit(history)}
-                  </Flex>
+                  <Flex gap={3}>{elmentEdit(history)}</Flex>
                 </Td>
               </Tr>
             ))}

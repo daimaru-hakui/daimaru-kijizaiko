@@ -29,6 +29,7 @@ import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import useSearch from "../../hooks/UseSearch";
+import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 
 type Props = {
   productId: string;
@@ -38,6 +39,7 @@ type Props = {
 const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mathRound2nd } = useUtil();
+  const { scaleCalc } = useCuttingReportFunc(null, null);
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
   const { startDay, endDay, SearchElement } = useSearch();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
@@ -148,10 +150,12 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <Tr>
                         <Th>裁断日</Th>
                         <Th>裁断報告書NO</Th>
+                        <Th>担当者</Th>
                         <Th>加工指示書NO</Th>
-                        <Th>商品</Th>
                         <Th>受注先名</Th>
-                        <Th>担当社</Th>
+                        <Th>商品</Th>
+                        <Th>数量</Th>
+                        <Th>用尺</Th>
                         <Th>裁断数量</Th>
                       </Tr>
                     </Thead>
@@ -165,10 +169,18 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                             <Tr key={index}>
                               <Td>{report?.cuttingDate}</Td>
                               <Td>{getSerialNumber(report?.serialNumber)}</Td>
-                              <Td>{report?.processNumber}</Td>
-                              <Td>{report?.itemName}</Td>
-                              <Td>{report?.client}</Td>
                               <Td>{getUserName(report?.staff)}</Td>
+                              <Td>{report?.processNumber}</Td>
+                              <Td>{report?.client}</Td>
+                              <Td>{report?.itemName}</Td>
+                              <Td isNumeric>{report?.totalQuantity}</Td>
+                              <Td isNumeric>
+                                {scaleCalc(
+                                  report?.quantity,
+                                  report?.totalQuantity
+                                )}
+                                m
+                              </Td>
                               <Td isNumeric>{report?.quantity || 0}m</Td>
                             </Tr>
                           )
