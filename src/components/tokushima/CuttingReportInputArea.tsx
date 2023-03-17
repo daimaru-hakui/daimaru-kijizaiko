@@ -193,6 +193,9 @@ const CuttingReportInputArea: NextPage<Props> = ({
         <Flex gap={3}>
           <Box>
             <Text fontWeight="bold">総枚数</Text>
+            <Box as="span" color="red">
+              ※
+            </Box>
             <NumberInput
               mt={1}
               name="totalQuantity"
