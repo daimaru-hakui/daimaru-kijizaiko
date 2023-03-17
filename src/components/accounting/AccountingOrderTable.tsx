@@ -86,11 +86,11 @@ const AccountingOrderTable = () => {
                 <Td>{history.productNumber}</Td>
                 {history.colorName && <Td>{history.colorName}</Td>}
                 <Td>{history.productName}</Td>
-                <Td>{history?.quantity.toLocaleString()}m</Td>
+                <Td isNumeric>{history?.quantity.toLocaleString()}m</Td>
                 {history.price && (
                   <>
-                    <Td>{history?.price.toLocaleString()}円</Td>
-                    <Td>
+                    <Td isNumeric>{history?.price.toLocaleString()}円</Td>
+                    <Td isNumeric>
                       {(history?.quantity * history?.price).toLocaleString()}円
                     </Td>
                   </>
