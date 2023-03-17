@@ -11,11 +11,17 @@ import {
   Flex,
   Button,
   TableCaption,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState, productsState } from "../../../store";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaSearch } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
@@ -26,19 +32,22 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
+import useSWR from "swr";
+import { UserType } from "../../../types/UserType";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
-  // const [products, setProducts] = useState([] as ProductType[]);
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProductFunc(null, null);
   const { isAuths } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
+  const { data: users } = useSWR(`/api/users`);
   const [search, setSearch] = useState({
     productNumber: "",
+    staff: "",
     colorName: "",
     productName: "",
     materialName: "",
@@ -52,6 +61,7 @@ const Products = () => {
             halfToFullChar(search.productNumber.toUpperCase())
           )
         )
+        .filter((product: ProductType) => product.staff.includes(search.staff))
         .filter((product: ProductType) =>
           product.colorName.includes(search.colorName)
         )
@@ -65,26 +75,18 @@ const Products = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, products]);
 
-  const elementFilterButton = () => (
+  const onReset = () => {
+    setSearch({
+      productNumber: "",
+      staff: "",
+      colorName: "",
+      productName: "",
+      materialName: "",
+    } as ProductType);
+  };
+
+  const filterBtnEl = () => (
     <Flex gap={3}>
-      {products.length !== filterProducts.length && (
-        <Button
-          size="sm"
-          colorScheme="facebook"
-          variant="outline"
-          bg="white"
-          onClick={() =>
-            setSearch({
-              productNumber: "",
-              colorName: "",
-              productName: "",
-              materialName: "",
-            } as ProductType)
-          }
-        >
-          解除
-        </Button>
-      )}
       <ProductSearchArea search={search} setSearch={setSearch} />
     </Flex>
   );
@@ -104,28 +106,67 @@ const Products = () => {
               <Box as="h2" fontSize="2xl">
                 生地一覧
               </Box>
-
               <Flex gap={3} style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
                 <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
                   <Button size="sm">CSV</Button>
                 </CSVLink>
-                {elementFilterButton()}
+                {filterBtnEl()}
               </Flex>
-
               <Flex
                 gap={3}
                 transition="0.2s"
                 style={isVisible ? { opacity: 1 } : { opacity: 0 }}
                 position="fixed"
-                // top="98px"
                 bottom="20px"
                 right={12}
               >
                 <CSVLink data={csvData}>
                   <Button size="sm">CSV</Button>
                 </CSVLink>
-                {elementFilterButton()}
+                {filterBtnEl()}
               </Flex>
+            </Flex>
+            <Flex
+              mt={3}
+              gap={3}
+              justifyContent="center"
+              alignItems="center"
+              flexDirection={{ base: "column", lg: "row" }}
+            >
+              <Select
+                placeholder="担当者で検索"
+                maxW={300}
+                onChange={(e) =>
+                  setSearch({ ...search, staff: e.target.value })
+                }
+                value={search.staff}
+              >
+                <option value="R&D">R&D</option>
+                {users?.contents.map((user: UserType) => (
+                  <option key={user.id} value={user.id}>
+                    {getUserName(user.id)}
+                  </option>
+                ))}
+              </Select>
+              <InputGroup maxW={300}>
+                <InputLeftElement pointerEvents="none">
+                  <FaSearch />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  name="productNumber"
+                  placeholder="生地の品番を検索..."
+                  value={search.productNumber}
+                  onChange={(e) =>
+                    setSearch({ ...search, productNumber: e.target.value })
+                  }
+                />
+              </InputGroup>
+              {products.length !== filterProducts.length && (
+                <Button size="md" colorScheme="facebook" onClick={onReset}>
+                  解除
+                </Button>
+              )}
             </Flex>
             <TableContainer p={6} w="100%">
               <Table variant="simple" size="sm">
@@ -162,7 +203,7 @@ const Products = () => {
                       <Td>{product.productNumber}</Td>
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
-                      <Td isNumeric>{product.price.toLocaleString()}円</Td>
+                      <Td isNumeric>{product?.price.toLocaleString()}円</Td>
                       <Td
                         isNumeric
                         fontWeight={quantityValueBold(product?.wip)}
@@ -225,12 +266,15 @@ const Products = () => {
                         </Flex>
                       </Td>
                       <Td>
-                        {(isAuths(['rd']) || product?.createUser === currentUser) ? (
+                        {isAuths(["rd"]) ||
+                        product?.createUser === currentUser ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}
                           />
-                        ) : ("")}
+                        ) : (
+                          ""
+                        )}
                       </Td>
                     </Tr>
                   ))}
