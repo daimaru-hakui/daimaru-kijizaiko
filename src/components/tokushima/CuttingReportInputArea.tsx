@@ -46,7 +46,9 @@ const CuttingReportInputArea: NextPage<Props> = ({
   endDay,
 }) => {
   const users = useRecoilValue(usersState);
-  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { data, mutate } = useSWRImmutable(
+    `/api/cutting-reports/${startDay}/${endDay}`
+  );
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
@@ -94,11 +96,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-      itemType ||
-      totalQuantity ||
-      category ||
-      productId ||
-      quantity
+        itemType ||
+        totalQuantity ||
+        category ||
+        productId ||
+        quantity
     );
   }, [items]);
 
@@ -114,6 +116,9 @@ const CuttingReportInputArea: NextPage<Props> = ({
           onChange={(e) => handleRadioChange(e, "itemType")}
         >
           <Stack direction="row">
+            <Box as="span" color="red">
+              ※
+            </Box>
             <Radio value="1">既製品</Radio>
             <Radio value="2">別注品</Radio>
           </Stack>
@@ -148,7 +153,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {filterUsers?.map((user: { id: string; name: string; }) => (
+              {filterUsers?.map((user: { id: string; name: string }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>

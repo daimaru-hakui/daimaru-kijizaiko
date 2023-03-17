@@ -9,7 +9,7 @@ type Props = {
 };
 const MenuLists: NextPage<Props> = ({ onClose }) => {
   const router = useRouter();
-  const { isAdminAuth, isAuth, isAuths } = useAuthManagement();
+  const { isAdminAuth, isAuths } = useAuthManagement();
 
   const menuItemEL = (title: string, link: string) => (
     <ListItem
@@ -95,17 +95,24 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
           <Divider />
         </>
       )}
-
-      {isAuths(["rd"]) && (
+      {isAuths(["rd", "tokushima"]) && (
         <>
           <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
             調整
           </Box>
           <List my={3} pl={3} spacing={1} fontSize="sm">
             {menuItemEL("生地在庫調整", "/adjustment/products")}
-            {menuItemEL("キバタ在庫調整", "/adjustment/gray-fabrics")}
           </List>
+          {isAuths(["rd"]) && (
+            <List my={3} pl={3} spacing={1} fontSize="sm">
+              {menuItemEL("キバタ在庫調整", "/adjustment/gray-fabrics")}
+            </List>
+          )}
           <Divider />
+        </>
+      )}
+      {isAuths(["rd"]) && (
+        <>
           <Box as="h3" mt={3} fontSize="sm" fontWeight="bold">
             設定
           </Box>

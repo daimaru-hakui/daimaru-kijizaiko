@@ -2,12 +2,10 @@ import {
   Box,
   Container,
   Flex,
-
   Stat,
   StatGroup,
   StatLabel,
   StatNumber,
-
 } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -36,7 +34,7 @@ const Dashboard = () => {
     let total = 0;
     products.forEach((product: ProductType) => {
       props.forEach((prop) => {
-        total += product[prop];
+        total += Number(product[prop]);
       });
     });
     return total;
@@ -245,9 +243,8 @@ const Dashboard = () => {
                   <StatCard
                     title="入荷予定金額"
                     quantity={Number(
-                      getTotalProductsPrice(["arrivingQuantity"])
-                        .toFixed())
-                      .toLocaleString()}
+                      getTotalProductsPrice(["arrivingQuantity"]).toFixed()
+                    ).toLocaleString()}
                     unit="円"
                     fontSize="3xl"
                   />
@@ -276,7 +273,6 @@ const Dashboard = () => {
               </Flex>
             </Flex>
             <Charts />
-
           </Container>
         </Box>
       )}
