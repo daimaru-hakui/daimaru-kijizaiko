@@ -28,9 +28,9 @@ const CuttingReport = () => {
     [] as CuttingReportType[]
   );
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { csvData } = useCuttingReportFunc(null, null);
   const { startDay, endDay, SearchElement } = useSearch();
   const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
 
   useEffect(() => {
     setCuttingReports(
@@ -85,7 +85,7 @@ const CuttingReport = () => {
                     <Td>{report.processNumber}</Td>
                     <Td>{report.itemName}</Td>
                     <Td>{report.client}</Td>
-                    <Td isNumeric>{report.totalQuantity}</Td>
+                    <Td isNumeric>{report.totalQuantity.toLocaleString()}</Td>
                     <Td>{getUserName(report.staff)}</Td>
                   </Tr>
                 ))}

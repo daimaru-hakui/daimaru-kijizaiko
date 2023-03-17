@@ -19,7 +19,7 @@ import ProductInputArea from "./ProductInputArea";
 
 type Props = {
   product: ProductType;
-  type: string | null
+  type: string | null;
 };
 
 const ProductEditModal: NextPage<Props> = ({ product, type }) => {
@@ -29,8 +29,8 @@ const ProductEditModal: NextPage<Props> = ({ product, type }) => {
 
   return (
     <>
-      {(isAuths(["rd"]) || currentUser === product.createUser) && (
-        type === "button" ? (
+      {(isAuths(["rd", "tokushima"]) || currentUser === product.createUser) &&
+        (type === "button" ? (
           <Button
             size="xs"
             variant="outline"
@@ -43,8 +43,7 @@ const ProductEditModal: NextPage<Props> = ({ product, type }) => {
           <Box w="full" onClick={onOpen}>
             編集
           </Box>
-        )
-      )}
+        ))}
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
         <ModalContent>

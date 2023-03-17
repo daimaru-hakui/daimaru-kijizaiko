@@ -15,8 +15,8 @@ import { useGetDisp } from "./UseGetDisp";
 import useSWR from "swr";
 
 export const useCuttingReportFunc = (
-  items: CuttingReportType | null,
-  setItems: Function | null,
+  items?: CuttingReportType | null,
+  setItems?: Function | null,
   startDay?: string,
   endDay?: string
 ) => {
