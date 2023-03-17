@@ -17,12 +17,15 @@ import { productsState } from "../../../../store";
 // import { ProductType } from "../../../types/ProductType";
 import AdjustmentProduct from "../../../components/adjustment/AdjustmentProduct";
 import { useUtil } from "../../../hooks/UseUtil";
+import { ProductType } from "../../../../types/FabricType";
+import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 
 const AdjustmentProducts = () => {
   const products = useRecoilValue(productsState);
-  const [filterProducts, setFilterProducts] = useState([] as any[]);
+  const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
+  const { isAuths } = useAuthManagement();
 
   useEffect(() => {
     setFilterProducts(
@@ -69,12 +72,21 @@ const AdjustmentProducts = () => {
                 <Th>担当</Th>
                 <Th>生地品番</Th>
                 <Th>色</Th>
-                <Th>単価（円）</Th>
-                <Th>仕掛在庫(m)</Th>
-                <Th>外部在庫(m)</Th>
-                <Th>入荷待ち(m)</Th>
-                <Th>徳島在庫(m)</Th>
-                <Th>処理</Th>
+
+                {isAuths(["rd", "tokushima"]) && (
+                  <>
+                    {isAuths(["rd"]) && (
+                      <>
+                        <Th>単価（円）</Th>
+                        <Th>仕掛在庫(m)</Th>
+                        <Th>外部在庫(m)</Th>
+                        <Th>入荷待ち(m)</Th>
+                      </>
+                    )}
+                    <Th>徳島在庫(m)</Th>
+                    <Th>処理</Th>
+                  </>
+                )}
               </Tr>
             </Thead>
             <Tbody>

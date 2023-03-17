@@ -26,6 +26,7 @@ import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { ProductType } from "../../../types/FabricType";
+import StockEditModal from "./StockEditModal";
 
 type Props = {
   items: CuttingReportType;
@@ -222,7 +223,12 @@ export const FabricsUsedInput: NextPage<Props> = ({
       <Box p={3} border="1px" borderColor="gray.200">
         <Flex gap={3} w="full" flexDirection={{ base: "column", md: "row" }}>
           <Box minW="100px">
-            <Text fontWeight="bold">選択</Text>
+            <Text fontWeight="bold">
+              選択
+              <Box as="span" color="red">
+                ※
+              </Box>
+            </Text>
             <Select
               mt={1}
               placeholder="選択"
@@ -238,11 +244,18 @@ export const FabricsUsedInput: NextPage<Props> = ({
             </Select>
           </Box>
           <Box w="full">
-            <Text fontWeight="bold">
-              品名{" "}
-              {product.productId &&
-                `(在庫 ${Number(getTokushimaStock(product.productId))}m)`}
-            </Text>
+            <Flex fontWeight="bold" alignItems="center">
+              品名
+              <Box as="span" color="red">
+                ※
+              </Box>
+              {product.productId && (
+                <>
+                  (在庫 {Number(getTokushimaStock(product.productId))}m)
+                  <StockEditModal productId={product.productId} />
+                </>
+              )}
+            </Flex>
             <Select
               mt={1}
               placeholder="選択"
@@ -263,7 +276,12 @@ export const FabricsUsedInput: NextPage<Props> = ({
           </Box>
 
           <Box minW="100px">
-            <Text fontWeight="bold">数量（m）</Text>
+            <Text fontWeight="bold">
+              数量(m)
+              <Box as="span" color="red">
+                ※
+              </Box>
+            </Text>
             <NumberInput
               mt={1}
               name="quantity"
@@ -280,8 +298,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
                     ? "red.300"
                     : ""
                   : getTokushimaStock(product.productId) < product?.quantity //新規
-                    ? "red.300"
-                    : ""
+                  ? "red.300"
+                  : ""
               }
               rounded="md"
               value={product?.quantity}
@@ -295,7 +313,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
             </NumberInput>
           </Box>
           <Box minW="100px">
-            <Text fontWeight="bold">用尺（m）</Text>
+            <Text fontWeight="bold">用尺(m)</Text>
             <Input
               mt={1}
               type="text"
