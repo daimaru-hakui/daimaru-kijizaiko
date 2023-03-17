@@ -13,14 +13,15 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Box,
 } from "@chakra-ui/react";
-import { EditIcon } from "@chakra-ui/icons";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useSetRecoilState } from "recoil";
 import { loadingState } from "../../../store";
+import { FaEdit } from "react-icons/fa";
 
 type Props = {
   productId: string;
@@ -60,7 +61,9 @@ const StockEditModal = ({ productId }: Props) => {
   };
   return (
     <>
-      <EditIcon ml={2} mt={1} cursor="pointer" onClick={onOpen} />
+      <Box ml={2} mt={1}>
+        <FaEdit cursor="pointer" onClick={onOpen} />
+      </Box>
       <Modal size="xs" isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
