@@ -116,11 +116,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
           onChange={(e) => handleRadioChange(e, "itemType")}
         >
           <Stack direction="row">
+            <Radio value="1">既製品</Radio>
+            <Radio value="2">別注品</Radio>
             <Box as="span" color="red">
               ※
             </Box>
-            <Radio value="1">既製品</Radio>
-            <Radio value="2">別注品</Radio>
           </Stack>
         </RadioGroup>
         <Flex gap={3} flexDirection={{ base: "column", md: "row" }}>
@@ -192,10 +192,12 @@ const CuttingReportInputArea: NextPage<Props> = ({
         </Box>
         <Flex gap={3}>
           <Box>
-            <Text fontWeight="bold">総枚数</Text>
-            <Box as="span" color="red">
-              ※
-            </Box>
+            <Text fontWeight="bold">
+              総枚数
+              <Box as="span" color="red">
+                ※
+              </Box>
+            </Text>
             <NumberInput
               mt={1}
               name="totalQuantity"
