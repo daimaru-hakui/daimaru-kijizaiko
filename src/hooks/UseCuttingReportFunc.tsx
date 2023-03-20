@@ -4,6 +4,7 @@ import {
   doc,
   runTransaction,
   serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -145,7 +146,7 @@ export const useCuttingReportFunc = (
 
         transaction.update(cuttingReportDocRef, {
           ...newItems,
-          createdAt: cuttingReportDoc.data()?.createdAt,
+          createdAt: cuttingReportDoc.data()?.createdAt.toDate(),
           updatedAt: serverTimestamp(),
           totalQuantity: Number(items.totalQuantity),
         });
