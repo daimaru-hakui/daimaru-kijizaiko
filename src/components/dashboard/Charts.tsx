@@ -18,10 +18,8 @@ import useSearch from "../../hooks/UseSearch";
 
 const Charts = () => {
   const [limitNum, setLimitNum] = useState(5);
-  const { startDay, endDay, SearchElement } = useSearch();
-  const { data: cuttingReports } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}`
-  );
+  const { startDay, endDay, staff, client, SearchElement } = useSearch();
+  const { data: cuttingReports } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
   const { data: fabricPurchaseConfirms } = useSWRImmutable(
     `/api/fabric-purchase-confirms/${startDay}/${endDay}`
   );
