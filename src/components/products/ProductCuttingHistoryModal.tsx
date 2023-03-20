@@ -41,7 +41,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { mathRound2nd } = useUtil();
   const { scaleCalc } = useCuttingReportFunc(null, null);
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
-  const { startDay, endDay, SearchElement } = useSearch();
+  const { startDay, endDay, staff, client, SearchElement } = useSearch();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const {
     getUserName,
@@ -50,9 +50,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
-  const { data } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}`
-  );
+  const { data } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
 
   useEffect(() => {
     const getCuttingReports = async () => {
@@ -61,24 +59,24 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string }) => report.productId === productId
+            (report: { productId: string; }) => report.productId === productId
           )
           .filter(
             (obj: CuttingReportType) =>
               new Date(startDay).getTime() <=
-                new Date(obj.cuttingDate).getTime() &&
+              new Date(obj.cuttingDate).getTime() &&
               new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
           )
-          .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
+          .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -163,7 +161,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number },
+                            report: CuttingHistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>
