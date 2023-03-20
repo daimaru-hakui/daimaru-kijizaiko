@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Flex,
+  Heading,
   Input,
   Stack,
   Table,
@@ -28,8 +29,8 @@ const CuttingReport = () => {
     [] as CuttingReportType[]
   );
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { startDay, endDay, SearchElement } = useSearch();
-  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { items, setItems, startDay, endDay, staff, client, SearchExtElement, onSearch } = useSearch();
+  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
 
   useEffect(() => {
@@ -39,7 +40,9 @@ const CuttingReport = () => {
           a.serialNumber > b.serialNumber && -1
       )
     );
-  }, [startDay, endDay, data]);
+  }, [data]);
+
+
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -54,7 +57,40 @@ const CuttingReport = () => {
             </CSVLink>
           </Flex>
 
-          <SearchElement />
+          <Flex
+            gap={6}
+            alignItems="center"
+            flexDirection={{ base: "column", md: "row" }}>
+            <SearchExtElement />
+            <Box w="full">
+              <Heading as="h4" fontSize="md">
+                受注先名を検索
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                w={{ base: "full", md: "300px" }}
+                flexDirection={{ base: "column", md: "row" }}
+              >
+                <Input
+                  w="full"
+                  name="client"
+                  value={items.client}
+                  placeholder="受注先名を検索"
+                  onChange={(e) => setItems({ ...items, client: e.target.value })}
+                />
+                <Button
+                  w={{ base: "full", md: "80px" }}
+                  px={6}
+                  colorScheme="facebook"
+                  onClick={onSearch}
+                >
+                  検索
+                </Button>
+              </Flex>
+            </Box>
+          </Flex>
 
           <TableContainer p={3} w="100%">
             <Table variant="simple" size="sm">

@@ -15,6 +15,16 @@ export const useUtil = () => {
     return `${year}-${monthStr}-${dayStr}`;
   };
 
+  const get3monthsAgo = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 3);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    let monthStr = "0" + month;
+    monthStr = monthStr.slice(-2);
+    return `${year}-${monthStr}-01`;
+  };
+
   const getNow = () => {
     const date = new Date();
     const year = date.getFullYear();
@@ -48,5 +58,5 @@ export const useUtil = () => {
     return Math.round(num * 100) / 100;
   };
 
-  return { quantityValueBold, getTodayDate, getNow, halfToFullChar, mathRound2nd };
+  return { quantityValueBold, getTodayDate, get3monthsAgo, getNow, halfToFullChar, mathRound2nd };
 };
