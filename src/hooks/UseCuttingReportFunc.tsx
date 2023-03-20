@@ -18,14 +18,16 @@ export const useCuttingReportFunc = (
   items?: CuttingReportType | null,
   setItems?: Function | null,
   startDay?: string,
-  endDay?: string
+  endDay?: string,
+  staff?: string,
+  client?: string
 ) => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
 
   // 商品登録項目を追加
   const addInput = () => {
@@ -152,7 +154,7 @@ export const useCuttingReportFunc = (
       console.log(err);
     } finally {
       setLoading(false);
-      // await mutate({ ...data });
+      await mutate({ ...data });
       await router.push("/tokushima/cutting-reports");
     }
   };

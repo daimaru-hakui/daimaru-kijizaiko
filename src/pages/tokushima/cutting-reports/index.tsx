@@ -4,6 +4,7 @@ import {
   Flex,
   Heading,
   Input,
+  Select,
   Stack,
   Table,
   TableContainer,
@@ -21,28 +22,17 @@ import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
 import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 import useSearch from "../../../hooks/UseSearch";
 
 const CuttingReport = () => {
   const { getTodayDate } = useUtil();
-  const [cuttingReports, setCuttingReports] = useState(
-    [] as CuttingReportType[]
-  );
+
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { items, setItems, startDay, endDay, staff, client, SearchExtElement, onSearch } = useSearch();
-  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { items, setItems, startDay, endDay, staff, client, SearchExtElement, onSearch, onReset } = useSearch();
+  const { data: cuttingReports } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-
-  useEffect(() => {
-    setCuttingReports(
-      data?.contents?.sort(
-        (a: CuttingReportType, b: CuttingReportType) =>
-          a.serialNumber > b.serialNumber && -1
-      )
-    );
-  }, [data]);
-
-
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -58,11 +48,11 @@ const CuttingReport = () => {
           </Flex>
 
           <Flex
+            w="full"
             gap={6}
-            alignItems="center"
-            flexDirection={{ base: "column", md: "row" }}>
+            flexDirection={{ base: "column", lg: "row" }}>
             <SearchExtElement />
-            <Box w="full">
+            <Box>
               <Heading as="h4" fontSize="md">
                 受注先名を検索
               </Heading>
@@ -70,8 +60,8 @@ const CuttingReport = () => {
                 mt={3}
                 gap={3}
                 alignItems="center"
-                w={{ base: "full", md: "300px" }}
-                flexDirection={{ base: "column", md: "row" }}
+                w={{ base: "full" }}
+                flexDirection={{ base: "column", lg: "row" }}
               >
                 <Input
                   w="full"
@@ -80,13 +70,44 @@ const CuttingReport = () => {
                   placeholder="受注先名を検索"
                   onChange={(e) => setItems({ ...items, client: e.target.value })}
                 />
+              </Flex>
+            </Box>
+            <Box>
+              <Heading as="h4" fontSize="md">
+                担当者を選択
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                w="full"
+                flexDirection={{ base: "column", lg: "row" }}
+              >
+                <Select
+                  name="staff"
+                  value={items.staff}
+                  placeholder="担当者を選択"
+                  onChange={(e) => setItems({ ...items, staff: e.target.value })}
+                >
+                  {users?.contents?.map((user) => (
+                    <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                  ))}
+                </Select>
                 <Button
-                  w={{ base: "full", md: "80px" }}
+                  w={{ base: "full", lg: "80px" }}
                   px={6}
                   colorScheme="facebook"
                   onClick={onSearch}
                 >
                   検索
+                </Button>
+                <Button
+                  w={{ base: "full", lg: "80px" }}
+                  px={6}
+                  variant="outline"
+                  onClick={onReset}
+                >
+                  クリア
                 </Button>
               </Flex>
             </Box>
@@ -107,13 +128,15 @@ const CuttingReport = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {cuttingReports?.map((report: CuttingReportType) => (
+                {cuttingReports?.contents?.map((report: CuttingReportType) => (
                   <Tr key={report.serialNumber}>
                     <Td>
                       <CuttingReportModal
                         reportId={report.id}
                         startDay={startDay}
                         endDay={endDay}
+                        staff={staff}
+                        client={client}
                       />
                     </Td>
                     <Td>{getSerialNumber(report.serialNumber)}</Td>

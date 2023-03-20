@@ -12,26 +12,26 @@ import {
 import { NextPage } from "next";
 import { CuttingReportType } from "../../../types/CuttingReportType";
 import CuttingReportInputArea from "./CuttingReportInputArea";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import useSWRImmutable from "swr/immutable";
 
 type Props = {
   report: CuttingReportType;
   startDay: string;
   endDay: string;
+  staff: string;
+  client: string;
 };
 
 const CuttingReportEditModal: NextPage<Props> = ({
   report,
   startDay,
   endDay,
+  staff,
+  client
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}`);
 
   return (
     <>
-
       <Button
         size="xs"
         variant="outline"
@@ -54,15 +54,16 @@ const CuttingReportEditModal: NextPage<Props> = ({
               onClose={onClose}
               startDay={startDay}
               endDay={endDay}
+              staff={staff}
+              client={client}
             />
           </ModalBody>
           <ModalFooter>
             <Button
               variant="outline"
               mr={3}
-              onClick={() => {
+              onClick={async () => {
                 onClose();
-                mutate({ ...data });
               }}
             >
               閉じる

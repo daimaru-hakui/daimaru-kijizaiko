@@ -29,10 +29,12 @@ export default async function handler(
       (doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType)
     ).filter((report) => (
       (staff === report.staff || staff === "")
-    )).filter((report) => {
-      const result = report.client.includes(String(client));
-      return result;
-    });
+    )).filter((report) => (
+      report.client.includes(String(client))
+    )).sort(
+      (a: CuttingReportType, b: CuttingReportType) =>
+        a.serialNumber > b.serialNumber && -1
+    );
     return res.status(200).json({ contents });
   }
 }

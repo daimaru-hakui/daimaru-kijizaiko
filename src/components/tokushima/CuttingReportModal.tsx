@@ -27,25 +27,28 @@ import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
 import useSWRImmutable from "swr/immutable";
+import useSWR from "swr";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
   reportId: string;
   startDay: string;
   endDay: string;
+  staff: string;
+  client: string;
 };
 
 const CuttingReportModal: NextPage<Props> = ({
   reportId,
   startDay,
   endDay,
+  staff,
+  client
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
   const { isAuths } = useAuthManagement();
-  const { data, mutate } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}`
-  );
+  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {
     getSerialNumber,
@@ -59,6 +62,7 @@ const CuttingReportModal: NextPage<Props> = ({
     setFilterReport(
       data?.contents?.find((value: CuttingReportType) => value.id === reportId)
     );
+
   }, [reportId, data]);
 
   return (
@@ -72,7 +76,12 @@ const CuttingReportModal: NextPage<Props> = ({
         詳細
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+      <Modal isOpen={isOpen}
+        size="3xl"
+        onClose={() => {
+          onClose();
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
@@ -84,6 +93,8 @@ const CuttingReportModal: NextPage<Props> = ({
                     report={filterReport}
                     startDay={startDay}
                     endDay={endDay}
+                    staff={staff}
+                    client={client}
                   />
                   {filterReport?.products?.length === 0 && (
                     <Button
@@ -93,7 +104,7 @@ const CuttingReportModal: NextPage<Props> = ({
                       cursor="pointer"
                       onClick={async () => {
                         await deleteCuttingReport(reportId);
-                        await mutate({ ...data });
+                        await mutate({ ...data }); //必要
                         onClose();
                       }}
                     >

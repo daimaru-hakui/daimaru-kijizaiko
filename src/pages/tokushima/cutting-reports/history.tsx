@@ -30,8 +30,8 @@ const HistoryCutting = () => {
     getColorName,
   } = useGetDisp();
   const { scaleCalc } = useCuttingReportFunc(null, null);
-  const { startDay, endDay, SearchElement } = useSearch();
-  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}`);
+  const { startDay, endDay, staff, client, SearchElement } = useSearch();
+  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   useEffect(() => {
@@ -93,6 +93,8 @@ const HistoryCutting = () => {
                           reportId={list.id}
                           startDay={startDay}
                           endDay={endDay}
+                          staff={staff}
+                          client={client}
                         />
                       </Flex>
                     </Td>
