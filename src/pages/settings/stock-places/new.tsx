@@ -21,28 +21,54 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types/StockPlaceType";
-import { UseInputSetting } from "../../../hooks/UseInputSetting";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type Inputs = StockPlaceType;
 
 const StockPlaceNew = () => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
-  const { items, setItems, handleInputChange } = UseInputSetting();
   const [flag, setFlag] = useState(false);
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
 
-  // 登録しているかのチェック
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    const collectionStockPlaces
+      = collection(db, "stockPlaces");
+    try {
+      await addDoc(collectionStockPlaces, {
+        name: data.name || "",
+        kana: data.kana || "",
+        address: data.address || "",
+        tel: data.tel || "",
+        fax: data.fax || "",
+        comment: data.comment || "",
+        createUser: currentUser || "",
+        updateUser: currentUser || "",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      router.push("/settings/stock-places");
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
+
   useEffect(() => {
-    let name = items?.name;
-    if (!name) name = "noValue";
-    const base = stockPlaces?.map((a: { name: string }) => a.name);
-    const result = base?.includes(name);
+    let item = watch('name');
+    if (!item) item = "noValue";
+    const base = stockPlaces?.map((a: { name: string; }) => a.name);
+    const result = base?.includes(item);
     if (!result) {
       setFlag(false);
     } else {
       setFlag(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
+  }, [watch('name')]);
 
   useEffect(() => {
     const getStockPlaces = async () => {
@@ -56,30 +82,6 @@ const StockPlaceNew = () => {
     };
     getStockPlaces();
   }, []);
-
-  const addStockPlace = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    const collectionStockPlaces = collection(db, "stockPlaces");
-    try {
-      await addDoc(collectionStockPlaces, {
-        name: items.name || "",
-        kana: items.kana || "",
-        address: items.address || "",
-        tel: items.tel || "",
-        fax: items.fax || "",
-        comment: items.comment || "",
-        createUser: currentUser || "",
-        updateUser: currentUser || "",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      router.push("/settings/stock-places");
-    }
-  };
 
   return (
     <Box w="100%" mt={12} px={6}>
@@ -101,87 +103,47 @@ const StockPlaceNew = () => {
             </Button>
           </Link>
         </Flex>
-        <Stack spacing={6} mt={6}>
-          <Flex gap={6} flexDirection={{ base: "column" }}>
-            <Box fontSize="2xl" fontWeight="bold" color="red">
-              {flag && "※すでに登録されています。"}
-            </Box>
-            <Box w="100%" flex={2}>
-              <Text>送り先名</Text>
-              <Input
-                mt={1}
-                name="name"
-                type="text"
-                placeholder="例）徳島工場"
-                value={items.name}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>フリガナ</Text>
-              <Input
-                mt={1}
-                name="kana"
-                type="text"
-                placeholder="トクシマコウジョウ"
-                value={items.kana}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>住所</Text>
-              <Input
-                mt={1}
-                name="address"
-                type="text"
-                placeholder=""
-                value={items.address}
-                onChange={handleInputChange}
-              />
-            </Box>
-            <Flex gap={3}>
-              <Box w="100%" flex={1}>
-                <Text>TEL</Text>
-                <Input
-                  mt={1}
-                  name="tel"
-                  type="text"
-                  placeholder=""
-                  value={items.tel}
-                  onChange={handleInputChange}
-                />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={6} mt={6}>
+            <Flex gap={6} flexDirection={{ base: "column" }}>
+              <Box w="100%" flex={2}>
+                <Text>送り先名</Text>
+                <Input mt={1} placeholder="例）徳島工場" {...register("name", { required: true })} />
+                {errors.name && <Box color="red" fontWeight="bold"> ※送り先名を入力してください</Box>}
+                {flag && <Box color="red" fontWeight="bold">※すでに登録されています。</Box>}
               </Box>
               <Box w="100%" flex={1}>
-                <Text>FAX</Text>
-                <Input
-                  mt={1}
-                  name="fax"
-                  type="text"
-                  placeholder=""
-                  value={items.fax}
-                  onChange={handleInputChange}
-                />
+                <Text>フリガナ</Text>
+                <Input mt={1} placeholder="フリガナ" {...register("kana", { required: true })} />
+              </Box>
+              <Box w="100%" flex={1}>
+                <Text>住所</Text>
+                <Input mt={1} {...register("address")} />
+              </Box>
+              <Flex gap={3}>
+                <Box w="100%" flex={1}>
+                  <Text>TEL</Text>
+                  <Input mt={1} {...register("tel")} />
+                </Box>
+                <Box w="100%" flex={1}>
+                  <Text>FAX</Text>
+                  <Input mt={1} {...register("fax")} />
+                </Box>
+              </Flex>
+              <Box w="100%" flex={1}>
+                <Text>備考</Text>
+                <Textarea mt={1} {...register("comment")} />
               </Box>
             </Flex>
-            <Box w="100%" flex={1}>
-              <Text>備考</Text>
-              <Textarea
-                mt={1}
-                name="comment"
-                value={items.comment}
-                onChange={handleInputChange}
-              />
-            </Box>
-          </Flex>
-
-          <Button
-            disabled={!items.name || !items.kana || flag}
-            colorScheme="facebook"
-            onClick={addStockPlace}
-          >
-            登録
-          </Button>
-        </Stack>
+            <Button
+              type="submit"
+              disabled={flag}
+              colorScheme="facebook"
+            >
+              登録
+            </Button>
+          </Stack>
+        </form>
       </Container>
     </Box>
   );

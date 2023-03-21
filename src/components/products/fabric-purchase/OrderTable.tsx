@@ -17,6 +17,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { NextPage } from "next";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
@@ -34,8 +35,6 @@ import { useUtil } from "../../../hooks/UseUtil";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
 import { useRouter } from "next/router";
-import useSWR from "swr";
-import { NextPage } from "next";
 
 type Props = {
   HOUSE_FACTORY?: string;
@@ -50,7 +49,6 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate, mathRound2nd } = useUtil();
-  // const { data, mutate } = useSWR("/api/fabric-purchase-orders");
   const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
   const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState(
     [] as HistoryType[]
@@ -71,7 +69,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       );
       setFilterFabricPurchaseOrders(
         newHistorys.sort(
-          (a: { serialNumber: number }, b: { serialNumber: number }) =>
+          (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
             a.serialNumber > b.serialNumber && -1
         )
       );
@@ -194,10 +192,13 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
         const productDocSnap = await transaction.get(productDocRef);
         if (!productDocSnap.exists()) throw "product does not exist!!";
 
+        const orderHistoryDoc = await transaction.get(orderHistoryDocRef);
+        const staff = orderHistoryDoc?.data()?.createUser;
+
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-            history.quantity +
-            items.remainingOrder || 0;
+          history.quantity +
+          items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
@@ -235,7 +236,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || getTodayDate(),
-          createUser: currentUser,
+          createUser: staff,
           updateUser: currentUser,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -313,7 +314,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
               <Tr key={history.id}>
                 <Td>
                   {isAuths(["rd", "tokushima"]) ||
-                  history.createUser === currentUser ? (
+                    history.createUser === currentUser ? (
                     <OrderToConfirmModal
                       history={history}
                       items={items}

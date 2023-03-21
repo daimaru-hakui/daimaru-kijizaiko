@@ -1,6 +1,10 @@
 import {
   Box,
+  Button,
   Flex,
+  Heading,
+  Input,
+  Select,
   Stack,
   Table,
   TableContainer,
@@ -15,27 +19,35 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState, loadingState, usersState } from "../../../../store";
+import { currentUserState, loadingState } from "../../../../store";
 import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import useSWR from "swr";
-import useSearch from "../../../hooks/UseSearch";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
+import { useUtil } from "../../../hooks/UseUtil";
+import { useForm } from "react-hook-form";
+import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 
 type Props = {
   HOUSE_FACTORY?: string;
 };
 
+type Inputs = {
+  start: string;
+  end: string;
+  client: string;
+  staff: string;
+};
+
 const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const setLoading = useSetRecoilState(loadingState);
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
-  const users = useRecoilValue(usersState);
   const currentUser = useRecoilValue(currentUserState);
+  const { getTodayDate, get3monthsAgo } = useUtil();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAuths } = useAuthManagement();
-
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,
@@ -44,10 +56,31 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
     comment: "",
     fixedAt: "",
   });
-  const { SearchElement, startDay, endDay } = useSearch();
-  const { data, mutate, isLoading } = useSWR(`/api/fabric-purchase-confirms/${startDay}/${endDay}`);
+  const [startDay, setStartDay] = useState(get3monthsAgo());
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [staff, setStaff] = useState("");
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data, mutate } = useSWR(`/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+    defaultValues: {
+      start: startDay,
+      end: endDay,
+      staff: "",
+    }
+  });
 
-  // 数量０のデータを非表示
+  const onSubmit = (data: Inputs) => {
+    setStartDay(data.start);
+    setEndDay(data.end);
+    setStaff(data.staff);
+  };
+  const onReset = () => {
+    setStartDay(get3monthsAgo());
+    setEndDay(getTodayDate());
+    setStaff("");
+    reset();
+  };
+
   useEffect(() => {
     data?.contents?.sort(
       (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
@@ -123,7 +156,63 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
         <Box as="h2" fontSize="2xl">
           入荷履歴
         </Box>
-        <SearchElement />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Flex
+            w="full"
+            gap={6}
+            flexDirection={{ base: "column", lg: "row" }}>
+            <Box>
+              <Heading as="h4" fontSize="md">
+                期間を選択
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                flexDirection={{ base: "column", lg: "row" }}
+              >
+                <Flex gap={3} w={{ base: "full", lg: "350px" }}>
+                  <Input type="date" {...register("start")} />
+                  <Input type="date" {...register("end")} />
+                </Flex>
+              </Flex>
+            </Box>
+            <Box>
+              <Heading as="h4" fontSize="md">
+                担当者を選択
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                w="full"
+                flexDirection={{ base: "column", lg: "row" }}
+              >
+                <Select placeholder="担当者を選択" {...register("staff")}                  >
+                  {users?.contents?.map((user) => (
+                    <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                  ))}
+                </Select>
+                <Button
+                  type="submit"
+                  w={{ base: "full", lg: "80px" }}
+                  px={6}
+                  colorScheme="facebook"
+                >
+                  検索
+                </Button>
+                <Button
+                  w={{ base: "full", lg: "80px" }}
+                  px={6}
+                  variant="outline"
+                  onClick={onReset}
+                >
+                  クリア
+                </Button>
+              </Flex>
+            </Box>
+          </Flex>
+        </form>
         <TableContainer w="100%">
           {filterHistories?.length > 0 ? (
             <Table variant="simple" size="sm">

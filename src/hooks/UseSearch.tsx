@@ -73,35 +73,6 @@ const useSearch = () => {
     </Box>
   );
 
-  const SearchExtElement = () => (
-
-    <Flex flexDirection={{ base: "column" }}>
-      <Heading as="h4" fontSize="md">
-        期間を選択
-      </Heading>
-      <Flex
-        mt={3}
-        gap={3}
-      >
-        <Flex gap={3} w={{ base: "full", lg: "350px" }}>
-          <Input
-            type="date"
-            name="start"
-            value={items.start}
-            onChange={handleInputChange}
-          />
-          <Input
-            type="date"
-            name="end"
-            value={items.end}
-            onChange={handleInputChange}
-          />
-        </Flex>
-      </Flex>
-    </Flex>
-
-  );
-
   return {
     startDay,
     endDay,
@@ -110,9 +81,6 @@ const useSearch = () => {
     items,
     setItems,
     SearchElement,
-    SearchExtElement,
-    onSearch,
-    onReset
   };
 };
 

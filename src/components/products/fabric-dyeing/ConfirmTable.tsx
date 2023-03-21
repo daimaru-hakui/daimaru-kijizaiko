@@ -1,6 +1,10 @@
 import {
   Box,
+  Button,
   Flex,
+  Heading,
+  Input,
+  Select,
   Stack,
   Table,
   TableContainer,
@@ -13,23 +17,31 @@ import {
 import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState, usersState } from "../../../../store";
+import { currentUserState, loadingState } from "../../../../store";
 import CommentModal from "../../CommentModal";
 import { HistoryType } from "../../../../types/HistoryType";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import useSWR from "swr";
-import useSearch from "../../../hooks/UseSearch";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
+import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
+import { useForm } from "react-hook-form";
+import { useUtil } from "../../../hooks/UseUtil";
 
+type Inputs = {
+  start: string;
+  end: string;
+  client: string;
+  staff: string;
+};
 
 const FabricDyeingConfirmTable = () => {
-  const setLoading = useSetRecoilState(loadingState);
-  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
-  const users = useRecoilValue(usersState);
-  const { isAdminAuth, isAuths } = useAuthManagement();
   const currentUser = useRecoilValue(currentUserState);
+  const setLoading = useSetRecoilState(loadingState);
+  const { getTodayDate, get3monthsAgo } = useUtil();
+  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+  const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const [items, setItems] = useState({
     scheduledAt: "",
@@ -39,15 +51,35 @@ const FabricDyeingConfirmTable = () => {
     comment: "",
     fixedAt: "",
   });
-  const { SearchElement, startDay, endDay } = useSearch();
-  const { data, mutate, isLoading } = useSWR(`/api/fabric-dyeing-confirms/${startDay}/${endDay}`);
+  const [startDay, setStartDay] = useState(get3monthsAgo());
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [staff, setStaff] = useState("");
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data, mutate } = useSWR(`/api/fabric-dyeing-confirms/${startDay}/${endDay}?createUser=${staff}`);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+    defaultValues: {
+      start: startDay,
+      end: endDay,
+      staff: "",
+    }
+  });
+
+  const onSubmit = (data: Inputs) => {
+    setStartDay(data.start);
+    setEndDay(data.end);
+    setStaff(data.staff);
+  };
+  const onReset = () => {
+    setStartDay(get3monthsAgo());
+    setEndDay(getTodayDate());
+    setStaff("");
+    reset();
+  };
 
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
       (history: { quantity: number; }) => history.quantity > 0 && history
-    ).sort(
-      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
-        (a.serialNumber > b.serialNumber) && - 1);
+    );
     setFilterHistories(newHistorys);
   }, [data]);
 
@@ -104,7 +136,65 @@ const FabricDyeingConfirmTable = () => {
         <Box as="h2" fontSize="2xl">
           染色履歴
         </Box>
-        <SearchElement />
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Flex
+            w="full"
+            gap={6}
+            flexDirection={{ base: "column", lg: "row" }}>
+            <Box>
+              <Heading as="h4" fontSize="md">
+                期間を選択
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                flexDirection={{ base: "column", lg: "row" }}
+              >
+                <Flex gap={3} w={{ base: "full", lg: "350px" }}>
+                  <Input type="date" {...register("start")} />
+                  <Input type="date" {...register("end")} />
+                </Flex>
+              </Flex>
+            </Box>
+            <Box>
+              <Heading as="h4" fontSize="md">
+                担当者を選択
+              </Heading>
+              <Flex
+                mt={3}
+                gap={3}
+                alignItems="center"
+                w="full"
+                flexDirection={{ base: "column", lg: "row" }}
+              >
+                <Select placeholder="担当者を選択" {...register("staff")}                  >
+                  {users?.contents?.map((user) => (
+                    <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                  ))}
+                </Select>
+                <Button
+                  type="submit"
+                  w={{ base: "full", lg: "80px" }}
+                  px={6}
+                  colorScheme="facebook"
+                >
+                  検索
+                </Button>
+                <Button
+                  w={{ base: "full", lg: "80px" }}
+                  px={6}
+                  variant="outline"
+                  onClick={onReset}
+                >
+                  クリア
+                </Button>
+              </Flex>
+            </Box>
+          </Flex>
+        </form>
+
         <TableContainer w="100%">
           {filterHistories?.length > 0 ? (
             <Table variant="simple" size="sm">

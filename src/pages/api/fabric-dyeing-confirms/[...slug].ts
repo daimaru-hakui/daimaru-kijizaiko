@@ -14,8 +14,10 @@ export default async function handler(
     return res.status(405).json("error");
   if (req.method === "GET") {
     const { slug } = req.query;
-    const startDay = slug[0] || process.env.NEXT_PUBLIC_BASE_DATE;
+    const startDay = slug[0];
     const endDay = slug[1];
+    const { createUser } = req.query;
+    
     const querySnapshot = await db
       .collection("fabricDyeingConfirms")
       // .where("quantity",">" ,0)
@@ -25,7 +27,13 @@ export default async function handler(
       .get();
     const snapshot = querySnapshot.docs.map(
       (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
-    );
+    ).filter((content) => (
+      (createUser === content.createUser || createUser === "")
+    )).sort((a, b) => {
+      if (a.fixedAt > b.fixedAt) {
+        return -1;
+      }
+    });;
     return res.status(200).json({ contents: snapshot });
   }
 }

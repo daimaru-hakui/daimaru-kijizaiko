@@ -2,6 +2,8 @@ import {
   Box,
   Button,
   Flex,
+  Heading,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -9,6 +11,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Stack,
   Table,
   TableContainer,
@@ -25,17 +28,24 @@ import { NextPage } from "next";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { HistoryType } from "../../../types/HistoryType";
-import useSearch from "../../hooks/UseSearch";
+import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
+import { useForm } from "react-hook-form";
 
 type Props = {
   productId: string;
   type?: string | null;
 };
 
+type Inputs = {
+  start: string;
+  end: string;
+  client: string;
+  staff: string;
+};
+
 const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { mathRound2nd } = useUtil();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const [filterFabricPurchases, setFilterFabricPurchases] = useState([
     { quantity: 0 },
@@ -47,27 +57,44 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     getColorName,
     getProductName,
   } = useGetDisp();
-  const { startDay, endDay, SearchElement } = useSearch();
-  const { data } = useSWRImmutable(
-    `/api/fabric-purchase-confirms/${startDay}/${endDay}`
-  );
+  const { getTodayDate, get3monthsAgo, mathRound2nd } = useUtil();
+  const [startDay, setStartDay] = useState(get3monthsAgo());
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [staff, setStaff] = useState("");
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data } = useSWR(`/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+    defaultValues: {
+      start: startDay,
+      end: endDay,
+      staff: "",
+      client: ''
+    }
+  });
+
+  const onSubmit = (data: Inputs) => {
+    setStartDay(data.start);
+    setEndDay(data.end);
+    setStaff(data.staff);
+  };
+  const onReset = () => {
+    setStartDay(get3monthsAgo());
+    setEndDay(getTodayDate());
+    setStaff("");
+    reset();
+  };
 
   useEffect(() => {
     const getArray = async () => {
       const filterArray = data?.contents
         .filter(
-          (content: HistoryType) => content.productId === productId && content
-        )
-        .sort((a, b) => {
-          if (a.fixedAt > b.fixedAt) {
-            return -1;
-          }
-        });
+          (content: HistoryType) => content.productId === productId
+        );
       setFilterFabricPurchases(filterArray);
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [productId, data]);
 
   useEffect(() => {
     let total = 0;
@@ -89,7 +116,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
         </Box>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>購入履歴</ModalHeader>
@@ -125,7 +152,63 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   flexDirection={{ base: "column", md: "row" }}
                   justifyContent="space-between"
                 >
-                  <SearchElement />
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <Flex
+                      w="full"
+                      gap={6}
+                      flexDirection={{ base: "column", lg: "row" }}>
+                      <Box>
+                        <Heading as="h4" fontSize="md">
+                          期間を選択
+                        </Heading>
+                        <Flex
+                          mt={3}
+                          gap={3}
+                          alignItems="center"
+                          flexDirection={{ base: "column", lg: "row" }}
+                        >
+                          <Flex gap={3} w={{ base: "full", lg: "350px" }}>
+                            <Input type="date" {...register("start")} />
+                            <Input type="date" {...register("end")} />
+                          </Flex>
+                        </Flex>
+                      </Box>
+                      <Box>
+                        <Heading as="h4" fontSize="md">
+                          担当者を選択
+                        </Heading>
+                        <Flex
+                          mt={3}
+                          gap={3}
+                          alignItems="center"
+                          w="full"
+                          flexDirection={{ base: "column", lg: "row" }}
+                        >
+                          <Select placeholder="担当者を選択" {...register("staff")}                  >
+                            {users?.contents?.map((user) => (
+                              <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                            ))}
+                          </Select>
+                          <Button
+                            type="submit"
+                            w={{ base: "full", lg: "80px" }}
+                            px={6}
+                            colorScheme="facebook"
+                          >
+                            検索
+                          </Button>
+                          <Button
+                            w={{ base: "full", lg: "80px" }}
+                            px={6}
+                            variant="outline"
+                            onClick={onReset}
+                          >
+                            クリア
+                          </Button>
+                        </Flex>
+                      </Box>
+                    </Flex>
+                  </form>
                 </Flex>
               </Box>
               {filterFabricPurchases?.length ? (
@@ -146,7 +229,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number },
+                            fabric: HistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

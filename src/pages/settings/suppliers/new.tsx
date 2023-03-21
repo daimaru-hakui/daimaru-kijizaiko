@@ -19,13 +19,33 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types/SupplierType";
-import { UseInputSetting } from "../../../hooks/UseInputSetting";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type Inputs = SupplierType;
 
 const SupplierNew = () => {
-  const [suppliers, setSuppliers] = useState([] as SupplierType[]);
   const router = useRouter();
-  const { items, setItems, handleInputChange } = UseInputSetting();
+  const [suppliers, setSuppliers] = useState([] as SupplierType[]);
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
   const [flag, setFlag] = useState(false);
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const result = window.confirm("登録して宜しいでしょうか");
+    if (!result) return;
+    const collectionSupplier = collection(db, "suppliers");
+    try {
+      await addDoc(collectionSupplier, {
+        name: data.name || "",
+        kana: data.kana || "",
+        comment: data.comment || "",
+        createdAt: serverTimestamp(),
+      });
+      router.push("/settings/suppliers");
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  };
 
   useEffect(() => {
     const getSuppliers = async () => {
@@ -40,35 +60,17 @@ const SupplierNew = () => {
 
   // 登録しているかのチェック
   useEffect(() => {
-    let name = items?.name;
-    if (!name) name = "noValue";
-    const base = suppliers?.map((a: { name: string }) => a.name);
-    const result = base?.includes(name);
+    let item = watch('name');
+    if (!item) item = "noValue";
+    const base = suppliers?.map((a: { name: string; }) => a.name);
+    const result = base?.includes(item);
     if (!result) {
       setFlag(false);
     } else {
       setFlag(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
-
-  const addSupplier = async () => {
-    const result = window.confirm("登録して宜しいでしょうか");
-    if (!result) return;
-    const collectionSupplier = collection(db, "suppliers");
-    try {
-      await addDoc(collectionSupplier, {
-        name: items.name || "",
-        kana: items.kana || "",
-        comment: items.comment || "",
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      router.push("/settings/suppliers");
-    }
-  };
+  }, [watch('name')]);
 
   return (
     <Box w="100%" mt={12} px={6}>
@@ -90,52 +92,33 @@ const SupplierNew = () => {
             </Button>
           </Link>
         </Flex>
-        <Stack spacing={6} mt={6}>
-          <Flex gap={6} flexDirection={{ base: "column" }}>
-            <Box fontSize="2xl" fontWeight="bold" color="red">
-              {flag && "※すでに登録されています。"}
-            </Box>
-            <Box w="100%" flex={2}>
-              <Text>仕入先名</Text>
-              <Input
-                mt={1}
-                name="name"
-                type="text"
-                placeholder="例）クラボウインターナショナル"
-                value={items.name}
-                onChange={(e) => handleInputChange(e)}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>フリガナ</Text>
-              <Input
-                mt={1}
-                name="kana"
-                type="text"
-                placeholder=""
-                value={items.kana}
-                onChange={(e) => handleInputChange(e)}
-              />
-            </Box>
-            <Box w="100%" flex={1}>
-              <Text>備考</Text>
-              <Textarea
-                mt={1}
-                name="comment"
-                value={items.comment}
-                onChange={(e) => handleInputChange(e)}
-              />
-            </Box>
-          </Flex>
-
-          <Button
-            disabled={!items.name || !items.kana || flag}
-            colorScheme="facebook"
-            onClick={addSupplier}
-          >
-            登録
-          </Button>
-        </Stack>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={6} mt={6}>
+            <Flex gap={6} flexDirection={{ base: "column" }}>
+              <Box w="100%" flex={2}>
+                <Text>仕入先名</Text>
+                <Input mt={1} {...register("name", { required: true })} />
+                {errors.name && <Box color="red" fontWeight="bold">※仕入れ先を入力してください</Box>}
+                {flag && <Box color="red" fontWeight="bold">※すでに登録されています。</Box>}
+              </Box>
+              <Box w="100%" flex={1}>
+                <Text>フリガナ</Text>
+                <Input mt={1} {...register("kana")} />
+              </Box>
+              <Box w="100%" flex={1}>
+                <Text>備考</Text>
+                <Textarea mt={1} {...register("comment")} />
+              </Box>
+            </Flex>
+            <Button
+              type="submit"
+              disabled={flag}
+              colorScheme="facebook"
+            >
+              登録
+            </Button>
+          </Stack>
+        </form>
       </Container>
     </Box>
   );

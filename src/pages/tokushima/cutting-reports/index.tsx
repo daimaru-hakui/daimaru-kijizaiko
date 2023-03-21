@@ -14,7 +14,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CSVLink } from "react-csv";
 import { CuttingReportType } from "../../../../types/CuttingReportType";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
@@ -23,16 +23,47 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
 import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
-import useSearch from "../../../hooks/UseSearch";
+import { useForm } from "react-hook-form";
+
+type Inputs = {
+  start: string;
+  end: string;
+  client: string;
+  staff: string;
+};
 
 const CuttingReport = () => {
-  const { getTodayDate } = useUtil();
-
   const { getSerialNumber, getUserName } = useGetDisp();
-  const { items, setItems, startDay, endDay, staff, client, SearchExtElement, onSearch, onReset } = useSearch();
-  const { data: cuttingReports } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { getTodayDate, get3monthsAgo } = useUtil();
+  const [startDay, setStartDay] = useState(get3monthsAgo());
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [staff, setStaff] = useState("");
+  const [client, setClient] = useState("");
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data: cuttingReports } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+    defaultValues: {
+      start: startDay,
+      end: endDay,
+      staff: "",
+      client: ''
+    }
+  });
+
+  const onSubmit = (data: Inputs) => {
+    setStartDay(data.start);
+    setEndDay(data.end);
+    setClient(data.client);
+    setStaff(data.staff);
+  };
+  const onReset = () => {
+    setStartDay(get3monthsAgo());
+    setEndDay(getTodayDate());
+    setStaff("");
+    setClient("");
+    reset();
+  };
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -46,72 +77,77 @@ const CuttingReport = () => {
               <Button size="sm">CSV</Button>
             </CSVLink>
           </Flex>
-
-          <Flex
-            w="full"
-            gap={6}
-            flexDirection={{ base: "column", lg: "row" }}>
-            <SearchExtElement />
-            <Box>
-              <Heading as="h4" fontSize="md">
-                受注先名を検索
-              </Heading>
-              <Flex
-                mt={3}
-                gap={3}
-                alignItems="center"
-                w={{ base: "full" }}
-                flexDirection={{ base: "column", lg: "row" }}
-              >
-                <Input
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Flex
+              w="full"
+              gap={6}
+              flexDirection={{ base: "column", lg: "row" }}>
+              <Box>
+                <Heading as="h4" fontSize="md">
+                  期間を選択
+                </Heading>
+                <Flex
+                  mt={3}
+                  gap={3}
+                  alignItems="center"
+                  flexDirection={{ base: "column", lg: "row" }}
+                >
+                  <Flex gap={3} w={{ base: "full", lg: "350px" }}>
+                    <Input type="date" {...register("start")} />
+                    <Input type="date" {...register("end")} />
+                  </Flex>
+                </Flex>
+              </Box>
+              <Box>
+                <Heading as="h4" fontSize="md">
+                  受注先名を検索
+                </Heading>
+                <Flex
+                  mt={3}
+                  gap={3}
+                  alignItems="center"
+                  w={{ base: "full" }}
+                  flexDirection={{ base: "column", lg: "row" }}
+                >
+                  <Input w="full" placeholder="受注先名を検索" {...register("client")} />
+                </Flex>
+              </Box>
+              <Box>
+                <Heading as="h4" fontSize="md">
+                  担当者を選択
+                </Heading>
+                <Flex
+                  mt={3}
+                  gap={3}
+                  alignItems="center"
                   w="full"
-                  name="client"
-                  value={items.client}
-                  placeholder="受注先名を検索"
-                  onChange={(e) => setItems({ ...items, client: e.target.value })}
-                />
-              </Flex>
-            </Box>
-            <Box>
-              <Heading as="h4" fontSize="md">
-                担当者を選択
-              </Heading>
-              <Flex
-                mt={3}
-                gap={3}
-                alignItems="center"
-                w="full"
-                flexDirection={{ base: "column", lg: "row" }}
-              >
-                <Select
-                  name="staff"
-                  value={items.staff}
-                  placeholder="担当者を選択"
-                  onChange={(e) => setItems({ ...items, staff: e.target.value })}
+                  flexDirection={{ base: "column", lg: "row" }}
                 >
-                  {users?.contents?.map((user) => (
-                    <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
-                  ))}
-                </Select>
-                <Button
-                  w={{ base: "full", lg: "80px" }}
-                  px={6}
-                  colorScheme="facebook"
-                  onClick={onSearch}
-                >
-                  検索
-                </Button>
-                <Button
-                  w={{ base: "full", lg: "80px" }}
-                  px={6}
-                  variant="outline"
-                  onClick={onReset}
-                >
-                  クリア
-                </Button>
-              </Flex>
-            </Box>
-          </Flex>
+                  <Select placeholder="担当者を選択" {...register("staff")}                  >
+                    {users?.contents?.map((user) => (
+                      <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                    ))}
+                  </Select>
+                  <Button
+                    type="submit"
+                    w={{ base: "full", lg: "80px" }}
+                    px={6}
+                    colorScheme="facebook"
+                  >
+                    検索
+                  </Button>
+                  <Button
+                    w={{ base: "full", lg: "80px" }}
+                    px={6}
+                    variant="outline"
+                    onClick={onReset}
+                  >
+                    クリア
+                  </Button>
+                </Flex>
+              </Box>
+            </Flex>
+          </form>
 
           <TableContainer p={3} w="100%">
             <Table variant="simple" size="sm">
@@ -153,7 +189,7 @@ const CuttingReport = () => {
           </TableContainer>
         </Stack>
       </Box>
-    </Box>
+    </Box >
   );
 };
 

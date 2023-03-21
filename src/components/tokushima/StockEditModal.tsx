@@ -37,8 +37,6 @@ const StockEditModal = ({ productId }: Props) => {
     setStock(data?.content?.tokushimaStock);
   }, [data?.content?.tokushimaStock]);
 
-  console.log(data?.content?.tokushimaStock);
-
   const updateProduct = async () => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
