@@ -91,6 +91,7 @@ export const useProductFunc = (
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
+      console.log(productId);
       console.log(err);
     } finally {
       setLoading(false);

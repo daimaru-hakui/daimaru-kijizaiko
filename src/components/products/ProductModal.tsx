@@ -3,7 +3,6 @@ import {
   Button,
   CheckboxGroup,
   Container,
-  Divider,
   Flex,
   Modal,
   ModalBody,
@@ -14,22 +13,25 @@ import {
   ModalOverlay,
   Stack,
   Text,
-  Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { ProductType } from "../../../types/FabricType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
 import ProductEditModal from "./ProductEditModal";
 import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
+import useSWR from "swr";
 
 type Props = {
-  product: ProductType;
+  title?: string;
+  productId: string;
 };
 
-const ProductModal: NextPage<Props> = ({ product }) => {
+const ProductModal: NextPage<Props> = ({ title = "詳細", productId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data } = useSWR(`/api/products/${productId}`);
+  const product = data?.content;
+
   const {
     getUserName,
     getSupplierName,
@@ -47,7 +49,7 @@ const ProductModal: NextPage<Props> = ({ product }) => {
         colorScheme="facebook"
         onClick={onOpen}
       >
-        詳細
+        {title}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
@@ -56,12 +58,9 @@ const ProductModal: NextPage<Props> = ({ product }) => {
             <Flex gap={3} alignItems="center">
               生地詳細
               <ProductEditModal product={product} type="button" />
-              <ProductCuttingHistoryModal
-                productId={product.id}
-                type="button"
-              />
+              <ProductCuttingHistoryModal productId={productId} type="button" />
               <ProductPurchaseHistoryModal
-                productId={product.id}
+                productId={productId}
                 type="button"
               />
             </Flex>
@@ -117,10 +116,10 @@ const ProductModal: NextPage<Props> = ({ product }) => {
                 {product?.grayFabricId && (
                   <Box flex={1} w="100%">
                     <Text fontWeight="bold">使用キバタ</Text>
-                    <Box mt={1}>
-                      {getGrayFabricNumber(product?.grayFabricId)}{" "}
-                      {getGrayFabricName(product?.grayFabricId)}
-                    </Box>
+                    <Flex gap={3} mt={1}>
+                      <Box> {getGrayFabricNumber(product?.grayFabricId)}</Box>
+                      <Box> {getGrayFabricName(product?.grayFabricId)}</Box>
+                    </Flex>
                   </Box>
                 )}
                 {product?.noteProduct && (

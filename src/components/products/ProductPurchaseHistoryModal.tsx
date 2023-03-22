@@ -62,14 +62,21 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const { data: users } = useSWRImmutable(`/api/users/sales`);
-  const { data } = useSWR(`/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const { data } = useSWR(
+    `/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`
+  );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
       staff: "",
-      client: ''
-    }
+      client: "",
+    },
   });
 
   const onSubmit = (data: Inputs) => {
@@ -86,10 +93,9 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = data?.contents
-        .filter(
-          (content: HistoryType) => content.productId === productId
-        );
+      const filterArray = data?.contents.filter(
+        (content: HistoryType) => content.productId === productId
+      );
       setFilterFabricPurchases(filterArray);
     };
     getArray();
@@ -108,18 +114,18 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     <>
       {type === "button" ? (
         <Button size="xs" colorScheme="facebook" onClick={onOpen}>
-          購入履歴
+          入荷履歴
         </Button>
       ) : (
         <Box w="full" onClick={onOpen}>
-          購入履歴
+          入荷履歴
         </Box>
       )}
 
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>購入履歴</ModalHeader>
+          <ModalHeader>入荷履歴</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={8}>
@@ -156,7 +162,8 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                     <Flex
                       w="full"
                       gap={6}
-                      flexDirection={{ base: "column", lg: "row" }}>
+                      flexDirection={{ base: "column", lg: "row" }}
+                    >
                       <Box>
                         <Heading as="h4" fontSize="md">
                           期間を選択
@@ -184,9 +191,14 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                           w="full"
                           flexDirection={{ base: "column", lg: "row" }}
                         >
-                          <Select placeholder="担当者を選択" {...register("staff")}                  >
+                          <Select
+                            placeholder="担当者を選択"
+                            {...register("staff")}
+                          >
                             {users?.contents?.map((user) => (
-                              <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                              <option key={user.id} value={user.id}>
+                                {getUserName(user.id)}
+                              </option>
                             ))}
                           </Select>
                           <Button
@@ -229,7 +241,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number; },
+                            fabric: HistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>

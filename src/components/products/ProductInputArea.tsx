@@ -56,7 +56,6 @@ const ProductInputArea: NextPage<Props> = ({
   product,
   onClose,
 }) => {
-  const productId = product.id;
   const grayFabrics = useRecoilValue(grayFabricsState);
   const users = useRecoilValue(usersState);
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
@@ -517,8 +516,8 @@ const ProductInputArea: NextPage<Props> = ({
             <Button
               w="100%"
               colorScheme="facebook"
-              onClick={() => {
-                updateProduct(productId);
+              onClick={async () => {
+                await updateProduct(product?.id);
                 onClose();
               }}
             >

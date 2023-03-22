@@ -8,7 +8,7 @@ type Props = {
   productId: string;
 };
 
-const CuttingProductMenu: NextPage<Props> = ({ productId }) => {
+const HistoryProductMenu: NextPage<Props> = ({ productId }) => {
   return (
     <Menu>
       <MenuButton p={1} rounded="md" _active={{ bg: "gray.200" }}>
@@ -26,4 +26,4 @@ const CuttingProductMenu: NextPage<Props> = ({ productId }) => {
   );
 };
 
-export default CuttingProductMenu;
+export default HistoryProductMenu;

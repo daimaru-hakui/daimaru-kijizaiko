@@ -15,7 +15,10 @@ export default async function handler(
   if (req.method === "GET") {
     const { id } = req.query;
     const querySnapshot = await db.collection("products").doc(`${id}`).get();
-    const content = { ...querySnapshot.data() } as ProductType;
+    const content = {
+      ...querySnapshot.data(),
+      id: querySnapshot.id,
+    } as ProductType;
     return res.status(200).json({ content });
   }
 }
