@@ -75,7 +75,7 @@ const MaterialsModal: NextPage<Props> = ({ obj, setObj }) => {
   }, [obj]);
 
   const addMaterials = () => {
-    setObj({ ...materials });
+    setObj({ ...obj });
   };
 
   return (

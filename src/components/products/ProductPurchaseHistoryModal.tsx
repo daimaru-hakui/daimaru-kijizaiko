@@ -27,7 +27,7 @@ import { useUtil } from "../../hooks/UseUtil";
 import { HistoryType } from "../../../types/HistoryType";
 import useSWR from "swr";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../dashboard/SearchArea";
+import SearchArea from "../SearchArea";
 
 type Props = {
   productId: string;
@@ -167,7 +167,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number },
+                            fabric: HistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

@@ -16,9 +16,12 @@ import { useEffect } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputProduct } from "../../hooks/UseInputProduct";
 import { ProductType } from "../../../types/FabricType";
-import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { currentUserState, loadingState } from "../../../store";
 
 type Props = {
   product: ProductType;
@@ -26,15 +29,42 @@ type Props = {
 
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const { getUserName } = useGetDisp(); //// ？
+  const currentUser = useRecoilValue(currentUserState);
   const { items, setItems, handleNumberChange } = useInputProduct();
-  const { updateAjustmentProduct, onReset } = useProductFunc(items, setItems);
   const { quantityValueBold } = useUtil();
   const { isAdminAuth, isAuths } = useAuthManagement();
+  const setLoading = useSetRecoilState(loadingState);
+  const { mathRound2nd, getTodayDate } = useUtil();
 
   useEffect(() => {
     setItems({ ...product } as ProductType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.price, product.tokushimaStock]);
+
+  const updateAjustmentProduct = async (productId: string) => {
+    setLoading(true);
+    try {
+      const docRef = doc(db, "products", productId);
+      await updateDoc(docRef, {
+        price: Number(items.price),
+        wip: mathRound2nd(Number(items.wip)),
+        externalStock: mathRound2nd(Number(items.externalStock)),
+        arrivingQuantity: mathRound2nd(Number(items.arrivingQuantity)),
+        tokushimaStock: mathRound2nd(Number(items.tokushimaStock)),
+        updatedAt: serverTimestamp(),
+        updateUser: currentUser,
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onReset = (product: ProductType) => {
+    setItems({ ...product });
+  };
+
 
   return (
     <Tr key={product.id}>

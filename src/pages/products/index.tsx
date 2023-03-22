@@ -41,7 +41,7 @@ const Products = () => {
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
-  const { csvData, isVisible, deleteProduct } = useProductFunc(null, null);
+  const { csvData, isVisible, deleteProduct } = useProductFunc();
   const { isAuths } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWR(`/api/users`);
@@ -271,7 +271,7 @@ const Products = () => {
                       </Td>
                       <Td>
                         {isAuths(["rd"]) ||
-                        product?.createUser === currentUser ? (
+                          product?.createUser === currentUser ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}

@@ -17,9 +17,9 @@ export default async function handler(
       .collection("products")
       .where("deletedAt", "==", "")
       .get();
-    const snapshot = querySnapshot.docs.map(
+    const contents = querySnapshot.docs.map(
       (doc) => ({ ...doc.data(), id: doc.id } as ProductType)
     );
-    return res.status(200).json({ contents: snapshot });
+    return res.status(200).json({ contents });
   }
 }

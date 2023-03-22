@@ -20,7 +20,7 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
 import useSWR from "swr";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../../../components/dashboard/SearchArea";
+import SearchArea from "../../../components/SearchArea";
 
 type Inputs = {
   start: string;

@@ -49,7 +49,6 @@ const ProductsNew = () => {
           title="生地の登録"
           pageType="new"
           product={product as ProductType}
-          onClose={() => {}}
         />
       </Container>
     </Box>

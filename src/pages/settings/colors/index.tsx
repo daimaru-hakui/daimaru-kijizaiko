@@ -20,12 +20,6 @@ const ColorIndex = () => {
   };
 
   return (
-    // <SettingListPage
-    //   title="色"
-    //   array={colors}
-    //   pathName={"colors"}
-    //   collectionName={"colors"}
-    // />
     <Box w="100%" mt={12} px={6}>
       <Container
         maxW="600px"

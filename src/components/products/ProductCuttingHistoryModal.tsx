@@ -33,7 +33,7 @@ import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../dashboard/SearchArea";
+import SearchArea from "../SearchArea";
 
 type Props = {
   productId: string;
@@ -98,24 +98,24 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string }) => report.productId === productId
+            (report: { productId: string; }) => report.productId === productId
           )
           .filter(
             (obj: CuttingReportType) =>
               new Date(startDay).getTime() <=
-                new Date(obj.cuttingDate).getTime() &&
+              new Date(obj.cuttingDate).getTime() &&
               new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
           )
-          .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
+          .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -200,7 +200,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number },
+                            report: CuttingHistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

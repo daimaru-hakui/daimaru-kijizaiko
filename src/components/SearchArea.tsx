@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Input, Select } from "@chakra-ui/react";
 import useSWRImmutable from "swr/immutable";
 import { useFormContext } from "react-hook-form";
-import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useGetDisp } from "../hooks/UseGetDisp";
 import { FC } from "react";
 
 type Props = {

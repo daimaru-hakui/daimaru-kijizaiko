@@ -16,7 +16,7 @@ import PurchaseQuantityRanking from "./PurchaseQuantityRanking";
 import useSWRImmutable from "swr/immutable";
 import { useForm, FormProvider } from "react-hook-form";
 import { useUtil } from "../../hooks/UseUtil";
-import SearchArea from "./SearchArea";
+import SearchArea from "../SearchArea";
 
 type Inputs = {
   start: string;

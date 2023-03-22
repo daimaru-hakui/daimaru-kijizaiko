@@ -21,7 +21,7 @@ import HistoryProductMenu from "../../../components/tokushima/HistoryProductMenu
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../../../components/dashboard/SearchArea";
+import SearchArea from "../../../components/SearchArea";
 
 type Inputs = {
   start: string;
@@ -78,14 +78,14 @@ const HistoryCutting = () => {
         ?.map((cuttingReport: CuttingReportType) =>
           cuttingReport?.products.map(
             (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-              } as CuttingHistoryType)
+            ({
+              ...cuttingReport,
+              ...product,
+            } as CuttingHistoryType)
           )
         )
         .flat()
-        .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
+        .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
           if (a.cuttingDate > b.cuttingDate) {
             return -1;
           }

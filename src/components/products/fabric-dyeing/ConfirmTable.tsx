@@ -27,7 +27,7 @@ import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import useSWR from "swr";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../../dashboard/SearchArea";
+import SearchArea from "../../SearchArea";
 
 type Inputs = {
   start: string;
@@ -79,7 +79,7 @@ const FabricDyeingConfirmTable = () => {
 
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: { quantity: number }) => history.quantity > 0 && history
+      (history: { quantity: number; }) => history.quantity > 0 && history
     );
     setFilterHistories(newHistorys);
   }, [data]);
@@ -175,15 +175,15 @@ const FabricDyeingConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => updateFabricDyeingConfirm(history)}
-                        orderType=""
-                      />
-                    )}
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => updateFabricDyeingConfirm(history)}
+                          orderType=""
+                        />
+                      )}
                   </Td>
                 </Tr>
               ))}

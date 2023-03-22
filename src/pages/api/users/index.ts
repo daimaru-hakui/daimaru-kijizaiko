@@ -15,7 +15,6 @@ export default async function handler(
   if (req.method === "GET") {
     const querySnapshot = await db
       .collection("users")
-      .where("sales", "==", true)
       .get();
     const contents = querySnapshot.docs.map(
       (doc) => ({ ...doc.data(), id: doc.id } as UserType)

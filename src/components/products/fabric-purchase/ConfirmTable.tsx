@@ -29,7 +29,7 @@ import useSWR from "swr";
 import ProductModal from "../ProductModal";
 import { useForm, FormProvider } from "react-hook-form";
 import HistoryProductMenu from "../../tokushima/HistoryProductMenu";
-import SearchArea from "../../dashboard/SearchArea";
+import SearchArea from "../../SearchArea";
 
 type Props = {
   HOUSE_FACTORY?: string;
@@ -85,7 +85,7 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
   useEffect(() => {
     data?.contents?.sort(
-      (a: { serialNumber: number }, b: { serialNumber: number }) =>
+      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
         a.serialNumber > b.serialNumber && -1
     );
     if (HOUSE_FACTORY) {
@@ -208,17 +208,17 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {history.accounting !== true
                       ? (isAuths(["rd"]) ||
-                          history?.createUser === currentUser) && (
-                          <HistoryEditModal
-                            history={history}
-                            type="confirm"
-                            items={items}
-                            setItems={setItems}
-                            onClick={() => {
-                              updateFabricPurchaseConfirm(history);
-                            }}
-                          />
-                        )
+                        history?.createUser === currentUser) && (
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => {
+                            updateFabricPurchaseConfirm(history);
+                          }}
+                        />
+                      )
                       : "金額確認済"}
                   </Td>
                 </Tr>
