@@ -69,7 +69,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       );
       setFilterFabricPurchaseOrders(
         newHistorys.sort(
-          (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
+          (a: { serialNumber: number }, b: { serialNumber: number }) =>
             a.serialNumber > b.serialNumber && -1
         )
       );
@@ -197,8 +197,8 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-          history.quantity +
-          items.remainingOrder || 0;
+            history.quantity +
+            items.remainingOrder || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
@@ -285,88 +285,89 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   );
 
   return (
-    <TableContainer p={6} w="100%">
-      <Box as="h2" fontSize="2xl">
-        入荷予定一覧
-      </Box>
-      {filterFabricPurchaseOrders?.length > 0 ? (
-        <Table mt={6} variant="simple" size="sm">
-          <Thead>
-            <Tr>
-              <Th>確定</Th>
-              <Th>発注NO.</Th>
-              <Th>発注日</Th>
-              <Th>入荷予定</Th>
-              <Th>担当者</Th>
-              <Th>品番</Th>
-              <Th>色</Th>
-              <Th>品名</Th>
-              <Th>数量</Th>
-              <Th>単価</Th>
-              <Th>金額</Th>
-              <Th>出荷先</Th>
-              <Th>コメント</Th>
-              <Th>編集/削除</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {filterFabricPurchaseOrders?.map((history: HistoryType) => (
-              <Tr key={history.id}>
-                <Td>
-                  {isAuths(["rd", "tokushima"]) ||
-                    history.createUser === currentUser ? (
-                    <OrderToConfirmModal
-                      history={history}
-                      items={items}
-                      setItems={setItems}
-                      onClick={() => confirmProcessingFabricPurchase(history)}
-                    />
-                  ) : (
-                    <Button size="xs" disabled={true}>
-                      入荷確定
-                    </Button>
-                  )}
-                </Td>
-                <Td>{getSerialNumber(history?.serialNumber)}</Td>
-                <Td>{history?.orderedAt}</Td>
-                <Td>{history?.scheduledAt}</Td>
-                <Td>{getUserName(history.createUser)}</Td>
-                <Td>{history.productNumber}</Td>
-                {history.colorName && <Td>{history.colorName}</Td>}
-                <Td>{history.productName}</Td>
-                <Td>{history?.quantity.toLocaleString()}m</Td>
-                {history.price && (
-                  <>
-                    <Td>{history?.price.toLocaleString()}円</Td>
-                    <Td>
-                      {(history?.quantity * history?.price).toLocaleString()}円
-                    </Td>
-                  </>
-                )}
-                <Td>{history?.stockPlace}</Td>
-                <Td w="100%" textAlign="center">
-                  {elementComment(history, "fabricDyeingOrders")}
-                </Td>
-                <Td>
-                  {(isAuths(["rd"]) || history?.createUser === currentUser) && (
-                    <Flex gap={3}>
-                      {history.orderType === "purchase" &&
-                        elmentEditDelete(
-                          history,
-                          updateFabricPurchaseOrder,
-                          deleteFabricPurchaseOrder
-                        )}
-                    </Flex>
-                  )}
-                </Td>
+    <>
+      <TableContainer p={6} pt={0} w="100%">
+        {filterFabricPurchaseOrders?.length > 0 ? (
+          <Table mt={6} variant="simple" size="sm">
+            <Thead>
+              <Tr>
+                <Th>確定</Th>
+                <Th>発注NO.</Th>
+                <Th>発注日</Th>
+                <Th>入荷予定</Th>
+                <Th>担当者</Th>
+                <Th>品番</Th>
+                <Th>色</Th>
+                <Th>品名</Th>
+                <Th>数量</Th>
+                <Th>単価</Th>
+                <Th>金額</Th>
+                <Th>出荷先</Th>
+                <Th>コメント</Th>
+                <Th>編集/削除</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      ) : (
-        <Box textAlign="center">現在登録された情報はありません。</Box>
-      )}
-    </TableContainer>
+            </Thead>
+            <Tbody>
+              {filterFabricPurchaseOrders?.map((history: HistoryType) => (
+                <Tr key={history.id}>
+                  <Td>
+                    {isAuths(["rd", "tokushima"]) ||
+                    history.createUser === currentUser ? (
+                      <OrderToConfirmModal
+                        history={history}
+                        items={items}
+                        setItems={setItems}
+                        onClick={() => confirmProcessingFabricPurchase(history)}
+                      />
+                    ) : (
+                      <Button size="xs" disabled={true}>
+                        入荷確定
+                      </Button>
+                    )}
+                  </Td>
+                  <Td>{getSerialNumber(history?.serialNumber)}</Td>
+                  <Td>{history?.orderedAt}</Td>
+                  <Td>{history?.scheduledAt}</Td>
+                  <Td>{getUserName(history.createUser)}</Td>
+                  <Td>{history.productNumber}</Td>
+                  {history.colorName && <Td>{history.colorName}</Td>}
+                  <Td>{history.productName}</Td>
+                  <Td>{history?.quantity.toLocaleString()}m</Td>
+                  {history.price && (
+                    <>
+                      <Td>{history?.price.toLocaleString()}円</Td>
+                      <Td>
+                        {(history?.quantity * history?.price).toLocaleString()}
+                        円
+                      </Td>
+                    </>
+                  )}
+                  <Td>{history?.stockPlace}</Td>
+                  <Td w="100%" textAlign="center">
+                    {elementComment(history, "fabricDyeingOrders")}
+                  </Td>
+                  <Td>
+                    {(isAuths(["rd"]) ||
+                      history?.createUser === currentUser) && (
+                      <Flex gap={3}>
+                        {history.orderType === "purchase" &&
+                          elmentEditDelete(
+                            history,
+                            updateFabricPurchaseOrder,
+                            deleteFabricPurchaseOrder
+                          )}
+                      </Flex>
+                    )}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        ) : (
+          <Box textAlign="center">現在登録された情報はありません。</Box>
+        )}
+      </TableContainer>
+    </>
   );
 };
 

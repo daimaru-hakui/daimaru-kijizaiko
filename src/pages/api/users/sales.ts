@@ -17,9 +17,13 @@ export default async function handler(
       .collection("users")
       .where("sales", "==", true)
       .get();
-    const contents = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as UserType)
-    );
+    const contents = querySnapshot.docs
+      .map((doc) => ({ ...doc.data(), id: doc.id } as UserType))
+      .sort((a, b) => {
+        if (a.rank < b.rank) {
+          return -1;
+        }
+      });
     return res.status(200).json({ contents });
   }
 }

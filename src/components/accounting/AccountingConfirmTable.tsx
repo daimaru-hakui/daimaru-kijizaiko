@@ -49,10 +49,7 @@ const AccountingConfirmTable = () => {
   );
 
   return (
-    <TableContainer p={6} w="100%">
-      <Box as="h2" fontSize="2xl">
-        処理済み
-      </Box>
+    <TableContainer p={6} pt={0} w="100%">
       {filterHistories?.length > 0 ? (
         <Table mt={6} variant="simple" size="sm">
           <Thead>

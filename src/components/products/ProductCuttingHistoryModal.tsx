@@ -33,6 +33,7 @@ import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
+import CuttingProductMenu from "../tokushima/HistoryProductMenu";
 
 type Props = {
   productId: string;
@@ -64,14 +65,21 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { data: users } = useSWRImmutable(`/api/users/sales`);
-  const { data } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const { data } = useSWRImmutable(
+    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
+  );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
       staff: "",
-      client: ''
-    }
+      client: "",
+    },
   });
 
   const onSubmit = (data: Inputs) => {
@@ -95,24 +103,24 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
+                ({
+                  ...cuttingReport,
+                  ...product,
+                  products: null,
+                } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string; }) => report.productId === productId
+            (report: { productId: string }) => report.productId === productId
           )
           .filter(
             (obj: CuttingReportType) =>
               new Date(startDay).getTime() <=
-              new Date(obj.cuttingDate).getTime() &&
+                new Date(obj.cuttingDate).getTime() &&
               new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
           )
-          .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
+          .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -178,7 +186,8 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                     <Flex
                       w="full"
                       gap={6}
-                      flexDirection={{ base: "column", lg: "row" }}>
+                      flexDirection={{ base: "column", lg: "row" }}
+                    >
                       <Box>
                         <Heading as="h4" fontSize="md">
                           期間を選択
@@ -206,7 +215,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                           w={{ base: "full" }}
                           flexDirection={{ base: "column", lg: "row" }}
                         >
-                          <Input w="full" placeholder="受注先名を検索" {...register("client")} />
+                          <Input
+                            w="full"
+                            placeholder="受注先名を検索"
+                            {...register("client")}
+                          />
                         </Flex>
                       </Box>
                       <Box>
@@ -220,9 +233,14 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                           w="full"
                           flexDirection={{ base: "column", lg: "row" }}
                         >
-                          <Select placeholder="担当者を選択" {...register("staff")}                  >
+                          <Select
+                            placeholder="担当者を選択"
+                            {...register("staff")}
+                          >
                             {users?.contents?.map((user) => (
-                              <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                              <option key={user.id} value={user.id}>
+                                {getUserName(user.id)}
+                              </option>
                             ))}
                           </Select>
                           <Button
@@ -267,7 +285,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number; },
+                            report: CuttingHistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>

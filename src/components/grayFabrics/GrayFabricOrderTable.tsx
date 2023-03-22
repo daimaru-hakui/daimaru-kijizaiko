@@ -28,7 +28,7 @@ import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import useSWR from "swr";
+// import useSWR from "swr";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 const GrayFabricOrderTable = () => {
@@ -167,91 +167,90 @@ const GrayFabricOrderTable = () => {
     }
   };
   return (
-    <TableContainer p={6} w="100%">
-      <Box as="h2" fontSize="2xl">
-        キバタ仕掛一覧
-      </Box>
-      {filterGrayFabrics.length > 0 ? (
-        <Table mt={6} variant="simple" size="sm">
-          <Thead>
-            <Tr>
-              <Th>処理</Th>
-              <Th>発注NO.</Th>
-              <Th>発注日</Th>
-              <Th>予定納期</Th>
-              <Th>担当者</Th>
-              <Th>品番</Th>
-              <Th>品名</Th>
-              <Th>仕入先</Th>
-              <Th>数量</Th>
-              <Th>コメント</Th>
-              <Th>編集/削除</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {filterGrayFabrics.map((history: any) => (
-              <Tr key={history.id}>
-                <Td>
-                  {isAuths(["rd"]) || history.createUser === currentUser ? (
-                    <OrderToConfirmModal
-                      history={history}
-                      items={items}
-                      setItems={setItems}
-                      onClick={confirmProcessing}
-                    />
-                  ) : (
-                    <Button size="xs" disabled={true}>
-                      確定
-                    </Button>
-                  )}
-                </Td>
-                <Td>{getSerialNumber(history.serialNumber)}</Td>
-                <Td>{history.orderedAt}</Td>
-                <Td>{history.scheduledAt}</Td>
-                <Td>{getUserName(history.createUser)}</Td>
-                <Td>{history.productNumber}</Td>
-                <Td>{history.productName}</Td>
-                <Td>{history.supplierName}</Td>
-                <Td isNumeric>{history?.quantity}m</Td>
-                <Td w="100%">
-                  <Flex gap={3}>
-                    <CommentModal
-                      id={history.id}
-                      comment={history.comment}
-                      collectionName="historyGrayFabricOrders"
-                    />
-                    {history?.comment.slice(0, 20) +
-                      (history.comment.length >= 1 ? "..." : "")}
-                  </Flex>
-                </Td>
-                <Td>
-                  {isAuths(["rd"]) ||
-                    (history.createUser === currentUser && (
-                      <Flex alignItems="center" gap={3}>
-                        <HistoryEditModal
-                          history={history}
-                          type="order"
-                          items={items}
-                          setItems={setItems}
-                          onClick={updateOrderHistory}
-                          orderType=""
-                        />
-                        <FaTrashAlt
-                          color="#444"
-                          cursor="pointer"
-                          onClick={() => deleteGrayFabricOrder(history)}
-                        />
-                      </Flex>
-                    ))}
-                </Td>
+    <>
+      <TableContainer p={6} pt={0} w="100%">
+        {filterGrayFabrics.length > 0 ? (
+          <Table mt={6} variant="simple" size="sm">
+            <Thead>
+              <Tr>
+                <Th>処理</Th>
+                <Th>発注NO.</Th>
+                <Th>発注日</Th>
+                <Th>予定納期</Th>
+                <Th>担当者</Th>
+                <Th>品番</Th>
+                <Th>品名</Th>
+                <Th>仕入先</Th>
+                <Th>数量</Th>
+                <Th>コメント</Th>
+                <Th>編集/削除</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      ) : (
-        <Box textAlign="center">現在登録された情報はありません。</Box>
-      )}
-    </TableContainer>
+            </Thead>
+            <Tbody>
+              {filterGrayFabrics.map((history: any) => (
+                <Tr key={history.id}>
+                  <Td>
+                    {isAuths(["rd"]) || history.createUser === currentUser ? (
+                      <OrderToConfirmModal
+                        history={history}
+                        items={items}
+                        setItems={setItems}
+                        onClick={confirmProcessing}
+                      />
+                    ) : (
+                      <Button size="xs" disabled={true}>
+                        確定
+                      </Button>
+                    )}
+                  </Td>
+                  <Td>{getSerialNumber(history.serialNumber)}</Td>
+                  <Td>{history.orderedAt}</Td>
+                  <Td>{history.scheduledAt}</Td>
+                  <Td>{getUserName(history.createUser)}</Td>
+                  <Td>{history.productNumber}</Td>
+                  <Td>{history.productName}</Td>
+                  <Td>{history.supplierName}</Td>
+                  <Td isNumeric>{history?.quantity}m</Td>
+                  <Td w="100%">
+                    <Flex gap={3}>
+                      <CommentModal
+                        id={history.id}
+                        comment={history.comment}
+                        collectionName="historyGrayFabricOrders"
+                      />
+                      {history?.comment.slice(0, 20) +
+                        (history.comment.length >= 1 ? "..." : "")}
+                    </Flex>
+                  </Td>
+                  <Td>
+                    {isAuths(["rd"]) ||
+                      (history.createUser === currentUser && (
+                        <Flex alignItems="center" gap={3}>
+                          <HistoryEditModal
+                            history={history}
+                            type="order"
+                            items={items}
+                            setItems={setItems}
+                            onClick={updateOrderHistory}
+                            orderType=""
+                          />
+                          <FaTrashAlt
+                            color="#444"
+                            cursor="pointer"
+                            onClick={() => deleteGrayFabricOrder(history)}
+                          />
+                        </Flex>
+                      ))}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        ) : (
+          <Box textAlign="center">現在登録された情報はありません。</Box>
+        )}
+      </TableContainer>
+    </>
   );
 };
 

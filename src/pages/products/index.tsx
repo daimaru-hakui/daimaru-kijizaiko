@@ -195,7 +195,7 @@ const Products = () => {
                       <Td>
                         <Flex alignItems="center" gap={3}>
                           <ProductMenu product={product} />
-                          <ProductModal product={product} />
+                          <ProductModal productId={product.id} />
                           <OrderAreaModal product={product} buttonSize="xs" />
                         </Flex>
                       </Td>

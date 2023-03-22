@@ -22,7 +22,7 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { CuttingHistoryType } from "../../../../types/CuttingHistoryType";
 import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
-import CuttingProductMenu from "../../../components/tokushima/CuttingProductMenu";
+import HistoryProductMenu from "../../../components/tokushima/HistoryProductMenu";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
 import { useUtil } from "../../../hooks/UseUtil";
@@ -33,7 +33,6 @@ type Inputs = {
   client: string;
   staff: string;
 };
-
 
 const HistoryCutting = () => {
   const {
@@ -50,15 +49,22 @@ const HistoryCutting = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { data: users } = useSWRImmutable(`/api/users/sales`);
-  const { data } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { data } = useSWR(
+    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
+  );
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
       staff: "",
-      client: ''
-    }
+      client: "",
+    },
   });
 
   const onSubmit = (data: Inputs) => {
@@ -81,14 +87,14 @@ const HistoryCutting = () => {
         ?.map((cuttingReport: CuttingReportType) =>
           cuttingReport?.products.map(
             (product: CuttingProductType) =>
-            ({
-              ...cuttingReport,
-              ...product,
-            } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+              } as CuttingHistoryType)
           )
         )
         .flat()
-        .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
+        .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
           if (a.cuttingDate > b.cuttingDate) {
             return -1;
           }
@@ -107,7 +113,8 @@ const HistoryCutting = () => {
             <Flex
               w="full"
               gap={6}
-              flexDirection={{ base: "column", lg: "row" }}>
+              flexDirection={{ base: "column", lg: "row" }}
+            >
               <Box>
                 <Heading as="h4" fontSize="md">
                   期間を選択
@@ -135,7 +142,11 @@ const HistoryCutting = () => {
                   w={{ base: "full" }}
                   flexDirection={{ base: "column", lg: "row" }}
                 >
-                  <Input w="full" placeholder="受注先名を検索" {...register("client")} />
+                  <Input
+                    w="full"
+                    placeholder="受注先名を検索"
+                    {...register("client")}
+                  />
                 </Flex>
               </Box>
               <Box>
@@ -149,9 +160,11 @@ const HistoryCutting = () => {
                   w="full"
                   flexDirection={{ base: "column", lg: "row" }}
                 >
-                  <Select placeholder="担当者を選択" {...register("staff")}                  >
+                  <Select placeholder="担当者を選択" {...register("staff")}>
                     {users?.contents?.map((user) => (
-                      <option key={user.id} value={user.id}>{getUserName(user.id)}</option>
+                      <option key={user.id} value={user.id}>
+                        {getUserName(user.id)}
+                      </option>
                     ))}
                   </Select>
                   <Button
@@ -198,7 +211,7 @@ const HistoryCutting = () => {
                   <Tr key={index}>
                     <Td>
                       <Flex alignItems="center" gap={3}>
-                        <CuttingProductMenu productId={list.productId} />{" "}
+                        <HistoryProductMenu productId={list.productId} />
                         <CuttingReportModal
                           reportId={list.id}
                           startDay={startDay}
@@ -218,7 +231,9 @@ const HistoryCutting = () => {
                     <Td>{list.client}</Td>
                     <Td>{list.itemName}</Td>
                     <Td isNumeric>{list.totalQuantity}</Td>
-                    <Td isNumeric>{scaleCalc(list.quantity, list.totalQuantity)}m</Td>
+                    <Td isNumeric>
+                      {scaleCalc(list.quantity, list.totalQuantity)}m
+                    </Td>
                     <Td>{getUserName(list.staff)}</Td>
                     <Td></Td>
                   </Tr>
