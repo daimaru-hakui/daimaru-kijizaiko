@@ -21,14 +21,15 @@ import { colorsState, materialNamesState } from "../../../store";
 import { ProductType } from "../../../types/FabricType";
 
 type Props = {
-  search: ProductType
-  setSearch: Function
-}
+  search: ProductType;
+  setSearch: Function;
+  onReset: Function;
+};
 
-const ProductSearchArea: NextPage<Props> = ({ search, setSearch }) => {
+const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const colorNames = useRecoilValue(colorsState)
-  const materialNames = useRecoilValue(materialNamesState)
+  const colorNames = useRecoilValue(colorsState);
+  const materialNames = useRecoilValue(materialNamesState);
   return (
     <>
       <Button
@@ -57,9 +58,9 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch }) => {
                   placeholder="生地の品番を検索..."
                   value={search.productNumber}
                   onChange={(e) =>
-                    setSearch(
-                      { ...search, productNumber: e.target.value }
-                    )} />
+                    setSearch({ ...search, productNumber: e.target.value })
+                  }
+                />
               </Box>
               <Box>
                 <Text>色</Text>
@@ -69,13 +70,11 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch }) => {
                   placeholder="色を検索..."
                   value={search.colorName}
                   onChange={(e) =>
-                    setSearch(
-                      { ...search, colorName: e.target.value }
-                    )} >
+                    setSearch({ ...search, colorName: e.target.value })
+                  }
+                >
                   {colorNames.map((color: { name: string }) => (
-                    <option key={color.name}>
-                      {color.name}
-                    </option>
+                    <option key={color.name}>{color.name}</option>
                   ))}
                 </Select>
               </Box>
@@ -88,9 +87,9 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch }) => {
                   placeholder="品名を検索..."
                   value={search.productName}
                   onChange={(e) =>
-                    setSearch(
-                      { ...search, productName: e.target.value }
-                    )} />
+                    setSearch({ ...search, productName: e.target.value })
+                  }
+                />
               </Box>
               <Box>
                 <Text>組織名</Text>
@@ -100,17 +99,15 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch }) => {
                   placeholder="色を検索..."
                   value={search.materialName}
                   onChange={(e) =>
-                    setSearch(
-                      { ...search, materialName: e.target.value }
-                    )} >
+                    setSearch({ ...search, materialName: e.target.value })
+                  }
+                >
                   {materialNames.map((materialName: { name: string }) => (
-                    <option key={materialName.name}>
-                      {materialName.name}
-                    </option>
+                    <option key={materialName.name}>{materialName.name}</option>
                   ))}
                 </Select>
               </Box>
-              <Button onClick={() => setSearch({ productNumber: "", colorName: "", productName: "", materialName: "" })}>リセット</Button>
+              <Button onClick={() => onReset()}>リセット</Button>
             </Stack>
           </DrawerBody>
 

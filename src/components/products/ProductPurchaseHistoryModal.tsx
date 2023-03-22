@@ -2,8 +2,6 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,7 +9,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Stack,
   Table,
   TableContainer,
@@ -29,8 +26,8 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { HistoryType } from "../../../types/HistoryType";
 import useSWR from "swr";
-import useSWRImmutable from "swr/immutable";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
+import SearchArea from "../dashboard/SearchArea";
 
 type Props = {
   productId: string;
@@ -61,16 +58,11 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
   const { data } = useSWR(
     `/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`
   );
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<Inputs>({
+
+  const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
@@ -88,7 +80,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     setStartDay(get3monthsAgo());
     setEndDay(getTodayDate());
     setStaff("");
-    reset();
+    methods.reset();
   };
 
   useEffect(() => {
@@ -152,77 +144,11 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                   合計 {mathRound2nd(sumTotalQuantity).toLocaleString()}円
                 </Box>
               </Flex>
-              <Box px={3}>
-                <Flex
-                  gap={{ base: 3, md: 3 }}
-                  flexDirection={{ base: "column", md: "row" }}
-                  justifyContent="space-between"
-                >
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Flex
-                      w="full"
-                      gap={6}
-                      flexDirection={{ base: "column", lg: "row" }}
-                    >
-                      <Box>
-                        <Heading as="h4" fontSize="md">
-                          期間を選択
-                        </Heading>
-                        <Flex
-                          mt={3}
-                          gap={3}
-                          alignItems="center"
-                          flexDirection={{ base: "column", lg: "row" }}
-                        >
-                          <Flex gap={3} w={{ base: "full", lg: "350px" }}>
-                            <Input type="date" {...register("start")} />
-                            <Input type="date" {...register("end")} />
-                          </Flex>
-                        </Flex>
-                      </Box>
-                      <Box>
-                        <Heading as="h4" fontSize="md">
-                          担当者を選択
-                        </Heading>
-                        <Flex
-                          mt={3}
-                          gap={3}
-                          alignItems="center"
-                          w="full"
-                          flexDirection={{ base: "column", lg: "row" }}
-                        >
-                          <Select
-                            placeholder="担当者を選択"
-                            {...register("staff")}
-                          >
-                            {users?.contents?.map((user) => (
-                              <option key={user.id} value={user.id}>
-                                {getUserName(user.id)}
-                              </option>
-                            ))}
-                          </Select>
-                          <Button
-                            type="submit"
-                            w={{ base: "full", lg: "80px" }}
-                            px={6}
-                            colorScheme="facebook"
-                          >
-                            検索
-                          </Button>
-                          <Button
-                            w={{ base: "full", lg: "80px" }}
-                            px={6}
-                            variant="outline"
-                            onClick={onReset}
-                          >
-                            クリア
-                          </Button>
-                        </Flex>
-                      </Box>
-                    </Flex>
-                  </form>
-                </Flex>
-              </Box>
+
+              <FormProvider {...methods}>
+                <SearchArea onSubmit={onSubmit} onReset={onReset} />
+              </FormProvider>
+
               {filterFabricPurchases?.length ? (
                 <TableContainer mt={6}>
                   <Table size="sm">

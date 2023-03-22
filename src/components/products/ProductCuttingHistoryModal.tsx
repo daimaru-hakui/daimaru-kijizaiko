@@ -32,8 +32,8 @@ import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
-import { useForm } from "react-hook-form";
-import CuttingProductMenu from "../tokushima/HistoryProductMenu";
+import { useForm, FormProvider } from "react-hook-form";
+import SearchArea from "../dashboard/SearchArea";
 
 type Props = {
   productId: string;
@@ -64,16 +64,11 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
   const { data } = useSWRImmutable(
     `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
   );
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<Inputs>({
+
+  const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
@@ -93,7 +88,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     setEndDay(getTodayDate());
     setStaff("");
     setClient("");
-    reset();
+    methods.reset();
   };
 
   useEffect(() => {
@@ -176,95 +171,15 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                 </Flex>
                 <Box fontSize="xl">合計 {mathRound2nd(sumTotalQuantity)}m</Box>
               </Flex>
-              <Box px={3}>
-                <Flex
-                  gap={{ base: 3, md: 3 }}
-                  flexDirection={{ base: "column", md: "row" }}
-                  justifyContent="space-between"
-                >
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Flex
-                      w="full"
-                      gap={6}
-                      flexDirection={{ base: "column", lg: "row" }}
-                    >
-                      <Box>
-                        <Heading as="h4" fontSize="md">
-                          期間を選択
-                        </Heading>
-                        <Flex
-                          mt={3}
-                          gap={3}
-                          alignItems="center"
-                          flexDirection={{ base: "column", lg: "row" }}
-                        >
-                          <Flex gap={3} w={{ base: "full", lg: "350px" }}>
-                            <Input type="date" {...register("start")} />
-                            <Input type="date" {...register("end")} />
-                          </Flex>
-                        </Flex>
-                      </Box>
-                      <Box>
-                        <Heading as="h4" fontSize="md">
-                          受注先名を検索
-                        </Heading>
-                        <Flex
-                          mt={3}
-                          gap={3}
-                          alignItems="center"
-                          w={{ base: "full" }}
-                          flexDirection={{ base: "column", lg: "row" }}
-                        >
-                          <Input
-                            w="full"
-                            placeholder="受注先名を検索"
-                            {...register("client")}
-                          />
-                        </Flex>
-                      </Box>
-                      <Box>
-                        <Heading as="h4" fontSize="md">
-                          担当者を選択
-                        </Heading>
-                        <Flex
-                          mt={3}
-                          gap={3}
-                          alignItems="center"
-                          w="full"
-                          flexDirection={{ base: "column", lg: "row" }}
-                        >
-                          <Select
-                            placeholder="担当者を選択"
-                            {...register("staff")}
-                          >
-                            {users?.contents?.map((user) => (
-                              <option key={user.id} value={user.id}>
-                                {getUserName(user.id)}
-                              </option>
-                            ))}
-                          </Select>
-                          <Button
-                            type="submit"
-                            w={{ base: "full", lg: "80px" }}
-                            px={6}
-                            colorScheme="facebook"
-                          >
-                            検索
-                          </Button>
-                          <Button
-                            w={{ base: "full", lg: "80px" }}
-                            px={6}
-                            variant="outline"
-                            onClick={onReset}
-                          >
-                            クリア
-                          </Button>
-                        </Flex>
-                      </Box>
-                    </Flex>
-                  </form>
-                </Flex>
-              </Box>
+
+              <FormProvider {...methods}>
+                <SearchArea
+                  onSubmit={onSubmit}
+                  onReset={onReset}
+                  client="client"
+                />
+              </FormProvider>
+
               {cuttingList?.length ? (
                 <TableContainer>
                   <Table size="sm">

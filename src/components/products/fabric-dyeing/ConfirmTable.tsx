@@ -25,10 +25,9 @@ import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import useSWR from "swr";
-import useSWRImmutable from "swr/immutable";
-import { useForm } from "react-hook-form";
 import { useUtil } from "../../../hooks/UseUtil";
-import Link from "next/link";
+import { useForm, FormProvider } from "react-hook-form";
+import SearchArea from "../../dashboard/SearchArea";
 
 type Inputs = {
   start: string;
@@ -55,16 +54,10 @@ const FabricDyeingConfirmTable = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
   const { data, mutate } = useSWR(
     `/api/fabric-dyeing-confirms/${startDay}/${endDay}?createUser=${staff}`
   );
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<Inputs>({
+  const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
       end: endDay,
@@ -81,7 +74,7 @@ const FabricDyeingConfirmTable = () => {
     setStartDay(get3monthsAgo());
     setEndDay(getTodayDate());
     setStaff("");
-    reset();
+    methods.reset();
   };
 
   useEffect(() => {
@@ -139,67 +132,9 @@ const FabricDyeingConfirmTable = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Flex
-          w="full"
-          px={6}
-          gap={6}
-          flexDirection={{ base: "column", lg: "row" }}
-        >
-          <Box>
-            <Heading as="h4" fontSize="md">
-              期間を選択
-            </Heading>
-            <Flex
-              mt={3}
-              gap={3}
-              alignItems="center"
-              flexDirection={{ base: "column", lg: "row" }}
-            >
-              <Flex gap={3} w={{ base: "full", lg: "350px" }}>
-                <Input type="date" {...register("start")} />
-                <Input type="date" {...register("end")} />
-              </Flex>
-            </Flex>
-          </Box>
-          <Box>
-            <Heading as="h4" fontSize="md">
-              担当者を選択
-            </Heading>
-            <Flex
-              mt={3}
-              gap={3}
-              alignItems="center"
-              w="full"
-              flexDirection={{ base: "column", lg: "row" }}
-            >
-              <Select placeholder="担当者を選択" {...register("staff")}>
-                {users?.contents?.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {getUserName(user.id)}
-                  </option>
-                ))}
-              </Select>
-              <Button
-                type="submit"
-                w={{ base: "full", lg: "80px" }}
-                px={6}
-                colorScheme="facebook"
-              >
-                検索
-              </Button>
-              <Button
-                w={{ base: "full", lg: "80px" }}
-                px={6}
-                variant="outline"
-                onClick={onReset}
-              >
-                クリア
-              </Button>
-            </Flex>
-          </Box>
-        </Flex>
-      </form>
+      <FormProvider {...methods}>
+        <SearchArea onSubmit={onSubmit} onReset={onReset} />
+      </FormProvider>
       <TableContainer p={6} w="100%">
         {filterHistories?.length > 0 ? (
           <Table variant="simple" size="sm">

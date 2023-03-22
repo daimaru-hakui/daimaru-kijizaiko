@@ -87,7 +87,11 @@ const Products = () => {
 
   const filterBtnEl = () => (
     <Flex gap={3}>
-      <ProductSearchArea search={search} setSearch={setSearch} />
+      <ProductSearchArea
+        search={search}
+        setSearch={setSearch}
+        onReset={onReset}
+      />
     </Flex>
   );
 
