@@ -90,6 +90,8 @@ const ProductInputArea: NextPage<Props> = ({
         updateProduct(product.id, data, materials);
         onClose();
         return;
+      default:
+        return;
     }
   };
 
@@ -137,7 +139,7 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="担当者名を選択"
                 {...register("staff", { required: true })}
               >
-                {users?.contents?.map((user: { id: string; name: string }) => (
+                {users?.contents?.map((user: { id: string; name: string; }) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
                   </option>

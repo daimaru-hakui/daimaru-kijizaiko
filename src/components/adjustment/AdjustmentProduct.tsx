@@ -30,9 +30,9 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const { getUserName } = useGetDisp(); //// ？
   const currentUser = useRecoilValue(currentUserState);
   const { quantityValueBold } = useUtil();
-  const { isAdminAuth, isAuths } = useAuthManagement();
+  const { isAuths } = useAuthManagement();
   const setLoading = useSetRecoilState(loadingState);
-  const { mathRound2nd, getTodayDate } = useUtil();
+  const { mathRound2nd } = useUtil();
   const [items, setItems] = useState({} as ProductType);
 
   const handleNumberChange = (e: any, name: string) => {

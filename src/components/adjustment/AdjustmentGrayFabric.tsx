@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Flex,
   NumberDecrementStepper,
@@ -12,12 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
-import { useInputGrayFabric } from "../../hooks/UseInputGrayFabric";
 
 type Props = {
   grayFabric: GrayFabricType;
@@ -25,31 +23,36 @@ type Props = {
 
 const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
   const { getUserName } = useGetDisp(); //// ？
-  const { items, setItems, handleNumberChange } = useInputGrayFabric();
-  const { updateAjustmentGrayFabric, onReset } = useGrayFabricFunc(
-    items,
-    setItems
-  );
+  const { updateAjustmentGrayFabric } = useGrayFabricFunc();
+
   const { quantityValueBold } = useUtil();
+  const [items, setItems] = useState({} as GrayFabricType);
+
+  const handleNumberChange = (e: any, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: value });
+  };
 
   useEffect(() => {
     setItems({ ...grayFabric } as any);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grayFabric.price, grayFabric.stock]);
 
-  return (
-    <Tr key={grayFabric.id}>
-      <Td>{grayFabric.productNumber}</Td>
+  const onReset = (grayFabric: GrayFabricType) => {
+    setItems({ ...grayFabric });
+  };
 
+  return (
+
+    <Tr height="50px">
+      <Td>{grayFabric.productNumber}</Td>
       <Td p={1} isNumeric>
         <NumberInput
           mt={1}
           w="90px"
-          name="price"
-          defaultValue={0}
+          value={items.price}
           min={0}
           max={100000}
-          value={items.price}
           onChange={(e) => handleNumberChange(e, "price")}
         >
           <NumberInputField textAlign="right" />
@@ -63,8 +66,6 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
         <NumberInput
           mt={1}
           w="90px"
-          name="wip"
-          defaultValue={0}
           min={0}
           max={100000}
           value={items.wip}
@@ -81,11 +82,9 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
         <NumberInput
           mt={1}
           w="90px"
-          name="stock"
-          defaultValue={0}
           min={0}
           max={100000}
-          value={items.stock}
+          value={grayFabric.stock}
           onChange={(e) => handleNumberChange(e, "stock")}
         >
           <NumberInputField textAlign="right" />
@@ -101,7 +100,7 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
           <Button
             size="xs"
             colorScheme="facebook"
-            onClick={() => updateAjustmentGrayFabric(grayFabric.id)}
+            onClick={() => updateAjustmentGrayFabric(items, grayFabric.id)}
           >
             更新
           </Button>
@@ -109,6 +108,7 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
         </Flex>
       </Td>
     </Tr>
+
   );
 };
 

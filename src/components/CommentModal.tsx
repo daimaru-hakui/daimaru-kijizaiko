@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Modal,
   ModalBody,
@@ -66,13 +67,16 @@ const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
           <ModalHeader>コメント</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Textarea
+            <Box>
+              {newComment}
+            </Box>
+            {/* <Textarea
               h="400px"
               value={newComment}
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
               ) => setNewComment(e.target.value)}
-            />
+            /> */}
           </ModalBody>
 
           <ModalFooter>

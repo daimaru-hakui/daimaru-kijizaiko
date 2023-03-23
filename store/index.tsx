@@ -63,12 +63,12 @@ export const stockPlacesState = atom<StockPlaceType[]>({
   default: [],
 });
 
-export const colorsState = atom<string[]>({
+export const colorsState = atom<string[] | null>({
   key: "colorsState",
   default: [],
 });
 
-export const materialNamesState = atom<string[]>({
+export const materialNamesState = atom<string[] | null>({
   key: "materialNamesState",
   default: [],
 });

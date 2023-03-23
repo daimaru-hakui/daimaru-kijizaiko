@@ -29,7 +29,7 @@ const GrayFabrics = () => {
     [] as GrayFabricType[]
   );
   const { getSupplierName } = useGetDisp();
-  const { deleteGrayFabric } = useGrayFabricFunc(null, null);
+  const { deleteGrayFabric } = useGrayFabricFunc();
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {
@@ -99,15 +99,15 @@ const GrayFabrics = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       fabric?.createUser === currentUser) && (
-                      <Flex alignItems="center" gap={3}>
-                        <GrayFabricEditModal grayFabric={fabric} />
-                        <FaTrashAlt
-                          color="#444"
-                          cursor="pointer"
-                          onClick={() => deleteGrayFabric(fabric.id)}
-                        />
-                      </Flex>
-                    )}
+                        <Flex alignItems="center" gap={3}>
+                          <GrayFabricEditModal grayFabric={fabric} />
+                          <FaTrashAlt
+                            color="#444"
+                            cursor="pointer"
+                            onClick={() => deleteGrayFabric(fabric.id)}
+                          />
+                        </Flex>
+                      )}
                   </Td>
                 </Tr>
               ))}

@@ -13,65 +13,60 @@ import { currentUserState, loadingState } from "../../store";
 import { GrayFabricType } from "../../types/GrayFabricType";
 import { useUtil } from "./UseUtil";
 
-export const useGrayFabricFunc = (
-  items: GrayFabricType | null,
-  setItems: Function | null
-) => {
+export const useGrayFabricFunc = () => {
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const router = useRouter();
-  const { mathRound2nd, getTodayDate } = useUtil();
+  const { mathRound2nd } = useUtil();
 
-  const addGrayFabric = async () => {
+  const addGrayFabric = async (data: GrayFabricType) => {
     const result = window.confirm("登録して宜しいでしょうか。");
     if (!result) return;
     const grayFabricsCollectionRef = collection(db, "grayFabrics");
     try {
       setLoading(true);
       await addDoc(grayFabricsCollectionRef, {
-        productName: items?.productName || "",
-        productNumber: items?.productNumber || "",
-        supplierId: items?.supplierId || "",
-        price: Number(items?.price) || 0,
-        comment: items?.comment || "",
+        productName: data?.productName || "",
+        productNumber: data?.productNumber || "",
+        supplierId: data?.supplierId || "",
+        price: Number(data?.price) || 0,
+        comment: data?.comment || "",
         wip: 0,
         stock: 0,
         createUser: currentUser,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      router.push("/gray-fabrics");
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      router.push("/gray-fabrics");
     }
   };
 
-  const updateGrayFabric = async (grayFabricId: string) => {
+  const updateGrayFabric = async (data: GrayFabricType, grayFabricId: string) => {
     const result = window.confirm("更新して宜しいでしょうか。");
     if (!result) return;
     const grayFabricsDocnRef = doc(db, "grayFabrics", grayFabricId);
     try {
       setLoading(true);
       await updateDoc(grayFabricsDocnRef, {
-        productName: items?.productName || "",
-        productNumber: items?.productNumber || "",
-        supplierId: items?.supplierId || "",
-        price: Number(items?.price) || 0,
-        comment: items?.comment || "",
+        productName: data?.productName || "",
+        productNumber: data?.productNumber || "",
+        supplierId: data?.supplierId || "",
+        price: Number(data?.price) || 0,
+        comment: data?.comment || "",
         wip: 0,
         stock: 0,
         updateUser: currentUser,
         updatedAt: serverTimestamp(),
       });
+      router.push("/gray-fabrics");
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      // reset();
-      // onClose();
-      router.push("/gray-fabrics");
     }
   };
 
@@ -86,18 +81,14 @@ export const useGrayFabricFunc = (
     await deleteDoc(docRef);
   };
 
-  const onReset = (grayFabric: GrayFabricType) => {
-    setItems(grayFabric);
-  };
-
-  const updateAjustmentGrayFabric = async (grayFabricId: string) => {
+  const updateAjustmentGrayFabric = async (data: GrayFabricType, grayFabricId: string) => {
     setLoading(true);
     try {
       const docRef = doc(db, "grayFabrics", grayFabricId);
       await updateDoc(docRef, {
-        price: Number(items.price),
-        wip: mathRound2nd(Number(items.wip)),
-        stock: mathRound2nd(Number(items.stock)),
+        price: Number(data.price),
+        wip: mathRound2nd(Number(data.wip)),
+        stock: mathRound2nd(Number(data.stock)),
         updatedAt: serverTimestamp(),
         updateUser: currentUser,
       });
@@ -113,6 +104,5 @@ export const useGrayFabricFunc = (
     updateGrayFabric,
     deleteGrayFabric,
     updateAjustmentGrayFabric,
-    onReset,
   };
 };

@@ -30,7 +30,7 @@ const Colors = () => {
   useEffect(() => {
     const getColors = async () => {
       const snapShot = await getDoc(doc(db, "components", "colors"));
-      setColors([...snapShot.data().data]);
+      setColors(snapShot?.data()?.data);
     };
     getColors();
   }, [colors]);

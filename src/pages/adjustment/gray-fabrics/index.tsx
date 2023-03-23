@@ -16,10 +16,11 @@ import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../../store";
 import { useUtil } from "../../../hooks/UseUtil";
 import AdjustmentGrayFabric from "../../../components/adjustment/AdjustmentGrayFabric";
+import { GrayFabricType } from "../../../../types/GrayFabricType";
 
 const AdjustmentGrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const [filterProducts, setFilterProducts] = useState([] as any[]);
+  const [filterProducts, setFilterProducts] = useState([] as any);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
 
@@ -28,11 +29,10 @@ const AdjustmentGrayFabrics = () => {
       grayFabrics.filter((grayFabric: any) =>
         grayFabric.productNumber.includes(
           halfToFullChar(searchText.toUpperCase())
-        )
-      )
+        ))
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchText, grayFabrics]);
+  }, []);
 
   const reset = () => {
     setSearchText("");
@@ -75,7 +75,7 @@ const AdjustmentGrayFabrics = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterProducts.map((grayFabric: any) => (
+              {filterProducts?.map((grayFabric: any) => (
                 <AdjustmentGrayFabric
                   key={grayFabric.id}
                   grayFabric={grayFabric}

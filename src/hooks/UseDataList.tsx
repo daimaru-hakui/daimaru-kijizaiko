@@ -65,10 +65,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as UserType)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as UserType)
         )
       )
     );
@@ -269,7 +269,7 @@ export const useDataList = () => {
   useEffect(() => {
     const getColors = async () => {
       onSnapshot(doc(db, "components", "colors"), (querySnap) =>
-        setColors([...querySnap.data()?.data])
+        setColors([...querySnap?.data()?.data])
       );
     };
     getColors();
@@ -279,9 +279,10 @@ export const useDataList = () => {
   useEffect(() => {
     const getMaterialNames = async () => {
       onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
-        setMaterialNames([...querySnap.data()?.data])
+        setMaterialNames([...querySnap?.data()?.data])
       );
     };
+
     getMaterialNames();
     console.log("materialNames");
   }, [setMaterialNames]);

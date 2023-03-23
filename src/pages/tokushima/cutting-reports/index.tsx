@@ -37,7 +37,7 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-  const { data: cuttingReports, mutate } = useSWR(
+  const { data: cuttingReports } = useSWR(
     `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`,
     { dedupingInterval: 3000 }
   );
