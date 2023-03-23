@@ -30,10 +30,8 @@ import {
   productsState,
   suppliersState,
 } from "../../../store";
-import { ColorType } from "../../../types/ColorType";
 import { ProductType } from "../../../types/FabricType";
 import { GrayFabricType } from "../../../types/GrayFabricType";
-import { MaterialNameType } from "../../../types/MaterialNameType";
 import { SupplierType } from "../../../types/SupplierType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
@@ -213,9 +211,9 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="色を選択"
                 {...register("colorName", { required: true })}
               >
-                {colors?.map((color: ColorType) => (
-                  <option key={color.id} value={color.name}>
-                    {color.name}
+                {colors?.map((color: string) => (
+                  <option key={color} value={color}>
+                    {color}
                   </option>
                 ))}
               </Select>
@@ -332,9 +330,9 @@ const ProductInputArea: NextPage<Props> = ({
                   placeholder="組織を選択してください"
                   {...register("materialName")}
                 >
-                  {materialNames?.map((m: MaterialNameType) => (
-                    <option key={m.id} value={m.name}>
-                      {m.name}
+                  {materialNames?.map((m: string) => (
+                    <option key={m} value={m}>
+                      {m}
                     </option>
                   ))}
                 </Select>
