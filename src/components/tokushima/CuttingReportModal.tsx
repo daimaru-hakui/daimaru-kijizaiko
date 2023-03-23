@@ -31,6 +31,7 @@ import useSWR from "swr";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 type Props = {
+  report?: CuttingReportType;
   reportId: string;
   startDay: string;
   endDay: string;
@@ -39,16 +40,19 @@ type Props = {
 };
 
 const CuttingReportModal: NextPage<Props> = ({
+  report,
   reportId,
   startDay,
   endDay,
   staff,
-  client
+  client,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
   const { isAuths } = useAuthManagement();
-  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { data, mutate } = useSWRImmutable(
+    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
+  );
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {
     getSerialNumber,
@@ -59,11 +63,8 @@ const CuttingReportModal: NextPage<Props> = ({
   } = useGetDisp();
 
   useEffect(() => {
-    setFilterReport(
-      data?.contents?.find((value: CuttingReportType) => value.id === reportId)
-    );
-
-  }, [reportId, data]);
+    setFilterReport({ ...report });
+  }, [report]);
 
   return (
     <>
@@ -76,7 +77,8 @@ const CuttingReportModal: NextPage<Props> = ({
         詳細
       </Button>
 
-      <Modal isOpen={isOpen}
+      <Modal
+        isOpen={isOpen}
         size="3xl"
         onClose={() => {
           onClose();

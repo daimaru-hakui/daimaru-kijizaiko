@@ -39,7 +39,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
       </Box>
       <List my={3} pl={3} spacing={1} fontSize="sm">
         {menuItemEL("生地一覧", "/products")}
-        {menuItemEL("生地の発注", "/products/order/new")}
+        {/* {menuItemEL("生地の発注", "/products/order/new")} */}
         {menuItemEL("染色仕掛一覧", "/products/fabric-dyeing/orders")}
         {menuItemEL("染色履歴一覧", "/products/fabric-dyeing/confirms")}
         {menuItemEL("入荷予定一覧", "/products/fabric-purchase/orders")}

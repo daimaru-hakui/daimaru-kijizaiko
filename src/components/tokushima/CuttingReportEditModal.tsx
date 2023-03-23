@@ -26,7 +26,7 @@ const CuttingReportEditModal: NextPage<Props> = ({
   startDay,
   endDay,
   staff,
-  client
+  client,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -59,13 +59,7 @@ const CuttingReportEditModal: NextPage<Props> = ({
             />
           </ModalBody>
           <ModalFooter>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={async () => {
-                onClose();
-              }}
-            >
+            <Button variant="outline" mr={3} onClick={onClose}>
               閉じる
             </Button>
           </ModalFooter>

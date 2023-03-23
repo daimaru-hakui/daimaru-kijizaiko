@@ -24,36 +24,34 @@ export const useProductFunc = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
-  const obj = (items, materials) => (
-    {
-      productType: items?.productType || "1",
-      staff: Number(items?.productType) === 2 ? items?.staff : "R&D",
-      supplierId: items?.supplierId || "",
-      supplierName: getSupplierName(items?.supplierId) || "",
-      grayFabricId: items?.grayFabricId || "",
-      productNumber:
-        items?.productNum + (items?.colorNum ? "-" + items?.colorNum : "") || "",
-      productNum: items?.productNum || "",
-      productName: items?.productName || "",
-      colorNum: items?.colorNum || "",
-      colorName: items?.colorName || "",
-      price: Number(items?.price) || 0,
-      materialName: items?.materialName || "",
-      materials: materials || {},
-      fabricWidth: items?.fabricWidth || "",
-      fabricWeight: items?.fabricWeight || "",
-      fabricLength: items?.fabricLength || "",
-      features: items?.features || [],
-      noteProduct: items?.noteProduct || "",
-      noteFabric: items?.noteFabric || "",
-      noteEtc: items?.noteEtc || "",
-      wip: 0,
-      externalStock: 0,
-      arrivingQuantity: 0,
-      tokushimaStock: 0,
-      deletedAt: "",
-    }
-  );
+  const obj = (items, materials) => ({
+    productType: items?.productType || "1",
+    staff: Number(items?.productType) === 2 ? items?.staff : "R&D",
+    supplierId: items?.supplierId || "",
+    supplierName: getSupplierName(items?.supplierId) || "",
+    grayFabricId: items?.grayFabricId || "",
+    productNumber:
+      items?.productNum + (items?.colorNum ? "-" + items?.colorNum : "") || "",
+    productNum: items?.productNum || "",
+    productName: items?.productName || "",
+    colorNum: items?.colorNum || "",
+    colorName: items?.colorName || "",
+    price: Number(items?.price) || 0,
+    materialName: items?.materialName || "",
+    materials: materials || {},
+    fabricWidth: items?.fabricWidth || "",
+    fabricWeight: items?.fabricWeight || "",
+    fabricLength: items?.fabricLength || "",
+    features: items?.features || [],
+    noteProduct: items?.noteProduct || "",
+    noteFabric: items?.noteFabric || "",
+    noteEtc: items?.noteEtc || "",
+    wip: 0,
+    externalStock: Number(items.externalStock) || 0,
+    arrivingQuantity: 0,
+    tokushimaStock: Number(items?.tokushimaStock) || 0,
+    deletedAt: "",
+  });
 
   // 生地登録
   const addProduct = async (items, materials) => {
@@ -159,8 +157,6 @@ export const useProductFunc = () => {
     setCsvData(body);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
-
-
 
   const toggleVisibility = () => {
     window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);

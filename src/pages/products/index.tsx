@@ -199,7 +199,7 @@ const Products = () => {
                       <Td>
                         <Flex alignItems="center" gap={3}>
                           <ProductMenu product={product} />
-                          <ProductModal productId={product.id} />
+                          <ProductModal product={product} />
                           <OrderAreaModal product={product} buttonSize="xs" />
                         </Flex>
                       </Td>
@@ -271,7 +271,7 @@ const Products = () => {
                       </Td>
                       <Td>
                         {isAuths(["rd"]) ||
-                          product?.createUser === currentUser ? (
+                        product?.createUser === currentUser ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}
