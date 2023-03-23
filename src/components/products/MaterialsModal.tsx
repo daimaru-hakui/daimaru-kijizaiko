@@ -21,7 +21,7 @@ import {
 import { NextPage } from "next";
 
 type Props = {
-  materials: any;
+  materials: { id: string; name: string }[];
   setMaterials: Function;
 };
 
@@ -46,6 +46,10 @@ const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
     { id: "f", name: "複合繊維" },
   ];
 
+  useEffect(() => {
+    setItems({ ...materials });
+  }, [materials]);
+
   const handleInputChange = (e: string, name: string) => {
     if (Number(e) === 0) {
       setItems((prev: any) => {
@@ -66,16 +70,12 @@ const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
       const result = sum !== 100 ? true : false;
       setTotal(result);
     };
-    calcSum(materials);
+    calcSum(items);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [materials]);
-
-  useEffect(() => {
-    setItems({ ...materials });
-  }, [materials]);
+  }, [items]);
 
   const addMaterials = () => {
-    setItems({ ...items });
+    setMaterials({ ...items });
   };
 
   return (
