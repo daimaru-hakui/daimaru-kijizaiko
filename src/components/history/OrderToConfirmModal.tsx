@@ -63,7 +63,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
 
   const handleNumberChange = (e: string, name: string) => {
     const value = e;
-    setItems({ ...items, [name]: Number(value) });
+    setItems({ ...items, [name]: value });
   };
 
   const inputReset = () => {
@@ -71,7 +71,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
   };
 
   const remainingOrderReset = () => {
-    const quantity = history.quantity - items.quantity;
+    const quantity = Number(history.quantity) - Number(items.quantity);
     const remainingOrder = quantity < 0 ? 0 : quantity;
     setItems({
       ...items,
@@ -163,9 +163,7 @@ const OrderToConfirmModal: NextPage<Props> = ({
                           mt={1}
                           name="stockPlace"
                           placeholder="送り先を選択してください"
-                          value={
-                            items.stockPlace || history.stockPlace
-                          }
+                          value={items.stockPlace || history.stockPlace}
                           onChange={(e) => handleInputChange(e)}
                         >
                           {stockPlaces?.map((place: StockPlaceType) => (
@@ -181,8 +179,11 @@ const OrderToConfirmModal: NextPage<Props> = ({
                 {status === 2 && (
                   <>
                     <Box w="100%">
-                      <Text>残数量(m)
-                        <Box as="span" ml={3} color="red">※生地の残数を入力してください</Box>
+                      <Text>
+                        残数量(m)
+                        <Box as="span" ml={3} color="red">
+                          ※生地の残数を入力してください
+                        </Box>
                       </Text>
                       <NumberInput
                         mt={1}
@@ -204,8 +205,11 @@ const OrderToConfirmModal: NextPage<Props> = ({
                     </Box>
                     {items.remainingOrder > 0 && (
                       <Box w="100%" mt={3}>
-                        <Text>予定納期
-                          <Box as="span" ml={3} color="red">※残数の予定納期を入力してください</Box>
+                        <Text>
+                          予定納期
+                          <Box as="span" ml={3} color="red">
+                            ※残数の予定納期を入力してください
+                          </Box>
                         </Text>
                         <Input
                           type="date"

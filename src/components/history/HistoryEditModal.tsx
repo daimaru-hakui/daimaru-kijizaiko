@@ -41,7 +41,6 @@ export const HistoryEditModal: NextPage<Props> = ({
   items,
   setItems,
   orderType,
-
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -61,7 +60,7 @@ export const HistoryEditModal: NextPage<Props> = ({
 
   const handleNumberChange = (e: string, name: string) => {
     const value = e;
-    setItems({ ...items, [name]: Number(value) });
+    setItems({ ...items, [name]: value });
   };
 
   const inputReset = () => {
@@ -71,7 +70,6 @@ export const HistoryEditModal: NextPage<Props> = ({
   return (
     <>
       <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
-
       <Modal
         isOpen={isOpen}
         onClose={() => {
@@ -143,7 +141,9 @@ export const HistoryEditModal: NextPage<Props> = ({
               </Box>
               {type === "order" && (
                 <Box w="100%">
-                  <Text>{orderType === "purchase" ? "入荷予定" : "仕上予定日"}</Text>
+                  <Text>
+                    {orderType === "purchase" ? "入荷予定" : "仕上予定日"}
+                  </Text>
                   <Input
                     type="date"
                     mt={1}

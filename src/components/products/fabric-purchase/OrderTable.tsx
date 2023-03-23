@@ -55,7 +55,6 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   );
   const STOCK_PLACE = "徳島工場";
 
-  // 数量０のデータを非表示
   useEffect(() => {
     if (HOUSE_FACTORY) {
       const newHistorys = fabricPurchaseOrders?.filter(
@@ -138,12 +137,14 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           const externalStock =
             (await productDocSnap.data().externalStock) || 0;
           const newExternalStock =
-            externalStock + history.quantity - items.quantity;
+            externalStock + Number(history.quantity) - Number(items.quantity);
 
           const arrivingQuantity =
             (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity =
-            arrivingQuantity - history.quantity + items.quantity;
+            arrivingQuantity -
+            Number(history.quantity) +
+            Number(items.quantity);
 
           transaction.update(productDocRef, {
             externalStock: mathRound2nd(newExternalStock),
@@ -154,7 +155,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           const arrivingQuantity =
             (await productDocSnap.data().arrivingQuantity) || 0;
           const newArrivingQuantity =
-            arrivingQuantity - history.quantity + items.quantity;
+            arrivingQuantity - history.quantity + Number(items.quantity);
 
           transaction.update(productDocRef, {
             arrivingQuantity: mathRound2nd(newArrivingQuantity),
@@ -162,8 +163,8 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
         }
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
@@ -197,13 +198,14 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-            history.quantity +
-            items.remainingOrder || 0;
+            Number(history.quantity) +
+            Number(items.remainingOrder) || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
           newTokushimaStock =
-            (await productDocSnap.data()?.tokushimaStock) + items.quantity || 0;
+            (await productDocSnap.data()?.tokushimaStock) +
+              Number(items.quantity) || 0;
         }
 
         transaction.update(productDocRef, {
@@ -212,7 +214,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
         });
 
         transaction.update(orderHistoryDocRef, {
-          quantity: items.remainingOrder,
+          quantity: Number(items.remainingOrder),
           orderedAt: items.orderedAt || getTodayDate(),
           scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
@@ -231,7 +233,7 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
           supplierId: history.supplierId,
           supplierName: history.supplierName,
           price: history.price,
-          quantity: items.quantity,
+          quantity: Number(items.quantity),
           stockPlace: items.stockPlace,
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
