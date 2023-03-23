@@ -33,7 +33,7 @@ export default async function handler(
         (a: CuttingReportType, b: CuttingReportType) =>
           a.serialNumber > b.serialNumber && -1
       );
-    console.log("1");
+    console.log("cutting-reoports api");
     return res.status(200).json({ contents });
   }
 }

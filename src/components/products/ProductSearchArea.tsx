@@ -28,7 +28,7 @@ type Props = {
 
 const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const colorNames = useRecoilValue(colorsState);
+  const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
   return (
     <>
@@ -73,8 +73,8 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
                     setSearch({ ...search, colorName: e.target.value })
                   }
                 >
-                  {colorNames.map((color: { name: string }) => (
-                    <option key={color.name}>{color.name}</option>
+                  {colors.map((color: string) => (
+                    <option key={color}>{color}</option>
                   ))}
                 </Select>
               </Box>
@@ -102,8 +102,8 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
                     setSearch({ ...search, materialName: e.target.value })
                   }
                 >
-                  {materialNames.map((materialName: { name: string }) => (
-                    <option key={materialName.name}>{materialName.name}</option>
+                  {materialNames.map((materialName: string) => (
+                    <option key={materialName}>{materialName}</option>
                   ))}
                 </Select>
               </Box>

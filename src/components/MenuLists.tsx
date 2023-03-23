@@ -119,8 +119,8 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
           <List my={3} pl={3} spacing={1} fontSize="sm">
             {menuItemEL("仕入先", "/settings/suppliers")}
             {menuItemEL("送り先", "/settings/stock-places")}
-            {menuItemEL("色", "/settings/colors")}
-            {menuItemEL("組織名", "/settings/material-names")}
+            {menuItemEL("色", "/settings/color")}
+            {menuItemEL("組織名", "/settings/material-Name")}
           </List>
           <Divider />
         </>

@@ -266,42 +266,24 @@ export const useDataList = () => {
     getStockPlaces();
   }, [setStockPlaces]);
 
-  // 色のデータを取得
   useEffect(() => {
     const getColors = async () => {
-      const q = query(collection(db, "colors"), orderBy("name", "asc"));
-      try {
-        onSnapshot(q, (querySnap) =>
-          setColors(
-            querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as ColorType)
-            )
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
+      onSnapshot(doc(db, "components", "colors"), (querySnap) =>
+        setColors([...querySnap.data()?.data])
+      );
     };
     getColors();
+    console.log("color");
   }, [setColors]);
 
-  // 組織名のデータを取得
   useEffect(() => {
     const getMaterialNames = async () => {
-      const q = query(collection(db, "materialNames"), orderBy("name", "asc"));
-      try {
-        onSnapshot(q, (querySnap) =>
-          setMaterialNames(
-            querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as MaterialNameType)
-            )
-          )
-        );
-      } catch (err) {
-        console.log(err);
-      }
+      onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
+        setMaterialNames([...querySnap.data()?.data])
+      );
     };
     getMaterialNames();
+    console.log("materialNames");
   }, [setMaterialNames]);
 
   const start = () => {
