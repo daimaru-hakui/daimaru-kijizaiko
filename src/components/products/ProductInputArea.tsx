@@ -39,7 +39,6 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
 import { useForm } from "react-hook-form";
-import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 
 type Props = {
@@ -64,7 +63,7 @@ const ProductInputArea: NextPage<Props> = ({
   const materialNames = useRecoilValue(materialNamesState);
   const [flag, setFlag] = useState(false);
   const { getMixed } = useGetDisp();
-  const [obj, setObj] = useState<any>({});
+  const [materials, setMaterials] = useState<any>({});
   const {
     getValues,
     register,
@@ -77,19 +76,22 @@ const ProductInputArea: NextPage<Props> = ({
       ...product,
     },
   });
+  console.log(materials);
   useEffect(() => {
-    setObj({ ...product?.materials });
+    setMaterials({ ...product?.materials });
   }, [product?.materials]);
 
   const { addProduct, updateProduct } = useProductFunc();
 
   const onSubmit = (data: ProductType) => {
-    if (pageType === "new") {
-      addProduct(data, obj);
-    }
-    if (pageType === "edit") {
-      updateProduct(product.id, data, obj);
-      onClose();
+    switch (pageType) {
+      case "new":
+        addProduct(data, materials);
+        return;
+      case "edit":
+        updateProduct(product.id, data, materials);
+        onClose();
+        return;
     }
   };
 
@@ -211,9 +213,9 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="色を選択"
                 {...register("colorName", { required: true })}
               >
-                {colors?.map((c: ColorType) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
+                {colors?.map((color: ColorType) => (
+                  <option key={color.id} value={color.name}>
+                    {color.name}
                   </option>
                 ))}
               </Select>
@@ -260,7 +262,6 @@ const ProductInputArea: NextPage<Props> = ({
             gap={6}
             alignItems="center"
             justifyContent="space-between"
-            // flexDirection={{ base: "column", md: "row" }}
           >
             <Box flex={1} w="100%">
               <Text fontWeight="bold">外部 初期在庫（ｍ）</Text>
@@ -392,7 +393,7 @@ const ProductInputArea: NextPage<Props> = ({
             <Flex flex={1} gap={6} w="100%">
               <Box w="100%">
                 <Text>混率</Text>
-                {obj && (
+                {Object.keys(materials).length > 0 && (
                   <Box
                     mt={1}
                     p={3}
@@ -401,13 +402,16 @@ const ProductInputArea: NextPage<Props> = ({
                     borderColor="gray.100"
                   >
                     <Stack spacing={3} w="100%">
-                      {getMixed(obj).map((material, index) => (
+                      {getMixed(materials).map((material, index) => (
                         <Text key={index}>{material}</Text>
                       ))}
                     </Stack>
                   </Box>
                 )}
-                <MaterialsModal obj={obj} setObj={setObj} />
+                <MaterialsModal
+                  materials={materials}
+                  setMaterials={setMaterials}
+                />
               </Box>
             </Flex>
           </Flex>

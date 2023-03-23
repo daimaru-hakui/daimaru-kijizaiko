@@ -21,13 +21,13 @@ import {
 import { NextPage } from "next";
 
 type Props = {
-  obj: any;
-  setObj: Function;
+  materials: any;
+  setMaterials: Function;
 };
 
-const MaterialsModal: NextPage<Props> = ({ obj, setObj }) => {
+const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [materials, setMaterials] = useState([]);
+  const [items, setItems] = useState([]);
   const [total, setTotal] = useState(true);
 
   const list = [
@@ -48,12 +48,12 @@ const MaterialsModal: NextPage<Props> = ({ obj, setObj }) => {
 
   const handleInputChange = (e: string, name: string) => {
     if (Number(e) === 0) {
-      setMaterials((prev: any) => {
+      setItems((prev: any) => {
         delete prev[name];
-        return { ...materials };
+        return { ...items };
       });
     } else {
-      setMaterials({ ...materials, [name]: Number(e) });
+      setItems({ ...items, [name]: Number(e) });
     }
   };
 
@@ -71,11 +71,11 @@ const MaterialsModal: NextPage<Props> = ({ obj, setObj }) => {
   }, [materials]);
 
   useEffect(() => {
-    setMaterials({ ...obj });
-  }, [obj]);
+    setItems({ ...materials });
+  }, [materials]);
 
   const addMaterials = () => {
-    setObj({ ...materials });
+    setItems({ ...items });
   };
 
   return (
@@ -91,20 +91,20 @@ const MaterialsModal: NextPage<Props> = ({ obj, setObj }) => {
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>
-              {list.map((m: { id: any; name: string; }) => (
-                <Flex key={m.id} alignItems="center">
-                  <Text w="100%">{m.name}</Text>
+              {list.map((material: { id: any; name: string }) => (
+                <Flex key={material.id} alignItems="center">
+                  <Text w="100%">{material.name}</Text>
                   <NumberInput
-                    name={m.id}
+                    name={material.id}
                     w="100%"
-                    defaultValue={materials[m.id] || ""}
+                    defaultValue={items[material.id] || ""}
                     value={
-                      materials &&
-                      (materials[m.id] === 0 ? "" : materials[m.id])
+                      items &&
+                      (items[material.id] === 0 ? "" : items[material.id])
                     }
                     min={0}
                     max={100}
-                    onChange={(e) => handleInputChange(e, m.id)}
+                    onChange={(e) => handleInputChange(e, material.id)}
                   >
                     <NumberInputField textAlign="right" />
                     <NumberInputStepper>

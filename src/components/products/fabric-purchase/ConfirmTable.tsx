@@ -115,16 +115,16 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        if (history.stockPlace === HOUSE_FACTORY) {
+        if (history.stockPlace === "徳島工場") {
           const stock = (await productDocSnap.data().tokushimaStock) || 0;
-          const newStock = stock - history.quantity + items.quantity;
+          const newStock = stock - history.quantity + Number(items.quantity);
           transaction.update(productDocRef, {
             tokushimaStock: newStock,
           });
         }
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
+          quantity: Number(items.quantity),
           price: items.price,
           fixedAt: items.fixedAt,
           comment: items.comment,
@@ -207,7 +207,7 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   </Td>
                   <Td>
                     {history.accounting !== true
-                      ? (isAuths(["rd"]) ||
+                      ? (isAuths(["rd", "tokushima"]) ||
                           history?.createUser === currentUser) && (
                           <HistoryEditModal
                             history={history}
