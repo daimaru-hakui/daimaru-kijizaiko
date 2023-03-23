@@ -12,9 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useInputProduct } from "../../hooks/UseInputProduct";
 import { ProductType } from "../../../types/FabricType";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
@@ -30,11 +29,16 @@ type Props = {
 const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const { getUserName } = useGetDisp(); //// ？
   const currentUser = useRecoilValue(currentUserState);
-  const { items, setItems, handleNumberChange } = useInputProduct();
   const { quantityValueBold } = useUtil();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const setLoading = useSetRecoilState(loadingState);
   const { mathRound2nd, getTodayDate } = useUtil();
+  const [items, setItems] = useState({} as ProductType);
+
+  const handleNumberChange = (e: any, name: string) => {
+    const value = e;
+    setItems({ ...items, [name]: value });
+  };
 
   useEffect(() => {
     setItems({ ...product } as ProductType);
@@ -64,7 +68,6 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
   const onReset = (product: ProductType) => {
     setItems({ ...product });
   };
-
 
   return (
     <Tr key={product.id}>

@@ -14,7 +14,6 @@ import { GiCancel } from "react-icons/gi";
 import { NextPage } from "next";
 import { useEffect } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useInputProduct } from "../../hooks/UseInputProduct";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabricType } from "../../../types/GrayFabricType";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";

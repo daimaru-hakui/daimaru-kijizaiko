@@ -37,8 +37,9 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-  const { data: cuttingReports } = useSWR(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
+  const { data: cuttingReports, mutate } = useSWR(
+    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`,
+    { dedupingInterval: 3000 }
   );
 
   const methods = useForm<Inputs>({
@@ -98,6 +99,7 @@ const CuttingReport = () => {
                   <Tr key={report.serialNumber}>
                     <Td>
                       <CuttingReportModal
+                        report={report}
                         reportId={report.id}
                         startDay={startDay}
                         endDay={endDay}

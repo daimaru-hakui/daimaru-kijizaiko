@@ -85,7 +85,7 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
 
   useEffect(() => {
     data?.contents?.sort(
-      (a: { serialNumber: number; }, b: { serialNumber: number; }) =>
+      (a: { serialNumber: number }, b: { serialNumber: number }) =>
         a.serialNumber > b.serialNumber && -1
     );
     if (HOUSE_FACTORY) {
@@ -183,10 +183,10 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     <Flex gap={3} alignItems="center">
                       <HistoryProductMenu productId={history.productId} />
-                      <ProductModal
+                      {/* <ProductModal
                         title="生地情報"
                         productId={history.productId}
-                      />
+                      /> */}
                     </Flex>
                   </Td>
                   <Td>{getSerialNumber(history?.serialNumber)}</Td>
@@ -208,17 +208,17 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {history.accounting !== true
                       ? (isAuths(["rd"]) ||
-                        history?.createUser === currentUser) && (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={() => {
-                            updateFabricPurchaseConfirm(history);
-                          }}
-                        />
-                      )
+                          history?.createUser === currentUser) && (
+                          <HistoryEditModal
+                            history={history}
+                            type="confirm"
+                            items={items}
+                            setItems={setItems}
+                            onClick={() => {
+                              updateFabricPurchaseConfirm(history);
+                            }}
+                          />
+                        )
                       : "金額確認済"}
                   </Td>
                 </Tr>

@@ -4,12 +4,13 @@ import { useRecoilValue } from "recoil";
 import { productsState } from "../../../../store";
 import { ProductType } from "../../../../types/FabricType";
 import OrderAreaModal from "../../../components/products/OrderAreaModal";
-import { useInputProduct } from "../../../hooks/UseInputProduct";
+// import { useInputProduct } from "../../../hooks/_UseInputProduct";
 
 const OrderNew = () => {
-  const { items, setItems, handleInputChange } = useInputProduct();
+  // const { items, setItems, handleInputChange } = useInputProduct();
   const products = useRecoilValue(productsState);
   const [filterPoduct, setFilterProduct] = useState({} as ProductType);
+  const [items, setItems] = useState({} as any);
 
   // 品番で絞り込み
   useEffect(() => {
@@ -40,7 +41,7 @@ const OrderNew = () => {
           name="productNumber"
           list="search"
           value={items.productNumber}
-          onChange={handleInputChange}
+          // onChange={handleInputChange}
           autoComplete="off"
         />
         <datalist id="search">

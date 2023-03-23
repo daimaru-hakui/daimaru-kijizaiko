@@ -20,17 +20,17 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
 import ProductEditModal from "./ProductEditModal";
 import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
-import useSWR from "swr";
+import { ProductType } from "../../../types/FabricType";
 
 type Props = {
   title?: string;
-  productId: string;
+  productId?: string;
+  product?: ProductType;
 };
 
-const ProductModal: NextPage<Props> = ({ title = "詳細", productId }) => {
+const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data } = useSWR(`/api/products/${productId}`);
-  const product = data?.content;
+  const productId = product?.id;
 
   const {
     getUserName,

@@ -27,6 +27,7 @@ import {
   colorsState,
   grayFabricsState,
   materialNamesState,
+  productsState,
   suppliersState,
 } from "../../../store";
 import { ColorType } from "../../../types/ColorType";
@@ -38,8 +39,8 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
 import { useForm } from "react-hook-form";
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 
 type Props = {
   title: string;
@@ -54,7 +55,8 @@ const ProductInputArea: NextPage<Props> = ({
   product,
   onClose,
 }) => {
-  const { data: products } = useSWR(`/api/products`);
+  // const { data: products } = useSWR(`/api/products`);
+  const products = useRecoilValue(productsState);
   const { data: users } = useSWRImmutable(`/api/users/sales`);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const suppliers = useRecoilValue(suppliersState);
@@ -63,10 +65,17 @@ const ProductInputArea: NextPage<Props> = ({
   const [flag, setFlag] = useState(false);
   const { getMixed } = useGetDisp();
   const [obj, setObj] = useState<any>({});
-  const { getValues, register, handleSubmit, watch, reset, formState: { errors } } = useForm({
+  const {
+    getValues,
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      ...product
-    }
+      ...product,
+    },
   });
   useEffect(() => {
     setObj({ ...product?.materials });
@@ -75,7 +84,6 @@ const ProductInputArea: NextPage<Props> = ({
   const { addProduct, updateProduct } = useProductFunc();
 
   const onSubmit = (data: ProductType) => {
-    console.log(data);
     if (pageType === "new") {
       addProduct(data, obj);
     }
@@ -86,15 +94,16 @@ const ProductInputArea: NextPage<Props> = ({
   };
 
   useEffect(() => {
-    let [productNum, colorNum] = [watch('productNum'), watch('colorNum')];
+    let [productNum, colorNum] = [watch("productNum"), watch("colorNum")];
     if (!productNum) productNum = "noValue";
     if (!colorNum) colorNum = "noValue";
-    const base = products?.contents?.map(
-      (product: ProductType) => product.productNum + product.colorNum);
+    const base = products?.map(
+      (product: ProductType) => product.productNum + product.colorNum
+    );
     const result = base?.includes(productNum + colorNum);
     !result ? setFlag(false) : setFlag(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch('productNum'), watch('colorNum')]);
+  }, [watch("productNum"), watch("colorNum")]);
 
   return (
     <>
@@ -106,23 +115,29 @@ const ProductInputArea: NextPage<Props> = ({
           <Box w="100%">
             <RadioGroup value={getValues("productType")}>
               <Stack direction="row">
-                <Radio value="1" {...register("productType")}>既製品</Radio>
-                <Radio value="2" {...register("productType")}>別注品</Radio>
+                <Radio value="1" {...register("productType")}>
+                  既製品
+                </Radio>
+                <Radio value="2" {...register("productType")}>
+                  別注品
+                </Radio>
               </Stack>
             </RadioGroup>
           </Box>
-          {Number(watch('productType')) === 2 && (
+          {Number(watch("productType")) === 2 && (
             <Box>
               <Text fontWeight="bold">
                 担当者
-                <Box ml={1} as="span" textColor="red">※</Box>
+                <Box ml={1} as="span" textColor="red">
+                  ※
+                </Box>
               </Text>
               <Select
                 mt={1}
                 placeholder="担当者名を選択"
                 {...register("staff", { required: true })}
               >
-                {users?.contents?.map((user: { id: string; name: string; }) => (
+                {users?.contents?.map((user: { id: string; name: string }) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
                   </option>
@@ -134,7 +149,9 @@ const ProductInputArea: NextPage<Props> = ({
             <Box w="100%">
               <Text fontWeight="bold">
                 仕入先
-                <Box ml={1} as="span" textColor="red">※</Box>
+                <Box ml={1} as="span" textColor="red">
+                  ※
+                </Box>
               </Text>
               <Select
                 mt={1}
@@ -164,7 +181,9 @@ const ProductInputArea: NextPage<Props> = ({
             <Box w="100%" flex="1">
               <Text fontWeight="bold">
                 品番
-                <Box ml={1} as="span" textColor="red">※</Box>
+                <Box ml={1} as="span" textColor="red">
+                  ※
+                </Box>
               </Text>
               <Input
                 mt={1}
@@ -183,7 +202,9 @@ const ProductInputArea: NextPage<Props> = ({
             <Box w="100%" flex="1">
               <Text fontWeight="bold">
                 色
-                <Box ml={1} as="span" textColor="red">※</Box>
+                <Box ml={1} as="span" textColor="red">
+                  ※
+                </Box>
               </Text>
               <Select
                 mt={1}
@@ -215,11 +236,53 @@ const ProductInputArea: NextPage<Props> = ({
             <Box flex={1} w="100%">
               <Text fontWeight="bold">
                 単価（円）
-                <Box ml={1} as="span" textColor="red">※</Box>
+                <Box ml={1} as="span" textColor="red">
+                  ※
+                </Box>
               </Text>
               <NumberInput
                 mt={1}
-                {...register("price", { required: true, })}
+                {...register("price", { required: true })}
+                min={0}
+                max={100000}
+                onChange={() => getValues}
+              >
+                <NumberInputField textAlign="right" />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </Box>
+          </Flex>
+          <Flex
+            w={{ base: "100%", md: "400px" }}
+            gap={6}
+            alignItems="center"
+            justifyContent="space-between"
+            // flexDirection={{ base: "column", md: "row" }}
+          >
+            <Box flex={1} w="100%">
+              <Text fontWeight="bold">外部 初期在庫（ｍ）</Text>
+              <NumberInput
+                mt={1}
+                {...register("externalStock")}
+                min={0}
+                max={100000}
+                onChange={() => getValues}
+              >
+                <NumberInputField textAlign="right" />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </Box>
+            <Box flex={1} w="100%">
+              <Text fontWeight="bold">徳島 初期在庫（ｍ）</Text>
+              <NumberInput
+                mt={1}
+                {...register("tokushimaStock")}
                 min={0}
                 max={100000}
                 onChange={() => getValues}
@@ -250,10 +313,7 @@ const ProductInputArea: NextPage<Props> = ({
           </Flex>
           <Box flex={1} w="100%">
             <Text>備考（使用製品品番）</Text>
-            <Textarea
-              mt={1}
-              {...register('noteProduct')}
-            />
+            <Textarea mt={1} {...register("noteProduct")} />
           </Box>
           <Divider />
           <Flex
@@ -269,7 +329,7 @@ const ProductInputArea: NextPage<Props> = ({
                 <Select
                   mt={1}
                   placeholder="組織を選択してください"
-                  {...register('materialName')}
+                  {...register("materialName")}
                 >
                   {materialNames?.map((m: MaterialNameType) => (
                     <option key={m.id} value={m.name}>
@@ -283,7 +343,7 @@ const ProductInputArea: NextPage<Props> = ({
                   <Text>規格（巾）cm</Text>
                   <NumberInput
                     mt={1}
-                    {...register('fabricWidth')}
+                    {...register("fabricWidth")}
                     min={0}
                     max={200}
                     onChange={() => getValues}
@@ -299,7 +359,7 @@ const ProductInputArea: NextPage<Props> = ({
                   <Text>規格（長さ）m</Text>
                   <NumberInput
                     mt={1}
-                    {...register('fabricLength')}
+                    {...register("fabricLength")}
                     min={0}
                     max={200}
                     onChange={() => getValues}
@@ -316,7 +376,7 @@ const ProductInputArea: NextPage<Props> = ({
                 <Text>規格（重さ）</Text>
                 <NumberInput
                   mt={1}
-                  {...register('fabricWeight')}
+                  {...register("fabricWeight")}
                   min={0}
                   max={200}
                   onChange={() => getValues}
@@ -404,25 +464,15 @@ const ProductInputArea: NextPage<Props> = ({
           </Box>
           <Box flex={1} w="full">
             <Text>備考（生地の性質など）</Text>
-            <Textarea
-              mt={1}
-              {...register('noteFabric')}
-            />
+            <Textarea mt={1} {...register("noteFabric")} />
           </Box>
           <Divider />
           <Box flex={1} w="full">
             <Text>備考（その他）</Text>
-            <Textarea
-              mt={1}
-              {...register('noteEtc')}
-            />
+            <Textarea mt={1} {...register("noteEtc")} />
           </Box>
           {pageType === "new" && (
-            <Button
-              type="submit"
-              colorScheme="facebook"
-              disabled={flag}
-            >
+            <Button type="submit" colorScheme="facebook" disabled={flag}>
               登録
             </Button>
           )}
@@ -437,10 +487,7 @@ const ProductInputArea: NextPage<Props> = ({
               >
                 キャンセル
               </Button>
-              <Button
-                type="submit"
-                w="100%"
-                colorScheme="facebook">
+              <Button type="submit" w="100%" colorScheme="facebook">
                 更新
               </Button>
             </Flex>
