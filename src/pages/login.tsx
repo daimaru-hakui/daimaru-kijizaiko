@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Box, Button, Container, Flex, Input } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { auth, db } from "../../firebase/index";
+import { useSetRecoilState } from "recoil";
+import { auth } from "../../firebase/index";
 import { currentUserState, loadingState } from "../../store";
 import { useAuthState } from "react-firebase-hooks/auth";
 

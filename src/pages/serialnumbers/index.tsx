@@ -1,10 +1,19 @@
-import { Box, Button, Container, Flex, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
-import { collection, doc, onSnapshot, query, updateDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-import { db } from '../../../firebase';
+import {
+  Box,
+  Container,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "../../../firebase";
 
-import { useGetDisp } from '../../hooks/UseGetDisp';
-
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 const SerialNumbers = () => {
   const [serialNumbers, setSerialNumber] = useState([]);
@@ -30,7 +39,14 @@ const SerialNumbers = () => {
 
   return (
     <Box w="100%" mt={12}>
-      <Container maxW="500px" mt={6} p={6} rounded="md" bg="white" boxShadow="md">
+      <Container
+        maxW="500px"
+        mt={6}
+        p={6}
+        rounded="md"
+        bg="white"
+        boxShadow="md"
+      >
         <TableContainer p={6} maxW="100%">
           <Box as="h2" fontSize="2xl">
             発注ナンバー
@@ -52,7 +68,6 @@ const SerialNumbers = () => {
             </Tbody>
           </Table>
         </TableContainer>
-
       </Container>
     </Box>
   );

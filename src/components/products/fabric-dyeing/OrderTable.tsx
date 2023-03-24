@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import CommentModal from "../../CommentModal";
-import { HistoryType } from "../../../../types/HistoryType";
+import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
@@ -45,7 +45,6 @@ const FabricDyeingOrderTable = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate } = useUtil();
-  // const { data, mutate } = useSWR("/api/fabric-dyeing-orders");
   const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
   const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] =
     useState<any>();
@@ -80,15 +79,15 @@ const FabricDyeingOrderTable = () => {
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         let stock = (await grayFabricDoSnap.data().stock) || 0;
-        const newStock = stock + history.quantity;
+        const newStock = stock + Number(history.quantity);
         transaction.update(grayFabricDocRef, {
-          stock: newStock,
+          stock: Number(newStock),
         });
 
         let wip = (await productDocSnap.data().wip) || 0;
-        const newWip = wip - history.quantity;
+        const newWip = wip - Number(history.quantity);
         transaction.update(productDocRef, {
-          wip: newWip,
+          wip: Number(newWip),
         });
 
         transaction.delete(historyDocRef);
@@ -116,7 +115,7 @@ const FabricDyeingOrderTable = () => {
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         let wip = (await productDocSnap.data().wip) || 0;
-        const newWip = wip - history.quantity;
+        const newWip = Number(wip) - Number(history.quantity);
         transaction.update(productDocRef, {
           wip: newWip,
         });
@@ -149,20 +148,22 @@ const FabricDyeingOrderTable = () => {
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const stock = (await grayFabricDocSnap.data().stock) || 0;
-        const newStock = stock + history.quantity - items.quantity;
+        const newStock =
+          Number(stock) + Number(history.quantity) - Number(items.quantity);
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
         const wip = (await productDocSnap.data().wip) || 0;
-        const newWip = wip - history.quantity + items.quantity;
+        const newWip =
+          Number(wip) - Number(history.quantity) + Number(items.quantity);
         transaction.update(productDocRef, {
           wip: newWip,
         });
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
@@ -192,14 +193,15 @@ const FabricDyeingOrderTable = () => {
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const wip = (await productDocSnap.data().wip) || 0;
-        const newWip = wip - history.quantity + items.quantity;
+        const newWip =
+          Number(wip) - Number(history.quantity) + Number(items.quantity);
         transaction.update(productDocRef, {
           wip: newWip,
         });
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
@@ -231,18 +233,19 @@ const FabricDyeingOrderTable = () => {
 
         const newWip =
           (await productDocSnap.data()?.wip) -
-            history.quantity +
-            items.remainingOrder || 0;
+            Number(history.quantity) +
+            Number(items.remainingOrder) || 0;
 
         const newStock =
-          (await productDocSnap.data()?.externalStock) + items.quantity || 0;
+          (await productDocSnap.data()?.externalStock) +
+            Number(items.quantity) || 0;
         transaction.update(productDocRef, {
           wip: newWip,
           externalStock: newStock,
         });
 
         transaction.update(orderHistoryDocRef, {
-          quantity: items.remainingOrder,
+          quantity: Number(items.remainingOrder),
           orderedAt: items.orderedAt || getTodayDate(),
           scheduledAt: items.scheduledAt || getTodayDate(),
           comment: items.comment,
@@ -260,8 +263,8 @@ const FabricDyeingOrderTable = () => {
           colorName: history.colorName,
           supplierId: history.supplierId,
           supplierName: history.supplierName,
-          price: history.price,
-          quantity: items.quantity,
+          price: Number(history.price),
+          quantity: Number(items.quantity),
           comment: items.comment,
           orderedAt: items.orderedAt || history.orderedAt,
           fixedAt: items.fixedAt || getTodayDate(),

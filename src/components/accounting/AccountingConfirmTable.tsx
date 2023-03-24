@@ -9,10 +9,9 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import CommentModal from "../CommentModal";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import useSWR from "swr";

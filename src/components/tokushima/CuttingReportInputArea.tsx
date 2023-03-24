@@ -20,13 +20,15 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { usersState } from "../../../store";
-import { CuttingProductType } from "../../../types/CuttingProductType";
-import { CuttingReportType } from "../../../types/CuttingReportType";
+import {
+  UserType,
+  CuttingProductType,
+  CuttingReportType,
+} from "../../../types";
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
-import { UserType } from "../../../types/UserType";
-import useSWRImmutable from "swr/immutable";
+import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 
 type Props = {
   title: string;
@@ -47,10 +49,15 @@ const CuttingReportInputArea: NextPage<Props> = ({
   startDay,
   endDay,
   staff,
-  client
+  client,
 }) => {
   const users = useRecoilValue(usersState);
-  const { data, mutate } = useSWRImmutable(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { data, mutate } = useSWRCuttingReportImutable(
+    startDay,
+    endDay,
+    staff,
+    client
+  );
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
@@ -98,11 +105,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-      itemType ||
-      totalQuantity ||
-      category ||
-      productId ||
-      quantity
+        itemType ||
+        totalQuantity ||
+        category ||
+        productId ||
+        quantity
     );
   }, [items]);
 
@@ -155,7 +162,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
               name="staff"
               onChange={handleInputChange}
             >
-              {filterUsers?.map((user: { id: string; name: string; }) => (
+              {filterUsers?.map((user: { id: string; name: string }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>
@@ -243,11 +250,13 @@ const CuttingReportInputArea: NextPage<Props> = ({
         onClick={async () => {
           if (pageType === "new") {
             addCuttingReport();
+            return;
           }
           if (pageType === "edit") {
             await updateCuttingReport(report.id);
-            await onClose();
             await mutate({ ...data }); //必要
+            await onClose();
+            return;
           }
         }}
       >

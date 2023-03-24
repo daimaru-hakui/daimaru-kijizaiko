@@ -10,13 +10,15 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
-import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
-import { CuttingReportType } from "../../../types/CuttingReportType";
-import { CuttingProductType } from "../../../types/CuttingProductType";
+import {
+  ProductType,
+  CuttingReportType,
+  CuttingHistoryType,
+  CuttingProductType,
+} from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
-import { ProductType } from "../../../types/FabricType";
-import useSWRImmutable from 'swr/immutable';
+import useSWRImmutable from "swr/immutable";
 
 ChartJS.register(
   CategoryScale,
@@ -55,31 +57,41 @@ const CuttingPriceRanking: NextPage<Props> = ({
     };
 
     const getArray = async () => {
-      const filterArray = data?.map((obj: CuttingReportType) => obj.products.map(
-        (product: CuttingProductType) => (
-          {
-            ...obj,
-            ...product,
-            price: getPrice(product?.productId) || 0,
-            products: null,
-          } as CuttingHistoryType & { price: number; })
-      )
-      ).flat().filter((obj) => (
-        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
-        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime())
-      );
+      const filterArray = data
+        ?.map((obj: CuttingReportType) =>
+          obj.products.map(
+            (product: CuttingProductType) =>
+              ({
+                ...obj,
+                ...product,
+                price: getPrice(product?.productId) || 0,
+                products: null,
+              } as CuttingHistoryType & { price: number })
+          )
+        )
+        .flat()
+        .filter(
+          (obj) =>
+            new Date(startDay).getTime() <=
+              new Date(obj.cuttingDate).getTime() &&
+            new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
+        );
 
-      const ProductIds = filterArray?.map((obj: { productId: string; }) => obj.productId);
+      const ProductIds = filterArray?.map(
+        (obj: { productId: string }) => obj.productId
+      );
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
         let sum = 0;
-        filterArray?.forEach((obj: { productId: string; quantity: number; price: number; }) => {
-          if (obj.productId === header) {
-            sum += obj.quantity * (obj.price || getPrice(header) || 0);
+        filterArray?.forEach(
+          (obj: { productId: string; quantity: number; price: number }) => {
+            if (obj.productId === header) {
+              sum += obj.quantity * (obj.price || getPrice(header) || 0);
+            }
           }
-        });
+        );
         return { productId: header, price: sum };
       });
 
@@ -116,7 +128,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string; }) =>
+      (ranking: { productId: string }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -129,7 +141,7 @@ const CuttingPriceRanking: NextPage<Props> = ({
         label: "使用金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { price: number; }) => ranking.price.toFixed()),
+          ?.map((ranking: { price: number }) => ranking.price.toFixed()),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
       },

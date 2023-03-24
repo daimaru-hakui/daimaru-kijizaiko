@@ -11,17 +11,19 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { CuttingProductType } from "../../../../types/CuttingProductType";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
+import {
+  CuttingReportType,
+  CuttingProductType,
+  CuttingHistoryType,
+} from "../../../../types";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
-import { useGetDisp } from "../../../hooks/UseGetDisp";
-import { CuttingHistoryType } from "../../../../types/CuttingHistoryType";
-import useSWR from "swr";
 import HistoryProductMenu from "../../../components/tokushima/HistoryProductMenu";
+import SearchArea from "../../../components/SearchArea";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
+import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../../../components/SearchArea";
+import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 
 type Inputs = {
   start: string;
@@ -44,9 +46,7 @@ const HistoryCutting = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data } = useSWR(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
-  );
+  const { data } = useSWRCuttingReports(startDay, endDay, staff, client);
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   const methods = useForm<Inputs>({
@@ -78,14 +78,14 @@ const HistoryCutting = () => {
         ?.map((cuttingReport: CuttingReportType) =>
           cuttingReport?.products.map(
             (product: CuttingProductType) =>
-            ({
-              ...cuttingReport,
-              ...product,
-            } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+              } as CuttingHistoryType)
           )
         )
         .flat()
-        .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
+        .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
           if (a.cuttingDate > b.cuttingDate) {
             return -1;
           }
@@ -130,6 +130,7 @@ const HistoryCutting = () => {
                         <HistoryProductMenu productId={list.productId} />
                         <CuttingReportModal
                           reportId={list.id}
+                          report={list}
                           startDay={startDay}
                           endDay={endDay}
                           staff={staff}

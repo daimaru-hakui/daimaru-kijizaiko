@@ -24,7 +24,7 @@ import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -82,7 +82,7 @@ const AccountingOrderToConfirmModal: NextPage<Props> = ({ history }) => {
       console.error(e);
     } finally {
       mutate("/api/fabric-purchase-confirms");
-      router.push('/accounting-dept/confirms');
+      router.push("/accounting-dept/confirms");
     }
   };
 

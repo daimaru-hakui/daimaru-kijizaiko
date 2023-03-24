@@ -13,7 +13,7 @@ import {
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import ProductInputArea from "./ProductInputArea";
 

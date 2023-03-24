@@ -23,7 +23,7 @@ import {
 import { NextPage } from "next";
 import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 
 type Props = {
   history: HistoryType;

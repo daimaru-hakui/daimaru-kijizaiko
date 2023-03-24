@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Flex,
   NumberDecrementStepper,
@@ -14,7 +13,7 @@ import { GiCancel } from "react-icons/gi";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";

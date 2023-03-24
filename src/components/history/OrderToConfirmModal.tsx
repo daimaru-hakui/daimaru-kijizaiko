@@ -24,8 +24,7 @@ import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
-import { HistoryType } from "../../../types/HistoryType";
-import { StockPlaceType } from "../../../types/StockPlaceType";
+import { HistoryType, StockPlaceType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {

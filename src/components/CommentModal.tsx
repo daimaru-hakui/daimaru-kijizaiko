@@ -11,11 +11,9 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { doc, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
-import { db } from "../../firebase";
 
 type Props = {
   id: string;
@@ -24,27 +22,13 @@ type Props = {
   mutate?: Function;
 };
 
-const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
+const CommentModal: NextPage<Props> = ({ comment }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newComment, setNewComment] = useState(comment);
-
 
   useEffect(() => {
     setNewComment(comment);
   }, [comment]);
-
-  // const updateComment = async (collectionName: string, docId: string) => {
-  //   const commentRef = doc(db, collectionName, docId);
-  //   try {
-  //     await updateDoc(commentRef, {
-  //       comment: newComment,
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   } finally {
-  //     onClose();
-  //   }
-  // };
 
   return (
     <>
@@ -67,18 +51,8 @@ const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
           <ModalHeader>コメント</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Box>
-              {newComment}
-            </Box>
-            {/* <Textarea
-              h="400px"
-              value={newComment}
-              onChange={(
-                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-              ) => setNewComment(e.target.value)}
-            /> */}
+            <Box>{newComment}</Box>
           </ModalBody>
-
           <ModalFooter>
             <Button
               mr={3}
@@ -89,13 +63,6 @@ const CommentModal: NextPage<Props> = ({ id, comment, collectionName }) => {
             >
               閉じる
             </Button>
-            {/* <Button
-              colorScheme="blue"
-              disabled={newComment === comment}
-              onClick={() => updateComment(collectionName, id)}
-            >
-              更新
-            </Button> */}
           </ModalFooter>
         </ModalContent>
       </Modal>

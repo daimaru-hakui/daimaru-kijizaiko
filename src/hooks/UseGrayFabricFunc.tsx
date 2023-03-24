@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
-import { GrayFabricType } from "../../types/GrayFabricType";
+import { GrayFabricType } from "../../types";
 import { useUtil } from "./UseUtil";
 
 export const useGrayFabricFunc = () => {
@@ -45,7 +45,10 @@ export const useGrayFabricFunc = () => {
     }
   };
 
-  const updateGrayFabric = async (data: GrayFabricType, grayFabricId: string) => {
+  const updateGrayFabric = async (
+    data: GrayFabricType,
+    grayFabricId: string
+  ) => {
     const result = window.confirm("更新して宜しいでしょうか。");
     if (!result) return;
     const grayFabricsDocnRef = doc(db, "grayFabrics", grayFabricId);
@@ -81,7 +84,10 @@ export const useGrayFabricFunc = () => {
     await deleteDoc(docRef);
   };
 
-  const updateAjustmentGrayFabric = async (data: GrayFabricType, grayFabricId: string) => {
+  const updateAjustmentGrayFabric = async (
+    data: GrayFabricType,
+    grayFabricId: string
+  ) => {
     setLoading(true);
     try {
       const docRef = doc(db, "grayFabrics", grayFabricId);

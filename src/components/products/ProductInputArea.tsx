@@ -30,9 +30,7 @@ import {
   productsState,
   suppliersState,
 } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
-import { GrayFabricType } from "../../../types/GrayFabricType";
-import { SupplierType } from "../../../types/SupplierType";
+import { ProductType, GrayFabricType, SupplierType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
@@ -74,7 +72,6 @@ const ProductInputArea: NextPage<Props> = ({
       ...product,
     },
   });
-  console.log(materials);
   useEffect(() => {
     setMaterials({ ...product?.materials });
   }, [product?.materials]);
@@ -139,7 +136,7 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="担当者名を選択"
                 {...register("staff", { required: true })}
               >
-                {users?.contents?.map((user: { id: string; name: string; }) => (
+                {users?.contents?.map((user: { id: string; name: string }) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
                   </option>

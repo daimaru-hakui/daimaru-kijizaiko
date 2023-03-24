@@ -15,12 +15,12 @@ import {
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../../store";
-import EditModal from "../../../components/settings/stock-places/EditModal";
-import CommentModal from "../../../components/CommentModal";
-import { StockPlaceType } from "../../../../types/StockPlaceType";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import EditModal from "../../../components/settings/stock-places/EditModal";
+import CommentModal from "../../../components/CommentModal";
+import { StockPlaceType } from "../../../../types";
 
 const StockPlaces = () => {
   const stockPlaces = useRecoilValue(stockPlacesState);

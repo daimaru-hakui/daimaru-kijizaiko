@@ -18,8 +18,7 @@ import {
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
-import { StockPlaceType } from "../../../types/StockPlaceType";
+import { ProductType, StockPlaceType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";

@@ -14,26 +14,23 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  InputRightElement,
   Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState, productsState } from "../../../store";
 import { FaTrashAlt, FaSearch } from "react-icons/fa";
-import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
+import { UserType, ProductType } from "../../../types";
 import OrderAreaModal from "../../components/products/OrderAreaModal";
 import ProductModal from "../../components/products/ProductModal";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { ProductType } from "../../../types/FabricType";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { useUtil } from "../../hooks/UseUtil";
 import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
+import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useUtil } from "../../hooks/UseUtil";
 import useSWR from "swr";
-import { UserType } from "../../../types/UserType";
 
 const Products = () => {
   const currentUser = useRecoilValue(currentUserState);

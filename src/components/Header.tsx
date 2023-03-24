@@ -10,13 +10,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { MdOutlineSettings } from "react-icons/md";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { auth } from "../../firebase";
 import { currentUserState, usersState } from "../../store";
+import { auth } from "../../firebase";
 import MenuDrawerButton from "./MenuDrawerButton";
-import Link from "next/link";
 
 const Header = () => {
   const router = useRouter();
@@ -32,7 +32,7 @@ const Header = () => {
   // 担当者名の表示
   const displayStaff = (id: string) => {
     const user = users?.find(
-      (user: { id: string; name: string; }) => id === user.id
+      (user: { id: string; name: string }) => id === user.id
     );
     return user?.name;
   };
@@ -73,7 +73,12 @@ const Header = () => {
               </Link>
               <Flex alignItems="center" gap={3}>
                 <Box>
-                  <Text fontSize="sm" display={{ base: "none", "2xl": "block" }}>{displayStaff(currentUser)}</Text>
+                  <Text
+                    fontSize="sm"
+                    display={{ base: "none", "2xl": "block" }}
+                  >
+                    {displayStaff(currentUser)}
+                  </Text>
                 </Box>
                 <Menu>
                   <MenuButton

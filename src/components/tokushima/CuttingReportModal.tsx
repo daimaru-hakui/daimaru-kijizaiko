@@ -22,13 +22,12 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
-import { CuttingReportType } from "../../../types/CuttingReportType";
+import { CuttingReportType } from "../../../types";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import CuttingReportEditModal from "./CuttingReportEditModal";
-import useSWRImmutable from "swr/immutable";
-import useSWR from "swr";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
 
 type Props = {
   report?: CuttingReportType;
@@ -50,8 +49,11 @@ const CuttingReportModal: NextPage<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
   const { isAuths } = useAuthManagement();
-  const { data, mutate } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
+  const { data, mutate } = useSWRCuttingReports(
+    startDay,
+    endDay,
+    staff,
+    client
   );
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {

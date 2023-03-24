@@ -1,6 +1,6 @@
 import { Box, Container } from "@chakra-ui/react";
 import { useState } from "react";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
 const ProductsNew = () => {

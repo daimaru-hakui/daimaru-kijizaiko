@@ -16,7 +16,7 @@ import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../../store";
 import { useUtil } from "../../../hooks/UseUtil";
 import AdjustmentGrayFabric from "../../../components/adjustment/AdjustmentGrayFabric";
-import { GrayFabricType } from "../../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../../types";
 
 const AdjustmentGrayFabrics = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
@@ -26,10 +26,11 @@ const AdjustmentGrayFabrics = () => {
 
   useEffect(() => {
     setFilterProducts(
-      grayFabrics.filter((grayFabric: any) =>
+      grayFabrics.filter((grayFabric: GrayFabricType) =>
         grayFabric.productNumber.includes(
           halfToFullChar(searchText.toUpperCase())
-        ))
+        )
+      )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -75,7 +76,7 @@ const AdjustmentGrayFabrics = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterProducts?.map((grayFabric: any) => (
+              {filterProducts?.map((grayFabric: GrayFabricType) => (
                 <AdjustmentGrayFabric
                   key={grayFabric.id}
                   grayFabric={grayFabric}

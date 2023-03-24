@@ -18,9 +18,9 @@ import {
 import { NextPage } from "next";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
-import ProductEditModal from "./ProductEditModal";
 import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
-import { ProductType } from "../../../types/FabricType";
+import ProductEditModal from "./ProductEditModal";
+import { ProductType } from "../../../types";
 
 type Props = {
   title?: string;
@@ -58,11 +58,11 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
             <Flex gap={3} alignItems="center">
               生地詳細
               <ProductEditModal product={product} type="button" />
-              <ProductCuttingHistoryModal productId={productId} type="button" />
+              {/* <ProductCuttingHistoryModal productId={productId} type="button" />
               <ProductPurchaseHistoryModal
                 productId={productId}
                 type="button"
-              />
+              /> */}
             </Flex>
           </ModalHeader>
           <ModalCloseButton />

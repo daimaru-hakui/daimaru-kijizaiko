@@ -17,7 +17,7 @@ import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
-import { SupplierType } from "../../../../types/SupplierType";
+import { SupplierType } from "../../../../types";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
@@ -28,10 +28,15 @@ type Inputs = SupplierType;
 
 const EditModal: NextPage<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
     defaultValues: {
-      ...supplier
-    }
+      ...supplier,
+    },
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -69,18 +74,18 @@ const EditModal: NextPage<Props> = ({ supplier }) => {
             <ModalBody>
               <Stack spacing={3}>
                 <Text>仕入先名</Text>
-                <Input {...register('name', { required: true })} />
+                <Input {...register("name", { required: true })} />
                 <Text>フリガナ</Text>
-                <Input {...register('kana', { required: true })} />
+                <Input {...register("kana", { required: true })} />
                 <Text>備考</Text>
-                <Textarea {...register('comment')} />
+                <Textarea {...register("comment")} />
               </Stack>
             </ModalBody>
             <ModalFooter>
               <Button mr={3} variant="ghost" onClick={onReset}>
                 Close
               </Button>
-              <Button type="submit" colorScheme="facebook" >
+              <Button type="submit" colorScheme="facebook">
                 OK
               </Button>
             </ModalFooter>

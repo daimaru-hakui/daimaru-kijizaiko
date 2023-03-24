@@ -28,10 +28,10 @@ import {
   usersState,
 } from "../../../../store";
 import CommentModal from "../../CommentModal";
-import { HistoryType } from "../../../../types/HistoryType";
+import { HistoryType } from "../../../../types";
+import { useUtil } from "../../../hooks/UseUtil";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
-import { useUtil } from "../../../hooks/UseUtil";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import OrderToConfirmModal from "../../history/OrderToConfirmModal";
 import { useRouter } from "next/router";

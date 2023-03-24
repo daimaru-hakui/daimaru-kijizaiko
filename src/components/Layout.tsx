@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import Header from "./Header";
 import Loading from "./Loading";
 import Sidebar from "./Sidebar";
+import { useDataList } from "../hooks/UseDataList";
 
 type Props = {
   children: ReactNode;
@@ -11,6 +12,7 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
   const router = useRouter();
+  const { start } = useDataList();
   return (
     <Box
       fontWeight="400"

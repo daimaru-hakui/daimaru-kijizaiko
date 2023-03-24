@@ -7,8 +7,6 @@ import {
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
-import { useState } from "react";
-
 import { useRecoilValue } from "recoil";
 import {
   currentUserState,
@@ -18,7 +16,7 @@ import {
   grayFabricsState,
   productsState,
 } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import Charts from "../../components/dashboard/Charts";
 import StatCard from "../../components/dashboard/StatCard";
 

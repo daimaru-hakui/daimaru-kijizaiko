@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import CommentModal from "../CommentModal";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
 import AccountingHistoryOrderToConfirmModal from "./AccountingOrderToConfirmModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";

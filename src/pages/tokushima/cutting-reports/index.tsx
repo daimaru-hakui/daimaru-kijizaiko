@@ -13,14 +13,14 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { CSVLink } from "react-csv";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
-import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
+import { CuttingReportType } from "../../../../types";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
-import useSWR from "swr";
-import { useForm, FormProvider } from "react-hook-form";
 import SearchArea from "../../../components/SearchArea";
+import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
+import { useForm, FormProvider } from "react-hook-form";
+import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 
 type Inputs = {
   start: string;
@@ -37,9 +37,12 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-  const { data: cuttingReports } = useSWR(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`,
-    { dedupingInterval: 3000 }
+
+  const { data: cuttingReports } = useSWRCuttingReports(
+    startDay,
+    endDay,
+    staff,
+    client
   );
 
   const methods = useForm<Inputs>({

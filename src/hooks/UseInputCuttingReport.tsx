@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CuttingReportType } from "../../types/CuttingReportType";
+import { CuttingReportType } from "../../types";
 import { useUtil } from "./UseUtil";
 
 export const useInputCuttingReport = () => {

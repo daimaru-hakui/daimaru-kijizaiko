@@ -1,10 +1,7 @@
 import {
   collection,
   doc,
-  startAt,
-  endAt,
   getDoc,
-  limit,
   onSnapshot,
   orderBy,
   query,
@@ -29,15 +26,14 @@ import {
   suppliersState,
   usersState,
 } from "../../store";
-import { ProductType } from "../../types/FabricType";
-import { useRouter } from "next/router";
-import { SupplierType } from "../../types/SupplierType";
-import { HistoryType } from "../../types/HistoryType";
-import { GrayFabricType } from "../../types/GrayFabricType";
-import { UserType } from "../../types/UserType";
-import { StockPlaceType } from "../../types/StockPlaceType";
-import { ColorType } from "../../types/ColorType";
-import { MaterialNameType } from "../../types/MaterialNameType";
+import {
+  UserType,
+  ProductType,
+  GrayFabricType,
+  SupplierType,
+  HistoryType,
+  StockPlaceType,
+} from "../../types";
 
 export const useDataList = () => {
   const [user] = useAuthState(auth);
@@ -55,7 +51,6 @@ export const useDataList = () => {
   const setFabricPurchaseConfirms = useSetRecoilState(
     fabricPurchaseConfirmsState
   );
-  const INIT_DATE = process.env.NEXT_PUBLIC_BASE_DATE;
 
   // users情報;
   useEffect(() => {
@@ -65,13 +60,14 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-          ({
-            ...doc.data(),
-            id: doc.id,
-          } as UserType)
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as UserType)
         )
       )
     );
+    console.log("users");
   }, [setUsers]);
 
   // 未登録であればauthorityに登録;
@@ -109,6 +105,7 @@ export const useDataList = () => {
         console.log(err);
       }
     };
+    console.log("products");
     getProducts();
   }, [setProducts]);
 

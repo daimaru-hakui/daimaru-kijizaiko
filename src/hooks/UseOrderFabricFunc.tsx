@@ -8,11 +8,10 @@ import { useRouter } from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
-import { ProductType } from "../../types/FabricType";
-import { HistoryType } from "../../types/HistoryType";
+import { ProductType, HistoryType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
-import useSWR from 'swr';
+import useSWR from "swr";
 import { useState } from "react";
 
 export const useOrderFabricFunc = (
@@ -220,8 +219,8 @@ export const useOrderFabricFunc = (
           quantity: items.quantity || 0,
           serialNumber,
           stockPlace: items.stockPlace || "徳島工場",
-          createUser: getUserName(currentUser)
-        }
+          createUser: getUserName(currentUser),
+        },
       });
     }
   };

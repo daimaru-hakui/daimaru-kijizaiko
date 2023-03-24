@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { UserType } from "../../../../types/UserType";
+import { UserType } from "../../../../types";
 
 type Data = {
   contents: UserType[];

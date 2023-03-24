@@ -1,12 +1,12 @@
 import { atom } from "recoil";
-import { ColorType } from "../types/ColorType";
-import { ProductType } from "../types/FabricType";
-import { GrayFabricType } from "../types/GrayFabricType";
-import { HistoryType } from "../types/HistoryType";
-import { MaterialNameType } from "../types/MaterialNameType";
-import { StockPlaceType } from "../types/StockPlaceType";
-import { SupplierType } from "../types/SupplierType";
-import { UserType } from "../types/UserType";
+import {
+  UserType,
+  ProductType,
+  GrayFabricType,
+  HistoryType,
+  StockPlaceType,
+  SupplierType,
+} from "../types";
 
 export const loadingState = atom<boolean>({
   key: "loadingState",

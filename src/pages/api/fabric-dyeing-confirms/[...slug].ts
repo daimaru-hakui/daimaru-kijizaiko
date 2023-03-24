@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { HistoryType } from "../../../../types/HistoryType";
+import { HistoryType } from "../../../../types";
 
 type Data = {
   contents: HistoryType[];
@@ -17,23 +17,24 @@ export default async function handler(
     const startDay = slug[0];
     const endDay = slug[1];
     const { createUser } = req.query;
-    
+
     const querySnapshot = await db
       .collection("fabricDyeingConfirms")
-      // .where("quantity",">" ,0)
       .orderBy("fixedAt")
       .startAt(startDay)
       .endAt(endDay)
       .get();
-    const snapshot = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
-    ).filter((content) => (
-      (createUser === content.createUser || createUser === "")
-    )).sort((a, b) => {
-      if (a.fixedAt > b.fixedAt) {
-        return -1;
-      }
-    });;
+    const snapshot = querySnapshot.docs
+      .map((doc) => ({ ...doc.data(), id: doc.id } as HistoryType))
+      .filter(
+        (content) => createUser === content.createUser || createUser === ""
+      )
+      .sort((a, b) => {
+        if (a.fixedAt > b.fixedAt) {
+          return -1;
+        }
+      });
+    console.log("fabric-dyeing-confirms");
     return res.status(200).json({ contents: snapshot });
   }
 }

@@ -24,10 +24,10 @@ import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import { HistoryType } from "../../../types/HistoryType";
-import useSWR from "swr";
+import { HistoryType } from "../../../types";
 import { useForm, FormProvider } from "react-hook-form";
 import SearchArea from "../SearchArea";
+import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 
 type Props = {
   productId: string;
@@ -58,9 +58,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data } = useSWR(
-    `/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`
-  );
+  const { data } = useSWRPurchaseConfirms(startDay, endDay, staff);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -167,7 +165,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number; },
+                            fabric: HistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>
