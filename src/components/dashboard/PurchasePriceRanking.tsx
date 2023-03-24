@@ -12,7 +12,7 @@ import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -47,13 +47,15 @@ const PurchasePriceRanking: NextPage<Props> = ({
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
-        const filterData = data?.filter((obj: HistoryType) => (
-          new Date(startDay).getTime() <= new Date(obj.fixedAt).getTime() &&
-          new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()));
+        const filterData = data?.filter(
+          (obj: HistoryType) =>
+            new Date(startDay).getTime() <= new Date(obj.fixedAt).getTime() &&
+            new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()
+        );
 
         let sum = 0;
         filterData.forEach(
-          (obj: { productId: string; quantity: number; price: number; }) => {
+          (obj: { productId: string; quantity: number; price: number }) => {
             if (obj.productId === header) {
               sum += obj.price * obj.quantity;
             }
@@ -95,7 +97,7 @@ const PurchasePriceRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string; }) =>
+      (ranking: { productId: string }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -108,7 +110,7 @@ const PurchasePriceRanking: NextPage<Props> = ({
         label: "購入金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((price: { price: number; }) => price.price.toFixed()),
+          ?.map((price: { price: number }) => price.price.toFixed()),
         borderColor: "rgba(255, 206, 86, 1)",
         backgroundColor: "rgba(255, 206, 86, 0.5)",
       },

@@ -2,11 +2,9 @@ import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import AccountingConfirmTable from "../../components/accounting/AccountingConfirmTable";
-import AccountingHistoryConfirmTable from "../../components/accounting/AccountingConfirmTable";
 import AccountingOrderTable from "../../components/accounting/AccountingOrderTable";
-import AccountingHistoryOrderTable from "../../components/accounting/AccountingOrderTable";
 
 const AccountingDept = () => {
   const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
@@ -64,15 +62,10 @@ const AccountingDept = () => {
 
           <TabPanels>
             <TabPanel>
-              <AccountingOrderTable
-
-
-              />
+              <AccountingOrderTable />
             </TabPanel>
             <TabPanel>
-              <AccountingConfirmTable
-
-              />
+              <AccountingConfirmTable />
             </TabPanel>
           </TabPanels>
         </Tabs>

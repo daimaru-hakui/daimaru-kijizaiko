@@ -2,7 +2,7 @@ import { Box, Container, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {

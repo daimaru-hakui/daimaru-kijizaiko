@@ -8,15 +8,15 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { suppliersState } from "../../../store";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { useForm } from 'react-hook-form';
+import { useForm } from "react-hook-form";
 
 type Props = {
   title: string;
@@ -29,24 +29,29 @@ const GrayFabricInputArea: NextPage<Props> = ({
   title,
   grayFabric,
   toggleSwitch,
-  onClose
+  onClose,
 }) => {
   const [grayFabrics, setGrayFabrics] = useState([] as GrayFabricType[]);
   const suppliers = useRecoilValue(suppliersState);
   const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc();
   const [flag, setFlag] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      ...grayFabric
-    }
+      ...grayFabric,
+    },
   });
 
   const onSubmit = (data: GrayFabricType) => {
     switch (toggleSwitch) {
-      case 'new':
+      case "new":
         addGrayFabric(data);
         return;
-      case 'edit':
+      case "edit":
         updateGrayFabric(data, grayFabric.id);
         onClose();
         return;
@@ -57,7 +62,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
 
   useEffect(() => {
     const getGrayFabrics = async () => {
-      const docsRef = collection(db, 'grayFabrics');
+      const docsRef = collection(db, "grayFabrics");
       const querysnap = await getDocs(docsRef);
       setGrayFabrics(
         querysnap.docs.map(
@@ -71,16 +76,14 @@ const GrayFabricInputArea: NextPage<Props> = ({
   // 生地が登録しているかのチェック
   useEffect(() => {
     let productNumber = watch("productNumber");
-    if (!productNumber) productNumber = 'noValue';
+    if (!productNumber) productNumber = "noValue";
 
     const base = grayFabrics.map(
-      (grayFabric: GrayFabricType) =>
-        grayFabric.productNumber
+      (grayFabric: GrayFabricType) => grayFabric.productNumber
     );
     setFlag(base?.includes(productNumber));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch("productNumber")]);
-
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -103,7 +106,7 @@ const GrayFabricInputArea: NextPage<Props> = ({
               placeholder="メーカーを選択してください"
               {...register("supplierId", { required: true })}
             >
-              {suppliers?.map((supplier: { id: string; name: string; }) => (
+              {suppliers?.map((supplier: { id: string; name: string }) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
                 </option>
@@ -152,26 +155,16 @@ const GrayFabricInputArea: NextPage<Props> = ({
         </Flex>
         <Box>
           <Text fontWeight="bold">コメント</Text>
-          <Textarea
-            mt={1}
-            {...register("comment")}
-          />
+          <Textarea mt={1} {...register("comment")} />
         </Box>
-        {toggleSwitch === 'new' && (
-          <Button
-            type="submit"
-            colorScheme="facebook"
-            disabled={flag}
-          >
+        {toggleSwitch === "new" && (
+          <Button type="submit" colorScheme="facebook" disabled={flag}>
             登録
           </Button>
         )}
 
-        {toggleSwitch === 'edit' && (
-          <Button
-            type="submit"
-            colorScheme="facebook"
-          >
+        {toggleSwitch === "edit" && (
+          <Button type="submit" colorScheme="facebook">
             更新
           </Button>
         )}

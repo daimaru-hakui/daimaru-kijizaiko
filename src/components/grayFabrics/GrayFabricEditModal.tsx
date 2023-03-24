@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { FaEdit } from "react-icons/fa";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import GrayFabricInputArea from "./GrayFabricInputArea";
 
 type Props = {

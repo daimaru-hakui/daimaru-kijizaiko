@@ -14,7 +14,7 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 
 type Props = {
@@ -43,7 +43,6 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
   };
 
   return (
-
     <Tr height="50px">
       <Td>{grayFabric.productNumber}</Td>
       <Td p={1} isNumeric>
@@ -108,7 +107,6 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
         </Flex>
       </Td>
     </Tr>
-
   );
 };
 

@@ -20,7 +20,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 import DisplayStock from "./DisplayStock";
 import OrderInputArea from "./OrderInputArea";
 

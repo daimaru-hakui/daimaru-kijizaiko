@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
-import { SupplierType } from "../../../../types/SupplierType";
+import { SupplierType } from "../../../../types";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Inputs = SupplierType;
@@ -26,7 +26,12 @@ type Inputs = SupplierType;
 const SupplierNew = () => {
   const router = useRouter();
   const [suppliers, setSuppliers] = useState([] as SupplierType[]);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Inputs>();
   const [flag, setFlag] = useState(false);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -60,9 +65,9 @@ const SupplierNew = () => {
 
   // 登録しているかのチェック
   useEffect(() => {
-    let item = watch('name');
+    let item = watch("name");
     if (!item) item = "noValue";
-    const base = suppliers?.map((a: { name: string; }) => a.name);
+    const base = suppliers?.map((a: { name: string }) => a.name);
     const result = base?.includes(item);
     if (!result) {
       setFlag(false);
@@ -70,7 +75,7 @@ const SupplierNew = () => {
       setFlag(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch('name')]);
+  }, [watch("name")]);
 
   return (
     <Box w="100%" mt={12} px={6}>
@@ -98,8 +103,16 @@ const SupplierNew = () => {
               <Box w="100%" flex={2}>
                 <Text>仕入先名</Text>
                 <Input mt={1} {...register("name", { required: true })} />
-                {errors.name && <Box color="red" fontWeight="bold">※仕入れ先を入力してください</Box>}
-                {flag && <Box color="red" fontWeight="bold">※すでに登録されています。</Box>}
+                {errors.name && (
+                  <Box color="red" fontWeight="bold">
+                    ※仕入れ先を入力してください
+                  </Box>
+                )}
+                {flag && (
+                  <Box color="red" fontWeight="bold">
+                    ※すでに登録されています。
+                  </Box>
+                )}
               </Box>
               <Box w="100%" flex={1}>
                 <Text>フリガナ</Text>
@@ -110,11 +123,7 @@ const SupplierNew = () => {
                 <Textarea mt={1} {...register("comment")} />
               </Box>
             </Flex>
-            <Button
-              type="submit"
-              disabled={flag}
-              colorScheme="facebook"
-            >
+            <Button type="submit" disabled={flag} colorScheme="facebook">
               登録
             </Button>
           </Stack>

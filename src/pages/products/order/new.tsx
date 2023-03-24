@@ -2,12 +2,10 @@ import { Box, Button, Container, Flex, Input, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../../store";
-import { ProductType } from "../../../../types/FabricType";
+import { ProductType } from "../../../../types";
 import OrderAreaModal from "../../../components/products/OrderAreaModal";
-// import { useInputProduct } from "../../../hooks/_UseInputProduct";
 
 const OrderNew = () => {
-  // const { items, setItems, handleInputChange } = useInputProduct();
   const products = useRecoilValue(productsState);
   const [filterPoduct, setFilterProduct] = useState({} as ProductType);
   const [items, setItems] = useState({} as any);

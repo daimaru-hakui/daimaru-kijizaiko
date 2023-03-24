@@ -12,7 +12,7 @@ import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -43,18 +43,19 @@ const PurchaseQuantityRanking: NextPage<Props> = ({
 
   useEffect(() => {
     const getArray = async () => {
-
       const ProductIds = data?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
-        const filterData = data?.filter((obj: HistoryType) => (
-          new Date(startDay).getTime() < new Date(obj.fixedAt).getTime() &&
-          new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()));
+        const filterData = data?.filter(
+          (obj: HistoryType) =>
+            new Date(startDay).getTime() < new Date(obj.fixedAt).getTime() &&
+            new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()
+        );
 
         let sum = 0;
-        filterData.forEach((obj: { productId: string; quantity: number; }) => {
+        filterData.forEach((obj: { productId: string; quantity: number }) => {
           if (obj.productId === header) {
             sum += obj.quantity;
           }
@@ -95,7 +96,7 @@ const PurchaseQuantityRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string; }) =>
+      (ranking: { productId: string }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -108,7 +109,7 @@ const PurchaseQuantityRanking: NextPage<Props> = ({
         label: "購入数量（ｍ）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { quantity: number; }) => ranking.quantity),
+          ?.map((ranking: { quantity: number }) => ranking.quantity),
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.5)",
       },

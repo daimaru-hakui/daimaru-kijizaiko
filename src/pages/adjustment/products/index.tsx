@@ -14,10 +14,9 @@ import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../../store";
-// import { ProductType } from "../../../types/ProductType";
+import { ProductType } from "../../../../types";
 import AdjustmentProduct from "../../../components/adjustment/AdjustmentProduct";
 import { useUtil } from "../../../hooks/UseUtil";
-import { ProductType } from "../../../../types/FabricType";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 
 const AdjustmentProducts = () => {
@@ -29,7 +28,7 @@ const AdjustmentProducts = () => {
 
   useEffect(() => {
     setFilterProducts(
-      products.filter((product: any) =>
+      products.filter((product: ProductType) =>
         product.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
       )
     );
@@ -90,7 +89,7 @@ const AdjustmentProducts = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterProducts.map((product: any) => (
+              {filterProducts.map((product: ProductType) => (
                 <AdjustmentProduct key={product.id} product={product} />
               ))}
             </Tbody>

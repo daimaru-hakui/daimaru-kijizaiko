@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
-import { StockPlaceType } from "../../../../types/StockPlaceType";
+import { StockPlaceType } from "../../../../types";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Inputs = StockPlaceType;
@@ -30,13 +30,17 @@ const StockPlaceNew = () => {
   const currentUser = useRecoilValue(currentUserState);
   const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
   const [flag, setFlag] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    const collectionStockPlaces
-      = collection(db, "stockPlaces");
+    const collectionStockPlaces = collection(db, "stockPlaces");
     try {
       await addDoc(collectionStockPlaces, {
         name: data.name || "",
@@ -58,9 +62,9 @@ const StockPlaceNew = () => {
   };
 
   useEffect(() => {
-    let item = watch('name');
+    let item = watch("name");
     if (!item) item = "noValue";
-    const base = stockPlaces?.map((a: { name: string; }) => a.name);
+    const base = stockPlaces?.map((a: { name: string }) => a.name);
     const result = base?.includes(item);
     if (!result) {
       setFlag(false);
@@ -68,7 +72,7 @@ const StockPlaceNew = () => {
       setFlag(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch('name')]);
+  }, [watch("name")]);
 
   useEffect(() => {
     const getStockPlaces = async () => {
@@ -108,13 +112,30 @@ const StockPlaceNew = () => {
             <Flex gap={6} flexDirection={{ base: "column" }}>
               <Box w="100%" flex={2}>
                 <Text>送り先名</Text>
-                <Input mt={1} placeholder="例）徳島工場" {...register("name", { required: true })} />
-                {errors.name && <Box color="red" fontWeight="bold"> ※送り先名を入力してください</Box>}
-                {flag && <Box color="red" fontWeight="bold">※すでに登録されています。</Box>}
+                <Input
+                  mt={1}
+                  placeholder="例）徳島工場"
+                  {...register("name", { required: true })}
+                />
+                {errors.name && (
+                  <Box color="red" fontWeight="bold">
+                    {" "}
+                    ※送り先名を入力してください
+                  </Box>
+                )}
+                {flag && (
+                  <Box color="red" fontWeight="bold">
+                    ※すでに登録されています。
+                  </Box>
+                )}
               </Box>
               <Box w="100%" flex={1}>
                 <Text>フリガナ</Text>
-                <Input mt={1} placeholder="フリガナ" {...register("kana", { required: true })} />
+                <Input
+                  mt={1}
+                  placeholder="フリガナ"
+                  {...register("kana", { required: true })}
+                />
               </Box>
               <Box w="100%" flex={1}>
                 <Text>住所</Text>
@@ -135,11 +156,7 @@ const StockPlaceNew = () => {
                 <Textarea mt={1} {...register("comment")} />
               </Box>
             </Flex>
-            <Button
-              type="submit"
-              disabled={flag}
-              colorScheme="facebook"
-            >
+            <Button type="submit" disabled={flag} colorScheme="facebook">
               登録
             </Button>
           </Stack>

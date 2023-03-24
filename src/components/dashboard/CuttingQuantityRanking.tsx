@@ -10,9 +10,11 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
-import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
-import { CuttingReportType } from "../../../types/CuttingReportType";
-import { CuttingProductType } from "../../../types/CuttingProductType";
+import {
+  CuttingReportType,
+  CuttingHistoryType,
+  CuttingProductType,
+} from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
 
@@ -45,26 +47,34 @@ const CuttingQuantityRanking: NextPage<Props> = ({
 
   useEffect(() => {
     const getArray = () => {
-      const filterArray = data?.map((obj: CuttingReportType) => obj.products.map(
-        (product: CuttingProductType) => (
-          {
-            ...obj,
-            ...product,
-            products: null,
-          } as CuttingHistoryType)
-      )
-      ).flat().filter((obj) => (
-        new Date(startDay).getTime() <= new Date(obj.cuttingDate).getTime() &&
-        new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime())
-      );
+      const filterArray = data
+        ?.map((obj: CuttingReportType) =>
+          obj.products.map(
+            (product: CuttingProductType) =>
+              ({
+                ...obj,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
+          )
+        )
+        .flat()
+        .filter(
+          (obj) =>
+            new Date(startDay).getTime() <=
+              new Date(obj.cuttingDate).getTime() &&
+            new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
+        );
 
-      const ProductIds = filterArray?.map((obj: { productId: string; }) => obj.productId);
+      const ProductIds = filterArray?.map(
+        (obj: { productId: string }) => obj.productId
+      );
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: any) => {
         let sum = 0;
-        filterArray?.forEach((obj: { productId: string; quantity: number; }) => {
+        filterArray?.forEach((obj: { productId: string; quantity: number }) => {
           if (obj.productId === header) {
             sum += obj.quantity;
           }
@@ -104,7 +114,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string; }) =>
+      (ranking: { productId: string }) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -117,7 +127,7 @@ const CuttingQuantityRanking: NextPage<Props> = ({
         label: "使用数量（ｍ）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { quantity: number; }) => ranking.quantity),
+          ?.map((ranking: { quantity: number }) => ranking.quantity),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },

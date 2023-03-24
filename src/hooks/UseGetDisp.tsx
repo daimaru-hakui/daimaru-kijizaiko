@@ -6,8 +6,7 @@ import {
   suppliersState,
   usersState,
 } from "../../store";
-import { ProductType } from "../../types/FabricType";
-import { MaterialsType } from "../../types/MaterialsType";
+import { ProductType, MaterialsType } from "../../types";
 
 export const useGetDisp = () => {
   const users = useRecoilValue(usersState);

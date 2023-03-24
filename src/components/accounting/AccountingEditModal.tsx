@@ -27,7 +27,7 @@ import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import useSWR from "swr";
 
@@ -36,10 +36,7 @@ type Props = {
   history: HistoryType;
 };
 
-export const AccountingEditModal: NextPage<Props> = ({
-  type,
-  history,
-}) => {
+export const AccountingEditModal: NextPage<Props> = ({ type, history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";

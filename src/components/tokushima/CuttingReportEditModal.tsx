@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { CuttingReportType } from "../../../types/CuttingReportType";
+import { CuttingReportType } from "../../../types";
 import CuttingReportInputArea from "./CuttingReportInputArea";
 
 type Props = {

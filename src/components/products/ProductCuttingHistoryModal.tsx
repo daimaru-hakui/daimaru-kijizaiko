@@ -25,15 +25,17 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
-import { CuttingProductType } from "../../../types/CuttingProductType";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { CuttingReportType } from "../../../types/CuttingReportType";
-import { CuttingHistoryType } from "../../../types/CuttingHistoryType";
+import {
+  CuttingReportType,
+  CuttingHistoryType,
+  CuttingProductType,
+} from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
-import useSWRImmutable from "swr/immutable";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm, FormProvider } from "react-hook-form";
 import SearchArea from "../SearchArea";
+import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 
 type Props = {
   productId: string;
@@ -64,9 +66,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`
-  );
+  const { data } = useSWRCuttingReportImutable(startDay, endDay, staff, client);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -98,24 +98,24 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
+                ({
+                  ...cuttingReport,
+                  ...product,
+                  products: null,
+                } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string; }) => report.productId === productId
+            (report: { productId: string }) => report.productId === productId
           )
           .filter(
             (obj: CuttingReportType) =>
               new Date(startDay).getTime() <=
-              new Date(obj.cuttingDate).getTime() &&
+                new Date(obj.cuttingDate).getTime() &&
               new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
           )
-          .sort((a: { cuttingDate: string; }, b: { cuttingDate: string; }) => {
+          .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
             if (a.cuttingDate > b.cuttingDate) {
               return -1;
             }
@@ -200,7 +200,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number; },
+                            report: CuttingHistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>

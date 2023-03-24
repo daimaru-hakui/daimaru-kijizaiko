@@ -12,14 +12,14 @@ import {
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import { db } from "../../../firebase";
-import { HistoryType } from "../../../types/HistoryType";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import CommentModal from "../CommentModal";
-import { HistoryEditModal } from "../history/HistoryEditModal";
 import useSWR from "swr";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
+import { HistoryType } from "../../../types";
+import { useGetDisp } from "../../hooks/UseGetDisp";
+import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import CommentModal from "../CommentModal";
+import { HistoryEditModal } from "../history/HistoryEditModal";
 
 const GrayFabricConfirmTable = () => {
   const [items, setItems] = useState({} as HistoryType);

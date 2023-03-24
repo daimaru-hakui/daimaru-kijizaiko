@@ -19,6 +19,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
+import { MaterialsType } from "../../../types";
 
 type Props = {
   materials: { id: string; name: string }[];
@@ -52,7 +53,7 @@ const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
 
   const handleInputChange = (e: string, name: string) => {
     if (Number(e) === 0) {
-      setItems((prev: any) => {
+      setItems((prev: MaterialsType[]) => {
         delete prev[name];
         return { ...items };
       });

@@ -22,7 +22,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, grayFabricOrdersState } from "../../../store";
-import { HistoryType } from "../../../types/HistoryType";
+import { HistoryType } from "../../../types";
 import OrderToConfirmModal from "../history/OrderToConfirmModal";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";

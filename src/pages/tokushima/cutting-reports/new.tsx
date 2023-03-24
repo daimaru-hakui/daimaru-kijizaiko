@@ -1,6 +1,6 @@
 import { Box, Container } from "@chakra-ui/react";
 import { useState } from "react";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { CuttingReportType } from "../../../../types";
 import CuttingReportInputArea from "../../../components/tokushima/CuttingReportInputArea";
 import { useUtil } from "../../../hooks/UseUtil";
 
@@ -34,7 +34,6 @@ const CuttingReportNew = () => {
           title="裁断報告書作成"
           pageType="new"
           report={report}
-          onClose={() => {}}
         />
       </Container>
     </Box>

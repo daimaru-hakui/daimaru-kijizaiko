@@ -18,14 +18,16 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingState, productsState } from "../../../store";
-import { CuttingReportType } from "../../../types/CuttingReportType";
-import { CuttingProductType } from "../../../types/CuttingProductType";
+import {
+  ProductType,
+  CuttingReportType,
+  CuttingProductType,
+} from "../../../types";
 import { db } from "../../../firebase";
 import { doc, runTransaction } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { ProductType } from "../../../types/FabricType";
 import StockEditModal from "./StockEditModal";
 
 type Props = {

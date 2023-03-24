@@ -21,7 +21,7 @@ import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
-import { StockPlaceType } from "../../../../types/StockPlaceType";
+import { StockPlaceType } from "../../../../types";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
@@ -33,10 +33,15 @@ type Inputs = StockPlaceType;
 const EditModal: NextPage<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
     defaultValues: {
-      ...stockPlace
-    }
+      ...stockPlace,
+    },
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -110,7 +115,6 @@ const EditModal: NextPage<Props> = ({ stockPlace }) => {
       </Modal>
     </>
   );
-
 };
 
 export default EditModal;

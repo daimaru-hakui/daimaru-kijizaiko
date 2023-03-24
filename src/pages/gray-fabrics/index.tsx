@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { currentUserState, grayFabricsState } from "../../../store";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import CommentModal from "../../components/CommentModal";
 import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrderAreaModal";
@@ -99,15 +99,15 @@ const GrayFabrics = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       fabric?.createUser === currentUser) && (
-                        <Flex alignItems="center" gap={3}>
-                          <GrayFabricEditModal grayFabric={fabric} />
-                          <FaTrashAlt
-                            color="#444"
-                            cursor="pointer"
-                            onClick={() => deleteGrayFabric(fabric.id)}
-                          />
-                        </Flex>
-                      )}
+                      <Flex alignItems="center" gap={3}>
+                        <GrayFabricEditModal grayFabric={fabric} />
+                        <FaTrashAlt
+                          color="#444"
+                          cursor="pointer"
+                          onClick={() => deleteGrayFabric(fabric.id)}
+                        />
+                      </Flex>
+                    )}
                   </Td>
                 </Tr>
               ))}

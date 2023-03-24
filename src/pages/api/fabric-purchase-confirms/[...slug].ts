@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { HistoryType } from "../../../../types/HistoryType";
+import { HistoryType } from "../../../../types";
 
 type Data = {
   contents: HistoryType[];
@@ -26,15 +26,17 @@ export default async function handler(
       .endAt(endDay)
       .get();
 
-    const contents = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
-    ).filter((content) => (
-      (createUser === content.createUser || createUser === "")
-    )).sort((a, b) => {
-      if (a.fixedAt > b.fixedAt) {
-        return -1;
-      }
-    });
+    const contents = querySnapshot.docs
+      .map((doc) => ({ ...doc.data(), id: doc.id } as HistoryType))
+      .filter(
+        (content) => createUser === content.createUser || createUser === ""
+      )
+      .sort((a, b) => {
+        if (a.fixedAt > b.fixedAt) {
+          return -1;
+        }
+      });
+    console.log("fabric-purchase-confirms");
     return res.status(200).json({ contents });
   }
 }

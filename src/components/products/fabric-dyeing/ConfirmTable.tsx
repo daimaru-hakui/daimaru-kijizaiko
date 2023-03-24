@@ -19,15 +19,15 @@ import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentUserState, loadingState } from "../../../../store";
 import CommentModal from "../../CommentModal";
-import { HistoryType } from "../../../../types/HistoryType";
+import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
-import useSWR from "swr";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
 import SearchArea from "../../SearchArea";
+import { useSWRFabricDyeingConfirms } from "../../../hooks/swr/useSWRFabricDyeingConfirms";
 
 type Inputs = {
   start: string;
@@ -54,9 +54,8 @@ const FabricDyeingConfirmTable = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data, mutate } = useSWR(
-    `/api/fabric-dyeing-confirms/${startDay}/${endDay}?createUser=${staff}`
-  );
+
+  const { data, mutate } = useSWRFabricDyeingConfirms(startDay, endDay, staff);
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
@@ -79,7 +78,7 @@ const FabricDyeingConfirmTable = () => {
 
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history.quantity > 0 && history
+      (history: { quantity: number }) => history.quantity > 0 && history
     );
     setFilterHistories(newHistorys);
   }, [data]);
@@ -97,14 +96,14 @@ const FabricDyeingConfirmTable = () => {
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
         const stock = (await productDocSnap.data().externalStock) || 0;
-        const newStock = stock - history.quantity + items.quantity;
+        const newStock = stock - history.quantity + Number(items.quantity);
         transaction.update(productDocRef, {
-          externalStock: newStock,
+          externalStock: Number(newStock),
         });
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
-          price: items.price,
+          quantity: Number(items.quantity),
+          price: Number(items.price),
           fixedAt: items.fixedAt,
           comment: items.comment,
           updateUser: currentUser,
@@ -175,15 +174,15 @@ const FabricDyeingConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={() => updateFabricDyeingConfirm(history)}
-                          orderType=""
-                        />
-                      )}
+                      <HistoryEditModal
+                        history={history}
+                        type="confirm"
+                        items={items}
+                        setItems={setItems}
+                        onClick={() => updateFabricDyeingConfirm(history)}
+                        orderType=""
+                      />
+                    )}
                   </Td>
                 </Tr>
               ))}

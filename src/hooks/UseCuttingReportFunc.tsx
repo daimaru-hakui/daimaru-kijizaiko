@@ -4,16 +4,15 @@ import {
   doc,
   runTransaction,
   serverTimestamp,
-  Timestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
-import { CuttingReportType } from "../../types/CuttingReportType";
+import { CuttingReportType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
-import useSWR from "swr";
+import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
 
 export const useCuttingReportFunc = (
   items?: CuttingReportType | null,
@@ -28,7 +27,12 @@ export const useCuttingReportFunc = (
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWR(`/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`);
+  const { data, mutate } = useSWRCuttingReportImutable(
+    startDay,
+    endDay,
+    staff,
+    client
+  );
 
   // 商品登録項目を追加
   const addInput = () => {
@@ -151,12 +155,11 @@ export const useCuttingReportFunc = (
           totalQuantity: Number(items.totalQuantity),
         });
       });
+      await mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
-      await mutate({ ...data });
-      await router.push("/tokushima/cutting-reports");
     }
   };
 
@@ -169,8 +172,6 @@ export const useCuttingReportFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      // await mutate({ ...data });
-      await router.push("/tokushima/cutting-reports");
     }
   };
 

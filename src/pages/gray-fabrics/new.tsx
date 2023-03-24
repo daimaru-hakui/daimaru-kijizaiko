@@ -1,6 +1,6 @@
 import { Box, Container } from "@chakra-ui/react";
 import { useState } from "react";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import GrayFabricInputArea from "../../components/grayFabrics/GrayFabricInputArea";
 
 const GrayFabricsNew = () => {
@@ -32,7 +32,6 @@ const GrayFabricsNew = () => {
           title="登録"
           grayFabric={grayFabric as GrayFabricType}
           toggleSwitch="new"
-          onClose={() => {}}
         />
       </Container>
     </Box>

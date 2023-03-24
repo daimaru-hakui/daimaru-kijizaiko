@@ -16,12 +16,12 @@ import {
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { suppliersState } from "../../../../store";
-import EditModal from "../../../components/settings/suppliers/EditModal";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import CommentModal from "../../../components/CommentModal";
-import { SupplierType } from "../../../../types/SupplierType";
+import EditModal from "../../../components/settings/suppliers/EditModal";
+import { SupplierType } from "../../../../types";
 
 const Suppliers = () => {
   const suppliers = useRecoilValue(suppliersState);

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { currentUserState, loadingState, productsState } from "../../store";
-import { ProductType } from "../../types/FabricType";
+import { ProductType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 

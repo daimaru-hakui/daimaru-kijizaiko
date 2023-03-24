@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
-import { UserType } from "../../../../types/UserType";
+import { UserType, CuttingReportType } from "../../../../types";
 
 const getTodayDate = () => {
   const date = new Date();

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { HistoryType } from "../../types/HistoryType";
+import { HistoryType } from "../../types";
 
 export const useInputHistory = () => {
   const [items, setItems] = useState({} as HistoryType);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setItems({ ...items, [name]: value });
@@ -22,8 +24,15 @@ export const useInputHistory = () => {
   };
 
   const onReset = (obj: HistoryType) => {
-    setItems({ ...obj })
-  }
+    setItems({ ...obj });
+  };
 
-  return { items, setItems, handleInputChange, handleNumberChange, handleRadioChange, onReset };
+  return {
+    items,
+    setItems,
+    handleInputChange,
+    handleNumberChange,
+    handleRadioChange,
+    onReset,
+  };
 };

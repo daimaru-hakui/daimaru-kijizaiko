@@ -2,7 +2,6 @@ import Head from "next/head";
 import { useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useDataList } from "../hooks/UseDataList";
 
 export default function Home() {
   const router = useRouter();
@@ -10,8 +9,6 @@ export default function Home() {
   useEffect(() => {
     router.push("/dashboard");
   }, [router]);
-
-  const { start } = useDataList()
 
   return (
     <Box w="100%" mt={12}>

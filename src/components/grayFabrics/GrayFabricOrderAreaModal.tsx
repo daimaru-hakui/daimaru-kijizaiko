@@ -34,7 +34,7 @@ import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
-import { GrayFabricType } from "../../../types/GrayFabricType";
+import { GrayFabricType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 
@@ -73,7 +73,11 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
-    const orderNumberDocRef = doc(db, "serialNumbers", "grayFabricOrderNumbers");
+    const orderNumberDocRef = doc(
+      db,
+      "serialNumbers",
+      "grayFabricOrderNumbers"
+    );
     const orderHistoryRef = collection(db, "grayFabricOrders");
 
     try {
@@ -82,7 +86,8 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
         if (!orderNumberDocSnap.exists()) throw "serialNumbers does not exist!";
 
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists()) throw "grayFabricOrders does not exist!";
+        if (!grayFabricDocSnap.exists())
+          throw "grayFabricOrders does not exist!";
 
         const newSerialNumber = orderNumberDocSnap.data().serialNumber + 1;
         transaction.update(orderNumberDocRef, {

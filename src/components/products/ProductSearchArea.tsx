@@ -18,7 +18,7 @@ import { NextPage } from "next";
 import { BsFilter } from "react-icons/bs";
 import { useRecoilValue } from "recoil";
 import { colorsState, materialNamesState } from "../../../store";
-import { ProductType } from "../../../types/FabricType";
+import { ProductType } from "../../../types";
 
 type Props = {
   search: ProductType;

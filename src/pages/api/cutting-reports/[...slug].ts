@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { CuttingReportType } from "../../../../types/CuttingReportType";
+import { CuttingReportType } from "../../../../types";
 
 type Data = {
   contents: CuttingReportType[];
