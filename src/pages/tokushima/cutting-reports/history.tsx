@@ -46,7 +46,7 @@ const HistoryCutting = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data } = useSWRCuttingReports(startDay, endDay, staff, client);
+  const { data } = useSWRCuttingReports(startDay, endDay);
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   const methods = useForm<Inputs>({
@@ -75,23 +75,20 @@ const HistoryCutting = () => {
   useEffect(() => {
     setCuttingList(
       data?.contents
-        ?.map((cuttingReport: CuttingReportType) =>
-          cuttingReport?.products.map(
+        ?.map((report: CuttingReportType) =>
+          report?.products.map(
             (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-              } as CuttingHistoryType)
+            ({
+              ...report,
+              ...product,
+            } as CuttingHistoryType)
           )
         )
         .flat()
-        .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
-          if (a.cuttingDate > b.cuttingDate) {
-            return -1;
-          }
-        })
+        .filter((report) => staff === report.staff || staff === "")
+        .filter((report) => report.client.includes(String(client)))
     );
-  }, [startDay, endDay, data]);
+  }, [startDay, endDay, data, staff, client]);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

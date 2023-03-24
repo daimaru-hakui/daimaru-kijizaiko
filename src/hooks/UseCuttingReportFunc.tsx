@@ -30,8 +30,6 @@ export const useCuttingReportFunc = (
   const { data, mutate } = useSWRCuttingReportImutable(
     startDay,
     endDay,
-    staff,
-    client
   );
 
   // 商品登録項目を追加

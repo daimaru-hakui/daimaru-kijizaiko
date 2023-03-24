@@ -66,7 +66,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data } = useSWRCuttingReportImutable(startDay, endDay, staff, client);
+  const { data } = useSWRCuttingReportImutable(startDay, endDay);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -98,32 +98,23 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-                ({
-                  ...cuttingReport,
-                  ...product,
-                  products: null,
-                } as CuttingHistoryType)
+              ({
+                ...cuttingReport,
+                ...product,
+                products: null,
+              } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string }) => report.productId === productId
+            (report: { productId: string; }) => report.productId === productId
           )
-          .filter(
-            (obj: CuttingReportType) =>
-              new Date(startDay).getTime() <=
-                new Date(obj.cuttingDate).getTime() &&
-              new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
-          )
-          .sort((a: { cuttingDate: string }, b: { cuttingDate: string }) => {
-            if (a.cuttingDate > b.cuttingDate) {
-              return -1;
-            }
-          })
+          .filter((report) => staff === report.staff || staff === "")
+          .filter((report) => report.client.includes(String(client)))
       );
     };
     getCuttingReports();
-  }, [data, productId, startDay, endDay]);
+  }, [data, productId, startDay, endDay, staff, client]);
 
   useEffect(() => {
     let total = 0;
@@ -200,7 +191,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number },
+                            report: CuttingHistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

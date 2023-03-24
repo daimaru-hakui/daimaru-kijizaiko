@@ -52,8 +52,6 @@ const CuttingReportModal: NextPage<Props> = ({
   const { data, mutate } = useSWRCuttingReports(
     startDay,
     endDay,
-    staff,
-    client
   );
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {

@@ -58,7 +58,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data } = useSWRPurchaseConfirms(startDay, endDay, staff);
+  const { data } = useSWRPurchaseConfirms(startDay, endDay);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -85,12 +85,13 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     const getArray = async () => {
       const filterArray = data?.contents.filter(
         (content: HistoryType) => content.productId === productId
-      );
+      )
+        .filter((history: HistoryType) => staff === history.createUser || staff === "");
       setFilterFabricPurchases(filterArray);
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, data]);
+  }, [productId, data, staff]);
 
   useEffect(() => {
     let total = 0;
@@ -165,7 +166,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number },
+                            fabric: HistoryType & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

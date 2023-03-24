@@ -10,23 +10,66 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../../../firebase";
 import useSWR from "swr";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types";
+import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import CommentModal from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
+import SearchArea from "../SearchArea";
+import { useForm, FormProvider } from "react-hook-form";
+import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
+
+type Inputs = {
+  start: string;
+  end: string;
+  client: string;
+  staff: string;
+};
 
 const GrayFabricConfirmTable = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const currentUser = useRecoilValue(currentUserState);
   const { isAuths } = useAuthManagement();
-  const { data, mutate, isLoading } = useSWR("/api/gray-fabric-confirms");
+  const { getTodayDate, get3monthsAgo } = useUtil();
+  const [startDay, setStartDay] = useState(get3monthsAgo());
+  const [endDay, setEndDay] = useState(getTodayDate());
+  const [staff, setStaff] = useState("");
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as HistoryType[]);
+  const { data, mutate } = useSWRGrayFavricConfirms(startDay, endDay);
+
+  const methods = useForm<Inputs>({
+    defaultValues: {
+      start: startDay,
+      end: endDay,
+      staff: "",
+    },
+  });
+
+  const onSubmit = (data: Inputs) => {
+    setStartDay(data.start);
+    setEndDay(data.end);
+    setStaff(data.staff);
+  };
+  const onReset = () => {
+    setStartDay(get3monthsAgo());
+    setEndDay(getTodayDate());
+    setStaff("");
+    methods.reset();
+  };
+
+  useEffect(() => {
+    const newData = data?.contents?.filter(
+      (content) => staff === content.createUser || staff === ""
+    );
+    setFilterGrayFabrics(newData);
+  }, [data, staff]);
 
   const updateConfirmHistory = async (history: any) => {
     const result = window.confirm("更新して宜しいでしょうか");
@@ -45,14 +88,14 @@ const GrayFabricConfirmTable = () => {
 
         const newStock =
           (await grayFabricDocSnap.data()?.stock) -
-            history.quantity +
-            items.quantity || 0;
+          history.quantity +
+          Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
+          quantity: Number(items.quantity),
           orderedAt: items.orderedAt,
           fixedAt: items.fixedAt,
           comment: items.comment,
@@ -67,8 +110,11 @@ const GrayFabricConfirmTable = () => {
   };
   return (
     <>
+      <FormProvider {...methods}>
+        <SearchArea onSubmit={onSubmit} onReset={onReset} />
+      </FormProvider>
       <TableContainer p={6} pt={0} w="100%">
-        {data?.contents?.length > 0 ? (
+        {filterGrayFabrics?.length > 0 ? (
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
@@ -85,7 +131,7 @@ const GrayFabricConfirmTable = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {data?.contents?.map((history: any) => (
+              {filterGrayFabrics?.map((history: any) => (
                 <Tr key={history.id}>
                   <Td>{getSerialNumber(history.serialNumber)}</Td>
                   <Td>{history.orderedAt}</Td>
@@ -109,22 +155,22 @@ const GrayFabricConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history.createUser === currentUser) && (
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={updateConfirmHistory}
-                        orderType=""
-                      />
-                    )}
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={updateConfirmHistory}
+                          orderType=""
+                        />
+                      )}
                   </Td>
                 </Tr>
               ))}
             </Tbody>
           </Table>
         ) : (
-          <Box textAlign="center">現在登録された情報はありません。</Box>
+          <Box mt={6} textAlign="center">現在登録された情報はありません。</Box>
         )}
       </TableContainer>
     </>

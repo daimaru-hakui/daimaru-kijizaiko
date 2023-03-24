@@ -55,7 +55,7 @@ const FabricDyeingConfirmTable = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
 
-  const { data, mutate } = useSWRFabricDyeingConfirms(startDay, endDay, staff);
+  const { data, mutate } = useSWRFabricDyeingConfirms(startDay, endDay);
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
@@ -78,10 +78,12 @@ const FabricDyeingConfirmTable = () => {
 
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: { quantity: number }) => history.quantity > 0 && history
+      (history: { quantity: number; }) => history.quantity > 0 && history
+    ).filter(
+      (content: HistoryType) => staff === content.createUser || staff === ""
     );
     setFilterHistories(newHistorys);
-  }, [data]);
+  }, [data, staff]);
 
   const updateFabricDyeingConfirm = async (history: HistoryType) => {
     setLoading(true);
@@ -174,15 +176,15 @@ const FabricDyeingConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => updateFabricDyeingConfirm(history)}
-                        orderType=""
-                      />
-                    )}
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => updateFabricDyeingConfirm(history)}
+                          orderType=""
+                        />
+                      )}
                   </Td>
                 </Tr>
               ))}

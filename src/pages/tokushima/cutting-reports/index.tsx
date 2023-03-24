@@ -11,7 +11,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CSVLink } from "react-csv";
 import { CuttingReportType } from "../../../../types";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
@@ -36,13 +36,12 @@ const CuttingReport = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
+  const [filterData, setFilterData] = useState([] as CuttingReportType[]);
   const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
 
-  const { data: cuttingReports } = useSWRCuttingReports(
+  const { data } = useSWRCuttingReports(
     startDay,
     endDay,
-    staff,
-    client
   );
 
   const methods = useForm<Inputs>({
@@ -67,6 +66,12 @@ const CuttingReport = () => {
     setClient("");
     methods.reset();
   };
+
+  useEffect(() => {
+    const result = data?.contents?.filter((report) => staff === report.staff || staff === "")
+      .filter((report) => report.client.includes(String(client)));
+    setFilterData(result);
+  }, [data, staff, client]);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -98,7 +103,7 @@ const CuttingReport = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {cuttingReports?.contents?.map((report: CuttingReportType) => (
+                {filterData?.map((report: CuttingReportType) => (
                   <Tr key={report.serialNumber}>
                     <Td>
                       <CuttingReportModal
