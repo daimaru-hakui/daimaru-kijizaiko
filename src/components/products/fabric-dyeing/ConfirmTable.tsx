@@ -77,12 +77,15 @@ const FabricDyeingConfirmTable = () => {
   };
 
   useEffect(() => {
-    const newHistorys = data?.contents?.filter(
-      (history: { quantity: number; }) => history.quantity > 0 && history
-    ).filter(
-      (content: HistoryType) => staff === content.createUser || staff === ""
-    );
-    setFilterHistories(newHistorys);
+    if (!staff) {
+      setFilterHistories(data?.contents);
+    } else {
+      setFilterHistories(data?.contents?.filter(
+        (history: { quantity: number; }) => history.quantity > 0 && history
+      ).filter(
+        (content: HistoryType) => staff === content.createUser || staff === ""
+      ));
+    }
   }, [data, staff]);
 
   const updateFabricDyeingConfirm = async (history: HistoryType) => {

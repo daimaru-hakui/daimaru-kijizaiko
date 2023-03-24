@@ -15,7 +15,7 @@ import { db } from "../../../firebase";
 import useSWR from "swr";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
-import { HistoryType } from "../../../types";
+import { GrayFabricType, HistoryType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
@@ -65,10 +65,13 @@ const GrayFabricConfirmTable = () => {
   };
 
   useEffect(() => {
-    const newData = data?.contents?.filter(
-      (content) => staff === content.createUser || staff === ""
-    );
-    setFilterGrayFabrics(newData);
+    if (!staff) {
+      setFilterGrayFabrics(data?.contents);
+    } else {
+      setFilterGrayFabrics(data?.contents?.filter(
+        (content: GrayFabricType) =>
+          staff === content.createUser || staff === ""));
+    }
   }, [data, staff]);
 
   const updateConfirmHistory = async (history: any) => {

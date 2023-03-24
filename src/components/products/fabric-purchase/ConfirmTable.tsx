@@ -82,7 +82,13 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   useEffect(() => {
-    let newHistories = data?.contents?.filter((history: HistoryType) => staff === history.createUser || staff === "");
+    let newHistories: HistoryType[];
+    if (!staff) {
+      newHistories = data?.contents;
+    } else {
+      newHistories = data?.contents?.filter(
+        (history: HistoryType) => staff === history.createUser || staff === "");
+    }
     if (HOUSE_FACTORY) {
       newHistories = newHistories?.filter((history: HistoryType) => {
         if (history.stockPlace === HOUSE_FACTORY) {

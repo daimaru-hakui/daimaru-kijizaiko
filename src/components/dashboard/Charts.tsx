@@ -58,15 +58,25 @@ const Charts = () => {
   };
 
   useEffect(() => {
-    const result =
-      cuttingReports?.contents?.filter((report) => staff === report.staff || staff === "");
-    setFilterCuttingReports(result);
+    if (!staff) {
+      setFilterCuttingReports(cuttingReports?.contents);
+    } else {
+      setFilterCuttingReports(
+        cuttingReports?.contents?.filter((report) => staff === report.staff || staff === "")
+      );
+    }
+
   }, [cuttingReports, staff]);
 
   useEffect(() => {
-    const result =
-      fabricPurchaseConfirms?.contents?.filter((report) => staff === report.createUser || staff === "");
-    setFilterPurchaseCofirms(result);
+    if (!staff) {
+      setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents);
+    } else {
+      setFilterPurchaseCofirms(
+        fabricPurchaseConfirms?.contents?.filter((report) =>
+          staff === report.createUser || staff === "")
+      );
+    }
   }, [fabricPurchaseConfirms, staff]);
 
   return (

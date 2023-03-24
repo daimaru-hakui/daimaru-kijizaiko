@@ -68,9 +68,15 @@ const CuttingReport = () => {
   };
 
   useEffect(() => {
-    const result = data?.contents?.filter((report) => staff === report.staff || staff === "")
-      .filter((report) => report.client.includes(String(client)));
-    setFilterData(result);
+    if (!staff) {
+      setFilterData(data?.contents);
+    } else {
+      setFilterData(
+        data?.contents?.filter((report) =>
+          staff === report.staff || staff === "")
+          .filter((report) => report.client.includes(String(client)))
+      );
+    }
   }, [data, staff, client]);
 
   return (

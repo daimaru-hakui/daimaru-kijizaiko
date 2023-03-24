@@ -83,11 +83,15 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
 
   useEffect(() => {
     const getArray = async () => {
-      const filterArray = data?.contents.filter(
+      let filterArray = data?.contents?.filter(
         (content: HistoryType) => content.productId === productId
-      )
-        .filter((history: HistoryType) => staff === history.createUser || staff === "");
-      setFilterFabricPurchases(filterArray);
+      );
+      if (!staff) {
+        setFilterFabricPurchases(filterArray);
+      } else {
+        setFilterFabricPurchases(filterArray.filter(
+          (history: HistoryType) => staff === history.createUser || staff === ""));
+      }
     };
     getArray();
     // eslint-disable-next-line react-hooks/exhaustive-deps
