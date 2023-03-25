@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Flex,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,16 +19,12 @@ type Props = {
   report: CuttingReportType;
   startDay: string;
   endDay: string;
-  staff: string;
-  client: string;
 };
 
 const CuttingReportEditModal: NextPage<Props> = ({
   report,
   startDay,
   endDay,
-  staff,
-  client,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -44,7 +42,11 @@ const CuttingReportEditModal: NextPage<Props> = ({
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>裁断報告書</ModalHeader>
+          <ModalHeader>
+            <Flex gap={3} alignItems="center">
+              <Box>裁断報告書</Box>
+            </Flex>
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <CuttingReportInputArea
@@ -54,8 +56,6 @@ const CuttingReportEditModal: NextPage<Props> = ({
               onClose={onClose}
               startDay={startDay}
               endDay={endDay}
-              staff={staff}
-              client={client}
             />
           </ModalBody>
           <ModalFooter>

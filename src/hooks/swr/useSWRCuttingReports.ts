@@ -3,10 +3,10 @@ export const useSWRCuttingReports = (
   startDay: string,
   endDay: string,
 ) => {
-  const { data, mutate } = useSWR(
+  const { data, mutate,isLoading } = useSWR(
     `/api/cutting-reports/${startDay}/${endDay}`,
-    { dedupingInterval: 10000, revalidateOnMount: true }
+    { dedupingInterval: 15000}
   );
 
-  return { data, mutate };
+  return { data, mutate ,isLoading};
 };

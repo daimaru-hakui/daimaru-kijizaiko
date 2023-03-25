@@ -3,9 +3,9 @@ export const useSWRFabricDyeingConfirms = (
   startDay: string,
   endDay: string,
 ) => {
-  const { data, mutate } = useSWR(
+  const { data, mutate,isLoading } = useSWR(
     `/api/fabric-dyeing-confirms/${startDay}/${endDay}`,
-    { dedupingInterval: 10000, revalidateOnMount: true }
+    { dedupingInterval: 10000 }
   );
-  return { data, mutate };
+  return { data, mutate,isLoading };
 };

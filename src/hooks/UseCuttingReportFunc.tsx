@@ -12,22 +12,20 @@ import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { CuttingReportType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
-import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
+import { useSWRCuttingReports } from "./swr/useSWRCuttingReports";
 
 export const useCuttingReportFunc = (
   items?: CuttingReportType | null,
   setItems?: Function | null,
   startDay?: string,
   endDay?: string,
-  staff?: string,
-  client?: string
 ) => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWRCuttingReportImutable(
+  const { data, mutate } = useSWRCuttingReports(
     startDay,
     endDay,
   );
@@ -138,6 +136,7 @@ export const useCuttingReportFunc = (
             transaction.update(productDocRef, {
               tokushimaStock: Math.round(newTokushimaStock * 100) / 100,
             });
+            await mutate({ ...data, products: { ...products } });
           });
         });
         const products = items.products.map((product) => ({

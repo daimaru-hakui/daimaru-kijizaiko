@@ -3,8 +3,8 @@ export const useSWRCuttingReportImutable = (
   startDay: string,
   endDay: string,
 ) => {
-  const { data, mutate } = useSWRImmutable(
+  const { data, mutate ,isLoading} = useSWRImmutable(
     `/api/cutting-reports/${startDay}/${endDay}`
   );
-  return { data, mutate };
+  return { data, mutate ,isLoading};
 };

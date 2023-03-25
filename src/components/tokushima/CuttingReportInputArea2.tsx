@@ -28,6 +28,7 @@ import {
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
+// import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
 
 type Props = {
@@ -106,6 +107,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
       quantity
     );
   }, [items]);
+  console.log(isLimitQuantity);
 
   return (
     <>
@@ -248,6 +250,7 @@ const CuttingReportInputArea: NextPage<Props> = ({
           }
           if (pageType === "edit") {
             await updateCuttingReport(report.id);
+            await mutate({ ...data }); //必要
             await onClose();
             return;
           }

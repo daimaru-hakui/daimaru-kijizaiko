@@ -53,6 +53,7 @@ const StockEditModal = ({ productId }: Props) => {
       onClose();
     }
   };
+  console.log(stock);
 
   const onReset = () => {
     setStock(0);

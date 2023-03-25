@@ -21,6 +21,7 @@ import SearchArea from "../../../components/SearchArea";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
+import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
 
 type Inputs = {
   start: string;
@@ -37,9 +38,8 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const [filterData, setFilterData] = useState([] as CuttingReportType[]);
-  const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-
-  const { data } = useSWRCuttingReports(
+  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null, startDay, endDay);
+  const { data, mutate } = useSWRCuttingReports(
     startDay,
     endDay,
   );
@@ -112,14 +112,14 @@ const CuttingReport = () => {
                 {filterData?.map((report: CuttingReportType) => (
                   <Tr key={report.serialNumber}>
                     <Td>
-                      <CuttingReportModal
-                        report={report}
-                        reportId={report.id}
-                        startDay={startDay}
-                        endDay={endDay}
-                        staff={staff}
-                        client={client}
-                      />
+                      <Flex gap={3}>
+                        <CuttingReportModal
+                          report={report}
+                          reportId={report.id}
+                          startDay={startDay}
+                          endDay={endDay}
+                        />
+                      </Flex>
                     </Td>
                     <Td>{getSerialNumber(report.serialNumber)}</Td>
                     <Td>{report.cuttingDate}</Td>

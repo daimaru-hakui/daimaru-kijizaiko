@@ -17,14 +17,14 @@ import { FaWindowClose } from "react-icons/fa";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { loadingState, productsState } from "../../../store";
+import { currentUserState, loadingState, productsState } from "../../../store";
 import {
   ProductType,
   CuttingReportType,
   CuttingProductType,
 } from "../../../types";
 import { db } from "../../../firebase";
-import { doc, runTransaction } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
@@ -48,6 +48,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
   setIsLimitQuantity,
 }) => {
   const products = useRecoilValue(productsState);
+  const currentUser = useRecoilValue(currentUserState);
   const [filterProducts, setFilterProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
   const setLoading = useSetRecoilState(loadingState);
@@ -100,6 +101,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
   ) => {
     const name = e.target.name;
     const value = e.target.value;
+    console.log(e);
+    if (e.type === "change" && name === "productId") product.quantity = 0;
     setItems(() => {
       let newArray = [];
       newArray = items.products.map((product, index) =>
@@ -166,6 +169,9 @@ export const FabricsUsedInput: NextPage<Props> = ({
 
         transaction.update(cuttingReportDocRef, {
           ...newObj,
+          createdAt: cuttingReportSnap.data().createdAt.toDate(),
+          updatedUser: currentUser,
+          updatedAt: serverTimestamp()
         });
 
         const newTokushimaStock =
@@ -174,6 +180,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
           tokushimaStock: Number(newTokushimaStock),
         });
       });
+
     } catch (err) {
       console.log(err);
     } finally {
@@ -300,8 +307,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
                     ? "red.300"
                     : ""
                   : getTokushimaStock(product.productId) < product?.quantity //新規
-                  ? "red.300"
-                  : ""
+                    ? "red.300"
+                    : ""
               }
               rounded="md"
               value={product?.quantity}

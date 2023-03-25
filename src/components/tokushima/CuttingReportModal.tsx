@@ -34,8 +34,6 @@ type Props = {
   reportId: string;
   startDay: string;
   endDay: string;
-  staff: string;
-  client: string;
 };
 
 const CuttingReportModal: NextPage<Props> = ({
@@ -43,8 +41,6 @@ const CuttingReportModal: NextPage<Props> = ({
   reportId,
   startDay,
   endDay,
-  staff,
-  client,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
@@ -95,8 +91,6 @@ const CuttingReportModal: NextPage<Props> = ({
                     report={filterReport}
                     startDay={startDay}
                     endDay={endDay}
-                    staff={staff}
-                    client={client}
                   />
                   {filterReport?.products?.length === 0 && (
                     <Button
