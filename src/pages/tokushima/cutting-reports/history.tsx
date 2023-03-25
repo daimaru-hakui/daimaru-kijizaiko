@@ -130,8 +130,6 @@ const HistoryCutting = () => {
                           report={list}
                           startDay={startDay}
                           endDay={endDay}
-                          staff={staff}
-                          client={client}
                         />
                       </Flex>
                     </Td>
