@@ -4,8 +4,7 @@ export const useSWRCuttingReports = (
   endDay: string,
 ) => {
   const { data, mutate,isLoading } = useSWR(
-    `/api/cutting-reports/${startDay}/${endDay}`,
-    { dedupingInterval: 15000}
+    `/api/cutting-reports/${startDay}/${endDay}`
   );
 
   return { data, mutate ,isLoading};
