@@ -18,8 +18,8 @@ import {
 import { FaPlus } from "react-icons/fa";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { usersState } from "../../../store";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { loadingState, usersState } from "../../../store";
 import {
   UserType,
   CuttingProductType,

@@ -69,7 +69,7 @@ const CuttingReport = () => {
 
   useEffect(() => {
     if (!staff) {
-      setFilterData(data?.contents.filter(
+      setFilterData(data?.contents?.filter(
         (report) => report.client.includes(String(client))));
     } else {
       setFilterData(
