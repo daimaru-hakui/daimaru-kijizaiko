@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Divider,
   Flex,
   Input,
   NumberDecrementStepper,
@@ -20,8 +19,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentUserState, loadingState, productsState } from "../../../store";
 import {
   ProductType,
-  CuttingReportType,
   CuttingProductType,
+  CuttingReportType,
 } from "../../../types";
 import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
@@ -29,14 +28,17 @@ import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import StockEditModal from "./StockEditModal";
+import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
 
 type Props = {
-  items: CuttingReportType;
+  items: CuttingProductType[];
   setItems: Function;
-  product: CuttingProductType;
+  product: any;
   rowIndex: number;
   reportId: string;
+  report: CuttingReportType;
   setIsLimitQuantity: Function;
+  totalQuantity: number;
 };
 
 export const FabricsUsedInput: NextPage<Props> = ({
@@ -44,20 +46,22 @@ export const FabricsUsedInput: NextPage<Props> = ({
   setItems,
   product,
   rowIndex,
+  report,
   reportId,
   setIsLimitQuantity,
+  totalQuantity,
 }) => {
   const products = useRecoilValue(productsState);
   const currentUser = useRecoilValue(currentUserState);
-  const [filterProducts, setFilterProducts] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const setLoading = useSetRecoilState(loadingState);
-  const { calcScale } = useCuttingReportFunc(null, null);
   const { halfToFullChar } = useUtil();
   const { getTokushimaStock } = useGetDisp();
+  const [filterProducts, setFilterProducts] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const { calcScale } = useCuttingReportFunc(null, null);
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
   const [maxLimitQuantity, setMaxLimitQuantity] = useState(0);
 
+  // 絞り込み
   useEffect(() => {
     setFilterProducts(
       products.filter((product: ProductType) =>
@@ -82,11 +86,11 @@ export const FabricsUsedInput: NextPage<Props> = ({
   useEffect(() => {
     const limit = reportId
       ? maxLimitQuantity // 編集の場合　maxLimitQuantity
-      : getTokushimaStock(product.productId);
-    const result = limit < items.products[rowIndex].quantity ? true : false;
+      : getTokushimaStock(product.productId); // 新規作成の場合
+    const result = limit < items[rowIndex].quantity ? true : false;
     setIsLimitQuantity(result);
   }, [
-    items.products,
+    items,
     reportId,
     product.productId,
     rowIndex,
@@ -101,55 +105,40 @@ export const FabricsUsedInput: NextPage<Props> = ({
   ) => {
     const name = e.target.name;
     const value = e.target.value;
-    console.log(e);
-    if (e.type === "change" && name === "productId") product.quantity = 0;
-    setItems(() => {
-      let newArray = [];
-      newArray = items.products.map((product, index) =>
+    if (e.type === "change" && name === "productId") items[rowIndex].quantity = 0;
+    setItems(
+      items.map((product, index) =>
         index === rowIndex ? { ...product, [name]: value } : product
-      );
-      return { ...items, products: [...newArray] };
-    });
+      ));
   };
 
   const handleNumbersChange = (e: string, name: string, rowIndex: number) => {
     const value = e;
-    setItems(() => {
-      let newArray = [];
-      newArray = items.products.map((product, index) =>
-        index === rowIndex ? { ...product, [name]: value } : product
-      );
-      return { ...items, products: [...newArray] };
-    });
+    setItems(items.map((product, index) =>
+      index === rowIndex ? { ...product, [name]: value } : product
+    ));
   };
 
   // 商品の行を削除;
   const deleteRowProduct = (rowIndex: number) => {
     const result = window.confirm("削除してよろしいでしょうか?");
     if (!result) return;
-    setItems(() => {
-      let newArray = [];
-      newArray = items.products.filter((_, index) => index !== rowIndex);
-      return { ...items, products: [...newArray] };
-    });
+    setItems(items.filter((_, index) => index !== rowIndex));
   };
 
   // 商品の行を削除（編集画面）;
   const deleteRowProductUpdate = async (rowIndex: number) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
-
-    setItems(() => {
-      let newArray = [];
-      newArray = items.products.filter((_, index) => index !== rowIndex);
-      return { ...items, products: [...newArray] };
-    });
-    setLoading(false);
-
-    if (!items.products[rowIndex].productId) {
+    setItems(items.filter((_, index) => index !== rowIndex));
+    if (!items[rowIndex].productId) {
       return;
     }
+
+    const arrayItems = items.map((item) => item.productId);
+    const baseProductId = report.products[rowIndex]?.productId;
+    const result2 = arrayItems.includes(baseProductId);
+    if (!result2) return;
 
     const cuttingReportDocRef = doc(db, "cuttingReports", reportId);
     const productDocRef = doc(db, "products", product.productId);
@@ -157,16 +146,13 @@ export const FabricsUsedInput: NextPage<Props> = ({
     try {
       runTransaction(db, async (transaction) => {
         const cuttingReportSnap = await transaction.get(cuttingReportDocRef);
-        if (!cuttingReportSnap.exists())
-          throw "cuttingReportSnap does not exist!";
+        if (!cuttingReportSnap.exists()) throw "cuttingReportSnap does not exist!";
 
         const productSnap = await transaction.get(productDocRef);
         if (!productSnap.exists()) throw "productSnap does not exist!";
 
-        let newArray = [];
-        newArray = items.products.filter((_, index) => index !== rowIndex);
-        const newObj = { ...items, products: [...newArray] };
-
+        const newArray = items.filter((_, index) => index !== rowIndex);
+        const newObj = { ...cuttingReportSnap.data(), products: newArray };
         transaction.update(cuttingReportDocRef, {
           ...newObj,
           createdAt: cuttingReportSnap.data().createdAt.toDate(),
@@ -184,7 +170,6 @@ export const FabricsUsedInput: NextPage<Props> = ({
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
     }
   };
 
@@ -241,7 +226,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
             <Select
               mt={1}
               placeholder="選択"
-              value={product.category}
+              value={items[rowIndex].category}
               name="category"
               onChange={(e) => handleInputsChange(e, rowIndex)}
             >
@@ -330,8 +315,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
               readOnly
               bg="gray.100"
               value={calcScale(
-                items?.products[rowIndex].quantity,
-                items.totalQuantity
+                items[rowIndex].quantity,
+                totalQuantity
               )}
             />
           </Box>

@@ -38,8 +38,8 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const [filterData, setFilterData] = useState([] as CuttingReportType[]);
-  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null, startDay, endDay);
-  const { data, mutate } = useSWRCuttingReports(
+  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(startDay, endDay);
+  const { data } = useSWRCuttingReports(
     startDay,
     endDay,
   );

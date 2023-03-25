@@ -12,11 +12,9 @@ import { db } from "../../firebase";
 import { currentUserState, loadingState } from "../../store";
 import { CuttingReportType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
-import { useSWRCuttingReports } from "./swr/useSWRCuttingReports";
+import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
 
 export const useCuttingReportFunc = (
-  items?: CuttingReportType | null,
-  setItems?: Function | null,
   startDay?: string,
   endDay?: string,
 ) => {
@@ -25,21 +23,10 @@ export const useCuttingReportFunc = (
   const setLoading = useSetRecoilState(loadingState);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWRCuttingReports(
+  const { data, mutate } = useSWRCuttingReportImutable(
     startDay,
     endDay,
   );
-
-  // 商品登録項目を追加
-  const addInput = () => {
-    setItems({
-      ...items,
-      products: [
-        ...items.products,
-        { category: "", productId: "", quantity: 0 },
-      ],
-    });
-  };
 
   // 用尺計算
   const calcScale = (meter: number, totalQuantity: number) => {
@@ -49,7 +36,7 @@ export const useCuttingReportFunc = (
   };
 
   // 裁断報告書作成
-  const addCuttingReport = async () => {
+  const addCuttingReport = async (data, items) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
@@ -63,7 +50,7 @@ export const useCuttingReportFunc = (
         if (!serialNumberDocSnap.exists())
           throw "serialNumberDocSnap does not exist!";
 
-        items.products.map(async (product) => {
+        items.map(async (product) => {
           if (!product.productId) return;
           const productDocRef = doc(db, "products", product.productId);
           runTransaction(db, async (transaction) => {
@@ -82,15 +69,15 @@ export const useCuttingReportFunc = (
           serialNumber: newSerialNumber,
         });
 
-        const products = items.products.map((product) => ({
+        const products = items.map((product) => ({
           ...product,
           quantity: Number(product.quantity),
         }));
-        const newItems = { ...items, products };
+        const newItems = { ...data, products };
 
         transaction.set(cuttingReportDocRef, {
           ...newItems,
-          totalQuantity: Number(items.totalQuantity),
+          totalQuantity: Number(data.totalQuantity),
           serialNumber: newSerialNumber,
           createUser: currentUser,
           createdAt: serverTimestamp(),
@@ -106,17 +93,18 @@ export const useCuttingReportFunc = (
   };
 
   // 裁断報告書更新
-  const updateCuttingReport = async (reportId: string) => {
+  const updateCuttingReport = async (data, items, reportId: string) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
-
     const cuttingReportDocRef = doc(db, "cuttingReports", reportId);
     const productsRef = collection(db, "products");
+
     try {
       runTransaction(db, async (transaction) => {
         const cuttingReportDoc = await transaction.get(cuttingReportDocRef);
-        items.products?.map(async (product, index) => {
+
+        items?.map(async (product, index) => {
           if (!product.productId) return;
           const productDocRef = doc(productsRef, product.productId);
           runTransaction(db, async (transaction) => {
@@ -136,23 +124,23 @@ export const useCuttingReportFunc = (
             transaction.update(productDocRef, {
               tokushimaStock: Math.round(newTokushimaStock * 100) / 100,
             });
-            await mutate({ ...data, products: { ...products } });
+            if (items.length - 1 === index) {
+              await mutate({ ...data });
+            }
           });
         });
-        const products = items.products.map((product) => ({
+        const products = items.map((product) => ({
           ...product,
           quantity: Number(product.quantity),
         }));
-        const newItems = { ...items, products };
-
         transaction.update(cuttingReportDocRef, {
-          ...newItems,
+          ...data,
+          products,
           createdAt: cuttingReportDoc.data()?.createdAt.toDate(),
           updatedAt: serverTimestamp(),
-          totalQuantity: Number(items.totalQuantity),
+          totalQuantity: Number(data.totalQuantity),
         });
       });
-      await mutate({ ...data });
     } catch (err) {
       console.log(err);
     } finally {
@@ -171,6 +159,7 @@ export const useCuttingReportFunc = (
     } finally {
     }
   };
+
 
   const scaleCalc = (meter: number, totalQuantity: number) => {
     if (meter === 0 || totalQuantity === 0) return 0;
@@ -219,7 +208,6 @@ export const useCuttingReportFunc = (
   }, [data]);
 
   return {
-    addInput,
     calcScale,
     addCuttingReport,
     updateCuttingReport,
