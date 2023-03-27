@@ -87,20 +87,22 @@ const Colors = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {colors?.map((color, index: number) => (
-                <Tr key={index}>
-                  <Td w="100%">{color}</Td>
-                  <Td w="20px">
-                    <Flex alignItems="center" justifyContent="center" gap={3}>
-                      <FaTrashAlt
-                        color="#444"
-                        cursor="pointer"
-                        onClick={() => deleteColor(color)}
-                      />
-                    </Flex>
-                  </Td>
-                </Tr>
-              ))}
+              {Object.values(colors)
+                ?.sort()
+                .map((color, index: number) => (
+                  <Tr key={index}>
+                    <Td w="100%">{color}</Td>
+                    <Td w="20px">
+                      <Flex alignItems="center" justifyContent="center" gap={3}>
+                        <FaTrashAlt
+                          color="#444"
+                          cursor="pointer"
+                          onClick={() => deleteColor(color)}
+                        />
+                      </Flex>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>
