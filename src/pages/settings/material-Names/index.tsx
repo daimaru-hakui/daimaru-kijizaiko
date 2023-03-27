@@ -90,20 +90,22 @@ const MaterialNames = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {materialNames?.map((materialName, index: number) => (
-                <Tr key={index}>
-                  <Td w="100%">{materialName}</Td>
-                  <Td w="20px">
-                    <Flex alignItems="center" justifyContent="center" gap={3}>
-                      <FaTrashAlt
-                        color="#444"
-                        cursor="pointer"
-                        onClick={() => deleteMaterialName(materialName)}
-                      />
-                    </Flex>
-                  </Td>
-                </Tr>
-              ))}
+              {Object.values(materialNames)
+                ?.sort()
+                ?.map((materialName, index: number) => (
+                  <Tr key={index}>
+                    <Td w="100%">{materialName}</Td>
+                    <Td w="20px">
+                      <Flex alignItems="center" justifyContent="center" gap={3}>
+                        <FaTrashAlt
+                          color="#444"
+                          cursor="pointer"
+                          onClick={() => deleteMaterialName(materialName)}
+                        />
+                      </Flex>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>

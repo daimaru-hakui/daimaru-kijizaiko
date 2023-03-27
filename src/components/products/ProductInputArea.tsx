@@ -93,16 +93,16 @@ const ProductInputArea: NextPage<Props> = ({
   };
 
   useEffect(() => {
-    let [productNum, colorNum] = [watch("productNum"), watch("colorNum")];
+    let [productNum, colorName] = [watch("productNum"), watch("colorName")];
     if (!productNum) productNum = "noValue";
-    if (!colorNum) colorNum = "noValue";
+    if (!colorName) colorName = "noValue";
     const base = products?.map(
-      (product: ProductType) => product.productNum + product.colorNum
+      (product: ProductType) => product.productNum + product.colorName
     );
-    const result = base?.includes(productNum + colorNum);
+    const result = base?.includes(productNum + colorName);
     !result ? setFlag(false) : setFlag(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("productNum"), watch("colorNum")]);
+  }, [watch("productNum"), watch("colorName")]);
 
   return (
     <>
@@ -210,11 +210,13 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="色を選択"
                 {...register("colorName", { required: true })}
               >
-                {colors?.map((color: string) => (
-                  <option key={color} value={color}>
-                    {color}
-                  </option>
-                ))}
+                {Object.values(colors)
+                  ?.sort()
+                  .map((color: string) => (
+                    <option key={color} value={color}>
+                      {color}
+                    </option>
+                  ))}
               </Select>
             </Box>
           </Flex>
@@ -329,11 +331,13 @@ const ProductInputArea: NextPage<Props> = ({
                   placeholder="組織を選択してください"
                   {...register("materialName")}
                 >
-                  {materialNames?.map((m: string) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
+                  {Object.values(materialNames)
+                    ?.sort()
+                    ?.map((m: string) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
                 </Select>
               </Box>
               <Flex gap={6}>
