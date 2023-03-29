@@ -93,16 +93,22 @@ const ProductInputArea: NextPage<Props> = ({
   };
 
   useEffect(() => {
-    let [productNum, colorName] = [watch("productNum"), watch("colorName")];
+    let [productNum, colorNum, colorName] = [
+      watch("productNum"),
+      watch("colorNum"),
+      watch("colorName"),
+    ];
     if (!productNum) productNum = "noValue";
+    if (!colorNum) colorNum = "";
     if (!colorName) colorName = "noValue";
     const base = products?.map(
-      (product: ProductType) => product.productNum + product.colorName
+      (product: ProductType) =>
+        product.productNum + product.colorNum + product.colorName
     );
-    const result = base?.includes(productNum + colorName);
+    const result = base?.includes(productNum + colorNum + colorName);
     !result ? setFlag(false) : setFlag(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("productNum"), watch("colorName")]);
+  }, [watch("productNum"), watch("colorNum"), watch("colorName")]);
 
   return (
     <>
