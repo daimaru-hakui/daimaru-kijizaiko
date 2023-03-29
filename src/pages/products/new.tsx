@@ -30,6 +30,7 @@ const ProductsNew = () => {
     externalStock: 0,
     arrivingQuantity: 0,
     tokushimaStock: 0,
+    locations: [],
     createUser: "",
     updateUser: "",
     createdAt: undefined,

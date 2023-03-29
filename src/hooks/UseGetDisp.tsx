@@ -2,17 +2,19 @@ import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import {
   grayFabricsState,
+  locationsState,
   productsState,
   suppliersState,
   usersState,
 } from "../../store";
-import { ProductType, MaterialsType } from "../../types";
+import { ProductType, MaterialsType, LocationType } from "../../types";
 
 export const useGetDisp = () => {
   const users = useRecoilValue(usersState);
   const suppliers = useRecoilValue(suppliersState);
   const products = useRecoilValue(productsState);
   const grayFabrics = useRecoilValue(grayFabricsState);
+  const locations = useRecoilValue(locationsState);
 
   // 混率の表示
   const getMixed = (materials: MaterialsType) => {
@@ -130,6 +132,13 @@ export const useGetDisp = () => {
     return product?.price || 0;
   };
 
+  const getLocation = (locationId: string) => {
+    const location = locations.find(
+      (location: LocationType) => location.id === locationId
+    );
+    return location?.name || "";
+  };
+
   return {
     getSerialNumber,
     getUserName,
@@ -144,5 +153,6 @@ export const useGetDisp = () => {
     getGrayFabricStock,
     getTokushimaStock,
     getPrice,
+    getLocation,
   };
 };

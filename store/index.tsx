@@ -6,6 +6,7 @@ import {
   HistoryType,
   StockPlaceType,
   SupplierType,
+  LocationType,
 } from "../types";
 
 export const loadingState = atom<boolean>({
@@ -60,6 +61,11 @@ export const suppliersState = atom<SupplierType[]>({
 
 export const stockPlacesState = atom<StockPlaceType[]>({
   key: "stockPlacesState",
+  default: [],
+});
+
+export const locationsState = atom<LocationType[]>({
+  key: "locationsState",
   default: [],
 });
 

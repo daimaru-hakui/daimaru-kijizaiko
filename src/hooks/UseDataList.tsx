@@ -20,6 +20,7 @@ import {
   fabricPurchaseOrdersState,
   grayFabricOrdersState,
   grayFabricsState,
+  locationsState,
   materialNamesState,
   productsState,
   stockPlacesState,
@@ -33,6 +34,7 @@ import {
   SupplierType,
   HistoryType,
   StockPlaceType,
+  LocationType,
 } from "../../types";
 
 export const useDataList = () => {
@@ -43,6 +45,7 @@ export const useDataList = () => {
   const [grayFabrics, setGrayFabrics] = useRecoilState(grayFabricsState);
   const setSuppliers = useSetRecoilState(suppliersState);
   const setStockPlaces = useSetRecoilState(stockPlacesState);
+  const setLocations = useSetRecoilState(locationsState);
   const setMaterialNames = useSetRecoilState(materialNamesState);
   const setColors = useSetRecoilState(colorsState);
   const setGrayFabricOrders = useSetRecoilState(grayFabricOrdersState);
@@ -262,6 +265,25 @@ export const useDataList = () => {
     };
     getStockPlaces();
   }, [setStockPlaces]);
+
+  // 徳島工場保管場所;
+  useEffect(() => {
+    const getLocations = async () => {
+      const q = query(collection(db, "locations"), orderBy("order", "asc"));
+      try {
+        onSnapshot(q, (querySnap) =>
+          setLocations(
+            querySnap.docs.map(
+              (doc) => ({ ...doc.data(), id: doc.id } as LocationType)
+            )
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getLocations();
+  }, [setLocations]);
 
   useEffect(() => {
     const getColors = async () => {

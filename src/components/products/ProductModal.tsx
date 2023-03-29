@@ -39,6 +39,7 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
     getFabricStd,
     getGrayFabricName,
     getGrayFabricNumber,
+    getLocation,
   } = useGetDisp();
 
   return (
@@ -112,6 +113,16 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
                   <Text fontWeight="bold">単価</Text>
                   <Box>{product?.price}円</Box>
                 </Box>
+                {product?.locations && (
+                  <Box w="100%">
+                    <Text fontWeight="bold">徳島保管場所</Text>
+                    <Flex gap={3}>
+                      {product.locations?.map((location, index) => (
+                        <Box key={index}>{getLocation(location)}</Box>
+                      ))}
+                    </Flex>
+                  </Box>
+                )}
 
                 {product?.grayFabricId && (
                   <Box flex={1} w="100%">

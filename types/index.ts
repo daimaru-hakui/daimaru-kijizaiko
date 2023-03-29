@@ -36,6 +36,7 @@ export type ProductType = {
   externalStock: number;
   arrivingQuantity: number;
   tokushimaStock: number;
+  locations: string[];
   createUser: string;
   updateUser: string;
   createdAt: Date;
@@ -156,5 +157,12 @@ export type StockPlaceType = {
   address: string;
   tel: string;
   fax: string;
+  comment: string;
+};
+
+export type LocationType = {
+  id: string;
+  name: string;
+  order: number;
   comment: string;
 };

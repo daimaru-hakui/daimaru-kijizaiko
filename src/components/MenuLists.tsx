@@ -121,6 +121,7 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
             {menuItemEL("送り先", "/settings/stock-places")}
             {menuItemEL("組織名", "/settings/material-Names")}
             {menuItemEL("色", "/settings/colors")}
+            {menuItemEL("保管場所", "/settings/locations")}
           </List>
           <Divider />
         </>

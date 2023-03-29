@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Container,
   Divider,
   Flex,
   FormControl,
@@ -26,11 +25,17 @@ import { features } from "../../../datalist";
 import {
   colorsState,
   grayFabricsState,
+  locationsState,
   materialNamesState,
   productsState,
   suppliersState,
 } from "../../../store";
-import { ProductType, GrayFabricType, SupplierType } from "../../../types";
+import {
+  ProductType,
+  GrayFabricType,
+  SupplierType,
+  LocationType,
+} from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import MaterialsModal from "./MaterialsModal";
@@ -52,13 +57,15 @@ const ProductInputArea: NextPage<Props> = ({
 }) => {
   // const { data: products } = useSWR(`/api/products`);
   const products = useRecoilValue(productsState);
+  const locations = useRecoilValue(locationsState);
   const { data: users } = useSWRImmutable(`/api/users/sales`);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const suppliers = useRecoilValue(suppliersState);
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
+  const [locationShow, setLocationShow] = useState([]);
   const [flag, setFlag] = useState(false);
-  const { getMixed } = useGetDisp();
+  const { getMixed, getLocation } = useGetDisp();
   const [materials, setMaterials] = useState<any>({});
   const {
     getValues,
@@ -109,6 +116,12 @@ const ProductInputArea: NextPage<Props> = ({
     !result ? setFlag(false) : setFlag(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch("productNum"), watch("colorNum"), watch("colorName")]);
+
+  useEffect(() => {
+    const locationArray = watch("locations");
+    setLocationShow(locationArray.map((location) => getLocation(location)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch("locations")]);
 
   return (
     <>
@@ -263,7 +276,7 @@ const ProductInputArea: NextPage<Props> = ({
             </Box>
           </Flex>
           <Flex
-            w={{ base: "100%", md: "400px" }}
+            w={{ base: "100%" }}
             gap={6}
             alignItems="center"
             justifyContent="space-between"
@@ -301,6 +314,42 @@ const ProductInputArea: NextPage<Props> = ({
               </NumberInput>
             </Box>
           </Flex>
+
+          <Box flex={1} w="100%">
+            <Text fontWeight="bold">徳島保管場所</Text>
+            <Flex gap={3}>
+              <Box
+                mt={1}
+                border="1px"
+                borderColor="#e2e8f0"
+                rounded="md"
+                p={1}
+                w="150px"
+              >
+                <select
+                  style={{ width: "100%" }}
+                  multiple
+                  // mt={1}
+                  placeholder="保管場所を選択"
+                  {...register("locations")}
+                >
+                  {locations.map((location: LocationType) => (
+                    <option key={location.id} value={location.id}>
+                      {location.name}
+                    </option>
+                  ))}
+                </select>
+              </Box>
+              {locationShow.length > 0 && (
+                <Box mt={1} border="1px" borderColor="#f4f4f4" p={1} w="150px">
+                  {locationShow.map((location, index) => (
+                    <Box key={index}>{location}</Box>
+                  ))}
+                </Box>
+              )}
+            </Flex>
+          </Box>
+
           <Flex gap={6}>
             <Box w="100%">
               <Text fontWeight="bold">キバタ登録</Text>
