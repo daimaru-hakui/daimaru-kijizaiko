@@ -50,6 +50,7 @@ export const useProductFunc = () => {
     externalStock: Number(items.externalStock) || 0,
     arrivingQuantity: 0,
     tokushimaStock: Number(items?.tokushimaStock) || 0,
+    locations: items.locations || [],
     deletedAt: "",
   });
 
