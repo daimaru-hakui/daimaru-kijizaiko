@@ -17,7 +17,6 @@ export default async function handler(
     const { slug } = req.query;
     const startDay = slug[0];
     const endDay = slug[1];
-    const { createUser } = req.query;
 
     const querySnapshot = await db
       .collection("fabricPurchaseConfirms")
@@ -25,12 +24,8 @@ export default async function handler(
       .startAt(startDay)
       .endAt(endDay)
       .get();
-
     const contents = querySnapshot.docs
       .map((doc) => ({ ...doc.data(), id: doc.id } as HistoryType))
-      .filter(
-        (content) => createUser === content.createUser || createUser === ""
-      )
       .sort((a, b) => {
         if (a.fixedAt > b.fixedAt) {
           return -1;

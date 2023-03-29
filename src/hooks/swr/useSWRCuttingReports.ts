@@ -2,13 +2,10 @@ import useSWR from "swr";
 export const useSWRCuttingReports = (
   startDay: string,
   endDay: string,
-  staff: string,
-  client: string
 ) => {
-  const { data, mutate } = useSWR(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=${client}`,
-    { dedupingInterval: 10000, revalidateOnMount: true }
+  const { data, mutate,isLoading } = useSWR(
+    `/api/cutting-reports/${startDay}/${endDay}`
   );
 
-  return { data, mutate };
+  return { data, mutate ,isLoading};
 };

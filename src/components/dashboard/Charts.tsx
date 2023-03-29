@@ -8,20 +8,21 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CuttingPriceRanking from "./CuttingPriceRanking";
 import CuttingQuantityRanking from "./CuttingQuantityRanking";
 import PurchasePriceRanking from "./PurchasePriceRanking";
 import PurchaseQuantityRanking from "./PurchaseQuantityRanking";
-import useSWRImmutable from "swr/immutable";
 import { useForm, FormProvider } from "react-hook-form";
 import { useUtil } from "../../hooks/UseUtil";
 import SearchArea from "../SearchArea";
+import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
+import { CuttingReportType, HistoryType } from "../../../types";
+import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 
 type Inputs = {
   start: string;
   end: string;
-  client: string;
   staff: string;
 };
 
@@ -31,12 +32,11 @@ const Charts = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data: cuttingReports } = useSWRImmutable(
-    `/api/cutting-reports/${startDay}/${endDay}?staff=${staff}&client=`
-  );
-  const { data: fabricPurchaseConfirms } = useSWRImmutable(
-    `/api/fabric-purchase-confirms/${startDay}/${endDay}?createUser=${staff}`
-  );
+  const { data: cuttingReports } = useSWRCuttingReportImutable(startDay, endDay);
+  const { data: fabricPurchaseConfirms } = useSWRPurchaseConfirms(startDay, endDay);
+  const [filterCuttingReports, setFilterCuttingReports] = useState([] as CuttingReportType[]);
+  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState([] as HistoryType[]);
+
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
@@ -56,6 +56,28 @@ const Charts = () => {
     setStaff("");
     methods.reset();
   };
+
+  useEffect(() => {
+    if (!staff) {
+      setFilterCuttingReports(cuttingReports?.contents);
+    } else {
+      setFilterCuttingReports(
+        cuttingReports?.contents?.filter((report) => staff === report.staff || staff === "")
+      );
+    }
+
+  }, [cuttingReports, staff]);
+
+  useEffect(() => {
+    if (!staff) {
+      setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents);
+    } else {
+      setFilterPurchaseCofirms(
+        fabricPurchaseConfirms?.contents?.filter((report) =>
+          staff === report.createUser || staff === "")
+      );
+    }
+  }, [fabricPurchaseConfirms, staff]);
 
   return (
     <>
@@ -103,13 +125,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <CuttingQuantityRanking
-          data={cuttingReports?.contents}
+          data={filterCuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <CuttingPriceRanking
-          data={cuttingReports?.contents}
+          data={filterCuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
@@ -125,13 +147,13 @@ const Charts = () => {
         flexDirection={{ base: "column", md: "row" }}
       >
         <PurchaseQuantityRanking
-          data={fabricPurchaseConfirms?.contents}
+          data={filterPurchaseCofirms}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
         />
         <PurchasePriceRanking
-          data={fabricPurchaseConfirms?.contents}
+          data={filterPurchaseCofirms}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}

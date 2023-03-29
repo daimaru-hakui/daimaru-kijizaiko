@@ -13,7 +13,7 @@ const CuttingReportNew = () => {
     processNumber: "",
     cuttingDate: getTodayDate(),
     itemName: "",
-    itemType: "",
+    itemType: "1",
     client: "",
     totalQuantity: 0,
     comment: "",

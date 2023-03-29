@@ -43,7 +43,6 @@ type Inputs = {
 
 const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const setLoading = useSetRecoilState(loadingState);
-  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const currentUser = useRecoilValue(currentUserState);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const { getSerialNumber, getUserName } = useGetDisp();
@@ -59,7 +58,9 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data, mutate } = useSWRPurchaseConfirms(startDay, endDay, staff);
+  const { data, mutate } = useSWRPurchaseConfirms(startDay, endDay);
+  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
@@ -81,24 +82,28 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   useEffect(() => {
-    data?.contents?.sort(
-      (a: { serialNumber: number }, b: { serialNumber: number }) =>
-        a.serialNumber > b.serialNumber && -1
-    );
+    let newHistories: HistoryType[];
+    if (!staff) {
+      newHistories = data?.contents;
+    } else {
+      newHistories = data?.contents?.filter(
+        (history: HistoryType) => staff === history.createUser || staff === "");
+    }
     if (HOUSE_FACTORY) {
-      const newHistorys = data?.contents?.filter((history: HistoryType) => {
+      newHistories = newHistories?.filter((history: HistoryType) => {
         if (history.stockPlace === HOUSE_FACTORY) {
           return history;
         }
       });
-      setFilterHistories(newHistorys);
+      setFilterHistories(newHistories);
     } else {
-      const newHistorys = data?.contents?.filter(
+      newHistories = newHistories?.filter(
         (history: HistoryType) => history
       );
-      setFilterHistories(newHistorys);
+      setFilterHistories(newHistories);
     }
-  }, [data, HOUSE_FACTORY]);
+  }, [data, HOUSE_FACTORY, staff]);
+
 
   const updateFabricPurchaseConfirm = async (history: HistoryType) => {
     setLoading(true);
@@ -205,17 +210,17 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {history.accounting !== true
                       ? (isAuths(["rd", "tokushima"]) ||
-                          history?.createUser === currentUser) && (
-                          <HistoryEditModal
-                            history={history}
-                            type="confirm"
-                            items={items}
-                            setItems={setItems}
-                            onClick={() => {
-                              updateFabricPurchaseConfirm(history);
-                            }}
-                          />
-                        )
+                        history?.createUser === currentUser) && (
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => {
+                            updateFabricPurchaseConfirm(history);
+                          }}
+                        />
+                      )
                       : "金額確認済"}
                   </Td>
                 </Tr>

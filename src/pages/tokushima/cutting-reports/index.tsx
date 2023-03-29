@@ -11,7 +11,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CSVLink } from "react-csv";
 import { CuttingReportType } from "../../../../types";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
@@ -21,6 +21,7 @@ import SearchArea from "../../../components/SearchArea";
 import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
+import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
 
 type Inputs = {
   start: string;
@@ -36,13 +37,11 @@ const CuttingReport = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { csvData } = useCuttingReportFunc(null, null, startDay, endDay);
-
-  const { data: cuttingReports } = useSWRCuttingReports(
+  const [filterData, setFilterData] = useState([] as CuttingReportType[]);
+  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(startDay, endDay);
+  const { data } = useSWRCuttingReports(
     startDay,
     endDay,
-    staff,
-    client
   );
 
   const methods = useForm<Inputs>({
@@ -67,6 +66,19 @@ const CuttingReport = () => {
     setClient("");
     methods.reset();
   };
+
+  useEffect(() => {
+    if (!staff) {
+      setFilterData(data?.contents?.filter(
+        (report) => report.client.includes(String(client))));
+    } else {
+      setFilterData(
+        data?.contents?.filter((report) =>
+          staff === report.staff || staff === "")
+          .filter((report) => report.client.includes(String(client)))
+      );
+    }
+  }, [data, staff, client]);
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -98,17 +110,17 @@ const CuttingReport = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {cuttingReports?.contents?.map((report: CuttingReportType) => (
+                {filterData?.map((report: CuttingReportType) => (
                   <Tr key={report.serialNumber}>
                     <Td>
-                      <CuttingReportModal
-                        report={report}
-                        reportId={report.id}
-                        startDay={startDay}
-                        endDay={endDay}
-                        staff={staff}
-                        client={client}
-                      />
+                      <Flex gap={3}>
+                        <CuttingReportModal
+                          report={report}
+                          reportId={report.id}
+                          startDay={startDay}
+                          endDay={endDay}
+                        />
+                      </Flex>
                     </Td>
                     <Td>{getSerialNumber(report.serialNumber)}</Td>
                     <Td>{report.cuttingDate}</Td>

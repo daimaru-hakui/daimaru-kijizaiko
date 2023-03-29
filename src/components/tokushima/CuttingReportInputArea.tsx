@@ -18,8 +18,8 @@ import {
 import { FaPlus } from "react-icons/fa";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { usersState } from "../../../store";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { loadingState, usersState } from "../../../store";
 import {
   UserType,
   CuttingProductType,
@@ -27,8 +27,7 @@ import {
 } from "../../../types";
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
-import { useInputCuttingReport } from "../../hooks/UseInputCuttingReport";
-import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
+import { useForm } from "react-hook-form";
 
 type Props = {
   title: string;
@@ -37,8 +36,6 @@ type Props = {
   onClose?: Function;
   startDay?: string;
   endDay?: string;
-  staff?: string;
-  client?: string;
 };
 
 const CuttingReportInputArea: NextPage<Props> = ({
@@ -48,41 +45,63 @@ const CuttingReportInputArea: NextPage<Props> = ({
   onClose,
   startDay,
   endDay,
-  staff,
-  client,
 }) => {
   const users = useRecoilValue(usersState);
-  const { data, mutate } = useSWRCuttingReportImutable(
-    startDay,
-    endDay,
-    staff,
-    client
-  );
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
-  const {
-    items,
-    setItems,
-    handleInputChange,
-    handleNumberChange,
-    handleRadioChange,
-  } = useInputCuttingReport();
-  const { addInput, addCuttingReport, updateCuttingReport } =
-    useCuttingReportFunc(items, setItems, startDay, endDay);
+  const [items, setItems] = useState([] as any);
+  const { addCuttingReport, updateCuttingReport } =
+    useCuttingReportFunc(startDay, endDay);
+  const { register, handleSubmit, getValues, formState: { errors } } = useForm({
+    defaultValues: {
+      ...report
+    }
+  });
+
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  useEffect(() => {
+    setTotalQuantity(report.totalQuantity);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 商品登録項目を追加
+  const addInput = () => {
+    setItems([
+      ...items,
+      { category: "", productId: "", quantity: 0 },
+    ]);
+  };
+
+  const onSubmit = async (data) => {
+    console.log(data);
+    switch (pageType) {
+      case "new":
+        await addCuttingReport(data, items);
+        return;
+      case "edit":
+        await updateCuttingReport(data, items, report.id);
+        await onClose();
+        return;
+      default:
+        return;
+    }
+  };
 
   useEffect(() => {
-    setItems({ ...report });
+    setItems([...report.products]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report]);
+
 
   useEffect(() => {
     setFilterUsers(users.filter((user: UserType) => user.sales));
   }, [users]);
 
+
   useEffect(() => {
     const productNumberValidate = () => {
-      const array = items?.products?.map(
+      const array = items?.map(
         (product: CuttingProductType) => product.productId
       );
       const setArray = new Set(array);
@@ -92,41 +111,39 @@ const CuttingReportInputArea: NextPage<Props> = ({
         return true;
       }
     };
-    const itemType = items.itemType === "" ? true : false;
     const totalQuantity = items.totalQuantity === 0 ? true : false;
-    const category = items?.products?.some(
+    const category = items?.some(
       (product) => product?.category === ""
     );
-    const productId = items?.products?.some(
+    const productId = items?.some(
       (product) => product?.productId === ""
     );
-    const quantity = items?.products?.some(
+    const quantity = items?.some(
       (product) => product?.quantity === 0 || String(product?.quantity) === "0"
     );
     setIsValidate(
       productNumberValidate() ||
-        itemType ||
-        totalQuantity ||
-        category ||
-        productId ||
-        quantity
+      totalQuantity ||
+      category ||
+      productId ||
+      quantity
     );
-  }, [items]);
+  }, [items, setItems]);
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Box as="h1" fontSize="2xl">
         {title}
       </Box>
       <Stack spacing={6} mt={6}>
         <RadioGroup
           defaultValue="1"
-          value={String(items.itemType)}
-          onChange={(e) => handleRadioChange(e, "itemType")}
+          {...register("itemType", { required: true })}
+          onChange={() => getValues("itemType")}
         >
           <Stack direction="row">
-            <Radio value="1">既製品</Radio>
-            <Radio value="2">別注品</Radio>
+            <Radio value="1"  {...register("itemType")}>既製品</Radio>
+            <Radio value="2"  {...register("itemType")}>別注品</Radio>
             <Box as="span" color="red">
               ※
             </Box>
@@ -135,34 +152,22 @@ const CuttingReportInputArea: NextPage<Props> = ({
         <Flex gap={3} flexDirection={{ base: "column", md: "row" }}>
           <Box w="full">
             <Text fontWeight="bold">裁断日</Text>
-            <Input
-              mt={1}
-              type="date"
-              name="cuttingDate"
-              value={items.cuttingDate}
-              onChange={handleInputChange}
+            <Input mt={1} type="date"
+              {...register("cuttingDate")}
             />
           </Box>
           <Box w="full">
             <Text fontWeight="bold">加工指示書NO.</Text>
-            <Input
-              mt={1}
-              type="text"
-              name="processNumber"
-              value={items.processNumber}
-              onChange={handleInputChange}
+            <Input mt={1} type="text"
+              {...register("processNumber")}
             />
           </Box>
           <Box w="full">
             <Text fontWeight="bold">担当者</Text>
-            <Select
-              mt={1}
-              placeholder="担当者名を選択"
-              value={items.staff}
-              name="staff"
-              onChange={handleInputChange}
+            <Select mt={1} placeholder="担当者名を選択"
+              {...register("staff")}
             >
-              {filterUsers?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user: { id: string; name: string; }) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>
@@ -172,31 +177,17 @@ const CuttingReportInputArea: NextPage<Props> = ({
         </Flex>
         <Box>
           <Text fontWeight="bold">受託先名</Text>
-          <Input
-            mt={1}
-            type="text"
-            name="client"
-            value={items.client}
-            onChange={handleInputChange}
+          <Input mt={1} {...register("client")}
           />
         </Box>
         <Box>
           <Text fontWeight="bold">製品名</Text>
-          <Input
-            mt={1}
-            type="text"
-            name="itemName"
-            value={items.itemName}
-            onChange={handleInputChange}
+          <Input mt={1} {...register("itemName")}
           />
         </Box>
         <Box>
           <Text fontWeight="bold">明細</Text>
-          <Textarea
-            mt={1}
-            name="comment"
-            value={items.comment}
-            onChange={handleInputChange}
+          <Textarea mt={1} {...register("comment")}
           />
         </Box>
         <Flex gap={3}>
@@ -209,12 +200,11 @@ const CuttingReportInputArea: NextPage<Props> = ({
             </Text>
             <NumberInput
               mt={1}
-              name="totalQuantity"
               defaultValue={0}
+              {...register("totalQuantity")}
+              onChange={(e: any) => setTotalQuantity(e)}
               min={0}
               max={10000}
-              value={items.totalQuantity}
-              onChange={(e) => handleNumberChange(e, "totalQuantity")}
             >
               <NumberInputField textAlign="right" />
               <NumberInputStepper>
@@ -225,15 +215,17 @@ const CuttingReportInputArea: NextPage<Props> = ({
           </Box>
         </Flex>
 
-        {items?.products?.map((product, index) => (
+        {items.map((product, index) => (
           <FabricsUsedInput
             key={index}
+            product={product as CuttingProductType}
             items={items}
             setItems={setItems}
-            product={product as CuttingProductType}
             rowIndex={index}
             reportId={report.id}
+            report={report}
             setIsLimitQuantity={setIsLimitQuantity}
+            totalQuantity={totalQuantity}
           />
         ))}
         <Flex justifyContent="center">
@@ -247,23 +239,12 @@ const CuttingReportInputArea: NextPage<Props> = ({
         my={12}
         colorScheme="facebook"
         disabled={isValidate || isLimitQuantity}
-        onClick={async () => {
-          if (pageType === "new") {
-            addCuttingReport();
-            return;
-          }
-          if (pageType === "edit") {
-            await updateCuttingReport(report.id);
-            await mutate({ ...data }); //必要
-            await onClose();
-            return;
-          }
-        }}
+        type="submit"
       >
         {pageType === "new" && "登録する"}
         {pageType === "edit" && "更新する"}
       </Button>
-    </>
+    </form >
   );
 };
 
