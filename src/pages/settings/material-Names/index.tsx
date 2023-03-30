@@ -19,11 +19,12 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
+import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { db } from "../../../../firebase";
 
-const MaterialNames = () => {
+const MaterialNames: NextPage = () => {
   const [materialNames, setMaterialNames] = useState([]);
   const [materialName, setMaterialName] = useState("");
 
@@ -35,19 +36,19 @@ const MaterialNames = () => {
     getMaterials();
   }, [materialNames]);
 
+  const adddMaterialName = async (materialName: string) => {
+    if (!materialName) return;
+    await updateDoc(doc(db, "components", "materialNames"), {
+      data: arrayUnion(materialName),
+    });
+    setMaterialName("");
+  };
+
   const deleteMaterialName = async (materialName: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
     await updateDoc(doc(db, "components", "materialNames"), {
       data: arrayRemove(materialName),
-    });
-    setMaterialName("");
-  };
-
-  const adddMaterialName = async (materialName: string) => {
-    if (!materialName) return;
-    await updateDoc(doc(db, "components", "materialNames"), {
-      data: arrayUnion(materialName),
     });
     setMaterialName("");
   };

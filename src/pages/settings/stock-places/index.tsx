@@ -21,8 +21,9 @@ import { db } from "../../../../firebase";
 import EditModal from "../../../components/settings/stock-places/EditModal";
 import CommentModal from "../../../components/CommentModal";
 import { StockPlaceType } from "../../../../types";
+import { NextPage } from "next";
 
-const StockPlaces = () => {
+const StockPlaces: NextPage = () => {
   const stockPlaces = useRecoilValue(stockPlacesState);
 
   const deleteStockPlace = async (stockPlaceId: string) => {

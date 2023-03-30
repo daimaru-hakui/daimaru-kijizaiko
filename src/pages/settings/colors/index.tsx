@@ -19,11 +19,12 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
+import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { db } from "../../../../firebase";
 
-const Colors = () => {
+const Colors: NextPage = () => {
   const [colors, setColors] = useState([]);
   const [color, setColor] = useState("");
 
@@ -35,19 +36,19 @@ const Colors = () => {
     getColors();
   }, [colors]);
 
+  const addColor = async (color: string) => {
+    if (!color) return;
+    await updateDoc(doc(db, "components", "colors"), {
+      data: arrayUnion(color),
+    });
+    setColor("");
+  };
+
   const deleteColor = async (color: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
     await updateDoc(doc(db, "components", "colors"), {
       data: arrayRemove(color),
-    });
-    setColor("");
-  };
-
-  const addColor = async (color: string) => {
-    if (!color) return;
-    await updateDoc(doc(db, "components", "colors"), {
-      data: arrayUnion(color),
     });
     setColor("");
   };

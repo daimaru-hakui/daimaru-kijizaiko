@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -27,7 +28,7 @@ import { ProductType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 
-const CompleteId = () => {
+const CompleteId: NextPage = () => {
   const router = useRouter();
   const products = useRecoilValue(productsState);
   const [product, setProduct] = useState({} as ProductType);

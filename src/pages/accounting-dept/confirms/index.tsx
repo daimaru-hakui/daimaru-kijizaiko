@@ -1,8 +1,9 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
+import { NextPage } from "next";
 import Link from "next/link";
 import AccountingConfirmTable from "../../../components/accounting/AccountingConfirmTable";
 
-const AccountingDeptConfirms = () => {
+const AccountingDeptConfirms: NextPage = () => {
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">

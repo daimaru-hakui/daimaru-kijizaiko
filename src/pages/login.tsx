@@ -7,8 +7,9 @@ import { useSetRecoilState } from "recoil";
 import { auth } from "../../firebase/index";
 import { currentUserState, loadingState } from "../../store";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { NextPage } from "next";
 
-const Login = () => {
+const Login: NextPage = () => {
   const router = useRouter();
   const [user] = useAuthState(auth);
   const setLoading = useSetRecoilState(loadingState);

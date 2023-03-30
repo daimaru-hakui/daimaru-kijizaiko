@@ -24,6 +24,7 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
+import { NextPage } from "next";
 
 type Inputs = {
   start: string;
@@ -32,7 +33,7 @@ type Inputs = {
   staff: string;
 };
 
-const HistoryCutting = () => {
+const HistoryCutting: NextPage = () => {
   const {
     getSerialNumber,
     getUserName,
@@ -78,10 +79,10 @@ const HistoryCutting = () => {
         ?.map((report: CuttingReportType) =>
           report?.products.map(
             (product: CuttingProductType) =>
-            ({
-              ...report,
-              ...product,
-            } as CuttingHistoryType)
+              ({
+                ...report,
+                ...product,
+              } as CuttingHistoryType)
           )
         )
         .flat()

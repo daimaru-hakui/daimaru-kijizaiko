@@ -1,9 +1,10 @@
 import { Box, Container } from "@chakra-ui/react";
+import { NextPage } from "next";
 import { useState } from "react";
 import { GrayFabricType } from "../../../types";
 import GrayFabricInputArea from "../../components/grayFabrics/GrayFabricInputArea";
 
-const GrayFabricsNew = () => {
+const GrayFabricsNew: NextPage = () => {
   const [grayFabric, setGrayFabric] = useState({
     id: "",
     supplierId: "",

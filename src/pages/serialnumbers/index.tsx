@@ -10,14 +10,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { collection, onSnapshot, query } from "firebase/firestore";
+import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 
 import { useGetDisp } from "../../hooks/UseGetDisp";
 
-const SerialNumbers = () => {
+const SerialNumbers: NextPage = () => {
   const [serialNumbers, setSerialNumber] = useState([]);
-  const [date, setDate] = useState("");
   const { getSerialNumber } = useGetDisp();
 
   // 仕入先　情報;

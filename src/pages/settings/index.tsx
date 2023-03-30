@@ -1,7 +1,8 @@
 import { Box, Button, Container, Flex } from "@chakra-ui/react";
+import { NextPage } from "next";
 import Link from "next/link";
 
-const index = () => {
+const index: NextPage = () => {
   return (
     <Box w="100%" mt={12}>
       <Container
