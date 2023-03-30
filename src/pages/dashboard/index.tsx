@@ -7,6 +7,7 @@ import {
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
+import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import {
   currentUserState,
@@ -20,7 +21,7 @@ import { ProductType } from "../../../types";
 import Charts from "../../components/dashboard/Charts";
 import StatCard from "../../components/dashboard/StatCard";
 
-const Dashboard = () => {
+const Dashboard: NextPage = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
   const grayFabrics = useRecoilValue(grayFabricsState);

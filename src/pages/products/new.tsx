@@ -1,9 +1,10 @@
 import { Box, Container } from "@chakra-ui/react";
+import { NextPage } from "next";
 import { useState } from "react";
 import { ProductType } from "../../../types";
 import ProductInputArea from "../../components/products/ProductInputArea";
 
-const ProductsNew = () => {
+const ProductsNew: NextPage = () => {
   const [product, setProduct] = useState({
     id: "",
     productType: 0,

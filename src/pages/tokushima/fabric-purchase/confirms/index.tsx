@@ -1,8 +1,9 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
+import { NextPage } from "next";
 import Link from "next/link";
 import FabricPurchaseConfirmTable from "../../../../components/products/fabric-purchase/ConfirmTable";
 
-const TokushimaFabricPurchaseConfirms = () => {
+const TokushimaFabricPurchaseConfirms: NextPage = () => {
   const HOUSE_FACTORY = "徳島工場";
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

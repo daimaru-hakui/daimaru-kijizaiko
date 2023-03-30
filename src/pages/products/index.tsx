@@ -30,9 +30,10 @@ import ProductSearchArea from "../../components/products/ProductSearchArea";
 import ProductMenu from "../../components/products/ProductMenu";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
+import { NextPage } from "next";
 
-const Products = () => {
+const Products: NextPage = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
@@ -41,7 +42,7 @@ const Products = () => {
   const { csvData, isVisible, deleteProduct } = useProductFunc();
   const { isAuths } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
-  const { data: users } = useSWR(`/api/users`);
+  const { data: users } = useSWRImmutable(`/api/users/sales`);
   const [search, setSearch] = useState({
     productNumber: "",
     staff: "",

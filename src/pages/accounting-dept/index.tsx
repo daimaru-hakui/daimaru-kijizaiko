@@ -1,12 +1,13 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
 import { HistoryType } from "../../../types";
 import AccountingConfirmTable from "../../components/accounting/AccountingConfirmTable";
 import AccountingOrderTable from "../../components/accounting/AccountingOrderTable";
 
-const AccountingDept = () => {
+const AccountingDept: NextPage = () => {
   const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
   const [historyConfirms, setHistoryConfirms] = useState([] as HistoryType[]);
 

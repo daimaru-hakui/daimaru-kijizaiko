@@ -20,8 +20,9 @@ import GrayFabricOrderAreaModal from "../../components/grayFabrics/GrayFabricOrd
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { NextPage } from "next";
 
-const GrayFabrics = () => {
+const GrayFabrics: NextPage = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
   const currentUser = useRecoilValue(currentUserState);
   const { isAuths } = useAuthManagement();

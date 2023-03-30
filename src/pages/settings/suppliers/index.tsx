@@ -22,8 +22,9 @@ import { db } from "../../../../firebase";
 import CommentModal from "../../../components/CommentModal";
 import EditModal from "../../../components/settings/suppliers/EditModal";
 import { SupplierType } from "../../../../types";
+import { NextPage } from "next";
 
-const Suppliers = () => {
+const Suppliers: NextPage = () => {
   const suppliers = useRecoilValue(suppliersState);
 
   const deleteSupplier = async (supplierId: string) => {

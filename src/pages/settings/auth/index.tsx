@@ -18,12 +18,13 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
+import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { UserType } from "../../../../types";
 import EditModal from "../../../components/settings/auth/AuthEditModal";
 
-const Auth = () => {
+const Auth: NextPage = () => {
   const [users, setUsers] = useState([] as UserType[]);
 
   //firestore users 情報の取得

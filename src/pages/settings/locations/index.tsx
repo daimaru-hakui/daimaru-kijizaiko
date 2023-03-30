@@ -20,8 +20,9 @@ import { db } from "../../../../firebase";
 import CommentModal from "../../../components/CommentModal";
 import { LocationType } from "../../../../types";
 import EditLocationModal from "../../../components/settings/locations/EditModal";
+import { NextPage } from "next";
 
-const Locations = () => {
+const Locations: NextPage = () => {
   const locations = useRecoilValue(locationsState);
 
   const deleteLocation = async (locationId: string) => {

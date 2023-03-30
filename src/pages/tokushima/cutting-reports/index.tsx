@@ -22,6 +22,7 @@ import CuttingReportModal from "../../../components/tokushima/CuttingReportModal
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
+import { NextPage } from "next";
 
 type Inputs = {
   start: string;
@@ -30,7 +31,7 @@ type Inputs = {
   staff: string;
 };
 
-const CuttingReport = () => {
+const CuttingReport: NextPage = () => {
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());
@@ -38,11 +39,11 @@ const CuttingReport = () => {
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const [filterData, setFilterData] = useState([] as CuttingReportType[]);
-  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(startDay, endDay);
-  const { data } = useSWRCuttingReports(
+  const { csvData, scaleCalc, deleteCuttingReport } = useCuttingReportFunc(
     startDay,
-    endDay,
+    endDay
   );
+  const { data } = useSWRCuttingReports(startDay, endDay);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -69,12 +70,15 @@ const CuttingReport = () => {
 
   useEffect(() => {
     if (!staff) {
-      setFilterData(data?.contents?.filter(
-        (report) => report.client.includes(String(client))));
-    } else {
       setFilterData(
         data?.contents?.filter((report) =>
-          staff === report.staff || staff === "")
+          report.client.includes(String(client))
+        )
+      );
+    } else {
+      setFilterData(
+        data?.contents
+          ?.filter((report) => staff === report.staff || staff === "")
           .filter((report) => report.client.includes(String(client)))
       );
     }

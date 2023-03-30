@@ -18,8 +18,9 @@ import { ProductType } from "../../../../types";
 import AdjustmentProduct from "../../../components/adjustment/AdjustmentProduct";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
+import { NextPage } from "next";
 
-const AdjustmentProducts = () => {
+const AdjustmentProducts: NextPage = () => {
   const products = useRecoilValue(productsState);
   const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
   const [searchText, setSearchText] = useState("");

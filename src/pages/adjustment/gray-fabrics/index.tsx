@@ -17,8 +17,9 @@ import { grayFabricsState } from "../../../../store";
 import { useUtil } from "../../../hooks/UseUtil";
 import AdjustmentGrayFabric from "../../../components/adjustment/AdjustmentGrayFabric";
 import { GrayFabricType } from "../../../../types";
+import { NextPage } from "next";
 
-const AdjustmentGrayFabrics = () => {
+const AdjustmentGrayFabrics: NextPage = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
   const [filterProducts, setFilterProducts] = useState([] as any);
   const [searchText, setSearchText] = useState("");
