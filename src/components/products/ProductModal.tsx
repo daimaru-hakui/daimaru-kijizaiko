@@ -113,7 +113,7 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
                   <Text fontWeight="bold">単価</Text>
                   <Box>{product?.price}円</Box>
                 </Box>
-                {product?.locations && (
+                {product?.locations?.length > 0 && (
                   <Box w="100%">
                     <Text fontWeight="bold">徳島保管場所</Text>
                     <Flex gap={3}>
@@ -158,11 +158,13 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
                   flexDirection={{ base: "column", md: "row" }}
                 >
                   <Stack spacing={6} flex={1} w="100%">
-                    <Box w="100%">
-                      <Text fontWeight="bold">組織名</Text>
-                      {product?.materialName}
-                    </Box>
-                    <Flex gap={6}>
+                    {product?.materialName && (
+                      <Box w="100%">
+                        <Text fontWeight="bold">組織名</Text>
+                        {product?.materialName}
+                      </Box>
+                    )}
+                    {product?.fabricWidth && (
                       <Box w="100%">
                         <Text fontWeight="bold">規格</Text>
                         <Flex>
@@ -173,12 +175,12 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
                           )}
                         </Flex>
                       </Box>
-                    </Flex>
+                    )}
                   </Stack>
                   <Flex flex={1} gap={6} w="100%">
-                    <Box w="100%">
-                      <Text fontWeight="bold">混率</Text>
-                      {product?.materials && (
+                    {Object.keys(product?.materials).length > 0 && (
+                      <Box w="100%">
+                        <Text fontWeight="bold">混率</Text>
                         <Box
                           mt={1}
                           p={3}
@@ -194,41 +196,38 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
                             )}
                           </Stack>
                         </Box>
-                      )}
-                    </Box>
+                      </Box>
+                    )}
                   </Flex>
                 </Flex>
-
-                <Box w="100%">
-                  <Text fontWeight="bold">機能性</Text>
-                  <CheckboxGroup colorScheme="green">
-                    <Flex m={1} wrap="wrap" gap={3}>
-                      {product?.features?.map((f: string, index: number) => (
-                        <Text key={index}>{f}</Text>
-                      ))}
-                    </Flex>
-                  </CheckboxGroup>
-                </Box>
-
-                <Box w="100%">
-                  <Text fontWeight="bold">画像</Text>
-                </Box>
-                {product?.noteFabric && (
-                  <>
-                    <Box flex={1} w="100%">
-                      <Text fontWeight="bold">備考（生地の性質など）</Text>
-                      <Box
-                        mt={1}
-                        p={3}
-                        rounded="md"
-                        border="1px"
-                        borderColor="gray.100"
-                      >
-                        {product?.noteFabric}
-                      </Box>
-                    </Box>
-                  </>
+                {product?.features?.length > 0 && (
+                  <Box w="100%">
+                    <Text fontWeight="bold">機能性</Text>
+                    <CheckboxGroup colorScheme="green">
+                      <Flex m={1} wrap="wrap" gap={3}>
+                        {product?.features?.map((f: string, index: number) => (
+                          <Text key={index}>{f}</Text>
+                        ))}
+                      </Flex>
+                    </CheckboxGroup>
+                  </Box>
                 )}
+
+                {product?.noteFabric && (
+                  <Box flex={1} w="100%">
+                    <Text fontWeight="bold">備考（生地の性質など）</Text>
+                    <Box
+                      mt={1}
+                      p={3}
+                      rounded="md"
+                      border="1px"
+                      borderColor="gray.100"
+                    >
+                      {product?.noteFabric}
+                    </Box>
+                  </Box>
+                )}
+                <Box w="100%">{/* <Text fontWeight="bold">画像</Text> */}</Box>
                 {product?.noteEtc && (
                   <Box flex={1} w="100%">
                     <Text fontWeight="bold">備考（その他）</Text>
