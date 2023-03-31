@@ -7,6 +7,7 @@ import theme from "../components/theme";
 import Head from "next/head";
 import { SWRConfig } from "swr";
 import axios from "axios";
+import { useDataList } from "../hooks/UseDataList";
 
 const fetcher = (url: string) =>
   axios
