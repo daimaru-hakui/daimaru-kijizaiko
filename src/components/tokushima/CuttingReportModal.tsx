@@ -45,10 +45,7 @@ const CuttingReportModal: NextPage<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
   const { isAuths } = useAuthManagement();
-  const { data, mutate } = useSWRCuttingReports(
-    startDay,
-    endDay,
-  );
+  const { data, mutate } = useSWRCuttingReports(startDay, endDay);
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
   const {
     getSerialNumber,
@@ -75,7 +72,7 @@ const CuttingReportModal: NextPage<Props> = ({
 
       <Modal
         isOpen={isOpen}
-        size="3xl"
+        size="4xl"
         onClose={() => {
           onClose();
         }}
@@ -156,7 +153,7 @@ const CuttingReportModal: NextPage<Props> = ({
                     </Box>
                   </Flex>
                   <Flex gap={6} flexDirection={{ base: "column", md: "row" }}>
-                    <Box>
+                    <Box minW="40px">
                       <Text fontWeight="bold">種別</Text>
                       <Box>
                         {filterReport?.itemType === "1" ? "既製" : "別注"}
