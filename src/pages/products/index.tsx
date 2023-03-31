@@ -53,22 +53,16 @@ const Products: NextPage = () => {
 
   useEffect(() => {
     setFilterProducts(
-      products
-        ?.filter((product: ProductType) =>
+      products?.filter(
+        (product: ProductType) =>
           product.productNumber.includes(
             halfToFullChar(search.productNumber.toUpperCase())
-          )
-        )
-        .filter((product: ProductType) => product.staff.includes(search.staff))
-        .filter((product: ProductType) =>
-          product.colorName.includes(search.colorName)
-        )
-        .filter((product: ProductType) =>
-          product.productName.includes(search.productName)
-        )
-        .filter((product: ProductType) =>
+          ) &&
+          product.staff.includes(search.staff) &&
+          product.colorName.includes(search.colorName) &&
+          product.productName.includes(search.productName) &&
           product.materialName.includes(search.materialName)
-        )
+      )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, products]);

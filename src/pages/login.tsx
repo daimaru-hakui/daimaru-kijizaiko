@@ -1,35 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { Box, Button, Container, Flex, Input } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Input, Stack } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useSetRecoilState } from "recoil";
-import { auth } from "../../firebase/index";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { currentUserState, loadingState } from "../../store";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { NextPage } from "next";
+import { auth } from "../../firebase/index";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useForm } from "react-hook-form";
 
 const Login: NextPage = () => {
   const router = useRouter();
-  const [user] = useAuthState(auth);
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
-  const [account, setAccount] = useState({
-    email: "",
-    password: "",
-  });
-  const setCurrentUser = useSetRecoilState(currentUserState);
+  const [user] = useAuthState(auth);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  useEffect(() => {
-    if (user) {
-      setCurrentUser(user.uid);
-      router.push("/");
-    }
-  }, [router, setCurrentUser, user]);
-
-  // サインイン
-  const signInUser = () => {
+  const onSubmit = (data: { email: string; password: string }) => {
+    signInUser(data.email, data.password);
+  };
+  const signInUser = (email: string, password: string) => {
     setLoading(true);
-    signInWithEmailAndPassword(auth, account.email, account.password)
+    signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         setCurrentUser(user?.uid);
@@ -44,82 +41,80 @@ const Login: NextPage = () => {
       });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setAccount({ ...account, [name]: value });
-  };
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user?.uid);
+        router.push("/");
+      } else {
+        setCurrentUser("");
+        router.push("/login");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Flex
-      w="100%"
-      h="100vh"
-      alignItems="center"
-      justifyContent="center"
-      px={6}
-      position="relative"
-    >
-      <Container
-        maxW="400px"
-        p={6}
-        pb={10}
-        borderRadius={6}
-        boxShadow="base"
-        bgColor="white"
-      >
-        <Flex
-          w="100%"
-          h="70px"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          fontSize="2xl"
-        >
-          <Box>
-            <FaLock />
-          </Box>
-          <Box mt={1}>Sign in</Box>
-        </Flex>
-        <Flex
-          flexDirection="column"
-          justifyContent="space-around"
-          mt={3}
-          px={6}
-        >
-          <Input
-            type="text"
-            w="100%"
-            mt={0}
-            backgroundColor="rgb(232 240 254)"
-            placeholder="メールアドレス"
-            name="email"
-            value={account.email}
-            onChange={handleChange}
-          />
-          <Input
-            type="password"
-            w="100%"
-            mt={3}
-            backgroundColor="rgb(232 240 254)"
-            placeholder="パスワード"
-            name="password"
-            value={account.password}
-            onChange={handleChange}
-          />
-
-          <Button
-            mt={3}
-            color="white"
-            bgColor="facebook.900"
-            _hover={{ backgroundColor: "facebook.500" }}
-            disabled={!account.email || !account.password}
-            onClick={signInUser}
+    <>
+      {currentUser === "" && (
+        <Flex w="100%" h="100vh" alignItems="center" justifyContent="center">
+          <Container
+            maxW="350px"
+            p={6}
+            rounded="md"
+            boxShadow="base"
+            bgColor="white"
           >
-            サインイン
-          </Button>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={4}>
+                <Flex
+                  w="100%"
+                  h="70px"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  fontSize="2xl"
+                >
+                  <FaLock />
+                  <Box>Sign in</Box>
+                </Flex>
+                <Box>
+                  <Input
+                    placeholder="メールアドレス"
+                    {...register("email", { required: true })}
+                  />
+                  {errors.email && (
+                    <Box as="span" color="red">
+                      emailアドレスを入力してください
+                    </Box>
+                  )}
+                </Box>
+                <Box>
+                  <Input
+                    type="password"
+                    placeholder="パスワード"
+                    {...register("password", { required: true })}
+                  />
+                  {errors.password && (
+                    <Box as="span" color="red">
+                      password入力してください
+                    </Box>
+                  )}
+                </Box>
+                <Button
+                  type="submit"
+                  color="white"
+                  bgColor="facebook.900"
+                  _hover={{ backgroundColor: "facebook.500" }}
+                >
+                  サインイン
+                </Button>
+              </Stack>
+            </form>
+          </Container>
         </Flex>
-      </Container>
-    </Flex>
+      )}
+    </>
   );
 };
 
