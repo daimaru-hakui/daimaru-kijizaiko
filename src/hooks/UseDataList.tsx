@@ -206,28 +206,6 @@ export const useDataList = () => {
     getFabricPurchaseOrders();
   }, [setFabricPurchaseOrders]);
 
-  // 生地発注履歴（confirm）
-  // useEffect(() => {
-  //   const getFabricPurchaseConfirms = async () => {
-  //     const q = query(
-  //       collection(db, "fabricPurchaseConfirms"),
-  //       where("quantity", ">", 0)
-  //     );
-  //     try {
-  //       onSnapshot(q, (querySnap) =>
-  //         setFabricPurchaseConfirms(
-  //           querySnap.docs
-  //             .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
-  //             .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
-  //         )
-  //       );
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   getFabricPurchaseConfirms();
-  // }, [setFabricPurchaseConfirms]);
-
   // 仕入先　情報;
   useEffect(() => {
     const getSuppliers = async () => {

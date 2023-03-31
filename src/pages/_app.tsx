@@ -1,8 +1,7 @@
 import "../../styles/globals.css";
-
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
-import { RecoilRoot } from "recoil";
+import { RecoilRoot, useRecoilState, useSetRecoilState } from "recoil";
 import Layout from "../components/Layout";
 import theme from "../components/theme";
 import Head from "next/head";

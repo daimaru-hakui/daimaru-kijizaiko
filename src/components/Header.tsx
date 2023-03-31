@@ -19,15 +19,8 @@ import { auth } from "../../firebase";
 import MenuDrawerButton from "./MenuDrawerButton";
 
 const Header = () => {
-  const router = useRouter();
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const users = useRecoilValue(usersState);
-
-  useEffect(() => {
-    if (currentUser === "") {
-      router.push("/login");
-    }
-  }, [currentUser, router]);
 
   // 担当者名の表示
   const displayStaff = (id: string) => {
@@ -51,55 +44,48 @@ const Header = () => {
   };
 
   return (
-    <>
-      {currentUser && (
-        <Flex
-          w="100%"
-          h={12}
-          alignItems="center"
-          bg="white"
-          boxShadow="sm"
-          position="fixed"
-          top={0}
-          zIndex={10}
-        >
-          <Container maxW="100%">
-            <Flex alignItems="center" justifyContent="space-between">
-              <MenuDrawerButton />
-              <Link href="/dashboard">
-                <Box fontSize="xl" fontWeight="700">
-                  生地在庫WEB
-                </Box>
-              </Link>
-              <Flex alignItems="center" gap={3}>
-                <Box>
-                  <Text
-                    fontSize="sm"
-                    display={{ base: "none", "2xl": "block" }}
-                  >
-                    {displayStaff(currentUser)}
-                  </Text>
-                </Box>
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<MdOutlineSettings size="25px" />}
-                    variant="outline"
-                  />
-                  <MenuList fontSize="sm">
-                    <Link href="/">
-                      <MenuItem>トップページ</MenuItem>
-                    </Link>
-                    <MenuItem onClick={signOut}>ログアウト</MenuItem>
-                  </MenuList>
-                </Menu>
-              </Flex>
-            </Flex>
-          </Container>
+    <Flex
+      w="100%"
+      h={12}
+      alignItems="center"
+      bg="white"
+      boxShadow="sm"
+      position="fixed"
+      top={0}
+      zIndex={10}
+    >
+      <Container maxW="100%">
+        <Flex alignItems="center" justifyContent="space-between">
+          <MenuDrawerButton />
+          <Link href="/dashboard">
+            <Box fontSize="xl" fontWeight="700">
+              生地在庫WEB
+            </Box>
+          </Link>
+          <Flex alignItems="center" gap={3}>
+            <Box>
+              <Text fontSize="sm" display={{ base: "none", "2xl": "block" }}>
+                {displayStaff(currentUser)}
+              </Text>
+            </Box>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<MdOutlineSettings size="25px" />}
+                variant="outline"
+              />
+              <MenuList fontSize="sm">
+                <Link href="/">
+                  <MenuItem>トップページ</MenuItem>
+                </Link>
+                <MenuItem onClick={signOut}>ログアウト</MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
         </Flex>
-      )}
-    </>
+      </Container>
+    </Flex>
   );
 };
 
