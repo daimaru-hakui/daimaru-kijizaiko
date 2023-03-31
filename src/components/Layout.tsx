@@ -15,7 +15,6 @@ type Props = {
 const Layout = ({ children }: Props) => {
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
-  const { start } = useDataList();
 
   useEffect(() => {
     if (currentUser === "") {
