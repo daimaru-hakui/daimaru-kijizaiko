@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   collection,
   doc,
@@ -9,7 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
@@ -41,8 +42,8 @@ export const useDataList = () => {
   const [user] = useAuthState(auth);
   const currentUser = useRecoilValue(currentUserState);
   const setUsers = useSetRecoilState(usersState);
-  const [products, setProducts] = useRecoilState(productsState);
-  const [grayFabrics, setGrayFabrics] = useRecoilState(grayFabricsState);
+  const setProducts = useSetRecoilState(productsState);
+  const setGrayFabrics = useSetRecoilState(grayFabricsState);
   const setSuppliers = useSetRecoilState(suppliersState);
   const setStockPlaces = useSetRecoilState(stockPlacesState);
   const setLocations = useSetRecoilState(locationsState);
@@ -51,12 +52,10 @@ export const useDataList = () => {
   const setGrayFabricOrders = useSetRecoilState(grayFabricOrdersState);
   const setFabricDyeingOrders = useSetRecoilState(fabricDyeingOrdersState);
   const setFabricPurchaseOrders = useSetRecoilState(fabricPurchaseOrdersState);
-  const setFabricPurchaseConfirms = useSetRecoilState(
-    fabricPurchaseConfirmsState
-  );
 
   // users情報;
   useEffect(() => {
+    if (!user) return;
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("rank", "asc"));
     onSnapshot(q, (querySnapshot) =>
@@ -94,6 +93,7 @@ export const useDataList = () => {
 
   // products情報;
   useEffect(() => {
+    if (!user) return;
     const getProducts = async () => {
       const q = query(collection(db, "products"), where("deletedAt", "==", ""));
       try {
@@ -120,6 +120,7 @@ export const useDataList = () => {
 
   // キバタ情報;
   useEffect(() => {
+    if (!user) return;
     const getGrayfabrics = async () => {
       const q = query(
         collection(db, "grayFabrics"),
@@ -142,6 +143,7 @@ export const useDataList = () => {
 
   // キバタ発注履歴（order）
   useEffect(() => {
+    if (!user) return;
     const getGrayFabricOrders = async () => {
       const q = query(
         collection(db, "grayFabricOrders"),
@@ -164,6 +166,7 @@ export const useDataList = () => {
 
   // 生地染色発注履歴（order）
   useEffect(() => {
+    if (!user) return;
     const getFabricDyeingOrders = async () => {
       const q = query(
         collection(db, "fabricDyeingOrders"),
@@ -186,6 +189,7 @@ export const useDataList = () => {
 
   // 生地k購入履歴（order）
   useEffect(() => {
+    if (!user) return;
     const getFabricPurchaseOrders = async () => {
       const q = query(
         collection(db, "fabricPurchaseOrders"),
@@ -208,6 +212,7 @@ export const useDataList = () => {
 
   // 仕入先　情報;
   useEffect(() => {
+    if (!user) return;
     const getSuppliers = async () => {
       const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
       try {
@@ -227,6 +232,7 @@ export const useDataList = () => {
 
   // 送り先　情報;
   useEffect(() => {
+    if (!user) return;
     const getStockPlaces = async () => {
       const q = query(collection(db, "stockPlaces"), orderBy("kana", "asc"));
       try {
@@ -246,6 +252,7 @@ export const useDataList = () => {
 
   // 徳島工場保管場所;
   useEffect(() => {
+    if (!user) return;
     const getLocations = async () => {
       const q = query(collection(db, "locations"), orderBy("order", "asc"));
       try {
@@ -264,6 +271,7 @@ export const useDataList = () => {
   }, [setLocations]);
 
   useEffect(() => {
+    if (!user) return;
     const getColors = async () => {
       onSnapshot(doc(db, "components", "colors"), (querySnap) =>
         setColors([...querySnap?.data()?.data])
@@ -274,6 +282,7 @@ export const useDataList = () => {
   }, [setColors]);
 
   useEffect(() => {
+    if (!user) return;
     const getMaterialNames = async () => {
       onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
         setMaterialNames([...querySnap?.data()?.data])
