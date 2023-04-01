@@ -20,10 +20,8 @@ import {
 import { ProductType } from "../../../types";
 import Charts from "../../components/dashboard/Charts";
 import StatCard from "../../components/dashboard/StatCard";
-import { useDataList } from "../../hooks/UseDataList";
 
 const Dashboard: NextPage = () => {
-  const { start } = useDataList();
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
   const grayFabrics = useRecoilValue(grayFabricsState);
