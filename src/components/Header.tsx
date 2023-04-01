@@ -11,8 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { MdOutlineSettings } from "react-icons/md";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { currentUserState, usersState } from "../../store";
 import { auth } from "../../firebase";
@@ -21,14 +19,6 @@ import MenuDrawerButton from "./MenuDrawerButton";
 const Header = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const users = useRecoilValue(usersState);
-
-  // 担当者名の表示
-  const displayStaff = (id: string) => {
-    const user = users?.find(
-      (user: { id: string; name: string }) => id === user.id
-    );
-    return user?.name;
-  };
 
   // サインアウト
   const signOut = () => {
@@ -41,6 +31,14 @@ const Header = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  // 担当者名の表示
+  const displayStaff = (id: string) => {
+    const user = users?.find(
+      (user: { id: string; name: string }) => id === user.id
+    );
+    return user?.name;
   };
 
   return (

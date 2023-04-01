@@ -1,13 +1,12 @@
 import "../../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
-import { RecoilRoot, useRecoilState, useSetRecoilState } from "recoil";
+import { RecoilRoot } from "recoil";
 import Layout from "../components/Layout";
 import theme from "../components/theme";
 import Head from "next/head";
 import { SWRConfig } from "swr";
 import axios from "axios";
-import { useDataList } from "../hooks/UseDataList";
 
 const fetcher = (url: string) =>
   axios

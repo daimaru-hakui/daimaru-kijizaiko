@@ -4,23 +4,30 @@ import { ReactNode, useEffect } from "react";
 import Header from "./Header";
 import Loading from "./Loading";
 import Sidebar from "./Sidebar";
-import { useDataList } from "../hooks/UseDataList";
-import { useRecoilValue } from "recoil";
+import { auth } from "../../firebase";
+import { useRecoilState } from "recoil";
 import { currentUserState } from "../../store";
+import { onAuthStateChanged } from "firebase/auth";
 
 type Props = {
   children: ReactNode;
 };
 
 const Layout = ({ children }: Props) => {
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const router = useRouter();
-  const currentUser = useRecoilValue(currentUserState);
 
   useEffect(() => {
-    if (currentUser === "") {
-      router.push("/login");
-    }
-  }, [currentUser, router]);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user?.uid);
+      } else {
+        setCurrentUser("");
+        router.push("/login");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Box

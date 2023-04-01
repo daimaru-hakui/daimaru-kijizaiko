@@ -6,7 +6,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { currentUserState, loadingState } from "../../store";
 import { NextPage } from "next";
 import { auth } from "../../firebase/index";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 
@@ -30,7 +30,6 @@ const Login: NextPage = () => {
       .then((userCredential) => {
         const user = userCredential.user;
         setCurrentUser(user?.uid);
-        router.push("/");
       })
       .catch((error) => {
         console.log(error.message);
@@ -45,10 +44,7 @@ const Login: NextPage = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user?.uid);
-        router.push("/");
-      } else {
-        setCurrentUser("");
-        router.push("/login");
+        router.push("/dashboard");
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
