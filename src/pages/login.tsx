@@ -44,7 +44,7 @@ const Login: NextPage = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user?.uid);
-        router.push("/dashboard");
+        router.push("/");
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

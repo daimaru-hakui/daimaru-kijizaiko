@@ -21,6 +21,7 @@ const Layout = ({ children }: Props) => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user?.uid);
+        router.push("/");
       } else {
         setCurrentUser("");
         router.push("/login");
