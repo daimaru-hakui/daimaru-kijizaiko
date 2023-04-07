@@ -254,15 +254,10 @@ const ProductInputArea: NextPage<Props> = ({
               />
             </Box>
             <Box flex={1} w="100%">
-              <Text fontWeight="bold">
-                単価（円）
-                <Box ml={1} as="span" textColor="red">
-                  ※
-                </Box>
-              </Text>
+              <Text fontWeight="bold">単価（円）</Text>
               <NumberInput
                 mt={1}
-                {...register("price", { required: true })}
+                {...register("price")}
                 min={0}
                 max={100000}
                 onChange={() => getValues}
