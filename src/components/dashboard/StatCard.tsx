@@ -1,14 +1,13 @@
-import { Box, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
-import { NextPage } from 'next';
+import { FC } from "react";
+import { Box, Stat, StatLabel, StatNumber } from "@chakra-ui/react";
 type Props = {
   title: string;
   quantity: string | number;
   unit: string;
-  fontSize: string
-}
+  fontSize: string;
+};
 
-const StatCard: NextPage<Props> = ({ title, quantity, unit, fontSize }) => {
-
+export const StatCard: FC<Props> = ({ title, quantity, unit, fontSize }) => {
   return (
     <>
       <Stat p={3} bg="white" rounded="md" boxShadow="md">
@@ -21,7 +20,5 @@ const StatCard: NextPage<Props> = ({ title, quantity, unit, fontSize }) => {
         </StatNumber>
       </Stat>
     </>
-  )
-}
-
-export default StatCard
+  );
+};

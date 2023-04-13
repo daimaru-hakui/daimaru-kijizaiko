@@ -9,12 +9,12 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import CommentModal from "../CommentModal";
+import { useEffect, useState, FC } from "react";
+import { CommentModal } from "../CommentModal";
 import { HistoryType } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import SearchArea from "../SearchArea";
+import { SearchArea } from "../SearchArea";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 import { useUtil } from "../../hooks/UseUtil";
@@ -26,7 +26,7 @@ type Inputs = {
   staff: string;
 };
 
-const AccountingConfirmTable = () => {
+export const AccountingConfirmTable: FC = () => {
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const { getUserName, getSerialNumber } = useGetDisp();
   const { getTodayDate, get3monthsAgo } = useUtil();
@@ -57,15 +57,22 @@ const AccountingConfirmTable = () => {
 
   useEffect(() => {
     if (!staff) {
-      setFilterHistories(data?.contents.filter(
-        (history: HistoryType) => history.accounting === true && history
-      ));
+      setFilterHistories(
+        data?.contents.filter(
+          (history: HistoryType) => history.accounting === true && history
+        )
+      );
     } else {
-      setFilterHistories(data?.contents?.filter(
-        (content: HistoryType) =>
-          staff === content.createUser || staff === "").filter(
+      setFilterHistories(
+        data?.contents
+          ?.filter(
+            (content: HistoryType) =>
+              staff === content.createUser || staff === ""
+          )
+          .filter(
             (history: HistoryType) => history.accounting === true && history
-          ));
+          )
+      );
     }
   }, [data, staff]);
 
@@ -127,7 +134,8 @@ const AccountingConfirmTable = () => {
                     <>
                       <Td>{history?.price.toLocaleString()}円</Td>
                       <Td>
-                        {(history?.quantity * history?.price).toLocaleString()}円
+                        {(history?.quantity * history?.price).toLocaleString()}
+                        円
                       </Td>
                     </>
                   )}
@@ -143,11 +151,11 @@ const AccountingConfirmTable = () => {
             </Tbody>
           </Table>
         ) : (
-          <Box mt={6} textAlign="center">現在登録された情報はありません。</Box>
+          <Box mt={6} textAlign="center">
+            現在登録された情報はありません。
+          </Box>
         )}
       </TableContainer>
     </>
   );
 };
-
-export default AccountingConfirmTable;

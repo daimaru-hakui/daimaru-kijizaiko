@@ -9,16 +9,16 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { GrayFabricType } from "../../../types";
-import GrayFabricInputArea from "./GrayFabricInputArea";
+import { GrayFabricInputArea } from "./GrayFabricInputArea";
 
 type Props = {
   grayFabric: GrayFabricType;
 };
 
-const GrayFabricEditModal: NextPage<Props> = ({ grayFabric }) => {
+export const GrayFabricEditModal: FC<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (

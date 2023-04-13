@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../../store";
 import { ProductType } from "../../../../types";
-import OrderAreaModal from "../../../components/products/OrderAreaModal";
+import { OrderAreaModal } from "../../../components/products/OrderAreaModal";
 
 const OrderNew: NextPage = () => {
   const products = useRecoilValue(productsState);

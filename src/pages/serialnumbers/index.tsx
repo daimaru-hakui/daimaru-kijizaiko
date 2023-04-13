@@ -9,12 +9,11 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../../../firebase";
-
 import { useGetDisp } from "../../hooks/UseGetDisp";
+import { NextPage } from "next";
 
 const SerialNumbers: NextPage = () => {
   const [serialNumbers, setSerialNumber] = useState([]);

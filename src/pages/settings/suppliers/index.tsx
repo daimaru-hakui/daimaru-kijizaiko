@@ -19,8 +19,8 @@ import { suppliersState } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
-import CommentModal from "../../../components/CommentModal";
-import EditModal from "../../../components/settings/suppliers/EditModal";
+import { CommentModal } from "../../../components/CommentModal";
+import { EditModal } from "../../../components/settings/suppliers/EditModal";
 import { SupplierType } from "../../../../types";
 import { NextPage } from "next";
 

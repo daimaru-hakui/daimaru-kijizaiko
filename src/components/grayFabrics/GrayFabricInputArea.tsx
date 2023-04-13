@@ -8,8 +8,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { NextPage } from "next";
+import { useEffect, useState, FC } from "react";
 import { useRecoilValue } from "recoil";
 import { suppliersState } from "../../../store";
 import { GrayFabricType } from "../../../types";
@@ -25,7 +24,7 @@ type Props = {
   onClose?: Function;
 };
 
-const GrayFabricInputArea: NextPage<Props> = ({
+export const GrayFabricInputArea: FC<Props> = ({
   title,
   grayFabric,
   toggleSwitch,
@@ -172,5 +171,3 @@ const GrayFabricInputArea: NextPage<Props> = ({
     </form>
   );
 };
-
-export default GrayFabricInputArea;

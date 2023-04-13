@@ -8,11 +8,9 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 
 type Props = {
@@ -22,7 +20,7 @@ type Props = {
   mutate?: Function;
 };
 
-const CommentModal: NextPage<Props> = ({ comment }) => {
+export const CommentModal: FC<Props> = ({ comment }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newComment, setNewComment] = useState(comment);
 
@@ -69,5 +67,3 @@ const CommentModal: NextPage<Props> = ({ comment }) => {
     </>
   );
 };
-
-export default CommentModal;

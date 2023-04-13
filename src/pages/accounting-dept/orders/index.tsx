@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import AccountingOrderTable from "../../../components/accounting/AccountingOrderTable";
+import { AccountingOrderTable } from "../../../components/accounting/AccountingOrderTable";
 
 const AccountingDeptOrders: NextPage = () => {
   return (

@@ -217,6 +217,7 @@ export const useOrderFabricFunc = (
         query: {
           productId: productId || "",
           quantity: items.quantity || 0,
+          scheduledAt: items.scheduledAt,
           serialNumber,
           stockPlace: items.stockPlace || "徳島工場",
           createUser: getUserName(currentUser),

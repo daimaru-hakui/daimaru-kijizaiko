@@ -1,13 +1,13 @@
-import { Box, Button, Divider, List, ListItem } from "@chakra-ui/react";
+import { FC } from "react";
+import { Box, Divider, List, ListItem } from "@chakra-ui/react";
 import Link from "next/link";
-import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useAuthManagement } from "../hooks/UseAuthManagement";
 
 type Props = {
   onClose: Function;
 };
-const MenuLists: NextPage<Props> = ({ onClose }) => {
+export const MenuLists: FC<Props> = ({ onClose }) => {
   const router = useRouter();
   const { isAdminAuth, isAuths } = useAuthManagement();
 
@@ -141,5 +141,3 @@ const MenuLists: NextPage<Props> = ({ onClose }) => {
     </Box>
   );
 };
-
-export default MenuLists;

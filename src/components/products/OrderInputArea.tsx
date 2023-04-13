@@ -15,7 +15,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
 import { ProductType, StockPlaceType } from "../../../types";
@@ -30,7 +30,7 @@ type Props = {
   onClose: Function;
 };
 
-const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
+export const OrderInputArea: FC<Props> = ({ product, orderType, onClose }) => {
   const grayFabricId = product?.grayFabricId || "";
   const stockPlaces = useRecoilValue(stockPlacesState);
   const { getTodayDate } = useUtil();
@@ -235,5 +235,3 @@ const OrderInputArea: NextPage<Props> = ({ product, orderType, onClose }) => {
     </Box>
   );
 };
-
-export default OrderInputArea;

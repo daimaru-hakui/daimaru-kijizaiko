@@ -20,11 +20,14 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
-import { HistoryType, StockPlaceType } from "../../../types";
+import {
+  GrayFabricHistoryType,
+  HistoryType,
+  StockPlaceType,
+} from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
@@ -34,7 +37,7 @@ type Props = {
   onClick: Function;
 };
 
-const OrderToConfirmModal: NextPage<Props> = ({
+export const OrderToConfirmModal: FC<Props> = ({
   history,
   items,
   setItems,
@@ -277,5 +280,3 @@ const OrderToConfirmModal: NextPage<Props> = ({
     </>
   );
 };
-
-export default OrderToConfirmModal;

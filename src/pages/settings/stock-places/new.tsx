@@ -7,8 +7,8 @@ import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types";
-import { NextPage } from "next";
 import { StockPlaceInputArea } from "../../../components/settings/stock-places/StockPlaceInputArea";
+import { NextPage } from "next";
 
 const StockPlaceNew: NextPage = () => {
   const router = useRouter();

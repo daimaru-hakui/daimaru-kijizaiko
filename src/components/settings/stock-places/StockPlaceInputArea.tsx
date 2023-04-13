@@ -7,7 +7,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC } from "react";
 import { StockPlaceType } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
@@ -22,7 +22,7 @@ type Props = {
 
 type Inputs = StockPlaceType;
 
-export const StockPlaceInputArea = ({
+export const StockPlaceInputArea: FC<Props> = ({
   type,
   stockPlace,
   addStockPlace,

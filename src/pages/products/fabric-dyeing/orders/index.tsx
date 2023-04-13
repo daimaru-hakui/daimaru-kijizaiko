@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import FabricDyeingOrderTable from "../../../../components/products/fabric-dyeing/OrderTable";
+import { FabricDyeingOrderTable } from "../../../../components/products/fabric-dyeing/OrderTable";
 
 const FabricDyeingsOrders: NextPage = () => {
   return (

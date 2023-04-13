@@ -55,6 +55,27 @@ export type GrayFabricType = {
   createUser: string;
 };
 
+export type GrayFabricHistoryType = {
+  id: string;
+  serialNumber: number;
+  orderType: string;
+  grayFabricId: string;
+  supplierId: string;
+  supplierName: string;
+  productNumber: string;
+  productName: string;
+  price: number;
+  quantity: number;
+  comment: string;
+  orderedAt: string;
+  scheduledAt: string;
+  fixedAt: string;
+  createUser: string;
+  updateUser: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type HistoryType = {
   id: string;
   serialNumber: number;

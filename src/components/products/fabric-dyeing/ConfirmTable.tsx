@@ -15,10 +15,10 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentUserState, loadingState } from "../../../../store";
-import CommentModal from "../../CommentModal";
+import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { db } from "../../../../firebase";
@@ -26,7 +26,7 @@ import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../../SearchArea";
+import { SearchArea } from "../../SearchArea";
 import { useSWRFabricDyeingConfirms } from "../../../hooks/swr/useSWRFabricDyeingConfirms";
 
 type Inputs = {
@@ -36,7 +36,7 @@ type Inputs = {
   staff: string;
 };
 
-const FabricDyeingConfirmTable = () => {
+export const FabricDyeingConfirmTable: FC = () => {
   const currentUser = useRecoilValue(currentUserState);
   const setLoading = useSetRecoilState(loadingState);
   const { getTodayDate, get3monthsAgo } = useUtil();
@@ -80,11 +80,16 @@ const FabricDyeingConfirmTable = () => {
     if (!staff) {
       setFilterHistories(data?.contents);
     } else {
-      setFilterHistories(data?.contents?.filter(
-        (history: { quantity: number; }) => history.quantity > 0 && history
-      ).filter(
-        (content: HistoryType) => staff === content.createUser || staff === ""
-      ));
+      setFilterHistories(
+        data?.contents
+          ?.filter(
+            (history: { quantity: number }) => history.quantity > 0 && history
+          )
+          .filter(
+            (content: HistoryType) =>
+              staff === content.createUser || staff === ""
+          )
+      );
     }
   }, [data, staff]);
 
@@ -179,15 +184,15 @@ const FabricDyeingConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={() => updateFabricDyeingConfirm(history)}
-                          orderType=""
-                        />
-                      )}
+                      <HistoryEditModal
+                        history={history}
+                        type="confirm"
+                        items={items}
+                        setItems={setItems}
+                        onClick={() => updateFabricDyeingConfirm(history)}
+                        orderType=""
+                      />
+                    )}
                   </Td>
                 </Tr>
               ))}
@@ -202,5 +207,3 @@ const FabricDyeingConfirmTable = () => {
     </>
   );
 };
-
-export default FabricDyeingConfirmTable;

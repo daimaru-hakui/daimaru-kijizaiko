@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import FabricPurchaseConfirmTable from "../../../../components/products/fabric-purchase/ConfirmTable";
+import { FabricPurchaseConfirmTable } from "../../../../components/products/fabric-purchase/ConfirmTable";
 
 const FabricPurchaseConfirms: NextPage = () => {
   return (

@@ -16,10 +16,10 @@ import {
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import CommentModal from "../../CommentModal";
+import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
@@ -32,11 +32,10 @@ import {
 } from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import OrderToConfirmModal from "../../history/OrderToConfirmModal";
+import { OrderToConfirmModal } from "../../history/OrderToConfirmModal";
 import { useRouter } from "next/router";
-// import useSWR from "swr";
 
-const FabricDyeingOrderTable = () => {
+export const FabricDyeingOrderTable: FC = () => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);

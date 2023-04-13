@@ -16,9 +16,9 @@ import {
   CuttingProductType,
   CuttingHistoryType,
 } from "../../../../types";
-import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
-import HistoryProductMenu from "../../../components/tokushima/HistoryProductMenu";
-import SearchArea from "../../../components/SearchArea";
+import { CuttingReportModal } from "../../../components/tokushima/CuttingReportModal";
+import { HistoryProductMenu } from "../../../components/tokushima/HistoryProductMenu";
+import { SearchArea } from "../../../components/SearchArea";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";

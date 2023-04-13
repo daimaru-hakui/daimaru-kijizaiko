@@ -10,18 +10,17 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { db } from "../../../firebase";
-import useSWR from "swr";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { GrayFabricType, HistoryType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import CommentModal from "../CommentModal";
+import { CommentModal } from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
-import SearchArea from "../SearchArea";
+import { SearchArea } from "../SearchArea";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
 
@@ -32,7 +31,7 @@ type Inputs = {
   staff: string;
 };
 
-const GrayFabricConfirmTable = () => {
+export const GrayFabricConfirmTable: FC = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const currentUser = useRecoilValue(currentUserState);
@@ -41,7 +40,9 @@ const GrayFabricConfirmTable = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState([] as HistoryType[]);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
+    [] as HistoryType[]
+  );
   const { data, mutate } = useSWRGrayFavricConfirms(startDay, endDay);
 
   const methods = useForm<Inputs>({
@@ -68,9 +69,12 @@ const GrayFabricConfirmTable = () => {
     if (!staff) {
       setFilterGrayFabrics(data?.contents);
     } else {
-      setFilterGrayFabrics(data?.contents?.filter(
-        (content: GrayFabricType) =>
-          staff === content.createUser || staff === ""));
+      setFilterGrayFabrics(
+        data?.contents?.filter(
+          (content: GrayFabricType) =>
+            staff === content.createUser || staff === ""
+        )
+      );
     }
   }, [data, staff]);
 
@@ -91,8 +95,8 @@ const GrayFabricConfirmTable = () => {
 
         const newStock =
           (await grayFabricDocSnap.data()?.stock) -
-          history.quantity +
-          Number(items.quantity) || 0;
+            history.quantity +
+            Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
@@ -158,26 +162,26 @@ const GrayFabricConfirmTable = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history.createUser === currentUser) && (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={updateConfirmHistory}
-                          orderType=""
-                        />
-                      )}
+                      <HistoryEditModal
+                        history={history}
+                        type="confirm"
+                        items={items}
+                        setItems={setItems}
+                        onClick={updateConfirmHistory}
+                        orderType=""
+                      />
+                    )}
                   </Td>
                 </Tr>
               ))}
             </Tbody>
           </Table>
         ) : (
-          <Box mt={6} textAlign="center">現在登録された情報はありません。</Box>
+          <Box mt={6} textAlign="center">
+            現在登録された情報はありません。
+          </Box>
         )}
       </TableContainer>
     </>
   );
 };
-
-export default GrayFabricConfirmTable;

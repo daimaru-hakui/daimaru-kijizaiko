@@ -1,19 +1,19 @@
-import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
+import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { FaEllipsisV } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { ProductType } from "../../../types";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
-import ProductEditModal from "./ProductEditModal";
-import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
+import { ProductCuttingHistoryModal } from "./ProductCuttingHistoryModal";
+import { ProductEditModal } from "./ProductEditModal";
+import { ProductPurchaseHistoryModal } from "./ProductPurchaseHistoryModal";
 
 type Props = {
   product: ProductType;
 };
 
-const ProductMenu: NextPage<Props> = ({ product }) => {
+export const ProductMenu: FC<Props> = ({ product }) => {
   const currentUser = useRecoilValue(currentUserState);
   const { isAuths } = useAuthManagement();
 
@@ -38,5 +38,3 @@ const ProductMenu: NextPage<Props> = ({ product }) => {
     </Menu>
   );
 };
-
-export default ProductMenu;

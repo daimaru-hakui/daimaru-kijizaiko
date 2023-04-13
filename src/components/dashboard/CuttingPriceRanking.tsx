@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,7 +17,6 @@ import {
   CuttingProductType,
 } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { NextPage } from "next";
 import useSWRImmutable from "swr/immutable";
 
 ChartJS.register(
@@ -36,7 +35,7 @@ type Props = {
   rankingNumber: number;
 };
 
-const CuttingPriceRanking: NextPage<Props> = ({
+export const CuttingPriceRanking: FC<Props> = ({
   data,
   startDay,
   endDay,
@@ -154,5 +153,3 @@ const CuttingPriceRanking: NextPage<Props> = ({
     </Box>
   );
 };
-
-export default CuttingPriceRanking;

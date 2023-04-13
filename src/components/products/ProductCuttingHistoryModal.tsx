@@ -23,8 +23,7 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { NextPage } from "next";
+import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import {
   CuttingReportType,
@@ -34,7 +33,7 @@ import {
 import { useUtil } from "../../hooks/UseUtil";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../SearchArea";
+import { SearchArea } from "../SearchArea";
 import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 
 type Props = {
@@ -49,7 +48,7 @@ type Inputs = {
   staff: string;
 };
 
-const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
+export const ProductCuttingHistoryModal: FC<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { scaleCalc } = useCuttingReportFunc(null, null);
   const [cuttingList, setCuttingList] = useState([] as CuttingHistoryType[]);
@@ -98,16 +97,16 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
           .map((cuttingReport: CuttingReportType) =>
             cuttingReport.products.map(
               (product: CuttingProductType) =>
-              ({
-                ...cuttingReport,
-                ...product,
-                products: null,
-              } as CuttingHistoryType)
+                ({
+                  ...cuttingReport,
+                  ...product,
+                  products: null,
+                } as CuttingHistoryType)
             )
           )
           .flat()
           .filter(
-            (report: { productId: string; }) => report.productId === productId
+            (report: { productId: string }) => report.productId === productId
           )
           .filter((report) => staff === report.staff || staff === "")
           .filter((report) => report.client.includes(String(client)))
@@ -191,7 +190,7 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {cuttingList.map(
                           (
-                            report: CuttingHistoryType & { quantity: number; },
+                            report: CuttingHistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>
@@ -234,5 +233,3 @@ const ProductCuttingHistoryModal: NextPage<Props> = ({ productId, type }) => {
     </>
   );
 };
-
-export default ProductCuttingHistoryModal;

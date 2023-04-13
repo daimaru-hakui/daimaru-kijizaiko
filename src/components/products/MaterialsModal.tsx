@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -18,7 +18,6 @@ import {
   NumberInputStepper,
   Stack,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
 import { MaterialsType } from "../../../types";
 
 type Props = {
@@ -26,7 +25,7 @@ type Props = {
   setMaterials: Function;
 };
 
-const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
+export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(true);
@@ -138,5 +137,3 @@ const MaterialsModal: NextPage<Props> = ({ materials, setMaterials }) => {
     </>
   );
 };
-
-export default MaterialsModal;

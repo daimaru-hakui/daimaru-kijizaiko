@@ -17,9 +17,9 @@ import { locationsState } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
-import CommentModal from "../../../components/CommentModal";
+import { CommentModal } from "../../../components/CommentModal";
 import { LocationType } from "../../../../types";
-import EditLocationModal from "../../../components/settings/locations/EditModal";
+import { EditLocationModal } from "../../../components/settings/locations/EditModal";
 import { NextPage } from "next";
 
 const Locations: NextPage = () => {

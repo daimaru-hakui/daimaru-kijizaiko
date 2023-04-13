@@ -20,12 +20,11 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { CuttingReportType } from "../../../types";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import CuttingReportEditModal from "./CuttingReportEditModal";
+import { CuttingReportEditModal } from "./CuttingReportEditModal";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
 
@@ -36,7 +35,7 @@ type Props = {
   endDay: string;
 };
 
-const CuttingReportModal: NextPage<Props> = ({
+export const CuttingReportModal: FC<Props> = ({
   report,
   reportId,
   startDay,
@@ -237,5 +236,3 @@ const CuttingReportModal: NextPage<Props> = ({
     </>
   );
 };
-
-export default CuttingReportModal;

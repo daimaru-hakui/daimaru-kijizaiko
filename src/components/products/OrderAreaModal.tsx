@@ -19,17 +19,17 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { ProductType } from "../../../types";
-import DisplayStock from "./DisplayStock";
-import OrderInputArea from "./OrderInputArea";
+import { DisplayStock } from "./DisplayStock";
+import { OrderInputArea } from "./OrderInputArea";
 
 type Props = {
   product: ProductType;
   buttonSize: string;
 };
 
-const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
+export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -110,5 +110,3 @@ const OrderAreaModal: NextPage<Props> = ({ product, buttonSize }) => {
     </>
   );
 };
-
-export default OrderAreaModal;

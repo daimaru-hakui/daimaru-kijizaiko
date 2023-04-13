@@ -10,8 +10,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabricType } from "../../../types";
@@ -21,7 +20,7 @@ type Props = {
   grayFabric: GrayFabricType;
 };
 
-const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
+export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
   const { getUserName } = useGetDisp(); //// ？
   const { updateAjustmentGrayFabric } = useGrayFabricFunc();
 
@@ -109,5 +108,3 @@ const AdjustmentGrayFabric: NextPage<Props> = ({ grayFabric }) => {
     </Tr>
   );
 };
-
-export default AdjustmentGrayFabric;

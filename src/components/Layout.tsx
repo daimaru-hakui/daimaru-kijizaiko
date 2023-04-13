@@ -1,9 +1,9 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
-import Header from "./Header";
-import Loading from "./Loading";
-import Sidebar from "./Sidebar";
+import { ReactNode, useEffect, FC } from "react";
+import { Header } from "./Header";
+import { Loading } from "./Loading";
+import { Sidebar } from "./Sidebar";
 import { auth } from "../../firebase";
 import { useRecoilState } from "recoil";
 import { currentUserState } from "../../store";
@@ -13,7 +13,7 @@ type Props = {
   children: ReactNode;
 };
 
-const Layout = ({ children }: Props) => {
+export const Layout: FC<Props> = ({ children }) => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const router = useRouter();
 
@@ -53,13 +53,3 @@ const Layout = ({ children }: Props) => {
     </Box>
   );
 };
-
-export default Layout;
-
-{
-  /* {router.pathname !== "/login" && <Header />}
-<Flex>
-  {router.pathname !== "/login" && <Sidebar />}
-  {children}
-</Flex> */
-}

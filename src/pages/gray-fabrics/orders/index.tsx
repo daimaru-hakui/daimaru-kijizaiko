@@ -2,7 +2,7 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
 
-import GrayFabricOrderTable from "../../../components/grayFabrics/GrayFabricOrderTable";
+import { GrayFabricOrderTable } from "../../../components/grayFabrics/GrayFabricOrderTable";
 
 const GrayFabricHistoryOrders: NextPage = () => {
   return (

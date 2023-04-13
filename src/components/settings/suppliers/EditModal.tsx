@@ -9,8 +9,8 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
+import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { NextPage } from "next";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types";
@@ -20,7 +20,7 @@ type Props = {
   supplier: SupplierType;
 };
 
-const EditModal: NextPage<Props> = ({ supplier }) => {
+export const EditModal: FC<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const updateSupplier = async (data: SupplierType) => {
@@ -70,5 +70,3 @@ const EditModal: NextPage<Props> = ({ supplier }) => {
     </>
   );
 };
-
-export default EditModal;

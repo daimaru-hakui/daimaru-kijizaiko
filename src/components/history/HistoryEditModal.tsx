@@ -20,10 +20,9 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
-import { HistoryType } from "../../../types";
+import { GrayFabricHistoryType, HistoryType } from "../../../types";
 
 type Props = {
   history: HistoryType;
@@ -34,7 +33,7 @@ type Props = {
   orderType?: string;
 };
 
-export const HistoryEditModal: NextPage<Props> = ({
+export const HistoryEditModal: FC<Props> = ({
   history,
   type,
   onClick,

@@ -16,8 +16,7 @@ import {
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { NextPage } from "next";
+import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
@@ -27,20 +26,20 @@ import {
   loadingState,
   usersState,
 } from "../../../../store";
-import CommentModal from "../../CommentModal";
+import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
-import OrderToConfirmModal from "../../history/OrderToConfirmModal";
+import { OrderToConfirmModal } from "../../history/OrderToConfirmModal";
 import { useRouter } from "next/router";
 
 type Props = {
   HOUSE_FACTORY?: string;
 };
 
-const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
+export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const router = useRouter();
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
@@ -372,5 +371,3 @@ const FabricPurchaseOrderTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
     </>
   );
 };
-
-export default FabricPurchaseOrderTable;
