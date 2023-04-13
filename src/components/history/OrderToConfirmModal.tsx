@@ -190,7 +190,6 @@ export const OrderToConfirmModal: FC<Props> = ({
                       <NumberInput
                         mt={1}
                         name="remainingOrder"
-                        // defaultValue={history.quantity - items.quantity}
                         min={0}
                         max={10000}
                         value={items.remainingOrder}
