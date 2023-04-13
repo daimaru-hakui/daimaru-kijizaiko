@@ -1,5 +1,5 @@
+import { FC } from "react";
 import { Box, Container, Flex, Text } from "@chakra-ui/react";
-import { NextPage } from "next";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
 import { ProductType } from "../../../types";
@@ -9,7 +9,7 @@ type Props = {
   product: ProductType;
 };
 
-const DisplayStock: NextPage<Props> = ({ product }) => {
+export const DisplayStock: FC<Props> = ({ product }) => {
   const grayFabrics = useRecoilValue(grayFabricsState);
   const { mathRound2nd } = useUtil();
 
@@ -94,5 +94,3 @@ const DisplayStock: NextPage<Props> = ({ product }) => {
     </Container>
   );
 };
-
-export default DisplayStock;

@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "../../../../store";
 import { ProductType } from "../../../../types";
-import AdjustmentProduct from "../../../components/adjustment/AdjustmentProduct";
+import { AdjustmentProduct } from "../../../components/adjustment/AdjustmentProduct";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { NextPage } from "next";

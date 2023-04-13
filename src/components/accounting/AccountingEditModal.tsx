@@ -21,8 +21,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
-import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
@@ -36,7 +35,7 @@ type Props = {
   history: HistoryType;
 };
 
-export const AccountingEditModal: NextPage<Props> = ({ type, history }) => {
+export const AccountingEditModal: FC<Props> = ({ type, history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
   const HOUSE_FACTORY = "徳島工場";

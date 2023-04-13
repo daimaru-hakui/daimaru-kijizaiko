@@ -13,10 +13,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState, productsState } from "../../../store";
+import { useEffect, useState, FC } from "react";
+import { useRecoilValue } from "recoil";
+import { currentUserState, productsState } from "../../../store";
 import {
   ProductType,
   CuttingProductType,
@@ -27,8 +26,7 @@ import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import StockEditModal from "./StockEditModal";
-import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
+import { StockEditModal } from "./StockEditModal";
 
 type Props = {
   items: CuttingProductType[];
@@ -41,7 +39,7 @@ type Props = {
   totalQuantity: number;
 };
 
-export const FabricsUsedInput: NextPage<Props> = ({
+export const FabricsUsedInput: FC<Props> = ({
   items,
   setItems,
   product,
@@ -105,18 +103,22 @@ export const FabricsUsedInput: NextPage<Props> = ({
   ) => {
     const name = e.target.name;
     const value = e.target.value;
-    if (e.type === "change" && name === "productId") items[rowIndex].quantity = 0;
+    if (e.type === "change" && name === "productId")
+      items[rowIndex].quantity = 0;
     setItems(
       items.map((product, index) =>
         index === rowIndex ? { ...product, [name]: value } : product
-      ));
+      )
+    );
   };
 
   const handleNumbersChange = (e: string, name: string, rowIndex: number) => {
     const value = e;
-    setItems(items.map((product, index) =>
-      index === rowIndex ? { ...product, [name]: value } : product
-    ));
+    setItems(
+      items.map((product, index) =>
+        index === rowIndex ? { ...product, [name]: value } : product
+      )
+    );
   };
 
   // 商品の行を削除;
@@ -146,7 +148,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
     try {
       runTransaction(db, async (transaction) => {
         const cuttingReportSnap = await transaction.get(cuttingReportDocRef);
-        if (!cuttingReportSnap.exists()) throw "cuttingReportSnap does not exist!";
+        if (!cuttingReportSnap.exists())
+          throw "cuttingReportSnap does not exist!";
 
         const productSnap = await transaction.get(productDocRef);
         if (!productSnap.exists()) throw "productSnap does not exist!";
@@ -157,7 +160,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
           ...newObj,
           createdAt: cuttingReportSnap.data().createdAt.toDate(),
           updatedUser: currentUser,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
 
         const newTokushimaStock =
@@ -166,7 +169,6 @@ export const FabricsUsedInput: NextPage<Props> = ({
           tokushimaStock: Number(newTokushimaStock),
         });
       });
-
     } catch (err) {
       console.log(err);
     } finally {
@@ -292,8 +294,8 @@ export const FabricsUsedInput: NextPage<Props> = ({
                     ? "red.300"
                     : ""
                   : getTokushimaStock(product.productId) < product?.quantity //新規
-                    ? "red.300"
-                    : ""
+                  ? "red.300"
+                  : ""
               }
               rounded="md"
               value={product?.quantity}
@@ -314,10 +316,7 @@ export const FabricsUsedInput: NextPage<Props> = ({
               textAlign="right"
               readOnly
               bg="gray.100"
-              value={calcScale(
-                items[rowIndex].quantity,
-                totalQuantity
-              )}
+              value={calcScale(items[rowIndex].quantity, totalQuantity)}
             />
           </Box>
         </Flex>

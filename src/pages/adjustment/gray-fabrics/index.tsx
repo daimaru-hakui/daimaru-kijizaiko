@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../../store";
 import { useUtil } from "../../../hooks/UseUtil";
-import AdjustmentGrayFabric from "../../../components/adjustment/AdjustmentGrayFabric";
+import { AdjustmentGrayFabric } from "../../../components/adjustment/AdjustmentGrayFabric";
 import { GrayFabricType } from "../../../../types";
 import { NextPage } from "next";
 

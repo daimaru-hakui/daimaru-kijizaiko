@@ -1,7 +1,6 @@
 import {
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
@@ -9,9 +8,11 @@ import {
   useDisclosure,
   Button,
 } from "@chakra-ui/react";
+import { FC } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import MenuLists from "./MenuLists";
-const MenuDrawerButton = () => {
+import { MenuLists } from "./MenuLists";
+
+export const MenuDrawerButton: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -38,5 +39,3 @@ const MenuDrawerButton = () => {
     </>
   );
 };
-
-export default MenuDrawerButton;

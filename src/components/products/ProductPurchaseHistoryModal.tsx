@@ -20,13 +20,12 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { NextPage } from "next";
+import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { HistoryType } from "../../../types";
 import { useForm, FormProvider } from "react-hook-form";
-import SearchArea from "../SearchArea";
+import { SearchArea } from "../SearchArea";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 
 type Props = {
@@ -41,7 +40,7 @@ type Inputs = {
   staff: string;
 };
 
-const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
+export const ProductPurchaseHistoryModal: FC<Props> = ({ productId, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const [filterFabricPurchases, setFilterFabricPurchases] = useState([
@@ -89,8 +88,12 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
       if (!staff) {
         setFilterFabricPurchases(filterArray);
       } else {
-        setFilterFabricPurchases(filterArray.filter(
-          (history: HistoryType) => staff === history.createUser || staff === ""));
+        setFilterFabricPurchases(
+          filterArray.filter(
+            (history: HistoryType) =>
+              staff === history.createUser || staff === ""
+          )
+        );
       }
     };
     getArray();
@@ -170,7 +173,7 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number; },
+                            fabric: HistoryType & { quantity: number },
                             index
                           ) => (
                             <Tr key={index}>
@@ -210,5 +213,3 @@ const ProductPurchaseHistoryModal: NextPage<Props> = ({ productId, type }) => {
     </>
   );
 };
-
-export default ProductPurchaseHistoryModal;

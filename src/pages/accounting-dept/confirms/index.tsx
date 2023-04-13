@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import AccountingConfirmTable from "../../../components/accounting/AccountingConfirmTable";
+import { AccountingConfirmTable } from "../../../components/accounting/AccountingConfirmTable";
 
 const AccountingDeptConfirms: NextPage = () => {
   return (

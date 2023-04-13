@@ -10,7 +10,7 @@ type Props = {
   client?: string;
 };
 
-const SearchArea: FC<Props> = ({ onSubmit, onReset, client }) => {
+export const SearchArea: FC<Props> = ({ onSubmit, onReset, client }) => {
   const { data: users } = useSWRImmutable(`/api/users/sales`);
   const { register, handleSubmit } = useFormContext();
   const { getUserName } = useGetDisp();
@@ -99,5 +99,3 @@ const SearchArea: FC<Props> = ({ onSubmit, onReset, client }) => {
     </form>
   );
 };
-
-export default SearchArea;

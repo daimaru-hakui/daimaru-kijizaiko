@@ -38,7 +38,7 @@ import {
 } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
-import MaterialsModal from "./MaterialsModal";
+import { MaterialsModal } from "./MaterialsModal";
 import { useForm } from "react-hook-form";
 import useSWRImmutable from "swr/immutable";
 

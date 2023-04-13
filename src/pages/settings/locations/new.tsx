@@ -7,8 +7,8 @@ import { db } from "../../../../firebase";
 import { LocationType } from "../../../../types";
 import { useRecoilValue } from "recoil";
 import { locationsState } from "../../../../store";
-import { NextPage } from "next";
 import { LocationInputArea } from "../../../components/settings/locations/LocationInputArea";
+import { NextPage } from "next";
 
 const LocationNew: NextPage = () => {
   const router = useRouter();

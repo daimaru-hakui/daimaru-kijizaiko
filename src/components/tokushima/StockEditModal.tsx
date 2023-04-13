@@ -15,7 +15,7 @@ import {
   NumberDecrementStepper,
   Box,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import useSWR from "swr";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -27,7 +27,7 @@ type Props = {
   productId: string;
 };
 
-const StockEditModal = ({ productId }: Props) => {
+export const StockEditModal: FC<Props> = ({ productId }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const setLoading = useSetRecoilState(loadingState);
   const { data } = useSWR(`/api/products/${productId}`);
@@ -98,5 +98,3 @@ const StockEditModal = ({ productId }: Props) => {
     </>
   );
 };
-
-export default StockEditModal;

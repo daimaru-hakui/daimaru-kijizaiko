@@ -1,10 +1,11 @@
+import { FC } from "react";
 import { Box } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store";
-import MenuLists from "./MenuLists";
+import { MenuLists } from "./MenuLists";
 
-const Sidebar = () => {
-  const currentUser = useRecoilValue(currentUserState)
+export const Sidebar: FC = () => {
+  const currentUser = useRecoilValue(currentUserState);
   const returnNull = () => {
     return;
   };
@@ -30,5 +31,3 @@ const Sidebar = () => {
     </>
   );
 };
-
-export default Sidebar;

@@ -28,9 +28,8 @@ import {
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
-import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, FC } from "react";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState } from "../../../store";
@@ -42,7 +41,7 @@ type Props = {
   grayFabric: GrayFabricType;
 };
 
-const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
+export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const currentUser = useRecoilValue(currentUserState);
@@ -223,5 +222,3 @@ const GrayFabricOrderAreaModal: NextPage<Props> = ({ grayFabric }) => {
     </>
   );
 };
-
-export default GrayFabricOrderAreaModal;

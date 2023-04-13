@@ -9,14 +9,15 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react";
+import { FC } from "react";
 import { MdOutlineSettings } from "react-icons/md";
 import Link from "next/link";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { currentUserState, usersState } from "../../store";
 import { auth } from "../../firebase";
-import MenuDrawerButton from "./MenuDrawerButton";
+import { MenuDrawerButton } from "./MenuDrawerButton";
 
-const Header = () => {
+export const Header: FC = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const users = useRecoilValue(usersState);
 
@@ -86,5 +87,3 @@ const Header = () => {
     </Flex>
   );
 };
-
-export default Header;

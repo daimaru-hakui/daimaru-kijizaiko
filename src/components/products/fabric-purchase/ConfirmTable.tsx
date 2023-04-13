@@ -14,20 +14,19 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
 import { currentUserState, loadingState } from "../../../../store";
-import CommentModal from "../../CommentModal";
+import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
-import HistoryProductMenu from "../../tokushima/HistoryProductMenu";
-import SearchArea from "../../SearchArea";
+import { HistoryProductMenu } from "../../tokushima/HistoryProductMenu";
+import { SearchArea } from "../../SearchArea";
 import { useSWRPurchaseConfirms } from "../../../hooks/swr/useSWRPurchaseConfirms";
 
 type Props = {
@@ -41,7 +40,7 @@ type Inputs = {
   staff: string;
 };
 
-const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
+export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const setLoading = useSetRecoilState(loadingState);
   const currentUser = useRecoilValue(currentUserState);
   const { getTodayDate, get3monthsAgo } = useUtil();
@@ -87,7 +86,8 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       newHistories = data?.contents;
     } else {
       newHistories = data?.contents?.filter(
-        (history: HistoryType) => staff === history.createUser || staff === "");
+        (history: HistoryType) => staff === history.createUser || staff === ""
+      );
     }
     if (HOUSE_FACTORY) {
       newHistories = newHistories?.filter((history: HistoryType) => {
@@ -97,13 +97,10 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
       });
       setFilterHistories(newHistories);
     } else {
-      newHistories = newHistories?.filter(
-        (history: HistoryType) => history
-      );
+      newHistories = newHistories?.filter((history: HistoryType) => history);
       setFilterHistories(newHistories);
     }
   }, [data, HOUSE_FACTORY, staff]);
-
 
   const updateFabricPurchaseConfirm = async (history: HistoryType) => {
     setLoading(true);
@@ -210,17 +207,17 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {history.accounting !== true
                       ? (isAuths(["rd", "tokushima"]) ||
-                        history?.createUser === currentUser) && (
-                        <HistoryEditModal
-                          history={history}
-                          type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={() => {
-                            updateFabricPurchaseConfirm(history);
-                          }}
-                        />
-                      )
+                          history?.createUser === currentUser) && (
+                          <HistoryEditModal
+                            history={history}
+                            type="confirm"
+                            items={items}
+                            setItems={setItems}
+                            onClick={() => {
+                              updateFabricPurchaseConfirm(history);
+                            }}
+                          />
+                        )
                       : "金額確認済"}
                   </Td>
                 </Tr>
@@ -236,5 +233,3 @@ const FabricPurchaseConfirmTable: NextPage<Props> = ({ HOUSE_FACTORY }) => {
     </>
   );
 };
-
-export default FabricPurchaseConfirmTable;

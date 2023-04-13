@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import FabricPurchaseOrderTable from "../../../../components/products/fabric-purchase/OrderTable";
+import { FabricPurchaseOrderTable } from "../../../../components/products/fabric-purchase/OrderTable";
 
 const TokushimaFabricPurchaseOrders: NextPage = () => {
   const HOUSE_FACTORY = "徳島工場";

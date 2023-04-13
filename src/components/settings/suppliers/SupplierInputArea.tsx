@@ -7,7 +7,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC } from "react";
 import { SupplierType } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
@@ -22,7 +22,7 @@ type Props = {
 
 type Inputs = SupplierType;
 
-export const SupplierInputArea = ({
+export const SupplierInputArea: FC<Props> = ({
   type,
   supplier,
   addSupplier,

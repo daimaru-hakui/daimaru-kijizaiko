@@ -11,10 +11,10 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { CuttingReportType } from "../../../types";
 import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
-import CuttingReportInputArea from "./CuttingReportInputArea";
+import { CuttingReportInputArea } from "./CuttingReportInputArea";
 
 type Props = {
   report: CuttingReportType;
@@ -22,16 +22,13 @@ type Props = {
   endDay: string;
 };
 
-const CuttingReportEditModal: NextPage<Props> = ({
+export const CuttingReportEditModal: FC<Props> = ({
   report,
   startDay,
   endDay,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, mutate } = useSWRCuttingReports(
-    startDay,
-    endDay,
-  );
+  const { data, mutate } = useSWRCuttingReports(startDay, endDay);
 
   return (
     <>
@@ -44,7 +41,8 @@ const CuttingReportEditModal: NextPage<Props> = ({
         編集
       </Button>
 
-      <Modal isOpen={isOpen}
+      <Modal
+        isOpen={isOpen}
         size="3xl"
         onClose={() => {
           mutate({ ...data });
@@ -70,11 +68,14 @@ const CuttingReportEditModal: NextPage<Props> = ({
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="outline" mr={3}
+            <Button
+              variant="outline"
+              mr={3}
               onClick={() => {
                 mutate({ ...data });
                 onClose();
-              }}>
+              }}
+            >
               閉じる
             </Button>
           </ModalFooter>
@@ -83,5 +84,3 @@ const CuttingReportEditModal: NextPage<Props> = ({
     </>
   );
 };
-
-export default CuttingReportEditModal;

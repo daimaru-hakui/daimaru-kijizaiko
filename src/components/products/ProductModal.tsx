@@ -15,11 +15,11 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import ProductCuttingHistoryModal from "./ProductCuttingHistoryModal";
-import ProductPurchaseHistoryModal from "./ProductPurchaseHistoryModal";
-import ProductEditModal from "./ProductEditModal";
+import { ProductCuttingHistoryModal } from "./ProductCuttingHistoryModal";
+import { ProductPurchaseHistoryModal } from "./ProductPurchaseHistoryModal";
+import { ProductEditModal } from "./ProductEditModal";
 import { ProductType } from "../../../types";
 
 type Props = {
@@ -28,7 +28,7 @@ type Props = {
   product?: ProductType;
 };
 
-const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
+export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const productId = product?.id;
 
@@ -255,5 +255,3 @@ const ProductModal: NextPage<Props> = ({ title = "詳細", product }) => {
     </>
   );
 };
-
-export default ProductModal;

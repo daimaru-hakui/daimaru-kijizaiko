@@ -17,27 +17,25 @@ import {
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
 import { currentUserState, grayFabricOrdersState } from "../../../store";
-import { HistoryType } from "../../../types";
-import OrderToConfirmModal from "../history/OrderToConfirmModal";
-import CommentModal from "../CommentModal";
+import { GrayFabricHistoryType, HistoryType } from "../../../types";
+import { OrderToConfirmModal } from "../history/OrderToConfirmModal";
+import { CommentModal } from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-// import useSWR from "swr";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
-const GrayFabricOrderTable = () => {
+export const GrayFabricOrderTable: FC = () => {
   const currentUser = useRecoilValue(currentUserState);
   const [items, setItems] = useState({} as HistoryType);
   const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
-  // const { data, mutate, isLoading } = useSWR("/api/gray-fabric-orders");
   const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
   const [filterGrayFabrics, setFilterGrayFabrics] = useState(
     [] as HistoryType[]
@@ -51,7 +49,7 @@ const GrayFabricOrderTable = () => {
   }, [grayFabricOrders]);
 
   // キバタ仕掛から削除
-  const deleteGrayFabricOrder = async (history: any) => {
+  const deleteGrayFabricOrder = async (history: GrayFabricHistoryType) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -76,7 +74,7 @@ const GrayFabricOrderTable = () => {
     }
   };
 
-  const updateOrderHistory = async (history: any) => {
+  const updateOrderHistory = async (history: GrayFabricHistoryType) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
@@ -114,7 +112,7 @@ const GrayFabricOrderTable = () => {
   };
 
   // 確定処理　キバタ仕掛⇒キバタ在庫
-  const confirmProcessing = async (history: HistoryType) => {
+  const confirmProcessing = async (history: GrayFabricHistoryType) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
@@ -187,7 +185,7 @@ const GrayFabricOrderTable = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterGrayFabrics.map((history: any) => (
+              {filterGrayFabrics.map((history: HistoryType) => (
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd"]) || history.createUser === currentUser ? (
@@ -253,5 +251,3 @@ const GrayFabricOrderTable = () => {
     </>
   );
 };
-
-export default GrayFabricOrderTable;

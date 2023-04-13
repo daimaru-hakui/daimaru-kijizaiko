@@ -6,10 +6,8 @@ import {
   Heading,
   Radio,
   RadioGroup,
-  Select,
   Stack,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -33,6 +31,7 @@ const CompleteId: NextPage = () => {
   const products = useRecoilValue(productsState);
   const [product, setProduct] = useState({} as ProductType);
   const quantity = router.query.quantity;
+  const scheduledAt = router.query.scheduledAt;
   const serialNumber = router.query.serialNumber;
   const stockPlace = router.query.stockPlace;
   const createUser = router.query.createUser;
@@ -195,6 +194,7 @@ const CompleteId: NextPage = () => {
                     品番/商品名
                   </Th>
                   <Th border="1px">数量</Th>
+                  <Th border="1px">希望納期</Th>
                   <Th border="1px">発注書NO.</Th>
                 </Tr>
               </Thead>
@@ -205,6 +205,9 @@ const CompleteId: NextPage = () => {
                   </Td>
                   <Td border="1px" isNumeric>
                     {quantity}m
+                  </Td>
+                  <Td border="1px" isNumeric>
+                    {scheduledAt}
                   </Td>
                   <Td border="1px" isNumeric>
                     {getSerialNumber(Number(serialNumber))}

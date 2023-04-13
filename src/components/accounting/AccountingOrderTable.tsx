@@ -9,15 +9,15 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import CommentModal from "../CommentModal";
+import { useEffect, useState, FC } from "react";
+import { CommentModal } from "../CommentModal";
 import { HistoryType } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
-import AccountingHistoryOrderToConfirmModal from "./AccountingOrderToConfirmModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import useSWR from "swr";
+import { AccountingOrderToConfirmModal } from "./AccountingOrderToConfirmModal";
 
-const AccountingOrderTable = () => {
+export const AccountingOrderTable: FC = () => {
   const [filterHistories, setFilterHistories] = useState<any>();
   const { getUserName, getSerialNumber } = useGetDisp();
   const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
@@ -74,7 +74,7 @@ const AccountingOrderTable = () => {
             {filterHistories?.map((history: HistoryType) => (
               <Tr key={history.id}>
                 <Td>
-                  <AccountingHistoryOrderToConfirmModal history={history} />
+                  <AccountingOrderToConfirmModal history={history} />
                 </Td>
                 <Td>{getSerialNumber(history?.serialNumber)}</Td>
                 <Td>{history?.orderedAt}</Td>
@@ -109,5 +109,3 @@ const AccountingOrderTable = () => {
     </TableContainer>
   );
 };
-
-export default AccountingOrderTable;

@@ -9,8 +9,8 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
+import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { NextPage } from "next";
 import { FaEdit } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
@@ -22,7 +22,7 @@ type Props = {
   location: LocationType;
 };
 
-const EditLocationModal: NextPage<Props> = ({ location }) => {
+export const EditLocationModal: FC<Props> = ({ location }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useRecoilValue(currentUserState);
 
@@ -74,5 +74,3 @@ const EditLocationModal: NextPage<Props> = ({ location }) => {
     </>
   );
 };
-
-export default EditLocationModal;

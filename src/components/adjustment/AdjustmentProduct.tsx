@@ -10,8 +10,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { ProductType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
@@ -25,7 +24,7 @@ type Props = {
   product: ProductType;
 };
 
-const AdjustmentProduct: NextPage<Props> = ({ product }) => {
+export const AdjustmentProduct: FC<Props> = ({ product }) => {
   const { getUserName } = useGetDisp(); //// ？
   const currentUser = useRecoilValue(currentUserState);
   const { quantityValueBold } = useUtil();
@@ -194,5 +193,3 @@ const AdjustmentProduct: NextPage<Props> = ({ product }) => {
     </Tr>
   );
 };
-
-export default AdjustmentProduct;

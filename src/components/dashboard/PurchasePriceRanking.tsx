@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +11,6 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { NextPage } from "next";
 import { HistoryType } from "../../../types";
 
 ChartJS.register(
@@ -29,7 +28,7 @@ type Props = {
   endDay: string;
   rankingNumber: number;
 };
-const PurchasePriceRanking: NextPage<Props> = ({
+export const PurchasePriceRanking: FC<Props> = ({
   data,
   startDay,
   endDay,
@@ -123,5 +122,3 @@ const PurchasePriceRanking: NextPage<Props> = ({
     </Box>
   );
 };
-
-export default PurchasePriceRanking;

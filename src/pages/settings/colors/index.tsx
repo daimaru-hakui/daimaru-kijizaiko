@@ -19,10 +19,10 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { db } from "../../../../firebase";
+import { NextPage } from "next";
 
 const Colors: NextPage = () => {
   const [colors, setColors] = useState([]);

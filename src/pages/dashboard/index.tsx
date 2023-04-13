@@ -18,8 +18,8 @@ import {
   productsState,
 } from "../../../store";
 import { ProductType } from "../../../types";
-import Charts from "../../components/dashboard/Charts";
-import StatCard from "../../components/dashboard/StatCard";
+import { Charts } from "../../components/dashboard/Charts";
+import { StatCard } from "../../components/dashboard/StatCard";
 
 const Dashboard: NextPage = () => {
   const currentUser = useRecoilValue(currentUserState);

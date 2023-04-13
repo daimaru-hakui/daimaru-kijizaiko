@@ -2,7 +2,7 @@ import { Box, Container } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
 import { CuttingReportType } from "../../../../types";
-import CuttingReportInputArea from "../../../components/tokushima/CuttingReportInputArea";
+import { CuttingReportInputArea } from "../../../components/tokushima/CuttingReportInputArea";
 import { useUtil } from "../../../hooks/UseUtil";
 
 const CuttingReportNew: NextPage = () => {

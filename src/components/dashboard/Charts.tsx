@@ -8,14 +8,14 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import CuttingPriceRanking from "./CuttingPriceRanking";
-import CuttingQuantityRanking from "./CuttingQuantityRanking";
-import PurchasePriceRanking from "./PurchasePriceRanking";
-import PurchaseQuantityRanking from "./PurchaseQuantityRanking";
+import React, { useEffect, useState, FC } from "react";
+import { CuttingPriceRanking } from "./CuttingPriceRanking";
+import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
+import { PurchasePriceRanking } from "./PurchasePriceRanking";
+import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
 import { useForm, FormProvider } from "react-hook-form";
 import { useUtil } from "../../hooks/UseUtil";
-import SearchArea from "../SearchArea";
+import { SearchArea } from "../SearchArea";
 import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 import { CuttingReportType, HistoryType } from "../../../types";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
@@ -26,16 +26,26 @@ type Inputs = {
   staff: string;
 };
 
-const Charts = () => {
+export const Charts: FC = () => {
   const [limitNum, setLimitNum] = useState(5);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data: cuttingReports } = useSWRCuttingReportImutable(startDay, endDay);
-  const { data: fabricPurchaseConfirms } = useSWRPurchaseConfirms(startDay, endDay);
-  const [filterCuttingReports, setFilterCuttingReports] = useState([] as CuttingReportType[]);
-  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState([] as HistoryType[]);
+  const { data: cuttingReports } = useSWRCuttingReportImutable(
+    startDay,
+    endDay
+  );
+  const { data: fabricPurchaseConfirms } = useSWRPurchaseConfirms(
+    startDay,
+    endDay
+  );
+  const [filterCuttingReports, setFilterCuttingReports] = useState(
+    [] as CuttingReportType[]
+  );
+  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState(
+    [] as HistoryType[]
+  );
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -62,10 +72,11 @@ const Charts = () => {
       setFilterCuttingReports(cuttingReports?.contents);
     } else {
       setFilterCuttingReports(
-        cuttingReports?.contents?.filter((report) => staff === report.staff || staff === "")
+        cuttingReports?.contents?.filter(
+          (report) => staff === report.staff || staff === ""
+        )
       );
     }
-
   }, [cuttingReports, staff]);
 
   useEffect(() => {
@@ -73,8 +84,9 @@ const Charts = () => {
       setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents);
     } else {
       setFilterPurchaseCofirms(
-        fabricPurchaseConfirms?.contents?.filter((report) =>
-          staff === report.createUser || staff === "")
+        fabricPurchaseConfirms?.contents?.filter(
+          (report) => staff === report.createUser || staff === ""
+        )
       );
     }
   }, [fabricPurchaseConfirms, staff]);
@@ -162,5 +174,3 @@ const Charts = () => {
     </>
   );
 };
-
-export default Charts;

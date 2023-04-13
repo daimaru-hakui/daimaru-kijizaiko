@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { db } from "../../../../firebase";
 import { SupplierType } from "../../../../types";
-import { NextPage } from "next";
 import { SupplierInputArea } from "../../../components/settings/suppliers/SupplierInputArea";
+import { NextPage } from "next";
 
 const SupplierNew: NextPage = () => {
   const router = useRouter();

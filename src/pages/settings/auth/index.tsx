@@ -18,11 +18,11 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
-import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
 import { UserType } from "../../../../types";
-import EditModal from "../../../components/settings/auth/AuthEditModal";
+import { AuthEditModal } from "../../../components/settings/auth/AuthEditModal";
+import { NextPage } from "next";
 
 const Auth: NextPage = () => {
   const [users, setUsers] = useState([] as UserType[]);
@@ -102,7 +102,7 @@ const Auth: NextPage = () => {
                   <Td>{elementAuthButton(user, "accounting")}</Td>
                   <Td>{elementAuthButton(user, "tokushima")}</Td>
                   <Td>
-                    <EditModal uid={user.uid} />
+                    <AuthEditModal uid={user.uid} />
                   </Td>
                 </Tr>
               ))}

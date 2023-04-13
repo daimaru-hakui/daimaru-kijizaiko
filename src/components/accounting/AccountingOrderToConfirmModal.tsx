@@ -18,8 +18,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { db } from "../../../firebase";
@@ -33,7 +32,7 @@ type Props = {
   history: HistoryType;
 };
 
-const AccountingOrderToConfirmModal: NextPage<Props> = ({ history }) => {
+export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { items, setItems, handleNumberChange, onReset } = useInputHistory();
@@ -189,5 +188,3 @@ const AccountingOrderToConfirmModal: NextPage<Props> = ({ history }) => {
     </>
   );
 };
-
-export default AccountingOrderToConfirmModal;

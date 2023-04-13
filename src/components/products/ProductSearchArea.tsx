@@ -14,7 +14,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { BsFilter } from "react-icons/bs";
 import { useRecoilValue } from "recoil";
 import { colorsState, materialNamesState } from "../../../store";
@@ -26,7 +26,11 @@ type Props = {
   onReset: Function;
 };
 
-const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
+export const ProductSearchArea: FC<Props> = ({
+  search,
+  setSearch,
+  onReset,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const colors = useRecoilValue(colorsState);
   const materialNames = useRecoilValue(materialNamesState);
@@ -121,5 +125,3 @@ const ProductSearchArea: NextPage<Props> = ({ search, setSearch, onReset }) => {
     </>
   );
 };
-
-export default ProductSearchArea;

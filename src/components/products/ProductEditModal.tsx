@@ -10,7 +10,7 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { FC } from "react";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../../store";
 import { ProductType } from "../../../types";
@@ -22,7 +22,7 @@ type Props = {
   type: string | null;
 };
 
-const ProductEditModal: NextPage<Props> = ({ product, type }) => {
+export const ProductEditModal: FC<Props> = ({ product, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuths } = useAuthManagement();
   const currentUser = useRecoilValue(currentUserState);
@@ -67,5 +67,3 @@ const ProductEditModal: NextPage<Props> = ({ product, type }) => {
     </>
   );
 };
-
-export default ProductEditModal;

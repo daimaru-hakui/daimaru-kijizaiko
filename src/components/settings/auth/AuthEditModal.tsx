@@ -19,15 +19,14 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import { db } from "../../../../firebase";
 
 type Props = {
   uid: string;
 };
 
-const AuthEditModal: NextPage<Props> = ({ uid }) => {
+export const AuthEditModal: FC<Props> = ({ uid }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [user, setUser] = useState<any>();
 
@@ -106,7 +105,12 @@ const AuthEditModal: NextPage<Props> = ({ uid }) => {
                 />
               </Box>
               <Box>
-                <Box><Box as="span" mr={2}>email:</Box>{user?.email}</Box>
+                <Box>
+                  <Box as="span" mr={2}>
+                    email:
+                  </Box>
+                  {user?.email}
+                </Box>
               </Box>
             </Stack>
           </ModalBody>
@@ -138,5 +142,3 @@ const AuthEditModal: NextPage<Props> = ({ uid }) => {
     </>
   );
 };
-
-export default AuthEditModal;

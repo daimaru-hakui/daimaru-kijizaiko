@@ -1,8 +1,9 @@
+import { FC } from "react";
 import { Flex, Spinner } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { loadingState } from "../../store";
 
-const Loading = () => {
+export const Loading: FC = () => {
   const loading = useRecoilValue(loadingState);
   return (
     <>
@@ -30,5 +31,3 @@ const Loading = () => {
     </>
   );
 };
-
-export default Loading;

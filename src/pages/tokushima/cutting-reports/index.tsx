@@ -17,11 +17,11 @@ import { CuttingReportType } from "../../../../types";
 import { useCuttingReportFunc } from "../../../hooks/UseCuttingReportFunc";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useUtil } from "../../../hooks/UseUtil";
-import SearchArea from "../../../components/SearchArea";
-import CuttingReportModal from "../../../components/tokushima/CuttingReportModal";
+import { SearchArea } from "../../../components/SearchArea";
+import { CuttingReportModal } from "../../../components/tokushima/CuttingReportModal";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
-import CuttingReportEditModal from "../../../components/tokushima/CuttingReportEditModal";
+import { CuttingReportEditModal } from "../../../components/tokushima/CuttingReportEditModal";
 import { NextPage } from "next";
 
 type Inputs = {

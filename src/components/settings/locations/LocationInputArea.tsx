@@ -12,8 +12,8 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
-import { LocationType, StockPlaceType } from "../../../../types";
+import React, { useState, useEffect, FC } from "react";
+import { LocationType } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -27,7 +27,7 @@ type Props = {
 
 type Inputs = LocationType;
 
-export const LocationInputArea = ({
+export const LocationInputArea: FC<Props> = ({
   type,
   location,
   addLocation,

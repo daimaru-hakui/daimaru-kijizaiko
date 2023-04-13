@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import GrayFabricConfirmTable from "../../../components/grayFabrics/GrayFabricConfirmTable";
+import { GrayFabricConfirmTable } from "../../../components/grayFabrics/GrayFabricConfirmTable";
 
 const GrayFabricHistoryConfirms: NextPage = () => {
   return (
