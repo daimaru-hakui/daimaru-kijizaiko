@@ -61,7 +61,8 @@ export const GrayFabricOrderTable: FC = () => {
         const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
         if (!grayFabricDocSnap.exists()) throw "Document does not exist!!";
 
-        const newWip = (await grayFabricDocSnap.data()?.wip) - history.quantity;
+        const newWip =
+          (await grayFabricDocSnap.data()?.wip) - Number(history.quantity);
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -91,13 +92,13 @@ export const GrayFabricOrderTable: FC = () => {
         const newWip =
           (await grayFabricDocSnap.data()?.wip) -
             history.quantity +
-            items.quantity || 0;
+            Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
 
         transaction.update(historyDocRef, {
-          quantity: items.quantity,
+          quantity: Number(items.quantity),
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
           comment: items.comment,
@@ -127,9 +128,10 @@ export const GrayFabricOrderTable: FC = () => {
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
-            history.quantity +
-            items.remainingOrder || 0;
-        const newStock = grayFabricDocSnap.data()?.stock + items.quantity || 0;
+            Number(history.quantity) +
+            Number(items.remainingOrder) || 0;
+        const newStock =
+          grayFabricDocSnap.data()?.stock + Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
           stock: newStock,

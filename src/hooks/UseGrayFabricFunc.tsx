@@ -60,8 +60,8 @@ export const useGrayFabricFunc = () => {
         supplierId: data?.supplierId || "",
         price: Number(data?.price) || 0,
         comment: data?.comment || "",
-        wip: 0,
-        stock: 0,
+        wip: mathRound2nd(Number(data.wip)),
+        stock: mathRound2nd(Number(data.stock)),
         updateUser: currentUser,
         updatedAt: serverTimestamp(),
       });
