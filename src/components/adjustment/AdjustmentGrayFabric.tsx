@@ -82,7 +82,7 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
           w="90px"
           min={0}
           max={100000}
-          value={grayFabric.stock}
+          value={items.stock}
           onChange={(e) => handleNumberChange(e, "stock")}
         >
           <NumberInputField textAlign="right" />

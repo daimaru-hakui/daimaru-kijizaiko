@@ -29,7 +29,6 @@ export const useGrayFabricFunc = () => {
         productName: data?.productName || "",
         productNumber: data?.productNumber || "",
         supplierId: data?.supplierId || "",
-        price: Number(data?.price) || 0,
         comment: data?.comment || "",
         wip: 0,
         stock: 0,
@@ -58,14 +57,10 @@ export const useGrayFabricFunc = () => {
         productName: data?.productName || "",
         productNumber: data?.productNumber || "",
         supplierId: data?.supplierId || "",
-        price: Number(data?.price) || 0,
         comment: data?.comment || "",
-        wip: mathRound2nd(Number(data.wip)),
-        stock: mathRound2nd(Number(data.stock)),
         updateUser: currentUser,
         updatedAt: serverTimestamp(),
       });
-      router.push("/gray-fabrics");
     } catch (err) {
       console.log(err);
     } finally {
