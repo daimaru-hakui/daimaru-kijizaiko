@@ -30,12 +30,14 @@ export const CommentModal: FC<Props> = ({ comment }) => {
 
   return (
     <>
-      <FaRegCommentDots
-        opacity={comment === "" ? "0.2" : "1"}
-        cursor="pointer"
-        fontSize="20px"
-        onClick={onOpen}
-      />
+      {comment && (
+        <FaRegCommentDots
+          opacity={comment === "" ? "0.2" : "1"}
+          cursor="pointer"
+          fontSize="20px"
+          onClick={onOpen}
+        />
+      )}
 
       <Modal
         isOpen={isOpen}
