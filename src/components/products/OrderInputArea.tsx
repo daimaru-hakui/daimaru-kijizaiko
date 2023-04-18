@@ -109,7 +109,7 @@ export const OrderInputArea: FC<Props> = ({ product, orderType, onClose }) => {
                 <Radio value="stock">
                   外部在庫から購入
                   <Box as="span" fontSize="sm">
-                    （別染めなどでメーカーに抱えてもらっている在庫）
+                    （別染メーカー保管在庫）
                   </Box>
                 </Radio>
               </Stack>
