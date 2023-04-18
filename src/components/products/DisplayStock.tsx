@@ -21,6 +21,14 @@ export const DisplayStock: FC<Props> = ({ product }) => {
     if (type === "stock") return result?.stock;
   };
 
+  const getTanQuentityEL = (item: number, fabricLength: number) =>
+    item > 0 &&
+    Number(fabricLength) > 0 && (
+      <Box as="span" pl={3}>
+        {Math.ceil(item / Number(fabricLength))}反
+      </Box>
+    );
+
   return (
     <Container maxW="600px" p={0}>
       <Flex gap={3} justifyContent="space-between">
@@ -35,6 +43,10 @@ export const DisplayStock: FC<Props> = ({ product }) => {
                   )}
                 </Box>
                 m
+                {getTanQuentityEL(
+                  getGrayFabric(product.grayFabricId, "wip"),
+                  product?.fabricLength
+                )}
               </Box>
             </Box>
             <Box w="100%" p={2} textAlign="center" bg="#5090f3" boxShadow="md">
@@ -46,18 +58,22 @@ export const DisplayStock: FC<Props> = ({ product }) => {
                   )}
                 </Box>
                 m
+                {getTanQuentityEL(
+                  getGrayFabric(product.grayFabricId, "stock"),
+                  product?.fabricLength
+                )}
               </Box>
             </Box>
           </Flex>
         )}
         <Flex w="100%" gap={3} flexDirection="column">
           <Box w="100%" p={2} textAlign="center" bg="#f3c150" boxShadow="md">
-            <Text fontSize="sm">生地仕掛</Text>
+            <Text fontSize="sm">染め仕掛</Text>
             <Box>
               <Box as="span" fontSize="2xl">
                 {mathRound2nd(product?.wip) || 0}
               </Box>
-              m
+              m{getTanQuentityEL(product?.wip, product?.fabricLength)}
             </Box>
           </Box>
           <Box w="100%" p={2} textAlign="center" bg="#a58acf" boxShadow="md">
@@ -66,7 +82,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
               <Box as="span" fontSize="2xl">
                 {product?.externalStock || 0}
               </Box>
-              m
+              m{getTanQuentityEL(product?.externalStock, product?.fabricLength)}
             </Box>
           </Box>
         </Flex>
@@ -78,6 +94,10 @@ export const DisplayStock: FC<Props> = ({ product }) => {
                 {product?.arrivingQuantity || 0}
               </Box>
               m
+              {getTanQuentityEL(
+                product?.arrivingQuantity,
+                product?.fabricLength
+              )}
             </Box>
           </Box>
           <Box w="100%" p={2} textAlign="center" bg="#54d1de" boxShadow="md">
@@ -87,6 +107,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
                 {mathRound2nd(product?.tokushimaStock || 0)}
               </Box>
               m
+              {getTanQuentityEL(product?.tokushimaStock, product?.fabricLength)}
             </Box>
           </Box>
         </Flex>

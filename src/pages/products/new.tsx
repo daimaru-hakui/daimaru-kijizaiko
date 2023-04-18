@@ -1,10 +1,14 @@
 import { Box, Container } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductType } from "../../../types";
 import ProductInputArea from "../../components/products/ProductInputArea";
 import { NextPage } from "next";
+import { db } from "../../../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/router";
 
 const ProductsNew: NextPage = () => {
+  const router = useRouter();
   const [product, setProduct] = useState({
     id: "",
     productType: 0,
@@ -37,6 +41,18 @@ const ProductsNew: NextPage = () => {
     createdAt: undefined,
     updatedAt: undefined,
   });
+  // useEffect(() => {
+  //   if (!router?.query?.id) return;
+  //   const getProduct = async () => {
+  //     const id = router?.query?.id;
+  //     console.log(id);
+  //     const docRef = doc(db, "products", `${id}`);
+  //     const docSnap = await getDoc(docRef);
+  //     setProduct({ ...docSnap.data() } as ProductType);
+  //   };
+  //   getProduct();
+  // }, [router]);
+  // console.log(product);
   return (
     <Box w="100%" mt={12} px={6}>
       <Container
