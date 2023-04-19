@@ -66,10 +66,16 @@ const AdjustmentProducts: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="78vh">
-            <Table w="100%" variant="simple" size="sm" overflow="auto">
-              <Thead w="100%" position="sticky" top={0} zIndex="docked">
-                <Tr bg="white">
+          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="72vh">
+            <Table w="100%" variant="simple" size="sm">
+              <Thead
+                w="100%"
+                position="sticky"
+                top={0}
+                zIndex="docked"
+                bg="white"
+              >
+                <Tr>
                   <Th>担当</Th>
                   <Th>生地品番</Th>
                   <Th>色</Th>

@@ -45,7 +45,7 @@ export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
           <ModalBody>
             <Stack spacing={6}>
               <DisplayStock product={product} />
-              <Divider />
+
               <Tabs variant="unstyled">
                 <TabList>
                   <Tab _selected={{ color: "white", bg: "blue.500" }}>

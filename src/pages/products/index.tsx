@@ -164,124 +164,134 @@ const Products: NextPage = () => {
                 </Button>
               )}
             </Flex>
-            <TableContainer p={6} w="100%">
-              <Table variant="simple" size="sm" w="100%">
-                <Thead>
-                  <Tr>
-                    <Th>詳細/発注</Th>
-                    <Th>担当</Th>
-                    <Th>生地品番</Th>
-                    <Th>色</Th>
-                    <Th>品名</Th>
-                    <Th>単価</Th>
-                    <Th>染め仕掛</Th>
-                    <Th>外部在庫</Th>
-                    <Th>入荷待ち</Th>
-                    <Th>徳島在庫</Th>
-                    <Th>組織名</Th>
-                    <Th>混率</Th>
-                    <Th>規格</Th>
-                    <Th>機能性</Th>
-                    <Th>削除</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {filterProducts?.map((product: ProductType) => (
-                    <Tr key={product.id}>
-                      <Td>
-                        <Flex alignItems="center" gap={3}>
-                          <ProductMenu product={product} />
-                          <ProductModal product={product} />
-                          <OrderAreaModal product={product} buttonSize="xs" />
-                        </Flex>
-                      </Td>
-                      <Td>{getUserName(product.staff)}</Td>
-                      <Td>{product.productNumber}</Td>
-                      <Td>{product?.colorName}</Td>
-                      <Td>{product?.productName}</Td>
-                      <Td isNumeric>{product?.price.toLocaleString()}円</Td>
-                      <Td
-                        isNumeric
-                        fontWeight={quantityValueBold(product?.wip)}
-                      >
-                        {mathRound2nd(product?.wip || 0).toLocaleString()}m
-                      </Td>
-                      <Td
-                        isNumeric
-                        fontWeight={quantityValueBold(product?.externalStock)}
-                      >
-                        {mathRound2nd(
-                          product?.externalStock || 0
-                        ).toLocaleString()}
-                        m
-                      </Td>
-                      <Td
-                        isNumeric
-                        fontWeight={quantityValueBold(
-                          product?.arrivingQuantity
-                        )}
-                      >
-                        {mathRound2nd(
-                          product?.arrivingQuantity || 0
-                        ).toLocaleString()}
-                        m
-                      </Td>
-                      <Td
-                        isNumeric
-                        fontWeight={quantityValueBold(product?.tokushimaStock)}
-                      >
-                        {mathRound2nd(
-                          product?.tokushimaStock || 0
-                        ).toLocaleString()}
-                        m
-                      </Td>
-                      <Td>{product.materialName}</Td>
-                      <Td>
-                        <Flex gap={1}>
-                          {getMixed(product.materials).map(
-                            (material, index) => (
-                              <Text key={index}>{material}</Text>
-                            )
-                          )}
-                        </Flex>
-                      </Td>
-                      <Td>
-                        <Flex>
-                          {getFabricStd(
-                            product.fabricWidth,
-                            product.fabricLength,
-                            product.fabricWeight
-                          )}
-                        </Flex>
-                      </Td>
-                      <Td>
-                        <Flex gap={2}>
-                          {product.features.map((f, index) => (
-                            <Text key={index}>{f}</Text>
-                          ))}
-                        </Flex>
-                      </Td>
-                      <Td>
-                        {isAuths(["rd"]) ||
-                        product?.createUser === currentUser ? (
-                          <FaTrashAlt
-                            cursor="pointer"
-                            onClick={() => deleteProduct(product.id)}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </Td>
+            <TableContainer p={6} w="100%" overflowX="unset" overflowY="unset">
+              <Box
+                mt={6}
+                w="100%"
+                overflowX="auto"
+                position="relative"
+                maxH={{ base: "56vh", md: "60vh", lg: "67vh" }}
+              >
+                <Table variant="simple" size="sm" w="100%">
+                  <Thead position="sticky" top={0} zIndex="docked" bg="white">
+                    <Tr>
+                      <Th>詳細/発注</Th>
+                      <Th>担当</Th>
+                      <Th>生地品番</Th>
+                      <Th>色</Th>
+                      <Th>品名</Th>
+                      <Th>単価</Th>
+                      <Th>染め仕掛</Th>
+                      <Th>外部在庫</Th>
+                      <Th>入荷待ち</Th>
+                      <Th>徳島在庫</Th>
+                      <Th>組織名</Th>
+                      <Th>混率</Th>
+                      <Th>規格</Th>
+                      <Th>機能性</Th>
+                      <Th>削除</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-                <TableCaption placement="top" textAlign="left" fontSize="sm">
-                  全{products.length}件中 {filterProducts.length}件表示
-                </TableCaption>
-                <TableCaption textAlign="left" fontSize="sm">
-                  全{products.length}件中 {filterProducts.length}件表示
-                </TableCaption>
-              </Table>
+                  </Thead>
+                  <Tbody>
+                    {filterProducts?.map((product: ProductType) => (
+                      <Tr key={product.id}>
+                        <Td>
+                          <Flex alignItems="center" gap={3}>
+                            <ProductMenu product={product} />
+                            <ProductModal product={product} />
+                            <OrderAreaModal product={product} buttonSize="xs" />
+                          </Flex>
+                        </Td>
+                        <Td>{getUserName(product.staff)}</Td>
+                        <Td>{product.productNumber}</Td>
+                        <Td>{product?.colorName}</Td>
+                        <Td>{product?.productName}</Td>
+                        <Td isNumeric>{product?.price.toLocaleString()}円</Td>
+                        <Td
+                          isNumeric
+                          fontWeight={quantityValueBold(product?.wip)}
+                        >
+                          {mathRound2nd(product?.wip || 0).toLocaleString()}m
+                        </Td>
+                        <Td
+                          isNumeric
+                          fontWeight={quantityValueBold(product?.externalStock)}
+                        >
+                          {mathRound2nd(
+                            product?.externalStock || 0
+                          ).toLocaleString()}
+                          m
+                        </Td>
+                        <Td
+                          isNumeric
+                          fontWeight={quantityValueBold(
+                            product?.arrivingQuantity
+                          )}
+                        >
+                          {mathRound2nd(
+                            product?.arrivingQuantity || 0
+                          ).toLocaleString()}
+                          m
+                        </Td>
+                        <Td
+                          isNumeric
+                          fontWeight={quantityValueBold(
+                            product?.tokushimaStock
+                          )}
+                        >
+                          {mathRound2nd(
+                            product?.tokushimaStock || 0
+                          ).toLocaleString()}
+                          m
+                        </Td>
+                        <Td>{product.materialName}</Td>
+                        <Td>
+                          <Flex gap={1}>
+                            {getMixed(product.materials).map(
+                              (material, index) => (
+                                <Text key={index}>{material}</Text>
+                              )
+                            )}
+                          </Flex>
+                        </Td>
+                        <Td>
+                          <Flex>
+                            {getFabricStd(
+                              product.fabricWidth,
+                              product.fabricLength,
+                              product.fabricWeight
+                            )}
+                          </Flex>
+                        </Td>
+                        <Td>
+                          <Flex gap={2}>
+                            {product.features.map((f, index) => (
+                              <Text key={index}>{f}</Text>
+                            ))}
+                          </Flex>
+                        </Td>
+                        <Td>
+                          {isAuths(["rd"]) ||
+                          product?.createUser === currentUser ? (
+                            <FaTrashAlt
+                              cursor="pointer"
+                              onClick={() => deleteProduct(product.id)}
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                  <TableCaption placement="top" textAlign="left" fontSize="sm">
+                    全{products.length}件中 {filterProducts.length}件表示
+                  </TableCaption>
+                  <TableCaption textAlign="left" fontSize="sm">
+                    全{products.length}件中 {filterProducts.length}件表示
+                  </TableCaption>
+                </Table>
+              </Box>
             </TableContainer>
           </Box>
         </Box>

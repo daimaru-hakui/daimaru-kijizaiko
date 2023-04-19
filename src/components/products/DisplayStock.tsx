@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Box, Container, Flex, Text } from "@chakra-ui/react";
+import { Box, Container, Divider, Flex, Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
 import { ProductType } from "../../../types";
@@ -24,8 +24,8 @@ export const DisplayStock: FC<Props> = ({ product }) => {
   const getTanQuentityEL = (item: number, fabricLength: number) =>
     item > 0 &&
     Number(fabricLength) > 0 && (
-      <Box as="span" pl={3}>
-        {Math.ceil(item / Number(fabricLength))}反
+      <Box as="span" pl={0}>
+        【{Math.ceil(item / Number(fabricLength))}反】
       </Box>
     );
 
@@ -112,6 +112,12 @@ export const DisplayStock: FC<Props> = ({ product }) => {
           </Box>
         </Flex>
       </Flex>
+      {Number(product?.fabricLength) !== 0 && (
+        <Text my={3} fontSize="sm">
+          ※反数は参考値になります。
+        </Text>
+      )}
+      <Divider />
     </Container>
   );
 };
