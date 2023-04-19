@@ -174,7 +174,7 @@ const Products: NextPage = () => {
                     <Th>色</Th>
                     <Th>品名</Th>
                     <Th>単価</Th>
-                    <Th>生地仕掛</Th>
+                    <Th>染め仕掛</Th>
                     <Th>外部在庫</Th>
                     <Th>入荷待ち</Th>
                     <Th>徳島在庫</Th>
