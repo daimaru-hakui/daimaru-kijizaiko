@@ -50,7 +50,7 @@ const AdjustmentProducts: NextPage = () => {
         rounded="md"
         boxShadow="md"
       >
-        <TableContainer p={6} w="100%">
+        <TableContainer w="100%" overflowX="unset" overflowY="unset">
           <Box as="h2" fontSize="2xl">
             生地在庫調整
           </Box>
@@ -66,35 +66,38 @@ const AdjustmentProducts: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>担当</Th>
-                <Th>生地品番</Th>
-                <Th>色</Th>
+          <Box mt={6} w="100%" overflowX="auto" position="relative" h="78vh">
+            <Table w="100%" variant="simple" size="sm" overflow="auto">
+              <Thead w="100%" position="sticky" top={0} zIndex="docked">
+                <Tr bg="white">
+                  <Th>担当</Th>
+                  <Th>生地品番</Th>
+                  <Th>色</Th>
 
-                {isAuths(["rd", "tokushima"]) && (
-                  <>
-                    {isAuths(["rd"]) && (
-                      <>
-                        <Th>単価（円）</Th>
-                        <Th>仕掛在庫(m)</Th>
-                        <Th>外部在庫(m)</Th>
-                        <Th>入荷待ち(m)</Th>
-                      </>
-                    )}
-                    <Th>徳島在庫(m)</Th>
-                    <Th>処理</Th>
-                  </>
-                )}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filterProducts.map((product: ProductType) => (
-                <AdjustmentProduct key={product.id} product={product} />
-              ))}
-            </Tbody>
-          </Table>
+                  {isAuths(["rd", "tokushima"]) && (
+                    <>
+                      {isAuths(["rd"]) && (
+                        <>
+                          <Th>単価（円）</Th>
+                          <Th>仕掛在庫(m)</Th>
+                          <Th>外部在庫(m)</Th>
+                          <Th>入荷待ち(m)</Th>
+                        </>
+                      )}
+                      <Th>徳島在庫(m)</Th>
+                      <Th>処理</Th>
+                    </>
+                  )}
+                </Tr>
+              </Thead>
+
+              <Tbody>
+                {filterProducts.map((product: ProductType) => (
+                  <AdjustmentProduct key={product.id} product={product} />
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
         </TableContainer>
       </Container>
     </Box>
