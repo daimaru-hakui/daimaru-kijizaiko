@@ -66,9 +66,15 @@ const AdjustmentGrayFabrics: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="78vh">
+          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="72vh">
             <Table mt={6} variant="simple" size="sm">
-              <Thead>
+              <Thead
+                w="100%"
+                position="sticky"
+                top={0}
+                zIndex="docked"
+                bg="white"
+              >
                 <Tr>
                   <Th>生地品番</Th>
                   <Th>単価（円）</Th>
