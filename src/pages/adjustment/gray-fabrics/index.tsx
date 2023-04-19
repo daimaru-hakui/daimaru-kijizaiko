@@ -50,7 +50,7 @@ const AdjustmentGrayFabrics: NextPage = () => {
         rounded="md"
         boxShadow="md"
       >
-        <TableContainer p={6} w="100%">
+        <TableContainer w="100%" overflowX="unset" overflowY="unset">
           <Box as="h2" fontSize="2xl">
             キバタ在庫調整
           </Box>
@@ -66,25 +66,27 @@ const AdjustmentGrayFabrics: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>生地品番</Th>
-                <Th>単価（円）</Th>
-                <Th>キバタ仕掛(m)</Th>
-                <Th>キバタ在庫(m)</Th>
-                <Th>処理</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filterProducts?.map((grayFabric: GrayFabricType) => (
-                <AdjustmentGrayFabric
-                  key={grayFabric.id}
-                  grayFabric={grayFabric}
-                />
-              ))}
-            </Tbody>
-          </Table>
+          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="78vh">
+            <Table mt={6} variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th>生地品番</Th>
+                  <Th>単価（円）</Th>
+                  <Th>キバタ仕掛(m)</Th>
+                  <Th>キバタ在庫(m)</Th>
+                  <Th>処理</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {filterProducts?.map((grayFabric: GrayFabricType) => (
+                  <AdjustmentGrayFabric
+                    key={grayFabric.id}
+                    grayFabric={grayFabric}
+                  />
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
         </TableContainer>
       </Container>
     </Box>

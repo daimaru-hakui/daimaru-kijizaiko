@@ -165,7 +165,7 @@ const Products: NextPage = () => {
               )}
             </Flex>
             <TableContainer p={6} w="100%">
-              <Table variant="simple" size="sm">
+              <Table variant="simple" size="sm" w="100%">
                 <Thead>
                   <Tr>
                     <Th>詳細/発注</Th>
