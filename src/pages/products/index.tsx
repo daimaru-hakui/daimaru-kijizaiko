@@ -91,7 +91,14 @@ const Products: NextPage = () => {
     <>
       {currentUser && (
         <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-          <Box w="100%" my={6} rounded="md" bg="white" boxShadow="md">
+          <Box
+            w="100%"
+            my={6}
+            rounded="md"
+            bg="white"
+            boxShadow="md"
+            maxH="calc(100vh - 100px)"
+            overflow="hidden">
             <Flex
               p={6}
               gap={3}
@@ -164,15 +171,18 @@ const Products: NextPage = () => {
                 </Button>
               )}
             </Flex>
-            <TableContainer p={6} w="100%" overflowX="unset" overflowY="unset">
+            <TableContainer p={6} w="100%" overflowX="unset" overflowY="unset" >
+              <Box textAlign="left" fontSize="sm">
+                全{products.length}件中 {filterProducts.length}件表示
+              </Box>
               <Box
-                mt={6}
+                mt={3}
                 w="100%"
                 overflowX="auto"
                 position="relative"
-                maxH={{ base: "56vh", md: "60vh", lg: "67vh" }}
+                maxH={{ base: "calc(100vh - 405px)", md: "calc(100vh - 360px)", lg: "calc(100vh - 310px)" }}
               >
-                <Table variant="simple" size="sm" w="100%">
+                <Table variant="simple" size="sm" w="100%" >
                   <Thead position="sticky" top={0} zIndex="docked" bg="white">
                     <Tr>
                       <Th>詳細/発注</Th>
@@ -272,7 +282,7 @@ const Products: NextPage = () => {
                         </Td>
                         <Td>
                           {isAuths(["rd"]) ||
-                          product?.createUser === currentUser ? (
+                            product?.createUser === currentUser ? (
                             <FaTrashAlt
                               cursor="pointer"
                               onClick={() => deleteProduct(product.id)}
@@ -284,12 +294,6 @@ const Products: NextPage = () => {
                       </Tr>
                     ))}
                   </Tbody>
-                  <TableCaption placement="top" textAlign="left" fontSize="sm">
-                    全{products.length}件中 {filterProducts.length}件表示
-                  </TableCaption>
-                  <TableCaption textAlign="left" fontSize="sm">
-                    全{products.length}件中 {filterProducts.length}件表示
-                  </TableCaption>
                 </Table>
               </Box>
             </TableContainer>

@@ -37,7 +37,7 @@ export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
         発注
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>発注</ModalHeader>

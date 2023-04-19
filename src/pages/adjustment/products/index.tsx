@@ -49,6 +49,7 @@ const AdjustmentProducts: NextPage = () => {
         bg="white"
         rounded="md"
         boxShadow="md"
+        maxH="calc(100vh - 100px)" overflow="hidden"
       >
         <TableContainer w="100%" overflowX="unset" overflowY="unset">
           <Box as="h2" fontSize="2xl">
@@ -66,7 +67,7 @@ const AdjustmentProducts: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="72vh">
+          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="calc(100vh - 255px)">
             <Table w="100%" variant="simple" size="sm">
               <Thead
                 w="100%"

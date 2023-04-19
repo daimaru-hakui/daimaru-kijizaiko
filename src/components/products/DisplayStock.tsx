@@ -15,7 +15,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
 
   const getGrayFabric = (grayFabricId: string, type: string) => {
     const result = grayFabrics.find(
-      (grayFabric: { id: string }) => grayFabric.id === grayFabricId
+      (grayFabric: { id: string; }) => grayFabric.id === grayFabricId
     );
     if (type === "wip") return result?.wip;
     if (type === "stock") return result?.stock;
@@ -31,9 +31,9 @@ export const DisplayStock: FC<Props> = ({ product }) => {
 
   return (
     <Container maxW="600px" p={0}>
-      <Flex gap={3} justifyContent="space-between">
+      <Flex gap={3} justifyContent="space-between" flexDirection={{ base: "column", md: "row" }}>
         {product.grayFabricId && (
-          <Flex w="100%" gap={3} flexDirection="column">
+          <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
             <Box w="100%" p={2} textAlign="center" bg="#f36450" boxShadow="md">
               <Text fontSize="sm">キバタ仕掛</Text>
               <Box>
@@ -66,7 +66,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             </Box>
           </Flex>
         )}
-        <Flex w="100%" gap={3} flexDirection="column">
+        <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
           <Box w="100%" p={2} textAlign="center" bg="#f3c150" boxShadow="md">
             <Text fontSize="sm">染め仕掛</Text>
             <Box>
@@ -86,7 +86,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             </Box>
           </Box>
         </Flex>
-        <Flex w="100%" gap={3} flexDirection="column">
+        <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
           <Box w="100%" p={2} textAlign="center" bg="#59b99d" boxShadow="md">
             <Text fontSize="sm">入荷待ち</Text>
             <Box>
@@ -112,11 +112,13 @@ export const DisplayStock: FC<Props> = ({ product }) => {
           </Box>
         </Flex>
       </Flex>
-      {Number(product?.fabricLength) !== 0 && (
-        <Text my={3} fontSize="sm">
-          ※反数は参考値になります。
-        </Text>
-      )}
+      <Box my={3}>
+        {Number(product?.fabricLength) !== 0 && (
+          <Text fontSize="sm">
+            ※反数は参考値になります。
+          </Text>
+        )}
+      </Box>
       <Divider />
     </Container>
   );
