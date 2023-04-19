@@ -49,7 +49,9 @@ const AdjustmentProducts: NextPage = () => {
         bg="white"
         rounded="md"
         boxShadow="md"
-        maxH="calc(100vh - 100px)" overflow="hidden"
+        minH="300px"
+        maxH="calc(100vh - 100px)"
+        overflow="hidden"
       >
         <TableContainer w="100%" overflowX="unset" overflowY="unset">
           <Box as="h2" fontSize="2xl">

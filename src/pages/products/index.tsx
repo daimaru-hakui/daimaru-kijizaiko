@@ -97,7 +97,7 @@ const Products: NextPage = () => {
             rounded="md"
             bg="white"
             boxShadow="md"
-            maxH="calc(100vh - 100px)"
+            h="calc(100vh - 100px)"
             overflow="hidden">
             <Flex
               p={6}
@@ -180,121 +180,127 @@ const Products: NextPage = () => {
                 w="100%"
                 overflowX="auto"
                 position="relative"
-                maxH={{ base: "calc(100vh - 405px)", md: "calc(100vh - 360px)", lg: "calc(100vh - 310px)" }}
+                h={{ base: "calc(100vh - 405px)", md: "calc(100vh - 360px)", lg: "calc(100vh - 310px)" }}
               >
-                <Table variant="simple" size="sm" w="100%" >
-                  <Thead position="sticky" top={0} zIndex="docked" bg="white">
-                    <Tr>
-                      <Th>詳細/発注</Th>
-                      <Th>担当</Th>
-                      <Th>生地品番</Th>
-                      <Th>色</Th>
-                      <Th>品名</Th>
-                      <Th>単価</Th>
-                      <Th>染め仕掛</Th>
-                      <Th>外部在庫</Th>
-                      <Th>入荷待ち</Th>
-                      <Th>徳島在庫</Th>
-                      <Th>組織名</Th>
-                      <Th>混率</Th>
-                      <Th>規格</Th>
-                      <Th>機能性</Th>
-                      <Th>削除</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {filterProducts?.map((product: ProductType) => (
-                      <Tr key={product.id}>
-                        <Td>
-                          <Flex alignItems="center" gap={3}>
-                            <ProductMenu product={product} />
-                            <ProductModal product={product} />
-                            <OrderAreaModal product={product} buttonSize="xs" />
-                          </Flex>
-                        </Td>
-                        <Td>{getUserName(product.staff)}</Td>
-                        <Td>{product.productNumber}</Td>
-                        <Td>{product?.colorName}</Td>
-                        <Td>{product?.productName}</Td>
-                        <Td isNumeric>{product?.price.toLocaleString()}円</Td>
-                        <Td
-                          isNumeric
-                          fontWeight={quantityValueBold(product?.wip)}
-                        >
-                          {mathRound2nd(product?.wip || 0).toLocaleString()}m
-                        </Td>
-                        <Td
-                          isNumeric
-                          fontWeight={quantityValueBold(product?.externalStock)}
-                        >
-                          {mathRound2nd(
-                            product?.externalStock || 0
-                          ).toLocaleString()}
-                          m
-                        </Td>
-                        <Td
-                          isNumeric
-                          fontWeight={quantityValueBold(
-                            product?.arrivingQuantity
-                          )}
-                        >
-                          {mathRound2nd(
-                            product?.arrivingQuantity || 0
-                          ).toLocaleString()}
-                          m
-                        </Td>
-                        <Td
-                          isNumeric
-                          fontWeight={quantityValueBold(
-                            product?.tokushimaStock
-                          )}
-                        >
-                          {mathRound2nd(
-                            product?.tokushimaStock || 0
-                          ).toLocaleString()}
-                          m
-                        </Td>
-                        <Td>{product.materialName}</Td>
-                        <Td>
-                          <Flex gap={1}>
-                            {getMixed(product.materials).map(
-                              (material, index) => (
-                                <Text key={index}>{material}</Text>
-                              )
-                            )}
-                          </Flex>
-                        </Td>
-                        <Td>
-                          <Flex>
-                            {getFabricStd(
-                              product.fabricWidth,
-                              product.fabricLength,
-                              product.fabricWeight
-                            )}
-                          </Flex>
-                        </Td>
-                        <Td>
-                          <Flex gap={2}>
-                            {product.features.map((f, index) => (
-                              <Text key={index}>{f}</Text>
-                            ))}
-                          </Flex>
-                        </Td>
-                        <Td>
-                          {isAuths(["rd"]) ||
-                            product?.createUser === currentUser ? (
-                            <FaTrashAlt
-                              cursor="pointer"
-                              onClick={() => deleteProduct(product.id)}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </Td>
+                {filterProducts.length > 0 ? (
+                  <Table variant="simple" size="sm" w="100%" >
+                    <Thead position="sticky" top={0} zIndex="docked" bg="white">
+                      <Tr>
+                        <Th>詳細/発注</Th>
+                        <Th>担当</Th>
+                        <Th>生地品番</Th>
+                        <Th>色</Th>
+                        <Th>品名</Th>
+                        <Th>単価</Th>
+                        <Th>染め仕掛</Th>
+                        <Th>外部在庫</Th>
+                        <Th>入荷待ち</Th>
+                        <Th>徳島在庫</Th>
+                        <Th>組織名</Th>
+                        <Th>混率</Th>
+                        <Th>規格</Th>
+                        <Th>機能性</Th>
+                        <Th>削除</Th>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                    </Thead>
+                    <Tbody>
+                      {filterProducts?.map((product: ProductType) => (
+                        <Tr key={product.id}>
+                          <Td>
+                            <Flex alignItems="center" gap={3}>
+                              <ProductMenu product={product} />
+                              <ProductModal product={product} />
+                              <OrderAreaModal product={product} buttonSize="xs" />
+                            </Flex>
+                          </Td>
+                          <Td>{getUserName(product.staff)}</Td>
+                          <Td>{product.productNumber}</Td>
+                          <Td>{product?.colorName}</Td>
+                          <Td>{product?.productName}</Td>
+                          <Td isNumeric>{product?.price.toLocaleString()}円</Td>
+                          <Td
+                            isNumeric
+                            fontWeight={quantityValueBold(product?.wip)}
+                          >
+                            {mathRound2nd(product?.wip || 0).toLocaleString()}m
+                          </Td>
+                          <Td
+                            isNumeric
+                            fontWeight={quantityValueBold(product?.externalStock)}
+                          >
+                            {mathRound2nd(
+                              product?.externalStock || 0
+                            ).toLocaleString()}
+                            m
+                          </Td>
+                          <Td
+                            isNumeric
+                            fontWeight={quantityValueBold(
+                              product?.arrivingQuantity
+                            )}
+                          >
+                            {mathRound2nd(
+                              product?.arrivingQuantity || 0
+                            ).toLocaleString()}
+                            m
+                          </Td>
+                          <Td
+                            isNumeric
+                            fontWeight={quantityValueBold(
+                              product?.tokushimaStock
+                            )}
+                          >
+                            {mathRound2nd(
+                              product?.tokushimaStock || 0
+                            ).toLocaleString()}
+                            m
+                          </Td>
+                          <Td>{product.materialName}</Td>
+                          <Td>
+                            <Flex gap={1}>
+                              {getMixed(product.materials).map(
+                                (material, index) => (
+                                  <Text key={index}>{material}</Text>
+                                )
+                              )}
+                            </Flex>
+                          </Td>
+                          <Td>
+                            <Flex>
+                              {getFabricStd(
+                                product.fabricWidth,
+                                product.fabricLength,
+                                product.fabricWeight
+                              )}
+                            </Flex>
+                          </Td>
+                          <Td>
+                            <Flex gap={2}>
+                              {product.features.map((f, index) => (
+                                <Text key={index}>{f}</Text>
+                              ))}
+                            </Flex>
+                          </Td>
+                          <Td>
+                            {isAuths(["rd"]) ||
+                              product?.createUser === currentUser ? (
+                              <FaTrashAlt
+                                cursor="pointer"
+                                onClick={() => deleteProduct(product.id)}
+                              />
+                            ) : (
+                              ""
+                            )}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                ) : (
+                  <Flex w="100%" justifyContent="center" alignItems="100%">
+                    <Flex p={6} >登録された生地はありません。</Flex>
+                  </Flex>
+                )}
               </Box>
             </TableContainer>
           </Box>
