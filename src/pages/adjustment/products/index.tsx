@@ -66,7 +66,7 @@ const AdjustmentProducts: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" h="78vh">
+          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="78vh">
             <Table w="100%" variant="simple" size="sm" overflow="auto">
               <Thead w="100%" position="sticky" top={0} zIndex="docked">
                 <Tr bg="white">
@@ -79,7 +79,7 @@ const AdjustmentProducts: NextPage = () => {
                       {isAuths(["rd"]) && (
                         <>
                           <Th>単価（円）</Th>
-                          <Th>仕掛在庫(m)</Th>
+                          <Th>染め仕掛(m)</Th>
                           <Th>外部在庫(m)</Th>
                           <Th>入荷待ち(m)</Th>
                         </>
