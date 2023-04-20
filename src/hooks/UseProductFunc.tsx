@@ -86,6 +86,10 @@ export const useProductFunc = () => {
     try {
       await updateDoc(docRef, {
         ...object,
+        wip: Number(items?.wip) || 0,
+        externalStock: Number(items.externalStock) || 0,
+        arrivingQuantity: Number(items?.arrivingQuantity) || 0,
+        tokushimaStock: Number(items?.tokushimaStock) || 0,
         updateUser: currentUser,
         updatedAt: serverTimestamp(),
       });
