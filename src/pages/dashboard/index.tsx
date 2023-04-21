@@ -116,7 +116,7 @@ const Dashboard: NextPage = () => {
                     </StatNumber>
                   </Stat>
                   <Stat borderRight="1px" borderColor="gray.300">
-                    <StatLabel>生地仕掛</StatLabel>
+                    <StatLabel>染め仕掛</StatLabel>
                     <StatNumber>
                       {fabricDyeingOrders?.length}
                       <Box as="span" fontSize="sm" ml={1}>
@@ -182,7 +182,7 @@ const Dashboard: NextPage = () => {
                   flexDirection={{ base: "column", md: "row" }}
                 >
                   <StatCard
-                    title="仕掛数量"
+                    title="染め仕掛数量"
                     quantity={Number(
                       getTotalProductsQuantity(["wip"]).toFixed()
                     ).toLocaleString()}
@@ -190,9 +190,9 @@ const Dashboard: NextPage = () => {
                     fontSize="3xl"
                   />
                   <StatCard
-                    title="入荷予定数量"
+                    title="外部在庫数量"
                     quantity={Number(
-                      getTotalProductsQuantity(["arrivingQuantity"]).toFixed()
+                      getTotalProductsQuantity(["externalStock"]).toFixed()
                     ).toLocaleString()}
                     unit="m"
                     fontSize="3xl"
@@ -203,9 +203,9 @@ const Dashboard: NextPage = () => {
                   flexDirection={{ base: "column", md: "row" }}
                 >
                   <StatCard
-                    title="外部在庫数量"
+                    title="入荷予定数量"
                     quantity={Number(
-                      getTotalProductsQuantity(["externalStock"]).toFixed()
+                      getTotalProductsQuantity(["arrivingQuantity"]).toFixed()
                     ).toLocaleString()}
                     unit="m"
                     fontSize="3xl"
@@ -232,7 +232,7 @@ const Dashboard: NextPage = () => {
                   flexDirection={{ base: "column", md: "row" }}
                 >
                   <StatCard
-                    title="仕掛金額"
+                    title="染め仕掛金額"
                     quantity={Number(
                       getTotalProductsPrice(["wip"]).toFixed()
                     ).toLocaleString()}
@@ -240,9 +240,9 @@ const Dashboard: NextPage = () => {
                     fontSize="3xl"
                   />
                   <StatCard
-                    title="入荷予定金額"
+                    title="外部在庫金額"
                     quantity={Number(
-                      getTotalProductsPrice(["arrivingQuantity"]).toFixed()
+                      getTotalProductsPrice(["externalStock"]).toFixed()
                     ).toLocaleString()}
                     unit="円"
                     fontSize="3xl"
@@ -253,9 +253,9 @@ const Dashboard: NextPage = () => {
                   flexDirection={{ base: "column", md: "row" }}
                 >
                   <StatCard
-                    title="外部在庫金額"
+                    title="入荷予定金額"
                     quantity={Number(
-                      getTotalProductsPrice(["externalStock"]).toFixed()
+                      getTotalProductsPrice(["arrivingQuantity"]).toFixed()
                     ).toLocaleString()}
                     unit="円"
                     fontSize="3xl"
