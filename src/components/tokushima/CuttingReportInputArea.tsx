@@ -49,6 +49,7 @@ export const CuttingReportInputArea: FC<Props> = ({
   const [filterUsers, setFilterUsers] = useState([] as UserType[]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
+
   const [items, setItems] = useState([] as any);
   const { addCuttingReport, updateCuttingReport } = useCuttingReportFunc(
     startDay,
@@ -56,6 +57,7 @@ export const CuttingReportInputArea: FC<Props> = ({
   );
   const {
     register,
+    watch,
     handleSubmit,
     getValues,
     formState: { errors },
@@ -64,7 +66,6 @@ export const CuttingReportInputArea: FC<Props> = ({
       ...report,
     },
   });
-
   const [totalQuantity, setTotalQuantity] = useState(0);
   useEffect(() => {
     setTotalQuantity(report.totalQuantity);
@@ -76,8 +77,8 @@ export const CuttingReportInputArea: FC<Props> = ({
     setItems([...items, { category: "", productId: "", quantity: 0 }]);
   };
 
+  console.log(watch("itemType"));
   const onSubmit = async (data) => {
-    console.log(data);
     switch (pageType) {
       case "new":
         await addCuttingReport(data, items);
@@ -134,9 +135,9 @@ export const CuttingReportInputArea: FC<Props> = ({
       </Box>
       <Stack spacing={6} mt={6}>
         <RadioGroup
-          defaultValue="1"
+          value={getValues("itemType")}
           {...register("itemType", { required: true })}
-          onChange={() => getValues("itemType")}
+          onChange={(e: any) => getValues(e)}
         >
           <Stack direction="row">
             <Radio value="1" {...register("itemType")}>
