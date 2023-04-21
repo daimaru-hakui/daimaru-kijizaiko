@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Divider,
   Flex,
   Modal,
   ModalBody,
@@ -17,12 +15,22 @@ import {
   TabPanels,
   Tabs,
   Text,
+  keyframes,
   useDisclosure,
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { ProductType } from "../../../types";
 import { DisplayStock } from "./DisplayStock";
 import { OrderInputArea } from "./OrderInputArea";
+
+const animationKeyframes = keyframes`
+  0% { background-color: #f3c150; }
+  25% { background-color: rgb(89, 185, 157); }
+  50% { background-color: #a58acf; }
+  75% { background-color: #54d1de; }
+  100% { background-color: #f3c150;  }
+`;
+const animation = `${animationKeyframes} 2s ease-in-out infinite`;
 
 type Props = {
   product: ProductType;
@@ -48,10 +56,22 @@ export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
 
               <Tabs variant="unstyled">
                 <TabList>
-                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
+                  <Tab
+                    _selected={{
+                      color: "white",
+                      bg: "blue.500",
+                      animation: animation,
+                    }}
+                  >
                     染め依頼
                   </Tab>
-                  <Tab _selected={{ color: "white", bg: "blue.500" }}>
+                  <Tab
+                    _selected={{
+                      color: "white",
+                      bg: "blue.500",
+                      animation: animation,
+                    }}
+                  >
                     購入伝票
                   </Tab>
                 </TabList>
