@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC, memo } from "react";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { FaEllipsisV } from "react-icons/fa";
 import { useRecoilValue } from "recoil";

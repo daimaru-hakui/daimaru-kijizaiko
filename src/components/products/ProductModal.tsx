@@ -15,14 +15,10 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import React, { FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { ProductCuttingHistoryModal } from "./ProductCuttingHistoryModal";
-import { ProductPurchaseHistoryModal } from "./ProductPurchaseHistoryModal";
 import { ProductEditModal } from "./ProductEditModal";
 import { ProductType } from "../../../types";
-import Link from "next/link";
-import { useRouter } from "next/router";
 
 type Props = {
   title?: string;
@@ -32,8 +28,6 @@ type Props = {
 
 export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
-  const productId = product?.id;
 
   const {
     getUserName,
@@ -62,11 +56,6 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
             <Flex gap={3} alignItems="center">
               生地詳細
               <ProductEditModal product={product} type="button" />
-              {/* <ProductCuttingHistoryModal productId={productId} type="button" />
-              <ProductPurchaseHistoryModal
-                productId={productId}
-                type="button"
-              /> */}
             </Flex>
           </ModalHeader>
           <ModalCloseButton />

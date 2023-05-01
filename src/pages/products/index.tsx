@@ -15,6 +15,7 @@ import {
   InputGroup,
   InputLeftElement,
   Select,
+  Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -33,16 +34,20 @@ import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
 
+type Users = {
+  contents: UserType[];
+};
+
 const Products: NextPage = () => {
   const currentUser = useRecoilValue(currentUserState);
   const products = useRecoilValue(productsState);
-  const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
+  const [filterProducts, setFilterProducts] = useState<ProductType[]>(null);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProductFunc();
   const { isAuths } = useAuthManagement();
   const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
   const [search, setSearch] = useState({
     productNumber: "",
     staff: "",
@@ -54,7 +59,7 @@ const Products: NextPage = () => {
   useEffect(() => {
     setFilterProducts(
       products?.filter(
-        (product: ProductType) =>
+        (product) =>
           product.productNumber.includes(
             halfToFullChar(search.productNumber.toUpperCase())
           ) &&
@@ -86,7 +91,7 @@ const Products: NextPage = () => {
       />
     </Flex>
   );
-
+  if (filterProducts === null) return <Flex w="full" h="100vh" justify="center" align="center"><Spinner /></Flex>;
   return (
     <>
       {currentUser && (
@@ -102,8 +107,8 @@ const Products: NextPage = () => {
             <Flex
               p={6}
               gap={3}
-              alignItems="center"
-              justifyContent="space-between"
+              align="center"
+              justify="space-between"
               flexDirection={{ base: "column", md: "row" }}
             >
               <Box as="h2" fontSize="2xl">
@@ -132,8 +137,8 @@ const Products: NextPage = () => {
             <Flex
               mt={3}
               gap={3}
-              justifyContent="center"
-              alignItems="center"
+              justify="center"
+              align="center"
               flexDirection={{ base: "column", lg: "row" }}
             >
               <Select
@@ -145,7 +150,7 @@ const Products: NextPage = () => {
                 value={search.staff}
               >
                 <option value="R&D">R&D</option>
-                {users?.contents.map((user: UserType) => (
+                {users?.contents.map((user) => (
                   <option key={user.id} value={user.id}>
                     {getUserName(user.id)}
                   </option>
@@ -165,7 +170,7 @@ const Products: NextPage = () => {
                   }
                 />
               </InputGroup>
-              {products.length !== filterProducts.length && (
+              {products?.length !== filterProducts?.length && (
                 <Button size="md" colorScheme="facebook" onClick={onReset}>
                   解除
                 </Button>
@@ -173,7 +178,7 @@ const Products: NextPage = () => {
             </Flex>
             <TableContainer p={6} w="100%" overflowX="unset" overflowY="unset" >
               <Box textAlign="left" fontSize="sm">
-                全{products.length}件中 {filterProducts.length}件表示
+                全{products?.length}件中 {filterProducts?.length}件表示
               </Box>
               <Box
                 mt={3}
@@ -182,7 +187,7 @@ const Products: NextPage = () => {
                 position="relative"
                 h={{ base: "calc(100vh - 405px)", md: "calc(100vh - 360px)", lg: "calc(100vh - 310px)" }}
               >
-                {filterProducts.length > 0 ? (
+                {filterProducts?.length > 0 ? (
                   <Table variant="simple" size="sm" w="100%" >
                     <Thead position="sticky" top={0} zIndex="docked" bg="white">
                       <Tr>
@@ -204,10 +209,10 @@ const Products: NextPage = () => {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filterProducts?.map((product: ProductType) => (
+                      {filterProducts?.map((product) => (
                         <Tr key={product.id}>
                           <Td>
-                            <Flex alignItems="center" gap={3}>
+                            <Flex align="center" gap={3}>
                               <ProductMenu product={product} />
                               <ProductModal product={product} />
                               <OrderAreaModal product={product} buttonSize="xs" />
@@ -297,7 +302,7 @@ const Products: NextPage = () => {
                     </Tbody>
                   </Table>
                 ) : (
-                  <Flex w="100%" justifyContent="center" alignItems="100%">
+                  <Flex w="100%" justify="center" align="100%">
                     <Flex p={6} >登録された生地はありません。</Flex>
                   </Flex>
                 )}
