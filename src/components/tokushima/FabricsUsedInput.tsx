@@ -53,7 +53,7 @@ export const FabricsUsedInput: FC<Props> = ({
   const currentUser = useRecoilValue(currentUserState);
   const { halfToFullChar } = useUtil();
   const { getTokushimaStock } = useGetDisp();
-  const [filterProducts, setFilterProducts] = useState([]);
+  const [filterProducts, setFilterProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState("");
   const { calcScale } = useCuttingReportFunc(null, null);
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
@@ -61,13 +61,18 @@ export const FabricsUsedInput: FC<Props> = ({
 
   // 絞り込み
   useEffect(() => {
-    setFilterProducts(
-      products.filter((product: ProductType) =>
+    setFilterProducts(() => {
+      let result = [];
+      result = products.filter((product: ProductType) =>
         product.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
-      )
-    );
+      );
+      if (items[rowIndex].category === "芯地") {
+        result = result.filter((product) => product.interfacing === true);
+      }
+      return result;
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchText, products]);
+  }, [searchText, products, items[rowIndex].category]);
 
   // 入力値の最大値をリミットにする
   useEffect(() => {
@@ -259,7 +264,7 @@ export const FabricsUsedInput: FC<Props> = ({
               name="productId"
               onChange={(e) => handleInputsChange(e, rowIndex)}
             >
-              {filterProducts?.map((product: any, index: number) => (
+              {filterProducts?.map((product, index: number) => (
                 <option key={index} value={product.id}>
                   {product.productNumber}
                   {"  "}

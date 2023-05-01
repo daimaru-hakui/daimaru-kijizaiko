@@ -32,6 +32,7 @@ export type ProductType = {
   noteProduct: string;
   noteFabric: string;
   noteEtc: string;
+  interfacing: boolean;
   wip: number;
   externalStock: number;
   arrivingQuantity: number;

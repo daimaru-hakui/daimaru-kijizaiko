@@ -15,6 +15,7 @@ import {
   RadioGroup,
   Select,
   Stack,
+  Switch,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -30,12 +31,7 @@ import {
   productsState,
   suppliersState,
 } from "../../../store";
-import {
-  ProductType,
-  GrayFabricType,
-  SupplierType,
-  LocationType,
-} from "../../../types";
+import { ProductType, UserType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import { MaterialsModal } from "./MaterialsModal";
@@ -49,6 +45,10 @@ type Props = {
   onClose?: Function;
 };
 
+type Data = {
+  contents: UserType[];
+};
+
 const ProductInputArea: NextPage<Props> = ({
   title,
   pageType,
@@ -58,7 +58,7 @@ const ProductInputArea: NextPage<Props> = ({
   // const { data: products } = useSWR(`/api/products`);
   const products = useRecoilValue(productsState);
   const locations = useRecoilValue(locationsState);
-  const { data: users } = useSWRImmutable(`/api/users/sales`);
+  const { data: users } = useSWRImmutable<Data>(`/api/users/sales`);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const suppliers = useRecoilValue(suppliersState);
   const colors = useRecoilValue(colorsState);
@@ -86,6 +86,7 @@ const ProductInputArea: NextPage<Props> = ({
   const { addProduct, updateProduct } = useProductFunc();
 
   const onSubmit = (data: ProductType) => {
+    // console.log(data);
     switch (pageType) {
       case "new":
         addProduct(data, materials);
@@ -109,8 +110,7 @@ const ProductInputArea: NextPage<Props> = ({
     if (!colorNum) colorNum = "";
     if (!colorName) colorName = "noValue";
     const base = products?.map(
-      (product: ProductType) =>
-        product.productNum + product.colorNum + product.colorName
+      (product) => product.productNum + product.colorNum + product.colorName
     );
     const result = base?.includes(productNum + colorNum + colorName);
     !result ? setFlag(false) : setFlag(true);
@@ -155,7 +155,7 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="担当者名を選択"
                 {...register("staff", { required: true })}
               >
-                {users?.contents?.map((user: { id: string; name: string }) => (
+                {users?.contents.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
                   </option>
@@ -176,7 +176,7 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="メーカーを選択してください"
                 {...register("supplierId", { required: true })}
               >
-                {suppliers?.map((supplier: SupplierType) => (
+                {suppliers?.map((supplier) => (
                   <option key={supplier.id} value={supplier.id}>
                     {supplier.name}
                   </option>
@@ -184,6 +184,26 @@ const ProductInputArea: NextPage<Props> = ({
               </Select>
             </Box>
           </Flex>
+
+          <Box w="full">
+            <Text>カテゴリー</Text>
+            <Flex
+              m={1}
+              p={2}
+              wrap="wrap"
+              rounded="md"
+              border="1px"
+              borderColor="gray.100"
+              gap={3}
+            >
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="email-alerts" mb="0">
+                  芯地
+                </FormLabel>
+                <Switch id="email-alerts" {...register("interfacing")} />
+              </FormControl>
+            </Flex>
+          </Box>
 
           {pageType === "new" && (
             <Box fontSize="md" fontWeight="bold" color="red">
@@ -231,7 +251,7 @@ const ProductInputArea: NextPage<Props> = ({
               >
                 {Object.values(colors)
                   ?.sort()
-                  .map((color: string) => (
+                  .map((color) => (
                     <option key={color} value={color}>
                       {color}
                     </option>
@@ -328,7 +348,7 @@ const ProductInputArea: NextPage<Props> = ({
                   placeholder="保管場所を選択"
                   {...register("locations")}
                 >
-                  {locations.map((location: LocationType) => (
+                  {locations.map((location) => (
                     <option key={location.id} value={location.id}>
                       {location.name}
                     </option>
@@ -353,7 +373,7 @@ const ProductInputArea: NextPage<Props> = ({
                 placeholder="キバタを選択してください"
                 {...register("grayFabricId")}
               >
-                {grayFabrics?.map((grayFabric: GrayFabricType) => (
+                {grayFabrics?.map((grayFabric) => (
                   <option key={grayFabric.id} value={grayFabric.id}>
                     {grayFabric.productNumber} {grayFabric.productName}
                   </option>

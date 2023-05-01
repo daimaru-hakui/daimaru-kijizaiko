@@ -24,43 +24,44 @@ export const useProductFunc = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
-  const obj = (items, materials) => ({
-    productType: items?.productType || "1",
-    staff: Number(items?.productType) === 2 ? items?.staff : "R&D",
-    supplierId: items?.supplierId || "",
-    supplierName: getSupplierName(items?.supplierId) || "",
-    grayFabricId: items?.grayFabricId || "",
+  const obj = (data: ProductType, materials) => ({
+    productType: data?.productType || "1",
+    staff: Number(data?.productType) === 2 ? data?.staff : "R&D",
+    supplierId: data?.supplierId || "",
+    supplierName: getSupplierName(data?.supplierId) || "",
+    grayFabricId: data?.grayFabricId || "",
+    interfacing: data.interfacing || false,
     productNumber:
-      items?.productNum + (items?.colorNum ? "-" + items?.colorNum : "") || "",
-    productNum: items?.productNum || "",
-    productName: items?.productName || "",
-    colorNum: items?.colorNum || "",
-    colorName: items?.colorName || "",
-    price: Number(items?.price) || 0,
-    materialName: items?.materialName || "",
+      data?.productNum + (data?.colorNum ? "-" + data?.colorNum : "") || "",
+    productNum: data?.productNum || "",
+    productName: data?.productName || "",
+    colorNum: data?.colorNum || "",
+    colorName: data?.colorName || "",
+    price: Number(data?.price) || 0,
+    materialName: data?.materialName || "",
     materials: materials || {},
-    fabricWidth: items?.fabricWidth || "",
-    fabricWeight: items?.fabricWeight || "",
-    fabricLength: items?.fabricLength || "",
-    features: items?.features || [],
-    noteProduct: items?.noteProduct || "",
-    noteFabric: items?.noteFabric || "",
-    noteEtc: items?.noteEtc || "",
+    fabricWidth: data?.fabricWidth || "",
+    fabricWeight: data?.fabricWeight || "",
+    fabricLength: data?.fabricLength || "",
+    features: data?.features || [],
+    noteProduct: data?.noteProduct || "",
+    noteFabric: data?.noteFabric || "",
+    noteEtc: data?.noteEtc || "",
     wip: 0,
-    externalStock: Number(items.externalStock) || 0,
+    externalStock: Number(data.externalStock) || 0,
     arrivingQuantity: 0,
-    tokushimaStock: Number(items?.tokushimaStock) || 0,
-    locations: items.locations || [],
+    tokushimaStock: Number(data?.tokushimaStock) || 0,
+    locations: data.locations || [],
     deletedAt: "",
   });
 
   // 生地登録
-  const addProduct = async (items, materials) => {
+  const addProduct = async (data: ProductType, materials) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
     const docRef = collection(db, "products");
-    const object = obj(items, materials);
+    const object = obj(data, materials);
     try {
       await addDoc(docRef, {
         ...object,
@@ -77,19 +78,23 @@ export const useProductFunc = () => {
     }
   };
 
-  const updateProduct = async (productId: string, items, materials) => {
+  const updateProduct = async (
+    productId: string,
+    data: ProductType,
+    materials
+  ) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setLoading(true);
     const docRef = doc(db, "products", `${productId}`);
-    const object = obj(items, materials);
+    const object = obj(data, materials);
     try {
       await updateDoc(docRef, {
         ...object,
-        wip: Number(items?.wip) || 0,
-        externalStock: Number(items.externalStock) || 0,
-        arrivingQuantity: Number(items?.arrivingQuantity) || 0,
-        tokushimaStock: Number(items?.tokushimaStock) || 0,
+        wip: Number(data?.wip) || 0,
+        externalStock: Number(data.externalStock) || 0,
+        arrivingQuantity: Number(data?.arrivingQuantity) || 0,
+        tokushimaStock: Number(data?.tokushimaStock) || 0,
         updateUser: currentUser,
         updatedAt: serverTimestamp(),
       });
