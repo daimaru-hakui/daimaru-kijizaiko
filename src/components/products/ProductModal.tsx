@@ -88,6 +88,14 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
                     <Box>{getSupplierName(product?.supplierId)}</Box>
                   </Box>
                 </Flex>
+                {product?.interfacing && (
+                  <Flex gap={6}>
+                    <Box w="100%">
+                      <Text fontWeight="bold">カテゴリー</Text>
+                      <Box>{product?.interfacing ? "芯地" : ""}</Box>
+                    </Box>
+                  </Flex>
+                )}
 
                 <Flex
                   w="100%"
