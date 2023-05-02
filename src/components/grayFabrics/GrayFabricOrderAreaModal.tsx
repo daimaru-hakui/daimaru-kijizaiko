@@ -30,9 +30,8 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useState, FC } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState } from "../../../store";
+import { useAuthStore } from "../../../store";
 import { GrayFabricType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
@@ -44,7 +43,7 @@ type Props = {
 export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { getSupplierName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const [items, setItems] = useState({

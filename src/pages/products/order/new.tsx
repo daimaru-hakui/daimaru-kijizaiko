@@ -1,21 +1,20 @@
 import { Box, Button, Container, Flex, Input, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { productsState } from "../../../../store";
-import { ProductType } from "../../../../types";
+import { useProductsStore } from "../../../../store";
+import { Product } from "../../../../types";
 import { OrderAreaModal } from "../../../components/products/OrderAreaModal";
 
 const OrderNew: NextPage = () => {
-  const products = useRecoilValue(productsState);
-  const [filterPoduct, setFilterProduct] = useState({} as ProductType);
-  const [items, setItems] = useState({} as any);
+  const products = useProductsStore((state) => state.products);
+  const [filterPoduct, setFilterProduct] = useState<Product>();
+  const [items, setItems] = useState<Product>();
 
   // 品番で絞り込み
   useEffect(() => {
     setFilterProduct(
       products.find(
-        (product: any) => product.productNumber === items.productNumber && true
+        (product) => product.productNumber === items.productNumber && true
       )
     );
   }, [items, products]);
@@ -44,7 +43,7 @@ const OrderNew: NextPage = () => {
           autoComplete="off"
         />
         <datalist id="search">
-          {products.map((product: any, index: number) => (
+          {products.map((product, index: number) => (
             <option key={index} value={product.productNumber}>
               {product.productName}
               {product.colorName}

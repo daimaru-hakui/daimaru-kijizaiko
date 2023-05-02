@@ -7,30 +7,30 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState, loadingState, productsState } from "../../store";
-import { ProductType } from "../../types";
+import { useAuthStore, useLoadingStore, useProductsStore } from "../../store";
+import { Product } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 
 export const useProductFunc = () => {
   const router = useRouter();
-  const setLoading = useSetRecoilState(loadingState);
-  const currentUser = useRecoilValue(currentUserState);
-  const products = useRecoilValue(productsState);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const products = useProductsStore((state) => state.products);
   const { getUserName, getSupplierName, getMixed, getFabricStd } = useGetDisp();
   const { getTodayDate } = useUtil();
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
-  const obj = (data: ProductType, materials) => ({
+  const obj = (data: Product, materials) => ({
     productType: data?.productType || "1",
     staff: Number(data?.productType) === 2 ? data?.staff : "R&D",
     supplierId: data?.supplierId || "",
     supplierName: getSupplierName(data?.supplierId) || "",
     grayFabricId: data?.grayFabricId || "",
-    interfacing: data.interfacing || false,
+    interfacing: data?.interfacing || false,
+    lining: data?.lining || false,
     productNumber:
       data?.productNum + (data?.colorNum ? "-" + data?.colorNum : "") || "",
     productNum: data?.productNum || "",
@@ -56,10 +56,10 @@ export const useProductFunc = () => {
   });
 
   // 生地登録
-  const addProduct = async (data: ProductType, materials) => {
+  const addProduct = async (data: Product, materials) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
     const docRef = collection(db, "products");
     const object = obj(data, materials);
     try {
@@ -73,19 +73,15 @@ export const useProductFunc = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       router.push("/products");
     }
   };
 
-  const updateProduct = async (
-    productId: string,
-    data: ProductType,
-    materials
-  ) => {
+  const updateProduct = async (productId: string, data: Product, materials) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
     const docRef = doc(db, "products", `${productId}`);
     const object = obj(data, materials);
     try {
@@ -102,7 +98,7 @@ export const useProductFunc = () => {
       console.log(productId);
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -142,7 +138,7 @@ export const useProductFunc = () => {
     ];
     let body = [];
     body.push(headers);
-    products.forEach((product: ProductType) => {
+    products.forEach((product) => {
       body.push([
         getUserName(product.staff),
         product.productNum,

@@ -1,9 +1,9 @@
 import { useRecoilValue } from "recoil";
-import { currentUserState, usersState } from "../../store";
+import { useAuthStore } from "../../store";
 
 export const useAuthManagement = () => {
-  const users = useRecoilValue(usersState);
-  const currentUser = useRecoilValue(currentUserState);
+  const users = useAuthStore((state) => state.users);
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   const isAdminAuth = () => {
     const array = [
@@ -16,17 +16,13 @@ export const useAuthManagement = () => {
   };
 
   const isAuth = (prop: string) => {
-    const user = users.find(
-      (user: { uid: string }) => user.uid === currentUser
-    );
+    const user = users.find((user) => user.uid === currentUser);
     if (!user) return false;
     return user[prop] ? true : false;
   };
 
   const isAuths = (props: string[]) => {
-    const user = users.find(
-      (user: { uid: string }) => user.uid === currentUser
-    );
+    const user = users.find((user) => user.uid === currentUser);
     if (!user) return false;
     return props.some((prop: string) => (user[prop] ? true : false));
   };

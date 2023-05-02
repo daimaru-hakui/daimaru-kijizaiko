@@ -21,10 +21,9 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
 import {
-  currentUserState,
   fabricPurchaseOrdersState,
-  loadingState,
-  usersState,
+  useAuthStore,
+  useLoadingStore,
 } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
@@ -41,9 +40,8 @@ type Props = {
 
 export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const router = useRouter();
-  const setLoading = useSetRecoilState(loadingState);
-  const currentUser = useRecoilValue(currentUserState);
-  const users = useRecoilValue(usersState);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
@@ -57,19 +55,13 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   useEffect(() => {
     if (HOUSE_FACTORY) {
       const newHistorys = fabricPurchaseOrders?.filter(
-        (history: HistoryType) =>
-          history.stockPlace === HOUSE_FACTORY && history
+        (history) => history.stockPlace === HOUSE_FACTORY && history
       );
       setFilterFabricPurchaseOrders(newHistorys);
     } else {
-      const newHistorys = fabricPurchaseOrders?.filter(
-        (history: HistoryType) => history
-      );
+      const newHistorys = fabricPurchaseOrders?.filter((history) => history);
       setFilterFabricPurchaseOrders(
-        newHistorys.sort(
-          (a: { serialNumber: number }, b: { serialNumber: number }) =>
-            a.serialNumber > b.serialNumber && -1
-        )
+        newHistorys.sort((a, b) => a.serialNumber > b.serialNumber && -1)
       );
     }
   }, [fabricPurchaseOrders, HOUSE_FACTORY]);
@@ -121,7 +113,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
 
   //　購入状況　orderを編集（stock ranning共通）
   const updateFabricPurchaseOrder = async (history: HistoryType) => {
-    setLoading(true);
+    setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseOrders", history.id);
     try {
@@ -174,7 +166,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -309,7 +301,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterFabricPurchaseOrders?.map((history: HistoryType) => (
+              {filterFabricPurchaseOrders?.map((history) => (
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd", "tokushima"]) ||

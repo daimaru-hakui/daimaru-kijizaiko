@@ -17,12 +17,12 @@ import {
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import { useEffect, useState, FC } from "react";
-import { useRecoilValue } from "recoil";
-import { usersState } from "../../../store";
+import { useAuthStore } from "../../../store";
 import {
-  UserType,
+  User,
   CuttingProductType,
   CuttingReportType,
+  Product,
 } from "../../../types";
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
@@ -45,12 +45,12 @@ export const CuttingReportInputArea: FC<Props> = ({
   startDay,
   endDay,
 }) => {
-  const users = useRecoilValue(usersState);
-  const [filterUsers, setFilterUsers] = useState([] as UserType[]);
+  const users = useAuthStore((state) => state.users);
+  const [filterUsers, setFilterUsers] = useState<User[]>([]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
 
-  const [items, setItems] = useState([] as any);
+  const [items, setItems] = useState<CuttingProductType[]>([]);
   const { addCuttingReport, updateCuttingReport } = useCuttingReportFunc(
     startDay,
     endDay
@@ -74,7 +74,10 @@ export const CuttingReportInputArea: FC<Props> = ({
 
   // 商品登録項目を追加
   const addInput = () => {
-    setItems([...items, { category: "", productId: "", quantity: 0 }]);
+    setItems([
+      ...items,
+      { category: "", productId: "", quantity: 0 } as CuttingProductType,
+    ]);
   };
 
   console.log(watch("itemType"));
@@ -98,7 +101,7 @@ export const CuttingReportInputArea: FC<Props> = ({
   }, [report]);
 
   useEffect(() => {
-    setFilterUsers(users.filter((user: UserType) => user.sales));
+    setFilterUsers(users.filter((user) => user.sales));
   }, [users]);
 
   useEffect(() => {
@@ -113,7 +116,7 @@ export const CuttingReportInputArea: FC<Props> = ({
         return true;
       }
     };
-    const totalQuantity = items.totalQuantity === 0 ? true : false;
+    const totalQuantity = watch("totalQuantity") === 0 ? true : false;
     const category = items?.some((product) => product?.category === "");
     const productId = items?.some((product) => product?.productId === "");
     const quantity = items?.some(
@@ -163,7 +166,7 @@ export const CuttingReportInputArea: FC<Props> = ({
           <Box w="full">
             <Text fontWeight="bold">担当者</Text>
             <Select mt={1} placeholder="担当者名を選択" {...register("staff")}>
-              {filterUsers?.map((user: { id: string; name: string }) => (
+              {filterUsers?.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
                 </option>

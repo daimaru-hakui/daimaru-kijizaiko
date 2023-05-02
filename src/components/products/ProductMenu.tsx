@@ -1,20 +1,19 @@
-import React, { FC, memo } from "react";
+import React, { FC } from "react";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { FaEllipsisV } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
-import { currentUserState } from "../../../store";
-import { ProductType } from "../../../types";
+import { useAuthStore } from "../../../store";
+import { Product } from "../../../types";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { ProductCuttingHistoryModal } from "./ProductCuttingHistoryModal";
 import { ProductEditModal } from "./ProductEditModal";
 import { ProductPurchaseHistoryModal } from "./ProductPurchaseHistoryModal";
 
 type Props = {
-  product: ProductType;
+  product: Product;
 };
 
 export const ProductMenu: FC<Props> = ({ product }) => {
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
 
   return (

@@ -1,54 +1,39 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, FC } from "react";
+import { ReactNode, FC } from "react";
 import { Header } from "./Header";
 import { Loading } from "./Loading";
 import { Sidebar } from "./Sidebar";
-import { auth } from "../../firebase";
-import { useRecoilState } from "recoil";
-import { currentUserState } from "../../store";
-import { onAuthStateChanged } from "firebase/auth";
+import { useAuthStore } from "../../store";
 
 type Props = {
   children: ReactNode;
 };
 
 export const Layout: FC<Props> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const router = useRouter();
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user?.uid);
-        router.push("/");
-      } else {
-        setCurrentUser("");
-        router.push("/login");
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <Box
       fontWeight="400"
       letterSpacing="wide"
       bg="#f4f4f4"
       minH="100vh"
-      w="100%"
+      w="full"
     >
       <Loading />
-      {currentUser === "" ? (
+      {router.pathname === "/login" ? (
         <Flex>{children}</Flex>
       ) : (
-        <>
-          <Header />
-          <Flex>
-            <Sidebar />
-            {children}
-          </Flex>
-        </>
+        currentUser && (
+          <>
+            <Header />
+            <Flex>
+              <Sidebar />
+              {children}
+            </Flex>
+          </>
+        )
       )}
     </Box>
   );

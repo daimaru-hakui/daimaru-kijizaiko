@@ -17,7 +17,7 @@ const GrayFabricsNew: NextPage = () => {
     createUser: "",
   });
   return (
-    <Box w="100%" mt={12} px={6}>
+    <Box w="full" mt={12} px={6}>
       <Container
         maxW="800px"
         my={6}

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { UserType, CuttingReportType } from "../../../../types";
+import { User, CuttingReportType } from "../../../../types";
 
 const getTodayDate = () => {
   const date = new Date();
@@ -35,7 +35,7 @@ export default async function handler(
         ({
           ...doc.data(),
           id: doc.id,
-        } as UserType)
+        } as User)
     );
 
     const querySnapshot = await db
@@ -49,7 +49,7 @@ export default async function handler(
       .map((doc) => ({ ...doc.data(), id: doc.id } as CuttingReportType))
       .filter((report) => Number(report?.itemType) === 1);
     const contents = reports.map((content) => {
-      const user = users.find((user: UserType) => user.uid === content.staff);
+      const user = users.find((user) => user.uid === content.staff);
       return { ...content, username: user.name };
     });
     return res.status(200).json({ contents });

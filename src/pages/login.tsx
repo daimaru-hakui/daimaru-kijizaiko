@@ -1,20 +1,13 @@
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { Box, Button, Container, Flex, Input, Stack } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState } from "../../store";
+import { useLoadingStore } from "../../store";
 import { NextPage } from "next";
 import { auth } from "../../firebase/index";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
 
 const Login: NextPage = () => {
-  const router = useRouter();
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
-  const setLoading = useSetRecoilState(loadingState);
-  const [user] = useAuthState(auth);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const {
     register,
     handleSubmit,
@@ -25,92 +18,77 @@ const Login: NextPage = () => {
     signInUser(data.email, data.password);
   };
   const signInUser = (email: string, password: string) => {
-    setLoading(true);
+    setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setCurrentUser(user?.uid);
       })
       .catch((error) => {
         console.log(error.message);
         window.alert("失敗しました");
       })
       .finally(() => {
-        setLoading(false);
+        setIsLoading(false);
       });
   };
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user?.uid);
-        router.push("/");
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <>
-      {currentUser === "" && (
-        <Flex w="100%" h="100vh" alignItems="center" justifyContent="center">
-          <Container
-            maxW="350px"
-            p={6}
-            rounded="md"
-            boxShadow="base"
-            bgColor="white"
-          >
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Stack spacing={4}>
-                <Flex
-                  w="100%"
-                  h="70px"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                  fontSize="2xl"
-                >
-                  <FaLock />
-                  <Box>Sign in</Box>
-                </Flex>
-                <Box>
-                  <Input
-                    placeholder="メールアドレス"
-                    {...register("email", { required: true })}
-                  />
-                  {errors.email && (
-                    <Box as="span" color="red">
-                      emailアドレスを入力してください
-                    </Box>
-                  )}
+    <Flex w="100%" h="100vh" align="center" justify="center">
+      <Container
+        maxW="350px"
+        p={6}
+        rounded="md"
+        boxShadow="base"
+        bgColor="white"
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={4}>
+            <Flex
+              w="100%"
+              h="70px"
+              direction="column"
+              justify="center"
+              align="center"
+              fontSize="2xl"
+            >
+              <FaLock />
+              <Box>Sign in</Box>
+            </Flex>
+            <Box>
+              <Input
+                placeholder="メールアドレス"
+                {...register("email", { required: true })}
+              />
+              {errors.email && (
+                <Box as="span" color="red">
+                  emailアドレスを入力してください
                 </Box>
-                <Box>
-                  <Input
-                    type="password"
-                    placeholder="パスワード"
-                    {...register("password", { required: true })}
-                  />
-                  {errors.password && (
-                    <Box as="span" color="red">
-                      password入力してください
-                    </Box>
-                  )}
+              )}
+            </Box>
+            <Box>
+              <Input
+                type="password"
+                placeholder="パスワード"
+                {...register("password", { required: true })}
+              />
+              {errors.password && (
+                <Box as="span" color="red">
+                  password入力してください
                 </Box>
-                <Button
-                  type="submit"
-                  color="white"
-                  bgColor="facebook.900"
-                  _hover={{ backgroundColor: "facebook.500" }}
-                >
-                  サインイン
-                </Button>
-              </Stack>
-            </form>
-          </Container>
-        </Flex>
-      )}
-    </>
+              )}
+            </Box>
+            <Button
+              type="submit"
+              color="white"
+              bgColor="facebook.900"
+              _hover={{ backgroundColor: "facebook.500" }}
+            >
+              サインイン
+            </Button>
+          </Stack>
+        </form>
+      </Container>
+    </Flex>
   );
 };
 

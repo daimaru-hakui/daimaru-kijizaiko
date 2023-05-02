@@ -5,29 +5,24 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState, loadingState } from "../../store";
-import { ProductType, HistoryType } from "../../types";
+import { useAuthStore, useLoadingStore } from "../../store";
+import { Product, HistoryType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
-import useSWR from "swr";
-import { useState } from "react";
 
 export const useOrderFabricFunc = (
   items: HistoryType,
-  product: ProductType,
+  product: Product,
   orderType: string
 ) => {
-  const currentUser = useRecoilValue(currentUserState);
-  const setLoading = useSetRecoilState(loadingState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const router = useRouter();
   const { getSupplierName, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const grayFabricId = product?.grayFabricId || "";
   const productId = product?.id || "";
-  // const { data } = useSWR();
-  const [result, setResult] = useState<any>();
 
   const Obj = {
     stockType: items.stockType,
@@ -53,7 +48,7 @@ export const useOrderFabricFunc = (
   const orderFabricDyeingFromStock = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
 
     const orderNumberDocRef = doc(
       db,
@@ -102,7 +97,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       router.push("/products/fabric-dyeing/orders");
     }
   };
@@ -111,7 +106,7 @@ export const useOrderFabricFunc = (
   const orderFabricDyeingFromRanning = async () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
 
     const orderNumberDocRef = doc(
       db,
@@ -150,7 +145,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       router.push("/products/fabric-dyeing/orders");
     }
   };
@@ -158,7 +153,7 @@ export const useOrderFabricFunc = (
   const orderFabricPurchase = async (stockType: string) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
 
     const orderNumberDocRef = doc(
       db,
@@ -210,7 +205,7 @@ export const useOrderFabricFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       // router.push("/products/fabric-purchase/orders");
       router.push({
         pathname: `/complete/${productId}`,

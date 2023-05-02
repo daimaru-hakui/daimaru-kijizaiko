@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
-import { GrayFabricHistoryType, HistoryType } from "../../../types";
+import { HistoryType } from "../../../types";
 
 type Props = {
   history: HistoryType;
@@ -85,9 +85,9 @@ export const HistoryEditModal: FC<Props> = ({
               <Box>
                 <Box>品番</Box>
                 <Flex gap={1}>
-                  <Box>{history.productNumber}</Box>
-                  {history.colorName && <Box>{history.colorName}</Box>}
-                  <Box>{history.productName}</Box>
+                  <Box>{history?.productNumber}</Box>
+                  {history?.colorName && <Box>{history?.colorName}</Box>}
+                  <Box>{history?.productName}</Box>
                 </Flex>
               </Box>
               <Box w="100%">
@@ -98,7 +98,7 @@ export const HistoryEditModal: FC<Props> = ({
                   defaultValue={0}
                   min={0}
                   max={10000}
-                  value={items.quantity}
+                  value={items?.quantity}
                   onChange={(e) => handleNumberChange(e, "quantity")}
                 >
                   <NumberInputField textAlign="right" />
@@ -108,7 +108,7 @@ export const HistoryEditModal: FC<Props> = ({
                   </NumberInputStepper>
                 </NumberInput>
               </Box>
-              {items.price && (
+              {items?.price && (
                 <Box w="100%">
                   <Text>金額（円）</Text>
                   <NumberInput
@@ -117,7 +117,7 @@ export const HistoryEditModal: FC<Props> = ({
                     defaultValue={0}
                     min={0}
                     max={10000}
-                    value={items.price === 0 ? "" : items.price}
+                    value={items?.price === 0 ? "" : items?.price}
                     onChange={(e) => handleNumberChange(e, "price")}
                   >
                     <NumberInputField textAlign="right" />
@@ -134,7 +134,7 @@ export const HistoryEditModal: FC<Props> = ({
                   type="date"
                   mt={1}
                   name="orderedAt"
-                  value={items.orderedAt}
+                  value={items?.orderedAt}
                   onChange={handleInputChange}
                 />
               </Box>
@@ -147,7 +147,7 @@ export const HistoryEditModal: FC<Props> = ({
                     type="date"
                     mt={1}
                     name="scheduledAt"
-                    value={items.scheduledAt}
+                    value={items?.scheduledAt}
                     onChange={handleInputChange}
                   />
                 </Box>
@@ -159,7 +159,7 @@ export const HistoryEditModal: FC<Props> = ({
                     type="date"
                     mt={1}
                     name="fixedAt"
-                    value={items.fixedAt}
+                    value={items?.fixedAt}
                     onChange={handleInputChange}
                   />
                 </Box>
@@ -169,7 +169,7 @@ export const HistoryEditModal: FC<Props> = ({
                 <Textarea
                   mt={1}
                   name="comment"
-                  value={items.comment}
+                  value={items?.comment}
                   onChange={handleInputChange}
                 />
               </Box>

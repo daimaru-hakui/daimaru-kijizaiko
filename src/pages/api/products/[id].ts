@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { ProductType } from "../../../../types";
+import { Product } from "../../../../types";
 
 type Data = {
-  content: ProductType;
+  content: Product;
 };
 
 export default async function handler(
@@ -18,7 +18,7 @@ export default async function handler(
     const content = {
       ...querySnapshot.data(),
       id: querySnapshot.id,
-    } as ProductType;
+    } as Product;
     return res.status(200).json({ content });
   }
 }

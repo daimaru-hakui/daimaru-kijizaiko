@@ -11,21 +11,20 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FC } from "react";
-import { useRecoilValue } from "recoil";
-import { currentUserState } from "../../../store";
-import { ProductType } from "../../../types";
+import { useAuthStore } from "../../../store";
+import { Product } from "../../../types";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import ProductInputArea from "./ProductInputArea";
+import { ProductInputArea } from "./ProductInputArea";
 
 type Props = {
-  product: ProductType;
+  product: Product;
   type: string | null;
 };
 
 export const ProductEditModal: FC<Props> = ({ product, type }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuths } = useAuthManagement();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   return (
     <>

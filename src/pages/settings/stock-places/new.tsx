@@ -3,16 +3,15 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types";
 import { StockPlaceInputArea } from "../../../components/settings/stock-places/StockPlaceInputArea";
 import { NextPage } from "next";
+import { useAuthStore } from "../../../../store";
 
 const StockPlaceNew: NextPage = () => {
   const router = useRouter();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const [stockPlace, setStockPlace] = useState({
     id: "",
     name: "",

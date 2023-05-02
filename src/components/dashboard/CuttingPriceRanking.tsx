@@ -10,12 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
-import {
-  ProductType,
-  CuttingReportType,
-  CuttingHistoryType,
-  CuttingProductType,
-} from "../../../types";
+import { Product, CuttingReportType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import useSWRImmutable from "swr/immutable";
 
@@ -35,6 +30,10 @@ type Props = {
   rankingNumber: number;
 };
 
+type Data = {
+  contents: Product[];
+};
+
 export const CuttingPriceRanking: FC<Props> = ({
   data,
   startDay,
@@ -45,28 +44,25 @@ export const CuttingPriceRanking: FC<Props> = ({
   const [chartDataList, setChartDataList] = useState([
     { productId: "", quantity: 0, price: 0 },
   ]);
-  const { data: products } = useSWRImmutable("/api/products");
+  const { data: products } = useSWRImmutable<Data>("/api/products");
 
   useEffect(() => {
     const getPrice = (productId: string) => {
       const product = products?.contents.find(
-        (product: ProductType) => product.id === productId
+        (product) => product.id === productId
       );
       return product?.price || 0;
     };
 
     const getArray = async () => {
       const filterArray = data
-        ?.map((obj: CuttingReportType) =>
-          obj.products.map(
-            (product: CuttingProductType) =>
-              ({
-                ...obj,
-                ...product,
-                price: getPrice(product?.productId) || 0,
-                products: null,
-              } as CuttingHistoryType & { price: number })
-          )
+        ?.map((obj) =>
+          obj.products.map((product) => ({
+            ...obj,
+            ...product,
+            price: getPrice(product?.productId) || 0,
+            products: null,
+          }))
         )
         .flat()
         .filter(
@@ -76,21 +72,17 @@ export const CuttingPriceRanking: FC<Props> = ({
             new Date(obj.cuttingDate).getTime() <= new Date(endDay).getTime()
         );
 
-      const ProductIds = filterArray?.map(
-        (obj: { productId: string }) => obj.productId
-      );
+      const ProductIds = filterArray?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
         let sum = 0;
-        filterArray?.forEach(
-          (obj: { productId: string; quantity: number; price: number }) => {
-            if (obj.productId === header) {
-              sum += obj.quantity * (obj.price || getPrice(header) || 0);
-            }
+        filterArray?.forEach((obj) => {
+          if (obj.productId === header) {
+            sum += obj.quantity * (obj.price || getPrice(header) || 0);
           }
-        );
+        });
         return { productId: header, price: sum };
       });
 
@@ -127,7 +119,7 @@ export const CuttingPriceRanking: FC<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string }) =>
+      (ranking) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -140,7 +132,7 @@ export const CuttingPriceRanking: FC<Props> = ({
         label: "使用金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { price: number }) => ranking.price.toFixed()),
+          ?.map((ranking) => ranking.price.toFixed()),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
       },

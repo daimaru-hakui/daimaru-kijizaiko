@@ -6,7 +6,7 @@ import { GrayFabricConfirmTable } from "../../../components/grayFabrics/GrayFabr
 const GrayFabricHistoryConfirms: NextPage = () => {
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
+      <Box my={6} bg="white" boxShadow="md" rounded="md">
         <Flex gap={3} p={6} alignItems="center">
           <Box as="h2" fontSize="2xl">
             キバタ発注履歴

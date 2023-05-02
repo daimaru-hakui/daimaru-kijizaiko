@@ -12,11 +12,10 @@ import {
 import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState } from "../../../../store";
 import { StockPlaceType } from "../../../../types";
 import { StockPlaceInputArea } from "./StockPlaceInputArea";
+import { useAuthStore } from "../../../../store";
 
 type Props = {
   stockPlace: StockPlaceType;
@@ -24,7 +23,7 @@ type Props = {
 
 export const EditModal: FC<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   const updateStockPlace = async (data: StockPlaceType) => {
     const result = window.confirm("変更して宜しいでしょうか");

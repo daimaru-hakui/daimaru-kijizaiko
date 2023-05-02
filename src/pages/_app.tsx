@@ -7,6 +7,11 @@ import theme from "../components/theme";
 import Head from "next/head";
 import { SWRConfig } from "swr";
 import axios from "axios";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useAuthStore } from "../../store";
+import { auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const fetcher = (url: string) =>
   axios
@@ -16,6 +21,35 @@ const fetcher = (url: string) =>
     });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const session = useAuthStore((state) => state.session);
+  const setSession = useAuthStore((state) => state.setSession);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const setCurrentUser = useAuthStore((state) => state.setCurrentUser);
+  const setUsers = useAuthStore((state) => state.setUsers);
+
+  useEffect(() => {
+    console.log("session");
+    const getSession = async () => {
+      if (auth.currentUser) {
+        setSession(auth.currentUser);
+        setCurrentUser(auth.currentUser?.uid);
+      }
+      onAuthStateChanged(auth, (session) => {
+        if (session) {
+          setSession(session);
+          setCurrentUser(session?.uid);
+          router.push("/");
+        } else {
+          setSession(null);
+          setCurrentUser(undefined);
+          router.push("/login");
+        }
+      });
+    };
+    getSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
   return (
     <>
       <Head>

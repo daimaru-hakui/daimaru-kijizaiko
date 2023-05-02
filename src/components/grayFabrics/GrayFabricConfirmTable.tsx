@@ -12,8 +12,6 @@ import {
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useState, useEffect, FC } from "react";
 import { db } from "../../../firebase";
-import { useRecoilValue } from "recoil";
-import { currentUserState } from "../../../store";
 import { GrayFabricType, HistoryType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
@@ -23,6 +21,7 @@ import { HistoryEditModal } from "../history/HistoryEditModal";
 import { SearchArea } from "../SearchArea";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
+import { useAuthStore } from "../../../store";
 
 type Inputs = {
   start: string;
@@ -34,7 +33,7 @@ type Inputs = {
 export const GrayFabricConfirmTable: FC = () => {
   const [items, setItems] = useState({} as HistoryType);
   const { getSerialNumber, getUserName } = useGetDisp();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());

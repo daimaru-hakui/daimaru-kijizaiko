@@ -1,7 +1,7 @@
 import { Box, Container } from "@chakra-ui/react";
 import { useState } from "react";
-import { ProductType } from "../../../types";
-import ProductInputArea from "../../components/products/ProductInputArea";
+import { Product } from "../../../types";
+import { ProductInputArea } from "../../components/products/ProductInputArea";
 import { NextPage } from "next";
 
 const ProductsNew: NextPage = () => {
@@ -28,6 +28,7 @@ const ProductsNew: NextPage = () => {
     noteFabric: "",
     noteEtc: "",
     interfacing: false,
+    lining: false,
     wip: 0,
     externalStock: 0,
     arrivingQuantity: 0,
@@ -49,11 +50,7 @@ const ProductsNew: NextPage = () => {
         rounded="md"
         boxShadow="md"
       >
-        <ProductInputArea
-          title="生地の登録"
-          pageType="new"
-          product={product as ProductType}
-        />
+        <ProductInputArea title="生地の登録" pageType="new" product={product} />
       </Container>
     </Box>
   );

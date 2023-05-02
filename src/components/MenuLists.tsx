@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useAuthManagement } from "../hooks/UseAuthManagement";
 
 type Props = {
-  onClose: Function;
+  onClose?: Function;
 };
 export const MenuLists: FC<Props> = ({ onClose }) => {
   const router = useRouter();
