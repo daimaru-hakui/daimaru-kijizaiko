@@ -18,16 +18,16 @@ import {
   NumberInputStepper,
   Stack,
 } from "@chakra-ui/react";
-import { MaterialsType } from "../../../types";
+import { Materials } from "../../../types";
 
 type Props = {
-  materials: { id: string; name: string }[];
+  materials: Materials[];
   setMaterials: Function;
 };
 
 export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<any>();
   const [total, setTotal] = useState(true);
 
   const list = [
@@ -52,7 +52,7 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
 
   const handleInputChange = (e: string, name: string) => {
     if (Number(e) === 0) {
-      setItems((prev: MaterialsType[]) => {
+      setItems((prev) => {
         delete prev[name];
         return { ...items };
       });
@@ -64,7 +64,7 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
   useEffect(() => {
     const calcSum = (materials: any) => {
       let sum = list
-        .map((m) => materials[m.id] && materials[m.id])
+        .map((m) => materials?.m?.id && materials?.m?.id)
         .filter((m) => m)
         .reduce((prev, current) => (prev = prev + current), 0);
       const result = sum !== 100 ? true : false;
@@ -91,16 +91,16 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>
-              {list.map((material: { id: any; name: string }) => (
-                <Flex key={material.id} alignItems="center">
-                  <Text w="100%">{material.name}</Text>
+              {list.map((material: { id: string; name: string }) => (
+                <Flex key={material?.id} alignItems="center">
+                  <Text w="100%">{material?.name}</Text>
                   <NumberInput
-                    name={material.id}
+                    name={material?.id}
                     w="100%"
-                    defaultValue={items[material.id] || ""}
+                    defaultValue={items?.material?.id || ""}
                     value={
                       items &&
-                      (items[material.id] === 0 ? "" : items[material.id])
+                      (items[material?.id] === 0 ? "" : items[material?.id])
                     }
                     min={0}
                     max={100}

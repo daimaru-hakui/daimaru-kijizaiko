@@ -16,9 +16,8 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { FC } from "react";
-import { useRecoilValue } from "recoil";
-import { stockPlacesState } from "../../../store";
-import { Product, StockPlaceType } from "../../../types";
+import { useSettingStore } from "../../../store";
+import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
@@ -32,7 +31,7 @@ type Props = {
 
 export const OrderInputArea: FC<Props> = ({ product, orderType, onClose }) => {
   const grayFabricId = product?.grayFabricId || "";
-  const stockPlaces = useRecoilValue(stockPlacesState);
+  const stockPlaces = useSettingStore((state) => state.stockPlaces);
   const { getTodayDate } = useUtil();
   const { getGrayFabricStock } = useGetDisp();
   const { items, handleInputChange, handleNumberChange, handleRadioChange } =
@@ -124,9 +123,9 @@ export const OrderInputArea: FC<Props> = ({ product, orderType, onClose }) => {
                 defaultValue="徳島工場"
                 onChange={handleInputChange}
               >
-                {stockPlaces?.map((m: StockPlaceType) => (
-                  <option key={m.id} value={m.name}>
-                    {m.name}
+                {stockPlaces?.map((place) => (
+                  <option key={place.id} value={place.name}>
+                    {place.name}
                   </option>
                 ))}
               </Select>

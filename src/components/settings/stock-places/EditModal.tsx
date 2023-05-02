@@ -13,19 +13,19 @@ import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
-import { StockPlaceType } from "../../../../types";
+import { StockPlace } from "../../../../types";
 import { StockPlaceInputArea } from "./StockPlaceInputArea";
 import { useAuthStore } from "../../../../store";
 
 type Props = {
-  stockPlace: StockPlaceType;
+  stockPlace: StockPlace;
 };
 
 export const EditModal: FC<Props> = ({ stockPlace }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useAuthStore((state) => state.currentUser);
 
-  const updateStockPlace = async (data: StockPlaceType) => {
+  const updateStockPlace = async (data: StockPlace) => {
     const result = window.confirm("変更して宜しいでしょうか");
     if (!result) return;
     const docRef = doc(db, "stockPlaces", `${stockPlace.id}`);

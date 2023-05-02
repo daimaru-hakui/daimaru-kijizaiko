@@ -13,19 +13,19 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React, { useState, useEffect, FC } from "react";
-import { LocationType } from "../../../../types";
+import { Location } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
   type: string;
-  location: LocationType;
+  location: Location;
   addLocation?: Function;
   updateLocation?: Function;
 };
 
-type Inputs = LocationType;
+type Inputs = Location;
 
 export const LocationInputArea: FC<Props> = ({
   type,
@@ -33,7 +33,7 @@ export const LocationInputArea: FC<Props> = ({
   addLocation,
   updateLocation,
 }: Props) => {
-  const [locations, setLocations] = useState([] as LocationType[]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [flag, setFlag] = useState(false);
   const {
     register,
@@ -79,9 +79,7 @@ export const LocationInputArea: FC<Props> = ({
     const getData = async () => {
       const collectionRef = collection(db, "locations");
       const docSnap = await getDocs(collectionRef);
-      setLocations(
-        docSnap.docs.map((doc) => ({ ...doc.data() } as LocationType))
-      );
+      setLocations(docSnap.docs.map((doc) => ({ ...doc.data() } as Location)));
     };
     getData();
   }, []);

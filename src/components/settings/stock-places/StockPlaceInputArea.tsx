@@ -8,19 +8,19 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React, { useState, useEffect, FC } from "react";
-import { StockPlaceType } from "../../../../types";
+import { StockPlace } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
   type: string;
-  stockPlace: StockPlaceType;
+  stockPlace: StockPlace;
   addStockPlace?: Function;
   updateStockPlace?: Function;
 };
 
-type Inputs = StockPlaceType;
+type Inputs = StockPlace;
 
 export const StockPlaceInputArea: FC<Props> = ({
   type,
@@ -28,7 +28,7 @@ export const StockPlaceInputArea: FC<Props> = ({
   addStockPlace,
   updateStockPlace,
 }: Props) => {
-  const [stockPlaces, setStockPlaces] = useState([] as StockPlaceType[]);
+  const [stockPlaces, setStockPlaces] = useState<StockPlace[]>([]);
   const [flag, setFlag] = useState(false);
   const {
     register,
@@ -59,7 +59,7 @@ export const StockPlaceInputArea: FC<Props> = ({
     if (type === "edit") return;
     let item = watch("name");
     if (!item) item = "noValue";
-    const base = stockPlaces?.map((a: { name: string }) => a.name);
+    const base = stockPlaces?.map((place) => place.name);
     const result = base?.includes(item);
     if (!result) {
       setFlag(false);
@@ -74,7 +74,7 @@ export const StockPlaceInputArea: FC<Props> = ({
       const collectionRef = collection(db, "stockPlaces");
       const docSnap = await getDocs(collectionRef);
       setStockPlaces(
-        docSnap.docs.map((doc) => ({ ...doc.data() } as StockPlaceType))
+        docSnap.docs.map((doc) => ({ ...doc.data() } as StockPlace))
       );
     };
     getData();

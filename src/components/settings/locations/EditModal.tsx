@@ -13,19 +13,19 @@ import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
-import { LocationType } from "../../../../types";
+import { Location } from "../../../../types";
 import { LocationInputArea } from "./LocationInputArea";
 import { useAuthStore } from "../../../../store";
 
 type Props = {
-  location: LocationType;
+  location: Location;
 };
 
 export const EditLocationModal: FC<Props> = ({ location }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentUser = useAuthStore((state) => state.currentUser);
 
-  const updateLocation = async (data: LocationType) => {
+  const updateLocation = async (data: Location) => {
     const result = window.confirm("変更して宜しいでしょうか");
     if (!result) return;
     const docRef = doc(db, "locations", `${location.id}`);

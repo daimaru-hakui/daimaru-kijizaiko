@@ -9,8 +9,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
-import { useRecoilValue } from "recoil";
-import { suppliersState } from "../../../store";
+import { useSettingStore } from "../../../store";
 import { GrayFabricType } from "../../../types";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { collection, getDocs } from "firebase/firestore";
@@ -31,7 +30,7 @@ export const GrayFabricInputArea: FC<Props> = ({
   onClose,
 }) => {
   const [grayFabrics, setGrayFabrics] = useState([] as GrayFabricType[]);
-  const suppliers = useRecoilValue(suppliersState);
+  const suppliers = useSettingStore((state) => state.suppliers);
   const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc();
   const [flag, setFlag] = useState(false);
   const {

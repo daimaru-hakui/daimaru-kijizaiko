@@ -5,9 +5,9 @@ import {
   Product,
   GrayFabricType,
   HistoryType,
-  StockPlaceType,
-  SupplierType,
-  LocationType,
+  StockPlace,
+  Supplier,
+  Location,
 } from "../types";
 
 type AuthState = {
@@ -85,6 +85,50 @@ export const useProductsStore = create<ProductsState>((set) => ({
   setProducts: (payload) => set({ products: payload }),
 }));
 
+// settings
+type SettingState = {
+  suppliers: Supplier[];
+  setSuppliers: (payload: Supplier[]) => void;
+  stockPlaces: StockPlace[];
+  setStockPlaces: (payload: StockPlace[]) => void;
+  locations: Location[];
+  setLocations: (payload: Location[]) => void;
+  colors: string[];
+  setColors: (payload: string[]) => void;
+  materialNames: string[];
+  setMaterialNames: (payload: string[]) => void;
+};
+
+export const useSettingStore = create<SettingState>((set) => ({
+  suppliers: [{ id: "", name: "", kana: "", comment: "" }],
+  setSuppliers: (payload) => set({ suppliers: payload }),
+  stockPlaces: [
+    {
+      id: "",
+      name: "",
+      kana: "",
+      address: "",
+      tel: "",
+      fax: "",
+      comment: "",
+    },
+  ],
+  setStockPlaces: (payload) => set({ stockPlaces: payload }),
+  locations: [
+    {
+      id: "",
+      name: "",
+      order: 0,
+      comment: "",
+    },
+  ],
+  setLocations: (payload) => set({ locations: payload }),
+  colors: [],
+  setColors: (payload) => set({ colors: payload }),
+  materialNames: [],
+  setMaterialNames: (payload) => set({ materialNames: payload }),
+}));
+
 import { atom } from "recoil";
 
 export const grayFabricsState = atom<GrayFabricType[]>({
@@ -109,30 +153,5 @@ export const fabricPurchaseOrdersState = atom<HistoryType[]>({
 
 export const fabricPurchaseConfirmsState = atom<HistoryType[]>({
   key: "fabricPurchaseConfirmsState",
-  default: [],
-});
-
-export const suppliersState = atom<SupplierType[]>({
-  key: "suppliersState",
-  default: [],
-});
-
-export const stockPlacesState = atom<StockPlaceType[]>({
-  key: "stockPlacesState",
-  default: [],
-});
-
-export const locationsState = atom<LocationType[]>({
-  key: "locationsState",
-  default: [],
-});
-
-export const colorsState = atom<string[] | null>({
-  key: "colorsState",
-  default: [],
-});
-
-export const materialNamesState = atom<string[] | null>({
-  key: "materialNamesState",
   default: [],
 });

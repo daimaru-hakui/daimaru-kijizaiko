@@ -16,8 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { BsFilter } from "react-icons/bs";
-import { useRecoilValue } from "recoil";
-import { colorsState, materialNamesState } from "../../../store";
+import { useSettingStore } from "../../../store";
 import { Product } from "../../../types";
 
 type Props = {
@@ -32,8 +31,8 @@ export const ProductSearchArea: FC<Props> = ({
   onReset,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const colors = useRecoilValue(colorsState);
-  const materialNames = useRecoilValue(materialNamesState);
+  const colors = useSettingStore((state) => state.colors);
+  const materialNames = useSettingStore((state) => state.materialNames);
   return (
     <>
       <Button

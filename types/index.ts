@@ -147,7 +147,7 @@ export type CuttingHistoryType = {
   serialNumber: number;
 };
 
-export type MaterialsType = {
+export type Materials = {
   t: string;
   c: string;
   n: string;
@@ -163,14 +163,14 @@ export type MaterialsType = {
   f: string;
 };
 
-export type SupplierType = {
+export type Supplier = {
   id: string;
   name: string;
   kana: string;
   comment: string;
 };
 
-export type StockPlaceType = {
+export type StockPlace = {
   id: string;
   name: string;
   kana: string;
@@ -180,7 +180,7 @@ export type StockPlaceType = {
   comment: string;
 };
 
-export type LocationType = {
+export type Location = {
   id: string;
   name: string;
   order: number;

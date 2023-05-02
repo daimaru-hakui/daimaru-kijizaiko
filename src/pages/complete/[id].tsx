@@ -20,8 +20,7 @@ import jsPDF from "jspdf";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { useProductsStore, stockPlacesState } from "../../../store";
+import { useProductsStore, useSettingStore } from "../../../store";
 import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
@@ -35,7 +34,7 @@ const CompleteId: NextPage = () => {
   const serialNumber = router.query.serialNumber;
   const stockPlace = router.query.stockPlace;
   const createUser = router.query.createUser;
-  const stockPlaces = useRecoilValue(stockPlacesState);
+  const stockPlaces = useSettingStore((state) => state.stockPlaces);
   const { getSerialNumber } = useGetDisp();
   const { getNow } = useUtil();
   const [items, setItems] = useState({ orderType: "発注書", show: "1" });

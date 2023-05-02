@@ -4,23 +4,22 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { db } from "../../../../firebase";
-import { LocationType } from "../../../../types";
-import { useRecoilValue } from "recoil";
-import { locationsState } from "../../../../store";
+import { Location } from "../../../../types";
+import { useSettingStore } from "../../../../store";
 import { LocationInputArea } from "../../../components/settings/locations/LocationInputArea";
 import { NextPage } from "next";
 
 const LocationNew: NextPage = () => {
   const router = useRouter();
-  const locations = useRecoilValue(locationsState);
+  const locations = useSettingStore((state) => state.locations);
   const [location, setLocation] = useState({
     id: "",
     name: "",
     order: locations.length + 1,
     comment: "",
-  } as LocationType);
+  } as Location);
 
-  const addLocation = async (data: LocationType) => {
+  const addLocation = async (data: Location) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     const collectionRef = collection(db, "locations");
