@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { UserType } from "../../../../types";
+import { User } from "../../../../types";
 
 type Data = {
-  contents: UserType[];
+  contents: User[];
 };
 
 export default async function handler(
@@ -18,7 +18,7 @@ export default async function handler(
       .where("sales", "==", true)
       .get();
     const contents = querySnapshot.docs
-      .map((doc) => ({ ...doc.data(), id: doc.id } as UserType))
+      .map((doc) => ({ ...doc.data(), id: doc.id } as User))
       .sort((a, b) => {
         if (a.rank < b.rank) {
           return -1;

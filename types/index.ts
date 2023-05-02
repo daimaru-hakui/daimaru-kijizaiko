@@ -1,4 +1,4 @@
-export type UserType = {
+export type User = {
   id: string;
   uid: string;
   name: string;
@@ -10,7 +10,7 @@ export type UserType = {
   order: boolean;
 };
 
-export type ProductType = {
+export type Product = {
   id: string;
   productType: number;
   staff: string;
@@ -33,6 +33,7 @@ export type ProductType = {
   noteFabric: string;
   noteEtc: string;
   interfacing: boolean;
+  lining: boolean;
   wip: number;
   externalStock: number;
   arrivingQuantity: number;

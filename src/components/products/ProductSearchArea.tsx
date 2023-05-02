@@ -18,10 +18,10 @@ import { FC } from "react";
 import { BsFilter } from "react-icons/bs";
 import { useRecoilValue } from "recoil";
 import { colorsState, materialNamesState } from "../../../store";
-import { ProductType } from "../../../types";
+import { Product } from "../../../types";
 
 type Props = {
-  search: ProductType;
+  search: Product;
   setSearch: Function;
   onReset: Function;
 };

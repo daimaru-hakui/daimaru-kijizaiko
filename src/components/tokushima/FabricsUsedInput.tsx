@@ -14,13 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { FaWindowClose } from "react-icons/fa";
 import { useEffect, useState, FC } from "react";
-import { useRecoilValue } from "recoil";
-import { currentUserState, productsState } from "../../../store";
-import {
-  ProductType,
-  CuttingProductType,
-  CuttingReportType,
-} from "../../../types";
+import { useAuthStore, useProductsStore } from "../../../store";
+import { Product, CuttingProductType, CuttingReportType } from "../../../types";
 import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
@@ -31,7 +26,7 @@ import { StockEditModal } from "./StockEditModal";
 type Props = {
   items: CuttingProductType[];
   setItems: Function;
-  product: any;
+  product: CuttingProductType;
   rowIndex: number;
   reportId: string;
   report: CuttingReportType;
@@ -49,11 +44,11 @@ export const FabricsUsedInput: FC<Props> = ({
   setIsLimitQuantity,
   totalQuantity,
 }) => {
-  const products = useRecoilValue(productsState);
-  const currentUser = useRecoilValue(currentUserState);
+  const products = useProductsStore((state) => state.products);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { halfToFullChar } = useUtil();
   const { getTokushimaStock } = useGetDisp();
-  const [filterProducts, setFilterProducts] = useState<ProductType[]>([]);
+  const [filterProducts, setFilterProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState("");
   const { calcScale } = useCuttingReportFunc(null, null);
   const categories = ["表地", "裏地", "芯地", "配色", "その他"];
@@ -63,11 +58,15 @@ export const FabricsUsedInput: FC<Props> = ({
   useEffect(() => {
     setFilterProducts(() => {
       let result = [];
-      result = products.filter((product: ProductType) =>
+      result = products.filter((product) =>
         product.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
       );
       if (items[rowIndex].category === "芯地") {
         result = result.filter((product) => product.interfacing === true);
+      }
+
+      if (items[rowIndex].category === "裏地") {
+        result = result.filter((product) => product.lining === true);
       }
       return result;
     });
@@ -183,12 +182,7 @@ export const FabricsUsedInput: FC<Props> = ({
   return (
     <Stack spacing={3}>
       <Box>
-        <Flex
-          mt={6}
-          w="full"
-          justifyContent="space-between"
-          alignItems="center"
-        >
+        <Flex mt={6} w="full" justify="space-between" align="center">
           <Flex gap={3}>
             <Text fontWeight="bold">
               使用生地
@@ -196,7 +190,7 @@ export const FabricsUsedInput: FC<Props> = ({
                 {rowIndex + 1}
               </Box>
             </Text>
-            <Flex alignItems="center">
+            <Flex align="center">
               <Input
                 type="text"
                 size="xs"
@@ -222,7 +216,7 @@ export const FabricsUsedInput: FC<Props> = ({
         </Flex>
       </Box>
       <Box p={3} border="1px" borderColor="gray.200">
-        <Flex gap={3} w="full" flexDirection={{ base: "column", md: "row" }}>
+        <Flex gap={3} w="full" direction={{ base: "column", md: "row" }}>
           <Box minW="100px">
             <Text fontWeight="bold">
               選択
@@ -245,7 +239,7 @@ export const FabricsUsedInput: FC<Props> = ({
             </Select>
           </Box>
           <Box w="full">
-            <Flex fontWeight="bold" alignItems="center">
+            <Flex fontWeight="bold" align="center">
               品名
               <Box as="span" color="red">
                 ※

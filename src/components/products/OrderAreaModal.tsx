@@ -19,7 +19,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FC } from "react";
-import { ProductType } from "../../../types";
+import { Product } from "../../../types";
 import { DisplayStock } from "./DisplayStock";
 import { OrderInputArea } from "./OrderInputArea";
 
@@ -33,7 +33,7 @@ const animationKeyframes = keyframes`
 const animation = `${animationKeyframes} 2s ease-in-out infinite`;
 
 type Props = {
-  product: ProductType;
+  product: Product;
   buttonSize: string;
 };
 

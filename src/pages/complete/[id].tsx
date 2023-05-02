@@ -21,15 +21,15 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { productsState, stockPlacesState } from "../../../store";
-import { ProductType } from "../../../types";
+import { useProductsStore, stockPlacesState } from "../../../store";
+import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 
 const CompleteId: NextPage = () => {
   const router = useRouter();
-  const products = useRecoilValue(productsState);
-  const [product, setProduct] = useState({} as ProductType);
+  const products = useProductsStore((state) => state.products);
+  const [product, setProduct] = useState<Product>();
   const quantity = router.query.quantity;
   const scheduledAt = router.query.scheduledAt;
   const serialNumber = router.query.serialNumber;
@@ -79,7 +79,6 @@ const CompleteId: NextPage = () => {
     }
   };
 
-  console.log(items);
   return (
     <Box w="100%" mt={12} px={6}>
       <Container
@@ -90,7 +89,7 @@ const CompleteId: NextPage = () => {
         rounded="md"
         boxShadow="md"
       >
-        <Flex w="full" flexDirection="column" alignItems="center" fontSize="xl">
+        <Flex w="full" direction="column" align="center" fontSize="xl">
           <Box as="h1" mt={6} fontSize="3xl">
             登録が完了しました
           </Box>
@@ -100,8 +99,8 @@ const CompleteId: NextPage = () => {
           <Flex
             p={6}
             mt={3}
-            flexDirection="column"
-            alignItems="flex-start"
+            direction="column"
+            align="flex-start"
             border="1px"
             borderColor="gray.200"
           >
@@ -155,7 +154,7 @@ const CompleteId: NextPage = () => {
           </Stack>
         </RadioGroup>
 
-        <Flex justifyContent="center">
+        <Flex justify="center">
           <Button mt={6} colorScheme="facebook" onClick={pdhDownloadHandler}>
             PDF作成
           </Button>
@@ -171,13 +170,13 @@ const CompleteId: NextPage = () => {
         boxShadow="md"
       >
         <Stack spacing={6}>
-          <Flex justifyContent="space-between" alignItems="center">
+          <Flex justify="space-between" align="center">
             <Box textAlign="left" fontSize="2xl">
               {product?.supplierName} 御中
             </Box>
             <Box>{getNow()}</Box>
           </Flex>
-          <Flex flexDirection="column" alignItems="flex-end">
+          <Flex direction="column" align="flex-end">
             <Box fontSize="xl">（株）大丸白衣</Box>
             <Box fontSize="base">TEL 06-6632-0891</Box>
             <Box fontSize="base">FAX 06-6641-9200</Box>

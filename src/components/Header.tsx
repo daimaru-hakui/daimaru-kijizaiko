@@ -12,18 +12,16 @@ import {
 import { FC } from "react";
 import { MdOutlineSettings } from "react-icons/md";
 import Link from "next/link";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { currentUserState, usersState } from "../../store";
+import { useAuthStore } from "../../store";
 import { auth } from "../../firebase";
 import { MenuDrawerButton } from "./MenuDrawerButton";
 
 export const Header: FC = () => {
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
-  const users = useRecoilValue(usersState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const users = useAuthStore((state) => state.users);
 
   // サインアウト
   const signOut = () => {
-    setCurrentUser("");
     auth
       .signOut()
       .then(() => {
@@ -36,9 +34,7 @@ export const Header: FC = () => {
 
   // 担当者名の表示
   const displayStaff = (id: string) => {
-    const user = users?.find(
-      (user: { id: string; name: string }) => id === user.id
-    );
+    const user = users?.find((user) => id === user.id);
     return user?.name;
   };
 

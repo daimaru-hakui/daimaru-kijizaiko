@@ -18,12 +18,12 @@ import {
 import React, { FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { ProductEditModal } from "./ProductEditModal";
-import { ProductType } from "../../../types";
+import { Product } from "../../../types";
 
 type Props = {
   title?: string;
   productId?: string;
-  product?: ProductType;
+  product?: Product;
 };
 
 export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {

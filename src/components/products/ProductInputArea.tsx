@@ -19,8 +19,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
 import {
@@ -28,10 +27,10 @@ import {
   grayFabricsState,
   locationsState,
   materialNamesState,
-  productsState,
   suppliersState,
+  useProductsStore,
 } from "../../../store";
-import { ProductType, UserType } from "../../../types";
+import { Product, User } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useProductFunc } from "../../hooks/UseProductFunc";
 import { MaterialsModal } from "./MaterialsModal";
@@ -41,22 +40,22 @@ import useSWRImmutable from "swr/immutable";
 type Props = {
   title: string;
   pageType: string;
-  product: ProductType;
+  product: Product;
   onClose?: Function;
 };
 
 type Data = {
-  contents: UserType[];
+  contents: User[];
 };
 
-const ProductInputArea: NextPage<Props> = ({
+export const ProductInputArea: FC<Props> = ({
   title,
   pageType,
   product,
   onClose,
 }) => {
   // const { data: products } = useSWR(`/api/products`);
-  const products = useRecoilValue(productsState);
+  const products = useProductsStore((state) => state.products);
   const locations = useRecoilValue(locationsState);
   const { data: users } = useSWRImmutable<Data>(`/api/users/sales`);
   const grayFabrics = useRecoilValue(grayFabricsState);
@@ -85,7 +84,7 @@ const ProductInputArea: NextPage<Props> = ({
 
   const { addProduct, updateProduct } = useProductFunc();
 
-  const onSubmit = (data: ProductType) => {
+  const onSubmit = (data: Product) => {
     // console.log(data);
     switch (pageType) {
       case "new":
@@ -189,18 +188,23 @@ const ProductInputArea: NextPage<Props> = ({
             <Text>カテゴリー</Text>
             <Flex
               m={1}
-              p={2}
-              wrap="wrap"
-              rounded="md"
-              border="1px"
-              borderColor="gray.100"
+              p={3}
               gap={3}
+              direction={{ base: "column", md: "row" }}
+              rounded="md"
+              borderColor="gray.100"
             >
-              <FormControl display="flex" alignItems="center">
-                <FormLabel htmlFor="email-alerts" mb="0">
+              <FormControl display="flex" alignItems="center" maxW={100}>
+                <FormLabel htmlFor="interfacing" mb="0" cursor="pointer">
                   芯地
                 </FormLabel>
-                <Switch id="email-alerts" {...register("interfacing")} />
+                <Switch id="interfacing" {...register("interfacing")} />
+              </FormControl>
+              <FormControl display="flex" alignItems="center" maxW={100}>
+                <FormLabel htmlFor="lining" mb="0" cursor="pointer">
+                  裏地
+                </FormLabel>
+                <Switch id="lining" {...register("lining")} />
               </FormControl>
             </Flex>
           </Box>
@@ -344,7 +348,6 @@ const ProductInputArea: NextPage<Props> = ({
                 <select
                   style={{ width: "100%" }}
                   multiple
-                  // mt={1}
                   placeholder="保管場所を選択"
                   {...register("locations")}
                 >
@@ -572,5 +575,3 @@ const ProductInputArea: NextPage<Props> = ({
     </>
   );
 };
-
-export default ProductInputArea;

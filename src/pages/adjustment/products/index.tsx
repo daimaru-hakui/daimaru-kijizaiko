@@ -13,23 +13,23 @@ import {
 import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { productsState } from "../../../../store";
-import { ProductType } from "../../../../types";
+import { useProductsStore } from "../../../../store";
+import { Product } from "../../../../types";
 import { AdjustmentProduct } from "../../../components/adjustment/AdjustmentProduct";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { NextPage } from "next";
 
 const AdjustmentProducts: NextPage = () => {
-  const products = useRecoilValue(productsState);
-  const [filterProducts, setFilterProducts] = useState([] as ProductType[]);
+  const products = useProductsStore((state) => state.products);
+  const [filterProducts, setFilterProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
   const { isAuths } = useAuthManagement();
 
   useEffect(() => {
     setFilterProducts(
-      products.filter((product: ProductType) =>
+      products.filter((product) =>
         product.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
       )
     );
@@ -57,7 +57,7 @@ const AdjustmentProducts: NextPage = () => {
           <Box as="h2" fontSize="2xl">
             生地在庫調整
           </Box>
-          <Flex mt={6} gap={1} alignItems="center">
+          <Flex mt={6} gap={1} align="center">
             <Input
               type="text"
               size="xs"
@@ -69,7 +69,13 @@ const AdjustmentProducts: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="calc(100vh - 255px)">
+          <Box
+            mt={6}
+            w="100%"
+            overflowX="auto"
+            position="relative"
+            maxH="calc(100vh - 255px)"
+          >
             <Table w="100%" variant="simple" size="sm">
               <Thead
                 w="100%"
@@ -101,7 +107,7 @@ const AdjustmentProducts: NextPage = () => {
               </Thead>
 
               <Tbody>
-                {filterProducts.map((product: ProductType) => (
+                {filterProducts.map((product) => (
                   <AdjustmentProduct key={product.id} product={product} />
                 ))}
               </Tbody>

@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { UserType } from "../../../../types";
+import { User } from "../../../../types";
 
 type Data = {
-  contents: UserType[];
+  contents: User[];
 };
 
 export default async function handler(
@@ -15,7 +15,7 @@ export default async function handler(
   if (req.method === "GET") {
     const querySnapshot = await db.collection("users").get();
     const contents = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as UserType)
+      (doc) => ({ ...doc.data(), id: doc.id } as User)
     );
     return res.status(200).json({ contents });
   }

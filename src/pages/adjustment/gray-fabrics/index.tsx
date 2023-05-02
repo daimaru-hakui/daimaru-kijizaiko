@@ -49,13 +49,14 @@ const AdjustmentGrayFabrics: NextPage = () => {
         bg="white"
         rounded="md"
         boxShadow="md"
-        maxH="calc(100vh - 100px)" overflow="hidden"
+        maxH="calc(100vh - 100px)"
+        overflow="hidden"
       >
         <TableContainer w="100%" overflowX="unset" overflowY="unset">
           <Box as="h2" fontSize="2xl">
             キバタ在庫調整
           </Box>
-          <Flex mt={6} gap={1} alignItems="center">
+          <Flex mt={6} gap={1} align="center">
             <Input
               type="text"
               size="xs"
@@ -67,7 +68,13 @@ const AdjustmentGrayFabrics: NextPage = () => {
             />
             <GiCancel cursor="pointer" onClick={reset} />
           </Flex>
-          <Box mt={6} w="100%" overflowX="auto" position="relative" maxH="calc(100vh - 255px)">
+          <Box
+            mt={6}
+            w="100%"
+            overflowX="auto"
+            position="relative"
+            maxH="calc(100vh - 255px)"
+          >
             <Table mt={6} variant="simple" size="sm">
               <Thead
                 w="100%"

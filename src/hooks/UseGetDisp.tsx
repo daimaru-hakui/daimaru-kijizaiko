@@ -1,18 +1,17 @@
-import { Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import {
   grayFabricsState,
   locationsState,
-  productsState,
   suppliersState,
-  usersState,
+  useAuthStore,
+  useProductsStore,
 } from "../../store";
-import { ProductType, MaterialsType, LocationType } from "../../types";
+import { MaterialsType, LocationType } from "../../types";
 
 export const useGetDisp = () => {
-  const users = useRecoilValue(usersState);
+  const users = useAuthStore((state) => state.users);
+  const products = useProductsStore((state) => state.products);
   const suppliers = useRecoilValue(suppliersState);
-  const products = useRecoilValue(productsState);
   const grayFabrics = useRecoilValue(grayFabricsState);
   const locations = useRecoilValue(locationsState);
 
@@ -60,50 +59,42 @@ export const useGetDisp = () => {
     if (userId === "R&D") {
       return "R&D";
     } else {
-      const user = users.find((user: { uid: string; }) => userId === user.uid);
+      const user = users.find((user) => userId === user.uid);
       return user?.name || "";
     }
   };
 
   // 仕入れ先の表示
   const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find(
-      (supplier: { id: string; }) => supplier.id === supplierId
-    );
+    const supplier = suppliers.find((supplier) => supplier.id === supplierId);
     return supplier?.name || "";
   };
 
   const getProductNumber = (productId: string) => {
-    const result = products.find(
-      (product: ProductType) => product.id === productId
-    );
+    const result = products.find((product) => product.id === productId);
     return result?.productNumber || productId;
   };
 
   const getProductName = (productId: string) => {
-    const result = products.find(
-      (product: ProductType) => product.id === productId
-    );
+    const result = products.find((product) => product.id === productId);
     return result?.productName || "";
   };
 
   const getColorName = (productId: string) => {
-    const result = products.find(
-      (product: ProductType) => product.id === productId
-    );
+    const result = products.find((product) => product.id === productId);
     return result?.colorName || productId;
   };
 
   const getGrayFabricNumber = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
+      (grayFabric) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productNumber || grayFabricId;
   };
 
   const getGrayFabricName = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabricId === grayFabric.id
+      (grayFabric) => grayFabricId === grayFabric.id
     );
     return grayFabric?.productName || grayFabricId;
   };
@@ -111,7 +102,7 @@ export const useGetDisp = () => {
   // キバタ在庫を取得
   const getGrayFabricStock = (grayFabricId: string) => {
     const grayFabric = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabric.id === grayFabricId
+      (grayFabric) => grayFabric.id === grayFabricId
     );
     const stock = grayFabric?.stock || 0;
     return stock;
@@ -119,16 +110,12 @@ export const useGetDisp = () => {
 
   // 徳島在庫数を取得
   const getTokushimaStock = (productId: string) => {
-    const stock = products.find(
-      (product: ProductType) => product.id === productId
-    );
+    const stock = products.find((product) => product.id === productId);
     return stock?.tokushimaStock || 0;
   };
 
   const getPrice = (productId: string) => {
-    const product = products.find(
-      (product: ProductType) => product.id === productId
-    );
+    const product = products.find((product) => product.id === productId);
     return product?.price || 0;
   };
 

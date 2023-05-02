@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { ProductType } from "../../../../types";
+import { Product } from "../../../../types";
 
 type Data = {
-  contents: ProductType[];
+  contents: Product[];
 };
 
 export default async function handler(
@@ -18,7 +18,7 @@ export default async function handler(
       .where("deletedAt", "==", "")
       .get();
     const contents = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as ProductType)
+      (doc) => ({ ...doc.data(), id: doc.id } as Product)
     );
     return res.status(200).json({ contents });
   }

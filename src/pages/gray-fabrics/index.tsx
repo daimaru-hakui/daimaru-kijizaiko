@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { currentUserState, grayFabricsState } from "../../../store";
+import { grayFabricsState, useAuthStore } from "../../../store";
 import { GrayFabricType } from "../../../types";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import { CommentModal } from "../../components/CommentModal";
@@ -24,7 +24,7 @@ import { NextPage } from "next";
 
 const GrayFabrics: NextPage = () => {
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
   const [filterGrayFabrics, setFilterGrayFabrics] = useState(
     [] as GrayFabricType[]

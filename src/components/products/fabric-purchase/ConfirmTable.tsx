@@ -1,10 +1,6 @@
 import {
   Box,
-  Button,
   Flex,
-  Heading,
-  Input,
-  Select,
   Table,
   TableContainer,
   Tbody,
@@ -15,9 +11,9 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState, loadingState } from "../../../../store";
+import { useAuthStore, useLoadingStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
@@ -40,9 +36,13 @@ type Inputs = {
   staff: string;
 };
 
+type Data = {
+  contents: HistoryType[];
+};
+
 export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
-  const setLoading = useSetRecoilState(loadingState);
-  const currentUser = useRecoilValue(currentUserState);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAuths } = useAuthManagement();
@@ -58,7 +58,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const { data, mutate } = useSWRPurchaseConfirms(startDay, endDay);
-  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+  const [filterHistories, setFilterHistories] = useState<HistoryType[]>([]);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -90,7 +90,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
       );
     }
     if (HOUSE_FACTORY) {
-      newHistories = newHistories?.filter((history: HistoryType) => {
+      newHistories = newHistories?.filter((history) => {
         if (history.stockPlace === HOUSE_FACTORY) {
           return history;
         }
@@ -103,7 +103,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   }, [data, HOUSE_FACTORY, staff]);
 
   const updateFabricPurchaseConfirm = async (history: HistoryType) => {
-    setLoading(true);
+    setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
     try {
@@ -134,7 +134,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
       console.log(err);
     } finally {
       mutate({ ...data });
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -177,7 +177,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterHistories?.map((history: HistoryType) => (
+              {filterHistories?.map((history) => (
                 <Tr key={history.id}>
                   <Td>
                     <Flex gap={3} alignItems="center">

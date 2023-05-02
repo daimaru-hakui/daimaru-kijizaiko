@@ -18,17 +18,16 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import {
-  currentUserState,
   fabricDyeingOrdersState,
-  loadingState,
-  usersState,
+  useAuthStore,
+  useLoadingStore,
 } from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
@@ -37,27 +36,27 @@ import { useRouter } from "next/router";
 
 export const FabricDyeingOrderTable: FC = () => {
   const router = useRouter();
-  const setLoading = useSetRecoilState(loadingState);
-  const currentUser = useRecoilValue(currentUserState);
-  const users = useRecoilValue(usersState);
-  const [items, setItems] = useState({} as HistoryType);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const [items, setItems] = useState<HistoryType>();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate } = useUtil();
   const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
-  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] =
-    useState<any>();
+  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<
+    HistoryType[]
+  >([]);
 
   // 数量０のデータを非表示
   useEffect(() => {
     const newFabricDyeingOrders = fabricDyeingOrders.filter(
-      (history: { quantity: number }) => history.quantity > 0 && history //後ほどフィルターを作る
+      (history) => history.quantity > 0 && history //後ほどフィルターを作る
     );
     setFilterfabricDyeingOrders(newFabricDyeingOrders);
   }, [fabricDyeingOrders]);
 
   // 生地仕掛状況　Orderを削除 type stock
-  const deleteFabricDyeingOrderStock = async (history: any) => {
+  const deleteFabricDyeingOrderStock = async (history: HistoryType) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -129,7 +128,7 @@ export const FabricDyeingOrderTable: FC = () => {
 
   //　生地仕掛状況　Order　編集（Stock在庫）
   const updateFabricDyeingOrderStock = async (history: HistoryType) => {
-    setLoading(true);
+    setIsLoading(true);
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -173,13 +172,13 @@ export const FabricDyeingOrderTable: FC = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   //　生地仕掛状況　Order　編集（ranning在庫）
   const updateFabricDyeingOrderRanning = async (history: HistoryType) => {
-    setLoading(true);
+    setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
 
@@ -211,7 +210,7 @@ export const FabricDyeingOrderTable: FC = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -219,7 +218,7 @@ export const FabricDyeingOrderTable: FC = () => {
   const confirmProcessingFabricDyeing = async (history: HistoryType) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
 
     const productDocRef = doc(db, "products", history.productId);
     const orderHistoryDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -275,7 +274,7 @@ export const FabricDyeingOrderTable: FC = () => {
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       router.push("/products/fabric-dyeing/confirms");
     }
   };
@@ -339,7 +338,7 @@ export const FabricDyeingOrderTable: FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterfabricDyeingOrders?.map((history: HistoryType) => (
+              {filterfabricDyeingOrders?.map((history) => (
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd"]) || history.createUser === currentUser ? (

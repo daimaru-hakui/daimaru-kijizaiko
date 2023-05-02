@@ -10,39 +10,36 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { auth, db } from "../../firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
+import { db } from "../../firebase";
 import {
   colorsState,
-  currentUserState,
   fabricDyeingOrdersState,
-  fabricPurchaseConfirmsState,
   fabricPurchaseOrdersState,
   grayFabricOrdersState,
   grayFabricsState,
   locationsState,
   materialNamesState,
-  productsState,
   stockPlacesState,
   suppliersState,
-  usersState,
+  useAuthStore,
+  useProductsStore,
 } from "../../store";
 import {
-  UserType,
-  ProductType,
+  User,
   GrayFabricType,
   SupplierType,
   HistoryType,
   StockPlaceType,
   LocationType,
+  Product,
 } from "../../types";
 
 export const useDataList = () => {
-  const [user] = useAuthState(auth);
-  const currentUser = useRecoilValue(currentUserState);
-  const setUsers = useSetRecoilState(usersState);
-  const setProducts = useSetRecoilState(productsState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const session = useAuthStore((state) => state.session);
+  const setUsers = useAuthStore((state) => state.setUsers);
+  const setProducts = useProductsStore((state) => state.setProducts);
   const setGrayFabrics = useSetRecoilState(grayFabricsState);
   const setSuppliers = useSetRecoilState(suppliersState);
   const setStockPlaces = useSetRecoilState(stockPlacesState);
@@ -55,7 +52,7 @@ export const useDataList = () => {
 
   // users情報;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("rank", "asc"));
     onSnapshot(q, (querySnapshot) =>
@@ -65,7 +62,7 @@ export const useDataList = () => {
             ({
               ...doc.data(),
               id: doc.id,
-            } as UserType)
+            } as User)
         )
       )
     );
@@ -81,26 +78,26 @@ export const useDataList = () => {
         if (!docSnap.exists()) {
           await setDoc(docRef, {
             uid: currentUser,
-            name: user?.email || "",
+            name: session?.email || "",
             rank: 1000,
-            email: user?.email || "",
+            email: session?.email || "",
           });
         }
       };
       addUsers();
     }
-  }, [currentUser, user]);
+  }, [currentUser, session]);
 
   // products情報;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getProducts = async () => {
       const q = query(collection(db, "products"), where("deletedAt", "==", ""));
       try {
         onSnapshot(q, (querySnap) =>
           setProducts(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc.id } as ProductType))
+              .map((doc) => ({ ...doc.data(), id: doc.id } as Product))
               .sort(compareFunc)
           )
         );
@@ -120,7 +117,7 @@ export const useDataList = () => {
 
   // キバタ情報;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getGrayfabrics = async () => {
       const q = query(
         collection(db, "grayFabrics"),
@@ -143,7 +140,7 @@ export const useDataList = () => {
 
   // キバタ発注履歴（order）
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getGrayFabricOrders = async () => {
       const q = query(
         collection(db, "grayFabricOrders"),
@@ -166,7 +163,7 @@ export const useDataList = () => {
 
   // 生地染色発注履歴（order）
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getFabricDyeingOrders = async () => {
       const q = query(
         collection(db, "fabricDyeingOrders"),
@@ -189,7 +186,7 @@ export const useDataList = () => {
 
   // 生地k購入履歴（order）
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getFabricPurchaseOrders = async () => {
       const q = query(
         collection(db, "fabricPurchaseOrders"),
@@ -212,7 +209,7 @@ export const useDataList = () => {
 
   // 仕入先　情報;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getSuppliers = async () => {
       const q = query(collection(db, "suppliers"), orderBy("kana", "asc"));
       try {
@@ -232,7 +229,7 @@ export const useDataList = () => {
 
   // 送り先　情報;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getStockPlaces = async () => {
       const q = query(collection(db, "stockPlaces"), orderBy("kana", "asc"));
       try {
@@ -252,7 +249,7 @@ export const useDataList = () => {
 
   // 徳島工場保管場所;
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getLocations = async () => {
       const q = query(collection(db, "locations"), orderBy("order", "asc"));
       try {
@@ -271,7 +268,7 @@ export const useDataList = () => {
   }, [setLocations]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getColors = async () => {
       onSnapshot(doc(db, "components", "colors"), (querySnap) =>
         setColors([...querySnap?.data()?.data])
@@ -282,7 +279,7 @@ export const useDataList = () => {
   }, [setColors]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!currentUser) return;
     const getMaterialNames = async () => {
       onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
         setMaterialNames([...querySnap?.data()?.data])

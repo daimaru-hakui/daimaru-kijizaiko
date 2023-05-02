@@ -23,12 +23,11 @@ import {
 import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState } from "../../../store";
 import { HistoryType } from "../../../types";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import useSWR from "swr";
+import { useAuthStore } from "../../../store";
 
 type Props = {
   type: string;
@@ -37,7 +36,7 @@ type Props = {
 
 export const AccountingEditModal: FC<Props> = ({ type, history }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const HOUSE_FACTORY = "徳島工場";
   const { items, setItems, handleInputChange, handleNumberChange, onReset } =
     useInputHistory();

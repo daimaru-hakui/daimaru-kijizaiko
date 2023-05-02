@@ -12,11 +12,10 @@ import {
 import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../../firebase";
-import { currentUserState } from "../../../../store";
 import { LocationType } from "../../../../types";
 import { LocationInputArea } from "./LocationInputArea";
+import { useAuthStore } from "../../../../store";
 
 type Props = {
   location: LocationType;
@@ -24,7 +23,7 @@ type Props = {
 
 export const EditLocationModal: FC<Props> = ({ location }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   const updateLocation = async (data: LocationType) => {
     const result = window.confirm("変更して宜しいでしょうか");

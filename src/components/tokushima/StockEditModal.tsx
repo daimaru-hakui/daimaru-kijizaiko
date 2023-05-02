@@ -19,8 +19,7 @@ import { useState, useEffect, FC } from "react";
 import useSWR from "swr";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { useSetRecoilState } from "recoil";
-import { loadingState } from "../../../store";
+import { useLoadingStore } from "../../../store";
 import { FaEdit } from "react-icons/fa";
 
 type Props = {
@@ -29,7 +28,7 @@ type Props = {
 
 export const StockEditModal: FC<Props> = ({ productId }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const setLoading = useSetRecoilState(loadingState);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { data } = useSWR(`/api/products/${productId}`);
   const [stock, setStock] = useState(null);
 
@@ -40,7 +39,7 @@ export const StockEditModal: FC<Props> = ({ productId }: Props) => {
   const updateProduct = async () => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
     const docRef = doc(db, "products", `${productId}`);
     try {
       await updateDoc(docRef, {
@@ -49,7 +48,7 @@ export const StockEditModal: FC<Props> = ({ productId }: Props) => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       onClose();
     }
   };

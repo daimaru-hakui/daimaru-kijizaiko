@@ -18,14 +18,14 @@ import {
 import { FC } from "react";
 import { useRecoilValue } from "recoil";
 import { stockPlacesState } from "../../../store";
-import { ProductType, StockPlaceType } from "../../../types";
+import { Product, StockPlaceType } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  product: ProductType;
+  product: Product;
   orderType: string;
   onClose: Function;
 };

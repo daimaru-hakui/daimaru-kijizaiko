@@ -7,26 +7,20 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState, loadingState } from "../../store";
+import { useLoadingStore, useAuthStore } from "../../store";
 import { CuttingReportType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
 
-export const useCuttingReportFunc = (
-  startDay?: string,
-  endDay?: string,
-) => {
+export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   const router = useRouter();
-  const currentUser = useRecoilValue(currentUserState);
-  const setLoading = useSetRecoilState(loadingState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWRCuttingReportImutable(
-    startDay,
-    endDay,
-  );
+  const { data, mutate } = useSWRCuttingReportImutable(startDay, endDay);
 
   // 用尺計算
   const calcScale = (meter: number, totalQuantity: number) => {
@@ -39,7 +33,7 @@ export const useCuttingReportFunc = (
   const addCuttingReport = async (data, items) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
 
     const serialNumberDocRef = doc(db, "serialNumbers", "cuttingReportNumbers");
     const cuttingReportDocRef = doc(collection(db, "cuttingReports"));
@@ -87,7 +81,7 @@ export const useCuttingReportFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       await router.push("/tokushima/cutting-reports");
     }
   };
@@ -96,7 +90,7 @@ export const useCuttingReportFunc = (
   const updateCuttingReport = async (data, items, reportId: string) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
-    setLoading(true);
+    setIsLoading(true);
     const cuttingReportDocRef = doc(db, "cuttingReports", reportId);
     const productsRef = collection(db, "products");
 
@@ -144,7 +138,7 @@ export const useCuttingReportFunc = (
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -159,7 +153,6 @@ export const useCuttingReportFunc = (
     } finally {
     }
   };
-
 
   const scaleCalc = (meter: number, totalQuantity: number) => {
     if (meter === 0 || totalQuantity === 0) return 0;

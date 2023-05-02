@@ -73,7 +73,7 @@ export const OrderToConfirmModal: FC<Props> = ({
   };
 
   const remainingOrderReset = () => {
-    const quantity = Number(history.quantity) - Number(items.quantity);
+    const quantity = Number(history?.quantity) - Number(items.quantity);
     const remainingOrder = quantity < 0 ? 0 : quantity;
     setItems({
       ...items,
@@ -91,7 +91,7 @@ export const OrderToConfirmModal: FC<Props> = ({
           onOpen();
         }}
       >
-        {items.orderType === "purchase" ? "入荷確定" : "確定"}
+        {items?.orderType === "purchase" ? "入荷確定" : "確定"}
       </Button>
 
       <Modal
@@ -110,8 +110,8 @@ export const OrderToConfirmModal: FC<Props> = ({
               <Flex gap={3}>
                 <Box>品　　番</Box>
                 <Flex gap={1}>
-                  <Box>{history.productNumber}</Box>
-                  <Box>{history.productName}</Box>
+                  <Box>{history?.productNumber}</Box>
+                  <Box>{history?.productName}</Box>
                 </Flex>
               </Flex>
               <Box>
@@ -137,7 +137,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                         // defaultValue={0}
                         min={0}
                         max={100000}
-                        value={items.quantity}
+                        value={items?.quantity}
                         onChange={(e) => handleNumberChange(e, "quantity")}
                       >
                         <NumberInputField textAlign="right" />
@@ -154,21 +154,21 @@ export const OrderToConfirmModal: FC<Props> = ({
                         type="date"
                         mt={1}
                         name="fixedAt"
-                        value={items.fixedAt || getTodayDate()}
+                        value={items?.fixedAt || getTodayDate()}
                         onChange={handleInputChange}
                       />
                     </Box>
-                    {items.orderType === "purchase" && (
+                    {items?.orderType === "purchase" && (
                       <Box w="100%" mt={3}>
                         <Text>送り先</Text>
                         <Select
                           mt={1}
                           name="stockPlace"
                           placeholder="送り先を選択してください"
-                          value={items.stockPlace || history.stockPlace}
+                          value={items?.stockPlace || history?.stockPlace}
                           onChange={(e) => handleInputChange(e)}
                         >
-                          {stockPlaces?.map((place: StockPlaceType) => (
+                          {stockPlaces?.map((place) => (
                             <option key={place.id} value={place.name}>
                               {place.name}
                             </option>
@@ -192,7 +192,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                         name="remainingOrder"
                         min={0}
                         max={10000}
-                        value={items.remainingOrder}
+                        value={items?.remainingOrder}
                         onChange={(e) =>
                           handleNumberChange(e, "remainingOrder")
                         }
@@ -204,7 +204,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                         </NumberInputStepper>
                       </NumberInput>
                     </Box>
-                    {items.remainingOrder > 0 && (
+                    {items?.remainingOrder > 0 && (
                       <Box w="100%" mt={3}>
                         <Text>
                           予定納期
@@ -216,7 +216,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                           type="date"
                           mt={1}
                           name="scheduledAt"
-                          value={items.scheduledAt}
+                          value={items?.scheduledAt}
                           onChange={handleInputChange}
                         />
                       </Box>

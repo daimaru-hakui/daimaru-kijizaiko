@@ -7,15 +7,14 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
-import { currentUserState, loadingState } from "../../store";
+import { useAuthStore, useLoadingStore } from "../../store";
 import { GrayFabricType } from "../../types";
 import { useUtil } from "./UseUtil";
 
 export const useGrayFabricFunc = () => {
-  const currentUser = useRecoilValue(currentUserState);
-  const setLoading = useSetRecoilState(loadingState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const router = useRouter();
   const { mathRound2nd } = useUtil();
 
@@ -24,7 +23,7 @@ export const useGrayFabricFunc = () => {
     if (!result) return;
     const grayFabricsCollectionRef = collection(db, "grayFabrics");
     try {
-      setLoading(true);
+      setIsLoading(true);
       await addDoc(grayFabricsCollectionRef, {
         productName: data?.productName || "",
         productNumber: data?.productNumber || "",
@@ -40,7 +39,7 @@ export const useGrayFabricFunc = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -52,7 +51,7 @@ export const useGrayFabricFunc = () => {
     if (!result) return;
     const grayFabricsDocnRef = doc(db, "grayFabrics", grayFabricId);
     try {
-      setLoading(true);
+      setIsLoading(true);
       await updateDoc(grayFabricsDocnRef, {
         productName: data?.productName || "",
         productNumber: data?.productNumber || "",
@@ -64,7 +63,7 @@ export const useGrayFabricFunc = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -83,7 +82,7 @@ export const useGrayFabricFunc = () => {
     data: GrayFabricType,
     grayFabricId: string
   ) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const docRef = doc(db, "grayFabrics", grayFabricId);
       await updateDoc(docRef, {
@@ -96,7 +95,7 @@ export const useGrayFabricFunc = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 

@@ -19,8 +19,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, FC } from "react";
-import { useRecoilValue } from "recoil";
-import { currentUserState } from "../../../store";
+import { useAuthStore } from "../../../store";
 import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { HistoryType } from "../../../types";
@@ -36,7 +35,7 @@ export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { items, setItems, handleNumberChange, onReset } = useInputHistory();
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const HOUSE_FACTORY = "徳島工場";
   const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
 

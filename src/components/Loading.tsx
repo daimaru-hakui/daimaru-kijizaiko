@@ -1,13 +1,12 @@
 import { FC } from "react";
 import { Flex, Spinner } from "@chakra-ui/react";
-import { useRecoilValue } from "recoil";
-import { loadingState } from "../../store";
+import { useLoadingStore } from "../../store";
 
 export const Loading: FC = () => {
-  const loading = useRecoilValue(loadingState);
+  const isLoading = useLoadingStore((state) => state.isLoading);
   return (
     <>
-      {loading && (
+      {isLoading && (
         <Flex
           position="fixed"
           width="100%"

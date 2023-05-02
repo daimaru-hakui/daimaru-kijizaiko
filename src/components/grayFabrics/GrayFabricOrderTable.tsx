@@ -21,7 +21,7 @@ import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { currentUserState, grayFabricOrdersState } from "../../../store";
+import { grayFabricOrdersState, useAuthStore } from "../../../store";
 import { GrayFabricHistoryType, HistoryType } from "../../../types";
 import { OrderToConfirmModal } from "../history/OrderToConfirmModal";
 import { CommentModal } from "../CommentModal";
@@ -31,15 +31,13 @@ import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 export const GrayFabricOrderTable: FC = () => {
-  const currentUser = useRecoilValue(currentUserState);
+  const currentUser = useAuthStore((state) => state.currentUser);
   const [items, setItems] = useState({} as HistoryType);
   const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
   const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
-    [] as HistoryType[]
-  );
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState<HistoryType[]>();
 
   useEffect(() => {
     const newGrayFabrics = grayFabricOrders.filter(
@@ -169,7 +167,7 @@ export const GrayFabricOrderTable: FC = () => {
   return (
     <>
       <TableContainer p={6} pt={0} w="100%">
-        {filterGrayFabrics.length > 0 ? (
+        {filterGrayFabrics?.length > 0 ? (
           <Table mt={6} variant="simple" size="sm">
             <Thead>
               <Tr>
@@ -187,7 +185,7 @@ export const GrayFabricOrderTable: FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterGrayFabrics.map((history: HistoryType) => (
+              {filterGrayFabrics.map((history) => (
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd"]) || history.createUser === currentUser ? (

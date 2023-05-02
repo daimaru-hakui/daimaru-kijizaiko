@@ -12,26 +12,25 @@ import {
 import { GiCancel } from "react-icons/gi";
 import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { ProductType } from "../../../types";
+import { Product } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState } from "../../../store";
+import { useAuthStore, useLoadingStore } from "../../../store";
 
 type Props = {
-  product: ProductType;
+  product: Product;
 };
 
 export const AdjustmentProduct: FC<Props> = ({ product }) => {
-  const { getUserName } = useGetDisp(); //// ？
-  const currentUser = useRecoilValue(currentUserState);
+  const { getUserName } = useGetDisp();
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { quantityValueBold } = useUtil();
   const { isAuths } = useAuthManagement();
-  const setLoading = useSetRecoilState(loadingState);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { mathRound2nd } = useUtil();
-  const [items, setItems] = useState({} as ProductType);
+  const [items, setItems] = useState<Product>();
 
   const handleNumberChange = (e: any, name: string) => {
     const value = e;
@@ -39,12 +38,12 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
   };
 
   useEffect(() => {
-    setItems({ ...product } as ProductType);
+    setItems({ ...product });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.price, product.tokushimaStock]);
 
   const updateAjustmentProduct = async (productId: string) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const docRef = doc(db, "products", productId);
       await updateDoc(docRef, {
@@ -59,11 +58,11 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const onReset = (product: ProductType) => {
+  const onReset = (product: Product) => {
     setItems({ ...product });
   };
 
@@ -82,7 +81,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
               defaultValue={0}
               min={0}
               max={100000}
-              value={items.price}
+              value={items?.price}
               onChange={(e) => handleNumberChange(e, "price")}
             >
               <NumberInputField textAlign="right" />
@@ -100,7 +99,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
               defaultValue={0}
               min={0}
               max={100000}
-              value={items.wip}
+              value={items?.wip}
               onChange={(e) => handleNumberChange(e, "wip")}
             >
               <NumberInputField textAlign="right" />
@@ -122,7 +121,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
               defaultValue={0}
               min={0}
               max={100000}
-              value={items.externalStock}
+              value={items?.externalStock}
               onChange={(e) => handleNumberChange(e, "externalStock")}
             >
               <NumberInputField textAlign="right" />
@@ -144,7 +143,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
               defaultValue={0}
               min={0}
               max={100000}
-              value={items.arrivingQuantity}
+              value={items?.arrivingQuantity}
               onChange={(e) => handleNumberChange(e, "arrivingQuantity")}
             >
               <NumberInputField textAlign="right" />
@@ -168,7 +167,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
           defaultValue={0}
           min={0}
           max={100000}
-          value={items.tokushimaStock}
+          value={items?.tokushimaStock}
           onChange={(e) => handleNumberChange(e, "tokushimaStock")}
         >
           <NumberInputField textAlign="right" />
@@ -179,7 +178,7 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
         </NumberInput>
       </Td>
       <Td flex="1">
-        <Flex alignItems="center" gap={3}>
+        <Flex align="center" gap={3}>
           <Button
             size="xs"
             colorScheme="facebook"

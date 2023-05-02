@@ -1,11 +1,6 @@
 import {
   Box,
-  Button,
   Flex,
-  Heading,
-  Input,
-  Select,
-  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -16,8 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserState, loadingState } from "../../../../store";
+import { useAuthStore, useLoadingStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { HistoryType } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
@@ -37,8 +31,8 @@ type Inputs = {
 };
 
 export const FabricDyeingConfirmTable: FC = () => {
-  const currentUser = useRecoilValue(currentUserState);
-  const setLoading = useSetRecoilState(loadingState);
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
   const { isAuths } = useAuthManagement();
@@ -82,9 +76,7 @@ export const FabricDyeingConfirmTable: FC = () => {
     } else {
       setFilterHistories(
         data?.contents
-          ?.filter(
-            (history: { quantity: number }) => history.quantity > 0 && history
-          )
+          ?.filter((history) => history.quantity > 0 && history)
           .filter(
             (content: HistoryType) =>
               staff === content.createUser || staff === ""
@@ -94,7 +86,7 @@ export const FabricDyeingConfirmTable: FC = () => {
   }, [data, staff]);
 
   const updateFabricDyeingConfirm = async (history: HistoryType) => {
-    setLoading(true);
+    setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingConfirms", history.id);
     try {
@@ -123,7 +115,7 @@ export const FabricDyeingConfirmTable: FC = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -164,7 +156,7 @@ export const FabricDyeingConfirmTable: FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterHistories?.map((history: HistoryType) => (
+              {filterHistories?.map((history) => (
                 <Tr key={history.id}>
                   <Td>{getSerialNumber(history?.serialNumber)}</Td>
                   <Td>{history?.orderedAt}</Td>

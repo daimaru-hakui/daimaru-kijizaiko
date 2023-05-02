@@ -2,11 +2,11 @@ import { FC } from "react";
 import { Box, Container, Divider, Flex, Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { grayFabricsState } from "../../../store";
-import { ProductType } from "../../../types";
+import { Product } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  product: ProductType;
+  product: Product;
 };
 
 export const DisplayStock: FC<Props> = ({ product }) => {
@@ -15,7 +15,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
 
   const getGrayFabric = (grayFabricId: string, type: string) => {
     const result = grayFabrics.find(
-      (grayFabric: { id: string; }) => grayFabric.id === grayFabricId
+      (grayFabric) => grayFabric.id === grayFabricId
     );
     if (type === "wip") return result?.wip;
     if (type === "stock") return result?.stock;
@@ -31,7 +31,11 @@ export const DisplayStock: FC<Props> = ({ product }) => {
 
   return (
     <Container maxW="600px" p={0}>
-      <Flex gap={3} justifyContent="space-between" flexDirection={{ base: "column", md: "row" }}>
+      <Flex
+        gap={3}
+        justifyContent="space-between"
+        flexDirection={{ base: "column", md: "row" }}
+      >
         {product.grayFabricId && (
           <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
             <Box w="100%" p={2} textAlign="center" bg="#f36450" boxShadow="md">
@@ -114,9 +118,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
       </Flex>
       <Box my={3}>
         {Number(product?.fabricLength) !== 0 && (
-          <Text fontSize="sm">
-            ※反数は参考値になります。
-          </Text>
+          <Text fontSize="sm">※反数は参考値になります。</Text>
         )}
       </Box>
       <Divider />

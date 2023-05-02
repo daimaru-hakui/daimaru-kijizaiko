@@ -20,12 +20,12 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../../../firebase";
-import { UserType } from "../../../../types";
+import { User } from "../../../../types";
 import { AuthEditModal } from "../../../components/settings/auth/AuthEditModal";
 import { NextPage } from "next";
 
 const Auth: NextPage = () => {
-  const [users, setUsers] = useState([] as UserType[]);
+  const [users, setUsers] = useState<User[]>([]);
 
   //firestore users 情報の取得
   useEffect(() => {
@@ -38,7 +38,7 @@ const Auth: NextPage = () => {
             ({
               ...doc.data(),
               id: doc.id,
-            } as UserType)
+            } as User)
         )
       );
     });
@@ -93,7 +93,7 @@ const Auth: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {users?.map((user: UserType) => (
+              {users?.map((user) => (
                 <Tr key={user.uid}>
                   <Td>{user.rank}</Td>
                   <Td>{user.name}</Td>
