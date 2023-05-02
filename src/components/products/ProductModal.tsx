@@ -154,9 +154,9 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
                 <Flex
                   gap={6}
                   w="100%"
-                  alignItems="flex-start"
-                  justifyContent="space-between"
-                  flexDirection={{ base: "column", md: "row" }}
+                  align="flex-start"
+                  justify="space-between"
+                  direction={{ base: "column", md: "row" }}
                 >
                   <Stack spacing={6} flex={1} w="100%">
                     {product?.materialName && (
@@ -223,6 +223,7 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
                       rounded="md"
                       border="1px"
                       borderColor="gray.100"
+                      whiteSpace="pre-wrap"
                     >
                       {product?.noteFabric}
                     </Box>
@@ -238,6 +239,7 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
                       rounded="md"
                       border="1px"
                       borderColor="gray.100"
+                      whiteSpace="pre-wrap"
                     >
                       {product?.noteEtc}
                     </Box>
