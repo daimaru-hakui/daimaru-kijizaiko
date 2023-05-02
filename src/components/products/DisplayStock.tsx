@@ -1,16 +1,15 @@
 import { FC } from "react";
 import { Box, Container, Divider, Flex, Text } from "@chakra-ui/react";
-import { useRecoilValue } from "recoil";
-import { grayFabricsState } from "../../../store";
 import { Product } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
+import { useGrayFabricStore } from "../../../store";
 
 type Props = {
   product: Product;
 };
 
 export const DisplayStock: FC<Props> = ({ product }) => {
-  const grayFabrics = useRecoilValue(grayFabricsState);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const { mathRound2nd } = useUtil();
 
   const getGrayFabric = (grayFabricId: string, type: string) => {
@@ -33,11 +32,11 @@ export const DisplayStock: FC<Props> = ({ product }) => {
     <Container maxW="600px" p={0}>
       <Flex
         gap={3}
-        justifyContent="space-between"
-        flexDirection={{ base: "column", md: "row" }}
+        justify="space-between"
+        direction={{ base: "column", md: "row" }}
       >
         {product.grayFabricId && (
-          <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
+          <Flex w="100%" gap={3} direction={{ base: "row", md: "column" }}>
             <Box w="100%" p={2} textAlign="center" bg="#f36450" boxShadow="md">
               <Text fontSize="sm">キバタ仕掛</Text>
               <Box>
@@ -70,7 +69,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             </Box>
           </Flex>
         )}
-        <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
+        <Flex w="100%" gap={3} direction={{ base: "row", md: "column" }}>
           <Box w="100%" p={2} textAlign="center" bg="#f3c150" boxShadow="md">
             <Text fontSize="sm">染め仕掛</Text>
             <Box>
@@ -90,7 +89,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             </Box>
           </Box>
         </Flex>
-        <Flex w="100%" gap={3} flexDirection={{ base: "row", md: "column" }}>
+        <Flex w="100%" gap={3} direction={{ base: "row", md: "column" }}>
           <Box w="100%" p={2} textAlign="center" bg="#59b99d" boxShadow="md">
             <Text fontSize="sm">入荷待ち</Text>
             <Box>

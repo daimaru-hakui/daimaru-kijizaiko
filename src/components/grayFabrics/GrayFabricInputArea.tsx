@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
 import { useSettingStore } from "../../../store";
-import { GrayFabricType } from "../../../types";
+import { GrayFabric } from "../../../types";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 
 type Props = {
   title: string;
-  grayFabric: GrayFabricType | undefined;
+  grayFabric: GrayFabric | undefined;
   toggleSwitch: string;
   onClose?: Function;
 };
@@ -29,7 +29,7 @@ export const GrayFabricInputArea: FC<Props> = ({
   toggleSwitch,
   onClose,
 }) => {
-  const [grayFabrics, setGrayFabrics] = useState([] as GrayFabricType[]);
+  const [grayFabrics, setGrayFabrics] = useState([] as GrayFabric[]);
   const suppliers = useSettingStore((state) => state.suppliers);
   const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc();
   const [flag, setFlag] = useState(false);
@@ -44,7 +44,7 @@ export const GrayFabricInputArea: FC<Props> = ({
     },
   });
 
-  const onSubmit = (data: GrayFabricType) => {
+  const onSubmit = (data: GrayFabric) => {
     switch (toggleSwitch) {
       case "new":
         addGrayFabric(data);
@@ -64,7 +64,7 @@ export const GrayFabricInputArea: FC<Props> = ({
       const querysnap = await getDocs(docsRef);
       setGrayFabrics(
         querysnap.docs.map(
-          (doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType)
+          (doc) => ({ ...doc.data(), id: doc.id } as GrayFabric)
         )
       );
     };
@@ -77,7 +77,7 @@ export const GrayFabricInputArea: FC<Props> = ({
     if (!productNumber) productNumber = "noValue";
 
     const base = grayFabrics.map(
-      (grayFabric: GrayFabricType) => grayFabric.productNumber
+      (grayFabric) => grayFabric.productNumber
     );
     setFlag(base?.includes(productNumber));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,7 +104,7 @@ export const GrayFabricInputArea: FC<Props> = ({
               placeholder="メーカーを選択してください"
               {...register("supplierId", { required: true })}
             >
-              {suppliers?.map((supplier: { id: string; name: string }) => (
+              {suppliers?.map((supplier: { id: string; name: string; }) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
                 </option>
@@ -120,9 +120,9 @@ export const GrayFabricInputArea: FC<Props> = ({
         )}
         <Flex
           gap={6}
-          alignItems="center"
-          justifyContent="space-between"
-          flexDirection={{ base: "column", md: "row" }}
+          align="center"
+          justify="space-between"
+          direction={{ base: "column", md: "row" }}
         >
           <Box w="100%" flex="2">
             <Text fontWeight="bold">

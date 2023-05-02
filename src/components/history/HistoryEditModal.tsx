@@ -22,10 +22,10 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 
 type Props = {
-  history: HistoryType;
+  history: any;
   type: string;
   onClick: Function;
   items: any;

@@ -11,7 +11,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 type Props = {
-  data: any;
+  data: History[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
@@ -46,15 +46,15 @@ export const PurchaseQuantityRanking: FC<Props> = ({
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
-      const newArray = headers.map((header: string) => {
+      const newArray = headers.map((header) => {
         const filterData = data?.filter(
-          (obj: HistoryType) =>
+          (obj) =>
             new Date(startDay).getTime() < new Date(obj.fixedAt).getTime() &&
             new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()
         );
 
         let sum = 0;
-        filterData.forEach((obj: { productId: string; quantity: number }) => {
+        filterData.forEach((obj) => {
           if (obj.productId === header) {
             sum += obj.quantity;
           }
@@ -95,7 +95,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map(
-      (ranking: { productId: string }) =>
+      (ranking) =>
         `${getProductNumber(ranking.productId)} ${getColorName(
           ranking.productId
         )}`
@@ -108,7 +108,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
         label: "購入数量（ｍ）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((ranking: { quantity: number }) => ranking.quantity),
+          ?.map((ranking) => ranking.quantity),
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.5)",
       },

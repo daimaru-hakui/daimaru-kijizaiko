@@ -45,7 +45,7 @@ export type Product = {
   updatedAt: Date;
 };
 
-export type GrayFabricType = {
+export type GrayFabric = {
   id: string;
   supplierId: string;
   productNumber: string;
@@ -57,7 +57,7 @@ export type GrayFabricType = {
   createUser: string;
 };
 
-export type GrayFabricHistoryType = {
+export type GrayFabricHistory = {
   id: string;
   serialNumber: number;
   orderType: string;
@@ -78,7 +78,7 @@ export type GrayFabricHistoryType = {
   updatedAt: Date;
 };
 
-export type HistoryType = {
+export type History = {
   id: string;
   serialNumber: number;
   orderType: string;

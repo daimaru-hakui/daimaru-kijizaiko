@@ -9,7 +9,7 @@ import {
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
 import { useAuthStore, useLoadingStore } from "../../store";
-import { GrayFabricType } from "../../types";
+import { GrayFabric } from "../../types";
 import { useUtil } from "./UseUtil";
 
 export const useGrayFabricFunc = () => {
@@ -18,7 +18,7 @@ export const useGrayFabricFunc = () => {
   const router = useRouter();
   const { mathRound2nd } = useUtil();
 
-  const addGrayFabric = async (data: GrayFabricType) => {
+  const addGrayFabric = async (data: GrayFabric) => {
     const result = window.confirm("登録して宜しいでしょうか。");
     if (!result) return;
     const grayFabricsCollectionRef = collection(db, "grayFabrics");
@@ -44,7 +44,7 @@ export const useGrayFabricFunc = () => {
   };
 
   const updateGrayFabric = async (
-    data: GrayFabricType,
+    data: GrayFabric,
     grayFabricId: string
   ) => {
     const result = window.confirm("更新して宜しいでしょうか。");
@@ -79,7 +79,7 @@ export const useGrayFabricFunc = () => {
   };
 
   const updateAjustmentGrayFabric = async (
-    data: GrayFabricType,
+    data: GrayFabric,
     grayFabricId: string
   ) => {
     setIsLoading(true);

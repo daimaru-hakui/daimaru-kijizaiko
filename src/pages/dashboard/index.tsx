@@ -8,12 +8,8 @@ import {
   StatNumber,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useRecoilValue } from "recoil";
 import {
-  fabricDyeingOrdersState,
-  fabricPurchaseOrdersState,
-  grayFabricOrdersState,
-  grayFabricsState,
+  useGrayFabricStore,
   useProductsStore,
 } from "../../../store";
 import { Charts } from "../../components/dashboard/Charts";
@@ -21,10 +17,10 @@ import { StatCard } from "../../components/dashboard/StatCard";
 
 const Dashboard: NextPage = () => {
   const products = useProductsStore((state) => state.products);
-  const grayFabrics = useRecoilValue(grayFabricsState);
-  const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
-  const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
-  const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
+  const grayFabricOrders = useGrayFabricStore((state) => state.grayFabricOrders);
+  const fabricDyeingOrders = useProductsStore((state) => state.fabricDyeingOrders);
+  const fabricPurchaseOrders = useProductsStore((state) => state.fabricPurchaseOrders);
 
   const getTotalProductsQuantity = (props: string[]) => {
     let total = 0;

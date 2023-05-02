@@ -19,10 +19,9 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
 import { db } from "../../../firebase";
-import { grayFabricOrdersState, useAuthStore } from "../../../store";
-import { GrayFabricHistoryType, HistoryType } from "../../../types";
+import { useAuthStore, useGrayFabricStore } from "../../../store";
+import { GrayFabricHistory, History } from "../../../types";
 import { OrderToConfirmModal } from "../history/OrderToConfirmModal";
 import { CommentModal } from "../CommentModal";
 import { HistoryEditModal } from "../history/HistoryEditModal";
@@ -32,12 +31,12 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 
 export const GrayFabricOrderTable: FC = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  const [items, setItems] = useState({} as HistoryType);
+  const [items, setItems] = useState<History>();
   const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate } = useUtil();
-  const grayFabricOrders = useRecoilValue(grayFabricOrdersState);
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState<HistoryType[]>();
+  const grayFabricOrders = useGrayFabricStore((state) => state.grayFabricOrders);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabricHistory[]>([]);
 
   useEffect(() => {
     const newGrayFabrics = grayFabricOrders.filter(
@@ -47,7 +46,7 @@ export const GrayFabricOrderTable: FC = () => {
   }, [grayFabricOrders]);
 
   // キバタ仕掛から削除
-  const deleteGrayFabricOrder = async (history: GrayFabricHistoryType) => {
+  const deleteGrayFabricOrder = async (history: GrayFabricHistory) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -73,7 +72,7 @@ export const GrayFabricOrderTable: FC = () => {
     }
   };
 
-  const updateOrderHistory = async (history: GrayFabricHistoryType) => {
+  const updateOrderHistory = async (history: GrayFabricHistory) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
@@ -89,8 +88,8 @@ export const GrayFabricOrderTable: FC = () => {
 
         const newWip =
           (await grayFabricDocSnap.data()?.wip) -
-            history.quantity +
-            Number(items.quantity) || 0;
+          history.quantity +
+          Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWip,
         });
@@ -111,7 +110,7 @@ export const GrayFabricOrderTable: FC = () => {
   };
 
   // 確定処理　キバタ仕掛⇒キバタ在庫
-  const confirmProcessing = async (history: GrayFabricHistoryType) => {
+  const confirmProcessing = async (history: GrayFabricHistory) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
@@ -126,8 +125,8 @@ export const GrayFabricOrderTable: FC = () => {
 
         const newWip =
           grayFabricDocSnap.data()?.wip -
-            Number(history.quantity) +
-            Number(items.remainingOrder) || 0;
+          Number(history.quantity) +
+          Number(items.remainingOrder) || 0;
         const newStock =
           grayFabricDocSnap.data()?.stock + Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {

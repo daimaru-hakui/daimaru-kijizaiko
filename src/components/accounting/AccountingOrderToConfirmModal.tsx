@@ -22,13 +22,13 @@ import { useEffect, FC } from "react";
 import { useAuthStore } from "../../../store";
 import { db } from "../../../firebase";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
 type Props = {
-  history: HistoryType;
+  history: History;
 };
 
 export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
@@ -46,8 +46,8 @@ export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
 
   // 購入状況　確定処理
   const confirmProcessingAccounting = async (
-    history: HistoryType,
-    items: HistoryType
+    history: History,
+    items: History
   ) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;

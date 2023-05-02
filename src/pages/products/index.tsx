@@ -113,7 +113,7 @@ const Products: NextPage = () => {
           gap={3}
           align="center"
           justify="space-between"
-          flexDirection={{ base: "column", md: "row" }}
+          direction={{ base: "column", md: "row" }}
         >
           <Box as="h2" fontSize="2xl">
             生地一覧
@@ -292,7 +292,7 @@ const Products: NextPage = () => {
                       </Td>
                       <Td>
                         {isAuths(["rd"]) ||
-                        product?.createUser === currentUser ? (
+                          product?.createUser === currentUser ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}

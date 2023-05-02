@@ -22,12 +22,12 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect, FC } from "react";
 import { useSettingStore } from "../../../store";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  history: HistoryType;
-  items: HistoryType;
+  history: any;
+  items: History;
   setItems: Function;
   onClick: Function;
 };

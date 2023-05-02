@@ -3,11 +3,12 @@ import { create } from "zustand";
 import {
   User,
   Product,
-  GrayFabricType,
-  HistoryType,
+  GrayFabric,
+  History,
   StockPlace,
   Supplier,
   Location,
+  GrayFabricHistory,
 } from "../types";
 
 type AuthState = {
@@ -43,6 +44,10 @@ export const useLoadingStore = create<LoadingState>((set) => ({
 type ProductsState = {
   products: Product[];
   setProducts: (payload: Product[]) => void;
+  fabricDyeingOrders: History[],
+  setFabricDyeingOrders: (payload: History[]) => void;
+  fabricPurchaseOrders: History[],
+  setFabricPurchaseOrders: (payload: History[]) => void;
 };
 
 export const useProductsStore = create<ProductsState>((set) => ({
@@ -83,6 +88,10 @@ export const useProductsStore = create<ProductsState>((set) => ({
     },
   ],
   setProducts: (payload) => set({ products: payload }),
+  fabricDyeingOrders: [],
+  setFabricDyeingOrders: (payload) => set({ fabricDyeingOrders: payload }),
+  fabricPurchaseOrders: [],
+  setFabricPurchaseOrders: (payload) => set({ fabricPurchaseOrders: payload }),
 }));
 
 // settings
@@ -129,29 +138,46 @@ export const useSettingStore = create<SettingState>((set) => ({
   setMaterialNames: (payload) => set({ materialNames: payload }),
 }));
 
-import { atom } from "recoil";
+// GrayFabrics
+type GrayFabricsState = {
+  grayFabrics: GrayFabric[];
+  setGrayFabrics: (payload: GrayFabric[]) => void;
+  grayFabricOrders: GrayFabricHistory[];
+  setGrayFabricOrders: (payload: GrayFabricHistory[]) => void;
+};
 
-export const grayFabricsState = atom<GrayFabricType[]>({
-  key: "grayFabricsState",
-  default: [],
-});
-
-export const grayFabricOrdersState = atom<HistoryType[]>({
-  key: "grayFabricOrdersState",
-  default: [],
-});
-
-export const fabricDyeingOrdersState = atom<HistoryType[]>({
-  key: "fabricDyeingOrdersState",
-  default: [],
-});
-
-export const fabricPurchaseOrdersState = atom<HistoryType[]>({
-  key: "fabricPurchaseOrdersState",
-  default: [],
-});
-
-export const fabricPurchaseConfirmsState = atom<HistoryType[]>({
-  key: "fabricPurchaseConfirmsState",
-  default: [],
-});
+export const useGrayFabricStore = create<GrayFabricsState>((set) => ({
+  grayFabrics: [{
+    id: "",
+    supplierId: "",
+    productNumber: "",
+    productName: "",
+    price: 0,
+    comment: "",
+    wip: 0,
+    stock: 0,
+    createUser: ""
+  }],
+  setGrayFabrics: (payload) => set({ grayFabrics: payload }),
+  grayFabricOrders: [{
+    id: "",
+    serialNumber: 0,
+    orderType: "",
+    grayFabricId: "",
+    supplierId: "",
+    supplierName: "",
+    productNumber: "",
+    productName: "",
+    price: 0,
+    quantity: 0,
+    comment: "",
+    orderedAt: "",
+    scheduledAt: "",
+    fixedAt: "",
+    createUser: "",
+    updateUser: "",
+    createdAt: null,
+    updatedAt: null
+  }],
+  setGrayFabricOrders: (payload) => set({ grayFabricOrders: payload }),
+}));

@@ -1,7 +1,6 @@
-import { useRecoilValue } from "recoil";
 import {
-  grayFabricsState,
   useAuthStore,
+  useGrayFabricStore,
   useProductsStore,
   useSettingStore,
 } from "../../store";
@@ -10,9 +9,9 @@ import { Materials, Location } from "../../types";
 export const useGetDisp = () => {
   const users = useAuthStore((state) => state.users);
   const products = useProductsStore((state) => state.products);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const suppliers = useSettingStore((state) => state.suppliers);
   const locations = useSettingStore((state) => state.locations);
-  const grayFabrics = useRecoilValue(grayFabricsState);
 
   // 混率の表示
   const getMixed = (materials: Materials) => {

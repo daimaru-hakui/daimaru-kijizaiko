@@ -11,26 +11,30 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
 import { CommentModal } from "../CommentModal";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import useSWR from "swr";
 import { AccountingOrderToConfirmModal } from "./AccountingOrderToConfirmModal";
 
+type Data = {
+  contents: History[];
+};
+
 export const AccountingOrderTable: FC = () => {
-  const [filterHistories, setFilterHistories] = useState<any>();
+  const [filterHistories, setFilterHistories] = useState<History[]>();
   const { getUserName, getSerialNumber } = useGetDisp();
-  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
+  const { data, mutate, isLoading } = useSWR<Data>("/api/fabric-purchase-confirms");
 
   // 数量０のデータを非表示
   useEffect(() => {
     const newHistorys = data?.contents?.filter(
-      (history: HistoryType) => history.accounting !== true && history
+      (history) => history.accounting !== true && history
     );
     setFilterHistories(newHistorys);
   }, [data]);
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -42,7 +46,7 @@ export const AccountingOrderTable: FC = () => {
     </Flex>
   );
 
-  const elmentEdit = (history: HistoryType) => (
+  const elmentEdit = (history: History) => (
     <Flex gap={3}>
       <AccountingEditModal type="order" history={history} />
     </Flex>
@@ -71,7 +75,7 @@ export const AccountingOrderTable: FC = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterHistories?.map((history: HistoryType) => (
+            {filterHistories?.map((history) => (
               <Tr key={history.id}>
                 <Td>
                   <AccountingOrderToConfirmModal history={history} />

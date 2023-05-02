@@ -7,12 +7,12 @@ import {
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
 import { useAuthStore, useLoadingStore } from "../../store";
-import { Product, HistoryType } from "../../types";
+import { Product, History } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 
 export const useOrderFabricFunc = (
-  items: HistoryType,
+  items: History,
   product: Product,
   orderType: string
 ) => {

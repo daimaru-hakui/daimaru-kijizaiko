@@ -12,22 +12,21 @@ import {
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
-import { grayFabricsState } from "../../../../store";
+import { useGrayFabricStore } from "../../../../store";
 import { useUtil } from "../../../hooks/UseUtil";
 import { AdjustmentGrayFabric } from "../../../components/adjustment/AdjustmentGrayFabric";
-import { GrayFabricType } from "../../../../types";
+import { GrayFabric } from "../../../../types";
 import { NextPage } from "next";
 
 const AdjustmentGrayFabrics: NextPage = () => {
-  const grayFabrics = useRecoilValue(grayFabricsState);
-  const [filterProducts, setFilterProducts] = useState([] as any);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
+  const [filterProducts, setFilterProducts] = useState<GrayFabric[]>([]);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
 
   useEffect(() => {
     setFilterProducts(
-      grayFabrics.filter((grayFabric: GrayFabricType) =>
+      grayFabrics.filter((grayFabric) =>
         grayFabric.productNumber.includes(
           halfToFullChar(searchText.toUpperCase())
         )
@@ -92,7 +91,7 @@ const AdjustmentGrayFabrics: NextPage = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {filterProducts?.map((grayFabric: GrayFabricType) => (
+                {filterProducts?.map((grayFabric) => (
                   <AdjustmentGrayFabric
                     key={grayFabric.id}
                     grayFabric={grayFabric}

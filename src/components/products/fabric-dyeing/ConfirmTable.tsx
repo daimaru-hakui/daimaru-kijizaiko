@@ -13,7 +13,7 @@ import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
 import { useAuthStore, useLoadingStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
-import { HistoryType } from "../../../../types";
+import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
@@ -34,7 +34,7 @@ export const FabricDyeingConfirmTable: FC = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getTodayDate, get3monthsAgo } = useUtil();
-  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+  const [filterHistories, setFilterHistories] = useState<History[]>([]);
   const { isAuths } = useAuthManagement();
   const { getSerialNumber, getUserName } = useGetDisp();
   const [items, setItems] = useState({
@@ -78,14 +78,14 @@ export const FabricDyeingConfirmTable: FC = () => {
         data?.contents
           ?.filter((history) => history.quantity > 0 && history)
           .filter(
-            (content: HistoryType) =>
+            (content: History) =>
               staff === content.createUser || staff === ""
           )
       );
     }
   }, [data, staff]);
 
-  const updateFabricDyeingConfirm = async (history: HistoryType) => {
+  const updateFabricDyeingConfirm = async (history: History) => {
     setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingConfirms", history.id);
@@ -119,7 +119,7 @@ export const FabricDyeingConfirmTable: FC = () => {
     }
   };
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -176,15 +176,15 @@ export const FabricDyeingConfirmTable: FC = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => updateFabricDyeingConfirm(history)}
-                        orderType=""
-                      />
-                    )}
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => updateFabricDyeingConfirm(history)}
+                          orderType=""
+                        />
+                      )}
                   </Td>
                 </Tr>
               ))}

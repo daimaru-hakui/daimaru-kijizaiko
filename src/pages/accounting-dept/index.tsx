@@ -3,13 +3,13 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { db } from "../../../firebase";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { AccountingConfirmTable } from "../../components/accounting/AccountingConfirmTable";
 import { AccountingOrderTable } from "../../components/accounting/AccountingOrderTable";
 
 const AccountingDept: NextPage = () => {
-  const [historyOrders, setHistoryOrders] = useState([] as HistoryType[]);
-  const [historyConfirms, setHistoryConfirms] = useState([] as HistoryType[]);
+  const [historyOrders, setHistoryOrders] = useState<History[]>([]);
+  const [historyConfirms, setHistoryConfirms] = useState<History[]>([]);
 
   useEffect(() => {
     const getHistoryOrders = async () => {
@@ -21,7 +21,7 @@ const AccountingDept: NextPage = () => {
         onSnapshot(q, (querySnap) =>
           setHistoryOrders(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+              (doc) => ({ ...doc.data(), id: doc.id } as History)
             )
           )
         );
@@ -42,7 +42,7 @@ const AccountingDept: NextPage = () => {
         onSnapshot(q, (querySnap) =>
           setHistoryConfirms(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+              (doc) => ({ ...doc.data(), id: doc.id } as History)
             )
           )
         );

@@ -18,16 +18,15 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
 import { CommentModal } from "../../CommentModal";
-import { HistoryType } from "../../../../types";
+import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import {
-  fabricDyeingOrdersState,
   useAuthStore,
   useLoadingStore,
+  useProductsStore,
 } from "../../../../store";
 import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
@@ -38,14 +37,12 @@ export const FabricDyeingOrderTable: FC = () => {
   const router = useRouter();
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const currentUser = useAuthStore((state) => state.currentUser);
-  const [items, setItems] = useState<HistoryType>();
+  const [items, setItems] = useState<History>();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate } = useUtil();
-  const fabricDyeingOrders = useRecoilValue(fabricDyeingOrdersState);
-  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<
-    HistoryType[]
-  >([]);
+  const fabricDyeingOrders = useProductsStore((state) => state.fabricDyeingOrders);
+  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<History[]>([]);
 
   // 数量０のデータを非表示
   useEffect(() => {
@@ -56,7 +53,7 @@ export const FabricDyeingOrderTable: FC = () => {
   }, [fabricDyeingOrders]);
 
   // 生地仕掛状況　Orderを削除 type stock
-  const deleteFabricDyeingOrderStock = async (history: HistoryType) => {
+  const deleteFabricDyeingOrderStock = async (history: History) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -97,7 +94,7 @@ export const FabricDyeingOrderTable: FC = () => {
   };
 
   // 生地仕掛状況　Orderを削除  type ranning
-  const deleteFabricDyeingOrderRanning = async (history: HistoryType) => {
+  const deleteFabricDyeingOrderRanning = async (history: History) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
 
@@ -127,7 +124,7 @@ export const FabricDyeingOrderTable: FC = () => {
   };
 
   //　生地仕掛状況　Order　編集（Stock在庫）
-  const updateFabricDyeingOrderStock = async (history: HistoryType) => {
+  const updateFabricDyeingOrderStock = async (history: History) => {
     setIsLoading(true);
     const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
     const productDocRef = doc(db, "products", history.productId);
@@ -177,7 +174,7 @@ export const FabricDyeingOrderTable: FC = () => {
   };
 
   //　生地仕掛状況　Order　編集（ranning在庫）
-  const updateFabricDyeingOrderRanning = async (history: HistoryType) => {
+  const updateFabricDyeingOrderRanning = async (history: History) => {
     setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricDyeingOrders", history.id);
@@ -215,7 +212,7 @@ export const FabricDyeingOrderTable: FC = () => {
   };
 
   // 生地染色　確定処理
-  const confirmProcessingFabricDyeing = async (history: HistoryType) => {
+  const confirmProcessingFabricDyeing = async (history: History) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -231,12 +228,12 @@ export const FabricDyeingOrderTable: FC = () => {
 
         const newWip =
           (await productDocSnap.data()?.wip) -
-            Number(history.quantity) +
-            Number(items.remainingOrder) || 0;
+          Number(history.quantity) +
+          Number(items.remainingOrder) || 0;
 
         const newStock =
           (await productDocSnap.data()?.externalStock) +
-            Number(items.quantity) || 0;
+          Number(items.quantity) || 0;
         transaction.update(productDocRef, {
           wip: newWip,
           externalStock: newStock,
@@ -279,7 +276,7 @@ export const FabricDyeingOrderTable: FC = () => {
     }
   };
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -292,7 +289,7 @@ export const FabricDyeingOrderTable: FC = () => {
   );
 
   const elmentEditDelete = (
-    history: HistoryType,
+    history: History,
     onClickUpdate: Function,
     onClickDelete: Function
   ) => (

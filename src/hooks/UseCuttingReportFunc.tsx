@@ -7,7 +7,6 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import { useLoadingStore, useAuthStore } from "../../store";
 import { CuttingReportType } from "../../types";

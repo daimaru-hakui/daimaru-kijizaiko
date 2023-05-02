@@ -23,7 +23,7 @@ import {
 import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { useForm, FormProvider } from "react-hook-form";
 import { SearchArea } from "../SearchArea";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
@@ -45,7 +45,7 @@ export const ProductPurchaseHistoryModal: FC<Props> = ({ productId, type }) => {
   const [sumTotalQuantity, setSumTotalQuantity] = useState(0);
   const [filterFabricPurchases, setFilterFabricPurchases] = useState([
     { quantity: 0 },
-  ] as HistoryType[]);
+  ] as History[]);
   const {
     getUserName,
     getSerialNumber,
@@ -83,14 +83,14 @@ export const ProductPurchaseHistoryModal: FC<Props> = ({ productId, type }) => {
   useEffect(() => {
     const getArray = async () => {
       let filterArray = data?.contents?.filter(
-        (content: HistoryType) => content.productId === productId
+        (content: History) => content.productId === productId
       );
       if (!staff) {
         setFilterFabricPurchases(filterArray);
       } else {
         setFilterFabricPurchases(
           filterArray.filter(
-            (history: HistoryType) =>
+            (history: History) =>
               staff === history.createUser || staff === ""
           )
         );
@@ -173,7 +173,7 @@ export const ProductPurchaseHistoryModal: FC<Props> = ({ productId, type }) => {
                       <>
                         {filterFabricPurchases?.map(
                           (
-                            fabric: HistoryType & { quantity: number },
+                            fabric: History & { quantity: number; },
                             index
                           ) => (
                             <Tr key={index}>

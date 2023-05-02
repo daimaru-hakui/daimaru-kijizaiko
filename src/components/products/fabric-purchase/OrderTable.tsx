@@ -18,15 +18,14 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
 import {
-  fabricPurchaseOrdersState,
   useAuthStore,
   useLoadingStore,
+  useProductsStore,
 } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
-import { HistoryType } from "../../../../types";
+import { History } from "../../../../types";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
@@ -42,13 +41,13 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const router = useRouter();
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const currentUser = useAuthStore((state) => state.currentUser);
-  const [items, setItems] = useState({} as HistoryType);
+  const [items, setItems] = useState({} as History);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
   const { getTodayDate, mathRound2nd } = useUtil();
-  const fabricPurchaseOrders = useRecoilValue(fabricPurchaseOrdersState);
+  const fabricPurchaseOrders = useProductsStore((state) => state.fabricPurchaseOrders);
   const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState(
-    [] as HistoryType[]
+    [] as History[]
   );
   const STOCK_PLACE = "徳島工場";
 
@@ -112,7 +111,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   //　購入状況　orderを編集（stock ranning共通）
-  const updateFabricPurchaseOrder = async (history: HistoryType) => {
+  const updateFabricPurchaseOrder = async (history: History) => {
     setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseOrders", history.id);
@@ -171,7 +170,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   // 購入状況　確定処理
-  const confirmProcessingFabricPurchase = async (history: HistoryType) => {
+  const confirmProcessingFabricPurchase = async (history: History) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
@@ -189,14 +188,14 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
 
         const newArrivingQuantity =
           (await productDocSnap.data()?.arrivingQuantity) -
-            Number(history.quantity) +
-            Number(items.remainingOrder) || 0;
+          Number(history.quantity) +
+          Number(items.remainingOrder) || 0;
 
         let newTokushimaStock = 0;
         if (items.stockPlace === STOCK_PLACE) {
           newTokushimaStock =
             (await productDocSnap.data()?.tokushimaStock) +
-              Number(items.quantity) || 0;
+            Number(items.quantity) || 0;
         }
 
         transaction.update(productDocRef, {
@@ -242,7 +241,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
     }
   };
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -255,7 +254,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   );
 
   const elmentEditDelete = (
-    history: HistoryType,
+    history: History,
     onClickUpdate: Function,
     onClickDelete: Function
   ) => (
@@ -305,7 +304,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd", "tokushima"]) ||
-                    history.createUser === currentUser ? (
+                      history.createUser === currentUser ? (
                       <OrderToConfirmModal
                         history={history}
                         items={items}
@@ -342,15 +341,15 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                      <Flex gap={3}>
-                        {history.orderType === "purchase" &&
-                          elmentEditDelete(
-                            history,
-                            updateFabricPurchaseOrder,
-                            deleteFabricPurchaseOrder
-                          )}
-                      </Flex>
-                    )}
+                        <Flex gap={3}>
+                          {history.orderType === "purchase" &&
+                            elmentEditDelete(
+                              history,
+                              updateFabricPurchaseOrder,
+                              deleteFabricPurchaseOrder
+                            )}
+                        </Flex>
+                      )}
                   </Td>
                 </Tr>
               ))}

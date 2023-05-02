@@ -10,22 +10,18 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect } from "react";
-import { useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import {
-  fabricDyeingOrdersState,
-  fabricPurchaseOrdersState,
-  grayFabricOrdersState,
-  grayFabricsState,
   useAuthStore,
+  useGrayFabricStore,
   useProductsStore,
   useSettingStore,
 } from "../../store";
 import {
   User,
-  GrayFabricType,
+  GrayFabric,
   Supplier,
-  HistoryType,
+  History,
   StockPlace,
   Location,
   Product,
@@ -36,16 +32,15 @@ export const useDataList = () => {
   const session = useAuthStore((state) => state.session);
   const setUsers = useAuthStore((state) => state.setUsers);
   const setProducts = useProductsStore((state) => state.setProducts);
-  const setGrayFabrics = useSetRecoilState(grayFabricsState);
+  const setGrayFabrics = useGrayFabricStore((state) => state.setGrayFabrics);
   const setSuppliers = useSettingStore((state) => state.setSuppliers);
   const setStockPlaces = useSettingStore((state) => state.setStockPlaces);
   const setLocations = useSettingStore((state) => state.setLocations);
   const setMaterialNames = useSettingStore((state) => state.setMaterialNames);
   const setColors = useSettingStore((state) => state.setColors);
-
-  const setGrayFabricOrders = useSetRecoilState(grayFabricOrdersState);
-  const setFabricDyeingOrders = useSetRecoilState(fabricDyeingOrdersState);
-  const setFabricPurchaseOrders = useSetRecoilState(fabricPurchaseOrdersState);
+  const setGrayFabricOrders = useGrayFabricStore((state) => state.setGrayFabricOrders);
+  const setFabricDyeingOrders = useProductsStore((state) => state.setFabricDyeingOrders);
+  const setFabricPurchaseOrders = useProductsStore((state) => state.setFabricPurchaseOrders);
 
   // users情報;
   useEffect(() => {
@@ -56,10 +51,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as User)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as User)
         )
       )
     );
@@ -124,7 +119,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setGrayFabrics(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as GrayFabricType)
+              (doc) => ({ ...doc.data(), id: doc.id } as GrayFabric)
             )
           )
         );
@@ -147,7 +142,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setGrayFabricOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as History))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );
@@ -170,7 +165,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setFabricDyeingOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as History))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );
@@ -193,7 +188,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setFabricPurchaseOrders(
             querySnap.docs
-              .map((doc) => ({ ...doc.data(), id: doc?.id } as HistoryType))
+              .map((doc) => ({ ...doc.data(), id: doc?.id } as History))
               .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
           )
         );

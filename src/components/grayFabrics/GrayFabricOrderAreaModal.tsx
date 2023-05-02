@@ -32,12 +32,12 @@ import { useRouter } from "next/router";
 import { useState, FC } from "react";
 import { db } from "../../../firebase";
 import { useAuthStore } from "../../../store";
-import { GrayFabricType } from "../../../types";
+import { GrayFabric } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
-  grayFabric: GrayFabricType;
+  grayFabric: GrayFabric;
 };
 
 export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
@@ -151,7 +151,7 @@ export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
               <Flex
                 gap={3}
                 w="100%"
-                flexDirection={{ base: "column", md: "row" }}
+                direction={{ base: "column", md: "row" }}
               >
                 <Box w="100%">
                   <Box>発注日</Box>

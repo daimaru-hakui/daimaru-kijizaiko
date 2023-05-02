@@ -13,11 +13,11 @@ import { GiCancel } from "react-icons/gi";
 import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
-import { GrayFabricType } from "../../../types";
+import { GrayFabric } from "../../../types";
 import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 
 type Props = {
-  grayFabric: GrayFabricType;
+  grayFabric: GrayFabric;
 };
 
 export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
@@ -25,19 +25,19 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
   const { updateAjustmentGrayFabric } = useGrayFabricFunc();
 
   const { quantityValueBold } = useUtil();
-  const [items, setItems] = useState({} as GrayFabricType);
+  const [items, setItems] = useState<GrayFabric>();
 
-  const handleNumberChange = (e: any, name: string) => {
+  const handleNumberChange = (e: string, name: string) => {
     const value = e;
     setItems({ ...items, [name]: value });
   };
 
   useEffect(() => {
-    setItems({ ...grayFabric } as any);
+    setItems({ ...grayFabric } as GrayFabric);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grayFabric.price, grayFabric.stock]);
 
-  const onReset = (grayFabric: GrayFabricType) => {
+  const onReset = (grayFabric: GrayFabric) => {
     setItems({ ...grayFabric });
   };
 
@@ -48,7 +48,7 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
         <NumberInput
           mt={1}
           w="90px"
-          value={items.price}
+          value={items?.price}
           min={0}
           max={100000}
           onChange={(e) => handleNumberChange(e, "price")}
@@ -66,7 +66,7 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
           w="90px"
           min={0}
           max={100000}
-          value={items.wip}
+          value={items?.wip}
           onChange={(e) => handleNumberChange(e, "wip")}
         >
           <NumberInputField textAlign="right" />
@@ -82,7 +82,7 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
           w="90px"
           min={0}
           max={100000}
-          value={items.stock}
+          value={items?.stock}
           onChange={(e) => handleNumberChange(e, "stock")}
         >
           <NumberInputField textAlign="right" />

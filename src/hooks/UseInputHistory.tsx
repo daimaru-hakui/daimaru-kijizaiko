@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { HistoryType } from "../../types";
+import { History } from "../../types";
 
 export const useInputHistory = () => {
-  const [items, setItems] = useState({} as HistoryType);
+  const [items, setItems] = useState({} as History);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -23,7 +23,7 @@ export const useInputHistory = () => {
     setItems({ ...items, [name]: value });
   };
 
-  const onReset = (obj: HistoryType) => {
+  const onReset = (obj: History) => {
     setItems({ ...obj });
   };
 

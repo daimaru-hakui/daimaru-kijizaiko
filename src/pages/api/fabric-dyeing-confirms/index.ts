@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../../firebase/sever";
-import { HistoryType } from "../../../../types";
+import { History } from "../../../../types";
 
 type Data = {
-  contents: HistoryType[];
+  contents: History[];
 };
 
 export default async function handler(
@@ -18,7 +18,7 @@ export default async function handler(
       .orderBy("fixedAt", "desc")
       .get();
     const snapshot = querySnapshot.docs.map(
-      (doc) => ({ ...doc.data(), id: doc.id } as HistoryType)
+      (doc) => ({ ...doc.data(), id: doc.id } as History)
     );
     return res.status(200).json({ contents: snapshot });
   }

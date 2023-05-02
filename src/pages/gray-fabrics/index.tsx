@@ -11,9 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
-import { grayFabricsState, useAuthStore } from "../../../store";
-import { GrayFabricType } from "../../../types";
+import { useAuthStore, useGrayFabricStore } from "../../../store";
+import { GrayFabric } from "../../../types";
 import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModal";
 import { CommentModal } from "../../components/CommentModal";
 import { GrayFabricOrderAreaModal } from "../../components/grayFabrics/GrayFabricOrderAreaModal";
@@ -23,19 +22,17 @@ import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { NextPage } from "next";
 
 const GrayFabrics: NextPage = () => {
-  const grayFabrics = useRecoilValue(grayFabricsState);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
-    [] as GrayFabricType[]
-  );
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabric[]>([]);
   const { getSupplierName } = useGetDisp();
   const { deleteGrayFabric } = useGrayFabricFunc();
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {
       setFilterGrayFabrics(
-        grayFabrics.filter((fabric: GrayFabricType) =>
+        grayFabrics.filter((fabric) =>
           fabric.productNumber.includes("")
         )
       );
@@ -64,7 +61,7 @@ const GrayFabrics: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterGrayFabrics?.map((fabric: GrayFabricType) => (
+              {filterGrayFabrics?.map((fabric) => (
                 <Tr key={fabric.id}>
                   <Td>
                     <GrayFabricOrderAreaModal grayFabric={fabric} />
@@ -100,15 +97,15 @@ const GrayFabrics: NextPage = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       fabric?.createUser === currentUser) && (
-                      <Flex alignItems="center" gap={3}>
-                        <GrayFabricEditModal grayFabric={fabric} />
-                        <FaTrashAlt
-                          color="#444"
-                          cursor="pointer"
-                          onClick={() => deleteGrayFabric(fabric.id)}
-                        />
-                      </Flex>
-                    )}
+                        <Flex alignItems="center" gap={3}>
+                          <GrayFabricEditModal grayFabric={fabric} />
+                          <FaTrashAlt
+                            color="#444"
+                            cursor="pointer"
+                            onClick={() => deleteGrayFabric(fabric.id)}
+                          />
+                        </Flex>
+                      )}
                   </Td>
                 </Tr>
               ))}

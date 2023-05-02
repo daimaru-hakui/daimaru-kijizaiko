@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
 import { CommentModal } from "../CommentModal";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { AccountingEditModal } from "./AccountingEditModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { SearchArea } from "../SearchArea";
@@ -26,8 +26,10 @@ type Inputs = {
   staff: string;
 };
 
+
+
 export const AccountingConfirmTable: FC = () => {
-  const [filterHistories, setFilterHistories] = useState([] as HistoryType[]);
+  const [filterHistories, setFilterHistories] = useState<History[]>([]);
   const { getUserName, getSerialNumber } = useGetDisp();
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());
@@ -59,24 +61,24 @@ export const AccountingConfirmTable: FC = () => {
     if (!staff) {
       setFilterHistories(
         data?.contents.filter(
-          (history: HistoryType) => history.accounting === true && history
+          (history: History) => history.accounting === true && history
         )
       );
     } else {
       setFilterHistories(
         data?.contents
           ?.filter(
-            (content: HistoryType) =>
+            (content: History) =>
               staff === content.createUser || staff === ""
           )
           .filter(
-            (history: HistoryType) => history.accounting === true && history
+            (history: History) => history.accounting === true && history
           )
       );
     }
   }, [data, staff]);
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -88,7 +90,7 @@ export const AccountingConfirmTable: FC = () => {
     </Flex>
   );
 
-  const elmentEdit = (history: HistoryType) => (
+  const elmentEdit = (history: History) => (
     <Flex gap={3}>
       <AccountingEditModal type="order" history={history} />
     </Flex>
@@ -120,7 +122,7 @@ export const AccountingConfirmTable: FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterHistories?.map((history: HistoryType) => (
+              {filterHistories?.map((history) => (
                 <Tr key={history.id}>
                   <Td>{getSerialNumber(history?.serialNumber)}</Td>
                   <Td>{history?.orderedAt}</Td>

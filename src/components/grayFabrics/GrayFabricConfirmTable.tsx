@@ -12,7 +12,7 @@ import {
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useState, useEffect, FC } from "react";
 import { db } from "../../../firebase";
-import { GrayFabricType, HistoryType } from "../../../types";
+import { GrayFabric, History } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
@@ -31,7 +31,7 @@ type Inputs = {
 };
 
 export const GrayFabricConfirmTable: FC = () => {
-  const [items, setItems] = useState({} as HistoryType);
+  const [items, setItems] = useState<History>();
   const { getSerialNumber, getUserName } = useGetDisp();
   const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
@@ -39,9 +39,7 @@ export const GrayFabricConfirmTable: FC = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState(
-    [] as HistoryType[]
-  );
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState<History[]>([]);
   const { data, mutate } = useSWRGrayFavricConfirms(startDay, endDay);
 
   const methods = useForm<Inputs>({
@@ -70,14 +68,14 @@ export const GrayFabricConfirmTable: FC = () => {
     } else {
       setFilterGrayFabrics(
         data?.contents?.filter(
-          (content: GrayFabricType) =>
+          (content: GrayFabric) =>
             staff === content.createUser || staff === ""
         )
       );
     }
   }, [data, staff]);
 
-  const updateConfirmHistory = async (history: any) => {
+  const updateConfirmHistory = async (history: History) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
@@ -94,8 +92,8 @@ export const GrayFabricConfirmTable: FC = () => {
 
         const newStock =
           (await grayFabricDocSnap.data()?.stock) -
-            history.quantity +
-            Number(items.quantity) || 0;
+          history.quantity +
+          Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
@@ -137,7 +135,7 @@ export const GrayFabricConfirmTable: FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {filterGrayFabrics?.map((history: any) => (
+              {filterGrayFabrics?.map((history) => (
                 <Tr key={history.id}>
                   <Td>{getSerialNumber(history.serialNumber)}</Td>
                   <Td>{history.orderedAt}</Td>
@@ -161,15 +159,15 @@ export const GrayFabricConfirmTable: FC = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history.createUser === currentUser) && (
-                      <HistoryEditModal
-                        history={history}
-                        type="confirm"
-                        items={items}
-                        setItems={setItems}
-                        onClick={updateConfirmHistory}
-                        orderType=""
-                      />
-                    )}
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={updateConfirmHistory}
+                          orderType=""
+                        />
+                      )}
                   </Td>
                 </Tr>
               ))}

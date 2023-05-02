@@ -11,11 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { FaEdit } from "react-icons/fa";
-import { GrayFabricType } from "../../../types";
+import { GrayFabric } from "../../../types";
 import { GrayFabricInputArea } from "./GrayFabricInputArea";
 
 type Props = {
-  grayFabric: GrayFabricType;
+  grayFabric: GrayFabric;
 };
 
 export const GrayFabricEditModal: FC<Props> = ({ grayFabric }) => {

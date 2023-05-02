@@ -11,7 +11,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 type Props = {
-  data: any;
+  data: History[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
@@ -41,24 +41,23 @@ export const PurchasePriceRanking: FC<Props> = ({
 
   useEffect(() => {
     const getArray = async () => {
-      const ProductIds = data?.map((obj: HistoryType) => obj.productId);
+      const ProductIds = data?.map((obj) => obj.productId);
       const headersObj = new Set(ProductIds);
       const headers = Array.from(headersObj);
 
       const newArray = headers.map((header: string) => {
         const filterData = data?.filter(
-          (obj: HistoryType) =>
+          (obj) =>
             new Date(startDay).getTime() <= new Date(obj.fixedAt).getTime() &&
             new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()
         );
 
         let sum = 0;
-        filterData.forEach(
-          (obj: { productId: string; quantity: number; price: number }) => {
-            if (obj.productId === header) {
-              sum += obj.price * obj.quantity;
-            }
+        filterData.forEach((obj) => {
+          if (obj.productId === header) {
+            sum += obj.price * obj.quantity;
           }
+        }
         );
         return { productId: header, price: sum };
       });
@@ -95,11 +94,10 @@ export const PurchasePriceRanking: FC<Props> = ({
 
   const labels = chartDataList
     ?.slice(0, rankingNumber)
-    ?.map(
-      (ranking: { productId: string }) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+    ?.map((ranking) =>
+      `${getProductNumber(ranking.productId)} ${getColorName(
+        ranking.productId
+      )}`
     );
 
   const dataList = {
@@ -109,7 +107,7 @@ export const PurchasePriceRanking: FC<Props> = ({
         label: "購入金額（円）",
         data: chartDataList
           ?.slice(0, rankingNumber)
-          ?.map((price: { price: number }) => price.price.toFixed()),
+          ?.map((price) => price.price.toFixed()),
         borderColor: "rgba(255, 206, 86, 1)",
         backgroundColor: "rgba(255, 206, 86, 0.5)",
       },

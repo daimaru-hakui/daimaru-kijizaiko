@@ -17,7 +17,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useUtil } from "../../hooks/UseUtil";
 import { SearchArea } from "../SearchArea";
 import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
-import { CuttingReportType, HistoryType } from "../../../types";
+import { CuttingReportType, History } from "../../../types";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 
 type Inputs = {
@@ -40,12 +40,8 @@ export const Charts: FC = () => {
     startDay,
     endDay
   );
-  const [filterCuttingReports, setFilterCuttingReports] = useState(
-    [] as CuttingReportType[]
-  );
-  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState(
-    [] as HistoryType[]
-  );
+  const [filterCuttingReports, setFilterCuttingReports] = useState<CuttingReportType[]>([]);
+  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState<History[]>([]);
 
   const methods = useForm<Inputs>({
     defaultValues: {

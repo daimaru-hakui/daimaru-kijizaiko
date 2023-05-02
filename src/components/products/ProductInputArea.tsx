@@ -20,10 +20,9 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
 import {
-  grayFabricsState,
+  useGrayFabricStore,
   useProductsStore,
   useSettingStore,
 } from "../../../store";
@@ -54,7 +53,7 @@ export const ProductInputArea: FC<Props> = ({
   // const { data: products } = useSWR(`/api/products`);
   const products = useProductsStore((state) => state.products);
   const { data: users } = useSWRImmutable<Data>(`/api/users/sales`);
-  const grayFabrics = useRecoilValue(grayFabricsState);
+  const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const locations = useSettingStore((state) => state.locations);
   const suppliers = useSettingStore((state) => state.suppliers);
   const colors = useSettingStore((state) => state.colors);
@@ -213,9 +212,9 @@ export const ProductInputArea: FC<Props> = ({
           )}
           <Flex
             gap={6}
-            alignItems="center"
-            justifyContent="space-between"
-            flexDirection={{ base: "column", md: "row" }}
+            align="center"
+            justify="space-between"
+            direction={{ base: "column", md: "row" }}
           >
             <Box w="100%" flex="1">
               <Text fontWeight="bold">
@@ -262,9 +261,9 @@ export const ProductInputArea: FC<Props> = ({
           </Flex>
           <Flex
             gap={6}
-            alignItems="center"
-            justifyContent="space-between"
-            flexDirection={{ base: "column", md: "row" }}
+            align="center"
+            justify="space-between"
+            direction={{ base: "column", md: "row" }}
           >
             <Box flex={2} w="100%">
               <Text fontWeight="bold">品名</Text>
@@ -294,8 +293,8 @@ export const ProductInputArea: FC<Props> = ({
           <Flex
             w={{ base: "100%" }}
             gap={6}
-            alignItems="center"
-            justifyContent="space-between"
+            align="center"
+            justify="space-between"
           >
             <Box flex={1} w="100%">
               <Text fontWeight="bold">外部 初期在庫（ｍ）</Text>
@@ -355,7 +354,7 @@ export const ProductInputArea: FC<Props> = ({
                   ))}
                 </select>
               </Box>
-              {locationShow.length > 0 && (
+              {locationShow?.length > 0 && (
                 <Box mt={1} border="1px" borderColor="#f4f4f4" p={1} w="150px">
                   {locationShow.map((location, index) => (
                     <Box key={index}>{location}</Box>
@@ -389,9 +388,9 @@ export const ProductInputArea: FC<Props> = ({
           <Flex
             gap={6}
             w="100%"
-            alignItems="flex-start"
-            justifyContent="space-between"
-            flexDirection={{ base: "column", md: "row" }}
+            align="flex-start"
+            justify="space-between"
+            direction={{ base: "column", md: "row" }}
           >
             <Stack spacing={6} flex={1} w="100%">
               <Box w="100%">

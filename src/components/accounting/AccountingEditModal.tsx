@@ -24,14 +24,14 @@ import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../firebase";
-import { HistoryType } from "../../../types";
+import { History } from "../../../types";
 import { useInputHistory } from "../../hooks/UseInputHistory";
 import useSWR from "swr";
 import { useAuthStore } from "../../../store";
 
 type Props = {
   type: string;
-  history: HistoryType;
+  history: History;
 };
 
 export const AccountingEditModal: FC<Props> = ({ type, history }) => {
@@ -49,8 +49,8 @@ export const AccountingEditModal: FC<Props> = ({ type, history }) => {
   }, [history, isOpen]);
 
   const updateHistoryAccountingOrder = async (
-    history: HistoryType,
-    items: HistoryType
+    history: History,
+    items: History
   ) => {
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);

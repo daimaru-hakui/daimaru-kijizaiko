@@ -11,11 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { useSetRecoilState } from "recoil";
 import { db } from "../../../../firebase";
 import { useAuthStore, useLoadingStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
-import { HistoryType } from "../../../../types";
+import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
@@ -37,7 +36,7 @@ type Inputs = {
 };
 
 type Data = {
-  contents: HistoryType[];
+  contents: History[];
 };
 
 export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
@@ -58,7 +57,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const { data, mutate } = useSWRPurchaseConfirms(startDay, endDay);
-  const [filterHistories, setFilterHistories] = useState<HistoryType[]>([]);
+  const [filterHistories, setFilterHistories] = useState<History[]>([]);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -81,12 +80,12 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   useEffect(() => {
-    let newHistories: HistoryType[];
+    let newHistories: History[];
     if (!staff) {
       newHistories = data?.contents;
     } else {
       newHistories = data?.contents?.filter(
-        (history: HistoryType) => staff === history.createUser || staff === ""
+        (history: History) => staff === history.createUser || staff === ""
       );
     }
     if (HOUSE_FACTORY) {
@@ -97,12 +96,12 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
       });
       setFilterHistories(newHistories);
     } else {
-      newHistories = newHistories?.filter((history: HistoryType) => history);
+      newHistories = newHistories?.filter((history: History) => history);
       setFilterHistories(newHistories);
     }
   }, [data, HOUSE_FACTORY, staff]);
 
-  const updateFabricPurchaseConfirm = async (history: HistoryType) => {
+  const updateFabricPurchaseConfirm = async (history: History) => {
     setIsLoading(true);
     const productDocRef = doc(db, "products", history.productId);
     const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
@@ -138,7 +137,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
     }
   };
 
-  const elementComment = (history: HistoryType, collectionName: string) => (
+  const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
       <CommentModal
         id={history.id}
@@ -207,17 +206,17 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     {history.accounting !== true
                       ? (isAuths(["rd", "tokushima"]) ||
-                          history?.createUser === currentUser) && (
-                          <HistoryEditModal
-                            history={history}
-                            type="confirm"
-                            items={items}
-                            setItems={setItems}
-                            onClick={() => {
-                              updateFabricPurchaseConfirm(history);
-                            }}
-                          />
-                        )
+                        history?.createUser === currentUser) && (
+                        <HistoryEditModal
+                          history={history}
+                          type="confirm"
+                          items={items}
+                          setItems={setItems}
+                          onClick={() => {
+                            updateFabricPurchaseConfirm(history);
+                          }}
+                        />
+                      )
                       : "金額確認済"}
                   </Td>
                 </Tr>

@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
 import { useProductsStore } from "../../../../store";
 import { Product } from "../../../../types";
 import { AdjustmentProduct } from "../../../components/adjustment/AdjustmentProduct";
