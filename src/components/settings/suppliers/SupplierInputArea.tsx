@@ -8,19 +8,19 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React, { useState, useEffect, FC } from "react";
-import { SupplierType } from "../../../../types";
+import { Supplier } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
   type: string;
-  supplier: SupplierType;
+  supplier: Supplier;
   addSupplier?: Function;
   updateSupplier?: Function;
 };
 
-type Inputs = SupplierType;
+type Inputs = Supplier;
 
 export const SupplierInputArea: FC<Props> = ({
   type,
@@ -28,7 +28,7 @@ export const SupplierInputArea: FC<Props> = ({
   addSupplier,
   updateSupplier,
 }: Props) => {
-  const [suppliers, setSuppliers] = useState([] as SupplierType[]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [flag, setFlag] = useState(false);
   const {
     register,
@@ -59,7 +59,7 @@ export const SupplierInputArea: FC<Props> = ({
     if (type === "edit") return;
     let item = watch("name");
     if (!item) item = "noValue";
-    const base = suppliers?.map((a: { name: string }) => a.name);
+    const base = suppliers?.map((supplier) => supplier.name);
     const result = base?.includes(item);
     if (!result) {
       setFlag(false);
@@ -73,9 +73,7 @@ export const SupplierInputArea: FC<Props> = ({
     const getData = async () => {
       const collectionRef = collection(db, "suppliers");
       const docSnap = await getDocs(collectionRef);
-      setSuppliers(
-        docSnap.docs.map((doc) => ({ ...doc.data() } as SupplierType))
-      );
+      setSuppliers(docSnap.docs.map((doc) => ({ ...doc.data() } as Supplier)));
     };
     getData();
   }, []);

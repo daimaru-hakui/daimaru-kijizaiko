@@ -12,18 +12,16 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useRecoilValue } from "recoil";
-import { locationsState } from "../../../../store";
+import { useSettingStore } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { CommentModal } from "../../../components/CommentModal";
-import { LocationType } from "../../../../types";
 import { EditLocationModal } from "../../../components/settings/locations/EditModal";
 import { NextPage } from "next";
 
 const Locations: NextPage = () => {
-  const locations = useRecoilValue(locationsState);
+  const locations = useSettingStore((state) => state.locations);
 
   const deleteLocation = async (locationId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -60,7 +58,7 @@ const Locations: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {locations?.map((location: LocationType) => (
+              {locations?.map((location) => (
                 <Tr key={location.id}>
                   <Td>{location.order}</Td>
                   <Td>{location.name}</Td>

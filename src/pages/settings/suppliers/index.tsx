@@ -4,7 +4,6 @@ import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
@@ -14,19 +13,16 @@ import {
 } from "@chakra-ui/react";
 
 import Link from "next/link";
-import { useRecoilValue } from "recoil";
-import { suppliersState } from "../../../../store";
+import { useSettingStore } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { CommentModal } from "../../../components/CommentModal";
 import { EditModal } from "../../../components/settings/suppliers/EditModal";
-import { SupplierType } from "../../../../types";
 import { NextPage } from "next";
 
 const Suppliers: NextPage = () => {
-  const suppliers = useRecoilValue(suppliersState);
-
+  const suppliers = useSettingStore((state) => state.suppliers);
   const deleteSupplier = async (supplierId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
@@ -62,7 +58,7 @@ const Suppliers: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {suppliers?.map((supplier: SupplierType) => (
+              {suppliers?.map((supplier) => (
                 <Tr key={supplier.id}>
                   <Td>{supplier.name}</Td>
                   <Td>{supplier.kana}</Td>

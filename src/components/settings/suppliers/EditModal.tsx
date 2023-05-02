@@ -13,17 +13,17 @@ import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { db } from "../../../../firebase";
-import { SupplierType } from "../../../../types";
+import { Supplier } from "../../../../types";
 import { SupplierInputArea } from "./SupplierInputArea";
 
 type Props = {
-  supplier: SupplierType;
+  supplier: Supplier;
 };
 
 export const EditModal: FC<Props> = ({ supplier }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const updateSupplier = async (data: SupplierType) => {
+  const updateSupplier = async (data: Supplier) => {
     const result = window.confirm("変更して宜しいでしょうか");
     if (!result) return;
     const docRef = doc(db, "suppliers", `${supplier.id}`);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { db } from "../../../../firebase";
-import { StockPlaceType } from "../../../../types";
+import { StockPlace } from "../../../../types";
 import { StockPlaceInputArea } from "../../../components/settings/stock-places/StockPlaceInputArea";
 import { NextPage } from "next";
 import { useAuthStore } from "../../../../store";
@@ -22,7 +22,7 @@ const StockPlaceNew: NextPage = () => {
     comment: "",
   });
 
-  const addStockPlace = async (data: StockPlaceType) => {
+  const addStockPlace = async (data: StockPlace) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     const collectionStockPlaces = collection(db, "stockPlaces");

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { db } from "../../../../firebase";
-import { SupplierType } from "../../../../types";
+import { Supplier } from "../../../../types";
 import { SupplierInputArea } from "../../../components/settings/suppliers/SupplierInputArea";
 import { NextPage } from "next";
 
@@ -19,9 +19,9 @@ const SupplierNew: NextPage = () => {
     tel: "",
     fax: "",
     comment: "",
-  } as SupplierType);
+  } as Supplier);
 
-  const addSupplier = async (data: SupplierType) => {
+  const addSupplier = async (data: Supplier) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     const collectionSupplier = collection(db, "suppliers");
@@ -49,7 +49,7 @@ const SupplierNew: NextPage = () => {
         rounded="md"
         boxShadow="md"
       >
-        <Flex justifyContent="space-between">
+        <Flex justify="space-between">
           <Box as="h2" fontSize="2xl">
             仕入先登録
           </Box>

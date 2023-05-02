@@ -13,25 +13,21 @@ import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { db } from "../../firebase";
 import {
-  colorsState,
   fabricDyeingOrdersState,
   fabricPurchaseOrdersState,
   grayFabricOrdersState,
   grayFabricsState,
-  locationsState,
-  materialNamesState,
-  stockPlacesState,
-  suppliersState,
   useAuthStore,
   useProductsStore,
+  useSettingStore,
 } from "../../store";
 import {
   User,
   GrayFabricType,
-  SupplierType,
+  Supplier,
   HistoryType,
-  StockPlaceType,
-  LocationType,
+  StockPlace,
+  Location,
   Product,
 } from "../../types";
 
@@ -41,11 +37,12 @@ export const useDataList = () => {
   const setUsers = useAuthStore((state) => state.setUsers);
   const setProducts = useProductsStore((state) => state.setProducts);
   const setGrayFabrics = useSetRecoilState(grayFabricsState);
-  const setSuppliers = useSetRecoilState(suppliersState);
-  const setStockPlaces = useSetRecoilState(stockPlacesState);
-  const setLocations = useSetRecoilState(locationsState);
-  const setMaterialNames = useSetRecoilState(materialNamesState);
-  const setColors = useSetRecoilState(colorsState);
+  const setSuppliers = useSettingStore((state) => state.setSuppliers);
+  const setStockPlaces = useSettingStore((state) => state.setStockPlaces);
+  const setLocations = useSettingStore((state) => state.setLocations);
+  const setMaterialNames = useSettingStore((state) => state.setMaterialNames);
+  const setColors = useSettingStore((state) => state.setColors);
+
   const setGrayFabricOrders = useSetRecoilState(grayFabricOrdersState);
   const setFabricDyeingOrders = useSetRecoilState(fabricDyeingOrdersState);
   const setFabricPurchaseOrders = useSetRecoilState(fabricPurchaseOrdersState);
@@ -216,7 +213,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setSuppliers(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as SupplierType)
+              (doc) => ({ ...doc.data(), id: doc.id } as Supplier)
             )
           )
         );
@@ -236,7 +233,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setStockPlaces(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as StockPlaceType)
+              (doc) => ({ ...doc.data(), id: doc.id } as StockPlace)
             )
           )
         );
@@ -256,7 +253,7 @@ export const useDataList = () => {
         onSnapshot(q, (querySnap) =>
           setLocations(
             querySnap.docs.map(
-              (doc) => ({ ...doc.data(), id: doc.id } as LocationType)
+              (doc) => ({ ...doc.data(), id: doc.id } as Location)
             )
           )
         );

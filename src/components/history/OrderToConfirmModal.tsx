@@ -21,13 +21,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState, useEffect, FC } from "react";
-import { useRecoilValue } from "recoil";
-import { stockPlacesState } from "../../../store";
-import {
-  GrayFabricHistoryType,
-  HistoryType,
-  StockPlaceType,
-} from "../../../types";
+import { useSettingStore } from "../../../store";
+import { HistoryType } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
@@ -45,7 +40,7 @@ export const OrderToConfirmModal: FC<Props> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [status, setStatus] = useState(1);
-  const stockPlaces = useRecoilValue(stockPlacesState);
+  const stockPlaces = useSettingStore((state) => state.stockPlaces);
   const { getTodayDate } = useUtil();
 
   useEffect(() => {

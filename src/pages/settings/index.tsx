@@ -15,9 +15,9 @@ const index: NextPage = () => {
       >
         <Flex
           gap={1}
-          alignItems="center"
-          justifyContent="flex-start"
-          flexDirection={{ base: "column", md: "row" }}
+          align="center"
+          justify="flex-start"
+          direction={{ base: "column", md: "row" }}
         >
           <Box w="100%">
             <Link href="/settings/auth">

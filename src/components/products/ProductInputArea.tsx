@@ -23,12 +23,9 @@ import { FC, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { features } from "../../../datalist";
 import {
-  colorsState,
   grayFabricsState,
-  locationsState,
-  materialNamesState,
-  suppliersState,
   useProductsStore,
+  useSettingStore,
 } from "../../../store";
 import { Product, User } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
@@ -56,12 +53,12 @@ export const ProductInputArea: FC<Props> = ({
 }) => {
   // const { data: products } = useSWR(`/api/products`);
   const products = useProductsStore((state) => state.products);
-  const locations = useRecoilValue(locationsState);
   const { data: users } = useSWRImmutable<Data>(`/api/users/sales`);
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const suppliers = useRecoilValue(suppliersState);
-  const colors = useRecoilValue(colorsState);
-  const materialNames = useRecoilValue(materialNamesState);
+  const locations = useSettingStore((state) => state.locations);
+  const suppliers = useSettingStore((state) => state.suppliers);
+  const colors = useSettingStore((state) => state.colors);
+  const materialNames = useSettingStore((state) => state.materialNames);
   const [locationShow, setLocationShow] = useState([]);
   const [flag, setFlag] = useState(false);
   const { getMixed, getLocation } = useGetDisp();

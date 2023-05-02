@@ -12,18 +12,16 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useRecoilValue } from "recoil";
-import { stockPlacesState } from "../../../../store";
+import { useSettingStore } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { EditModal } from "../../../components/settings/stock-places/EditModal";
 import { CommentModal } from "../../../components/CommentModal";
-import { StockPlaceType } from "../../../../types";
 import { NextPage } from "next";
 
 const StockPlaces: NextPage = () => {
-  const stockPlaces = useRecoilValue(stockPlacesState);
+  const stockPlaces = useSettingStore((state) => state.stockPlaces);
 
   const deleteStockPlace = async (stockPlaceId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -63,7 +61,7 @@ const StockPlaces: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {stockPlaces?.map((stockPlace: StockPlaceType) => (
+              {stockPlaces?.map((stockPlace) => (
                 <Tr key={stockPlace.id}>
                   <Td>{stockPlace.name}</Td>
                   <Td>{stockPlace.kana}</Td>
@@ -82,7 +80,7 @@ const StockPlaces: NextPage = () => {
                     </Flex>
                   </Td>
                   <Td>
-                    <Flex alignItems="center" justifyContent="center" gap={3}>
+                    <Flex align="center" justify="center" gap={3}>
                       <EditModal stockPlace={stockPlace} />
                       {stockPlace?.id !== "ifk1EZX80Jecxy04fqxu" && (
                         <FaTrashAlt

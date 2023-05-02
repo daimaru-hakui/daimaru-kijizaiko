@@ -1,22 +1,21 @@
 import { useRecoilValue } from "recoil";
 import {
   grayFabricsState,
-  locationsState,
-  suppliersState,
   useAuthStore,
   useProductsStore,
+  useSettingStore,
 } from "../../store";
-import { MaterialsType, LocationType } from "../../types";
+import { Materials, Location } from "../../types";
 
 export const useGetDisp = () => {
   const users = useAuthStore((state) => state.users);
   const products = useProductsStore((state) => state.products);
-  const suppliers = useRecoilValue(suppliersState);
+  const suppliers = useSettingStore((state) => state.suppliers);
+  const locations = useSettingStore((state) => state.locations);
   const grayFabrics = useRecoilValue(grayFabricsState);
-  const locations = useRecoilValue(locationsState);
 
   // 混率の表示
-  const getMixed = (materials: MaterialsType) => {
+  const getMixed = (materials: Materials) => {
     let array = [];
     const t = materials?.t ? `ポリエステル${materials.t}% ` : "";
     const c = materials?.c ? `綿${materials.c}% ` : "";
@@ -121,7 +120,7 @@ export const useGetDisp = () => {
 
   const getLocation = (locationId: string) => {
     const location = locations.find(
-      (location: LocationType) => location.id === locationId
+      (location: Location) => location.id === locationId
     );
     return location?.name || "";
   };
