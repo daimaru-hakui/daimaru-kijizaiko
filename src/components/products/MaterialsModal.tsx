@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, FC } from "react";
 import {
   Modal,
@@ -21,14 +22,14 @@ import {
 import { Materials } from "../../../types";
 
 type Props = {
-  materials: Materials[];
+  materials: Materials;
   setMaterials: Function;
 };
 
 export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [items, setItems] = useState<any>();
-  const [total, setTotal] = useState(true);
+  const [items, setItems] = useState<Materials>();
+  const [isTotal, setIsTotal] = useState(true);
 
   const list = [
     { id: "t", name: "ポリエステル" },
@@ -48,7 +49,7 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
 
   useEffect(() => {
     setItems({ ...materials });
-  }, [materials]);
+  }, []);
 
   const handleInputChange = (e: string, name: string) => {
     if (Number(e) === 0) {
@@ -62,16 +63,15 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
   };
 
   useEffect(() => {
-    const calcSum = (materials: any) => {
-      let sum = list
-        .map((m) => materials?.m?.id && materials?.m?.id)
-        .filter((m) => m)
-        .reduce((prev, current) => (prev = prev + current), 0);
+    const calcSum = (materials: Materials | {} = {}) => {
+      let sum = 0;
+      Object.values(materials).forEach((value) => {
+        sum += Number(value);
+      });
       const result = sum !== 100 ? true : false;
-      setTotal(result);
+      setIsTotal(result);
     };
     calcSum(items);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   const addMaterials = () => {
@@ -91,13 +91,13 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={6}>
-              {list.map((material: { id: string; name: string }) => (
-                <Flex key={material?.id} alignItems="center">
+              {list.map((material) => (
+                <Flex key={material?.id} align="center">
                   <Text w="100%">{material?.name}</Text>
                   <NumberInput
                     name={material?.id}
                     w="100%"
-                    defaultValue={items?.material?.id || ""}
+                    defaultValue={material?.id || ""}
                     value={
                       items &&
                       (items[material?.id] === 0 ? "" : items[material?.id])
@@ -122,7 +122,7 @@ export const MaterialsModal: FC<Props> = ({ materials, setMaterials }) => {
               閉じる
             </Button>
             <Button
-              disabled={total}
+              disabled={isTotal}
               colorScheme="blue"
               onClick={() => {
                 addMaterials();
