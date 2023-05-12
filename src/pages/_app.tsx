@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import "../../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -12,6 +13,7 @@ import { useAuthStore } from "../../store";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 const fetcher = (url: string) =>
   axios
@@ -39,6 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const session = useAuthStore((state) => state.session);
   const setSession = useAuthStore((state) => state.setSession);
   const setCurrentUser = useAuthStore((state) => state.setCurrentUser);
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     getUsers();
@@ -78,7 +81,6 @@ export default function App({ Component, pageProps }: AppProps) {
       });
     };
     getSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (
@@ -87,11 +89,13 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>大丸白衣 生地在庫アプリ</title>
       </Head>
       <ChakraProvider theme={theme}>
-        <SWRConfig value={{ fetcher }}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </SWRConfig>
+        <QueryClientProvider client={queryClient}>
+          <SWRConfig value={{ fetcher }}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </SWRConfig>
+        </QueryClientProvider>
       </ChakraProvider>
     </>
   );

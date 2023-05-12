@@ -10,7 +10,6 @@ import {
   Text,
   Flex,
   Button,
-  TableCaption,
   Input,
   InputGroup,
   InputLeftElement,
@@ -32,6 +31,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
+import { useProducts } from "../../hooks/Products/useQueryProducts";
 
 type Users = {
   contents: User[];
@@ -45,8 +45,10 @@ const Products: NextPage = () => {
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProductFunc();
   const { isAuths } = useAuthManagement();
-  const { quantityValueBold, halfToFullChar, getTodayDate } = useUtil();
+  const { halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
+
+
   const [search, setSearch] = useState<Product>({
     productNumber: "",
     staff: "",
@@ -193,7 +195,7 @@ const Products: NextPage = () => {
               lg: "calc(100vh - 310px)",
             }}
           >
-            {filterProducts?.length > 0 ? (
+            {products?.length > 0 ? (
               <Table variant="simple" size="sm" w="100%">
                 <Thead position="sticky" top={0} zIndex="docked" bg="white">
                   <Tr>
@@ -231,13 +233,13 @@ const Products: NextPage = () => {
                       <Td isNumeric>{product?.price.toLocaleString()}円</Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityValueBold(product?.wip)}
+                        fontWeight={product?.wip ? "bold" : "normal"}
                       >
                         {mathRound2nd(product?.wip || 0).toLocaleString()}m
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityValueBold(product?.externalStock)}
+                        fontWeight={product?.externalStock ? "bold" : "normal"}
                       >
                         {mathRound2nd(
                           product?.externalStock || 0
@@ -246,9 +248,7 @@ const Products: NextPage = () => {
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityValueBold(
-                          product?.arrivingQuantity
-                        )}
+                        fontWeight={product?.arrivingQuantity ? "bold" : "normal"}
                       >
                         {mathRound2nd(
                           product?.arrivingQuantity || 0
@@ -257,7 +257,7 @@ const Products: NextPage = () => {
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={quantityValueBold(product?.tokushimaStock)}
+                        fontWeight={product?.tokushimaStock ? "bold" : "normal"}
                       >
                         {mathRound2nd(
                           product?.tokushimaStock || 0

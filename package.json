@@ -28,6 +28,7 @@
     "react-firebase-hooks": "^5.1.0",
     "react-hook-form": "^7.43.7",
     "react-icons": "^4.6.0",
+    "react-query": "^3.39.3",
     "swr": "^2.0.3",
     "zustand": "^4.3.7"
   },

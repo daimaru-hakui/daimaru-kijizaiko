@@ -55,10 +55,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as User)
+          ({
+            ...doc.data(),
+            id: doc.id,
+          } as User)
         )
       )
     );
@@ -90,20 +90,15 @@ export const useDataList = () => {
       onSnapshot(q, (querySnap) =>
         setProducts(
           querySnap.docs
-            .map((doc) => ({ ...doc.data(), id: doc.id } as Product))
-            .sort(compareFunc)
+            .map((doc) => ({ ...doc.data(), id: doc.id } as Product)).sort((a, b) => (
+              a.productNumber < b.productNumber && -1
+            ))
         )
       );
     } catch (err) {
       console.log(err);
     }
   };
-
-  function compareFunc(a: any, b: any) {
-    if (a.productNumber < b.productNumber) {
-      return -1;
-    }
-  }
 
   // キバタ情報;
   const getGrayfabrics = async () => {
@@ -234,17 +229,13 @@ export const useDataList = () => {
       setColors([...querySnap?.data()?.data])
     );
   };
-  getColors();
+
 
   const getMaterialNames = async () => {
     onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
       setMaterialNames([...querySnap?.data()?.data])
     );
   };
-
-  // const start = () => {
-  //   return true;
-  // };
 
   return {
     getUsers,
