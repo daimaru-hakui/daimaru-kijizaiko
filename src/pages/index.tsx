@@ -2,12 +2,9 @@ import Head from "next/head";
 import { useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useDataList } from "../hooks/UseDataList";
 
 export default function Home() {
   const router = useRouter();
-  const { start } = useDataList();
-
   useEffect(() => {
     router.push("/dashboard");
   }, [router]);

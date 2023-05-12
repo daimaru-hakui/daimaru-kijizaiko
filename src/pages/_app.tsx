@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "../../store";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useDataList } from "../hooks/UseDataList";
 
 const fetcher = (url: string) =>
   axios
@@ -20,12 +21,40 @@ const fetcher = (url: string) =>
     });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const {
+    getUsers,
+    registerUser,
+    getProducts,
+    getFabricPurchaseOrders,
+    getGrayfabrics,
+    getGrayFabricOrders,
+    getFabricDyeingOrders,
+    getSuppliers,
+    getStockPlaces,
+    getLocations,
+    getColors,
+    getMaterialNames,
+  } = useDataList();
   const router = useRouter();
   const session = useAuthStore((state) => state.session);
   const setSession = useAuthStore((state) => state.setSession);
-  const currentUser = useAuthStore((state) => state.currentUser);
   const setCurrentUser = useAuthStore((state) => state.setCurrentUser);
-  const setUsers = useAuthStore((state) => state.setUsers);
+
+  useEffect(() => {
+    getUsers();
+    registerUser();
+    getProducts();
+    getFabricPurchaseOrders();
+    getGrayfabrics();
+    getGrayFabricOrders();
+    getFabricDyeingOrders();
+    getSuppliers();
+    getStockPlaces();
+    getLocations();
+    getColors();
+    getMaterialNames();
+    console.log("getproduct");
+  }, []);
 
   useEffect(() => {
     console.log("session");
@@ -38,7 +67,9 @@ export default function App({ Component, pageProps }: AppProps) {
         if (session) {
           setSession(session);
           setCurrentUser(session?.uid);
-          router.push("/");
+          if (router.pathname === "/login") {
+            router.push("/dashboard");
+          }
         } else {
           setSession(null);
           setCurrentUser(undefined);
@@ -49,6 +80,7 @@ export default function App({ Component, pageProps }: AppProps) {
     getSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
+
   return (
     <>
       <Head>
