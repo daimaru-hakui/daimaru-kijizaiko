@@ -12,7 +12,7 @@ import {
 import { FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { GrayFabric } from "../../../types";
-import { GrayFabricInputArea } from "./GrayFabricInputArea";
+import { GrayFabricForm } from "./GrayFabricForm";
 
 type Props = {
   grayFabric: GrayFabric;
@@ -30,7 +30,7 @@ export const GrayFabricEditModal: FC<Props> = ({ grayFabric }) => {
           <ModalHeader>キバタ詳細</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <GrayFabricInputArea
+            <GrayFabricForm
               title="キバタの更新"
               grayFabric={grayFabric}
               toggleSwitch="edit"

@@ -267,7 +267,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                   colorScheme="facebook"
                   disabled={items.remainingOrder >= 0 ? false : true}
                   onClick={() => {
-                    onClick(history);
+                    onClick(history, items);
                     onClose();
                   }}
                 >

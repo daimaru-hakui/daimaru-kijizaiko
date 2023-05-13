@@ -293,8 +293,8 @@ export const FabricsUsedInput: FC<Props> = ({
                     ? "red.300"
                     : ""
                   : getTokushimaStock(product.productId) < product?.quantity //新規
-                  ? "red.300"
-                  : ""
+                    ? "red.300"
+                    : ""
               }
               rounded="md"
               value={product?.quantity}

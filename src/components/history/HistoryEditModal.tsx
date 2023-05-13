@@ -43,13 +43,6 @@ export const HistoryEditModal: FC<Props> = ({
   orderType,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    deleteFabricDyeingOrderStock,
-    deleteFabricDyeingOrderRanning,
-    updateFabricDyeingOrderStock,
-    updateFabricDyeingOrderRanning,
-    confirmProcessingFabricDyeing
-  } = useFabricDyeing();
 
   // 初期値をitemsに代入
   useEffect(() => {

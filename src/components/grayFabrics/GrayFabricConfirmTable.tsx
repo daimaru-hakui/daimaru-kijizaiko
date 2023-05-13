@@ -12,16 +12,17 @@ import {
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useState, useEffect, FC } from "react";
 import { db } from "../../../firebase";
-import { GrayFabric, History } from "../../../types";
+import { GrayFabric, GrayFabricHistory, History } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { CommentModal } from "../CommentModal";
-import { HistoryEditModal } from "../history/HistoryEditModal";
 import { SearchArea } from "../SearchArea";
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
 import { useAuthStore } from "../../../store";
+import { GrayFabricEditModal } from "./GrayFabricEditModal";
+import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
 
 type Inputs = {
   start: string;
@@ -31,7 +32,6 @@ type Inputs = {
 };
 
 export const GrayFabricConfirmTable: FC = () => {
-  const [items, setItems] = useState<History>();
   const { getSerialNumber, getUserName } = useGetDisp();
   const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
@@ -39,8 +39,8 @@ export const GrayFabricConfirmTable: FC = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState<History[]>([]);
-  const { data, mutate } = useSWRGrayFavricConfirms(startDay, endDay);
+  const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabricHistory[]>([]);
+  const { data } = useSWRGrayFavricConfirms(startDay, endDay);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -63,55 +63,11 @@ export const GrayFabricConfirmTable: FC = () => {
   };
 
   useEffect(() => {
-    if (!staff) {
-      setFilterGrayFabrics(data?.contents);
-    } else {
-      setFilterGrayFabrics(
-        data?.contents?.filter(
-          (content: GrayFabric) =>
-            staff === content.createUser || staff === ""
-        )
-      );
-    }
+    setFilterGrayFabrics(
+      data?.contents.filter(
+        (content) => staff === content.createUser || staff === ""));
   }, [data, staff]);
 
-  const updateConfirmHistory = async (history: History) => {
-    const result = window.confirm("更新して宜しいでしょうか");
-    if (!result) return;
-
-    const grayFabricDocRef = doc(db, "grayFabrics", history.grayFabricId);
-    const historyDocRef = doc(db, "grayFabricConfirms", history.id);
-    try {
-      await runTransaction(db, async (transaction) => {
-        const grayFabricDocSnap = await transaction.get(grayFabricDocRef);
-        if (!grayFabricDocSnap.exists())
-          throw "grayFabricDocSnap does not exist!!";
-
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) throw "historyDocSnap does not exist!";
-
-        const newStock =
-          (await grayFabricDocSnap.data()?.stock) -
-          history.quantity +
-          Number(items.quantity) || 0;
-        transaction.update(grayFabricDocRef, {
-          stock: newStock,
-        });
-
-        transaction.update(historyDocRef, {
-          quantity: Number(items.quantity),
-          orderedAt: items.orderedAt,
-          fixedAt: items.fixedAt,
-          comment: items.comment,
-          updatedAt: serverTimestamp(),
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      mutate({ ...data });
-    }
-  };
   return (
     <>
       <FormProvider {...methods}>
@@ -159,13 +115,11 @@ export const GrayFabricConfirmTable: FC = () => {
                   <Td>
                     {(isAuths(["rd"]) ||
                       history.createUser === currentUser) && (
-                        <HistoryEditModal
+                        <GrayFabricHistoryEditModal
                           history={history}
+                          startDay={startDay}
+                          endDay={endDay}
                           type="confirm"
-                          items={items}
-                          setItems={setItems}
-                          onClick={updateConfirmHistory}
-                          orderType=""
                         />
                       )}
                   </Td>

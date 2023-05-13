@@ -1,7 +1,7 @@
 import { Box, Container } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
-import { GrayFabricInputArea } from "../../components/grayFabrics/GrayFabricInputArea";
+import { GrayFabricForm } from "../../components/grayFabrics/GrayFabricForm";
 
 const GrayFabricsNew: NextPage = () => {
   const [grayFabric, setGrayFabric] = useState({
@@ -28,7 +28,7 @@ const GrayFabricsNew: NextPage = () => {
         <Box as="h1" fontSize="2xl">
           キバタ登録
         </Box>
-        <GrayFabricInputArea
+        <GrayFabricForm
           title="登録"
           grayFabric={grayFabric}
           toggleSwitch="new"

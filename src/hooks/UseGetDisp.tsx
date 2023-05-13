@@ -5,6 +5,7 @@ import {
   useSettingStore,
 } from "../../store";
 import { Materials, Location } from "../../types";
+import { useUtil } from "./UseUtil";
 
 export const useGetDisp = () => {
   const users = useAuthStore((state) => state.users);
@@ -12,6 +13,7 @@ export const useGetDisp = () => {
   const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const suppliers = useSettingStore((state) => state.suppliers);
   const locations = useSettingStore((state) => state.locations);
+  const { mathRound2nd } = useUtil();
 
   // 混率の表示
   const getMixed = (materials: Materials) => {
@@ -109,7 +111,7 @@ export const useGetDisp = () => {
   // 徳島在庫数を取得
   const getTokushimaStock = (productId: string) => {
     const stock = products.find((product) => product.id === productId);
-    return stock?.tokushimaStock || 0;
+    return mathRound2nd(stock?.tokushimaStock) || 0;
   };
 
   const getPrice = (productId: string) => {

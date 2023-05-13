@@ -23,7 +23,7 @@ type Props = {
   onClose?: Function;
 };
 
-export const GrayFabricInputArea: FC<Props> = ({
+export const GrayFabricForm: FC<Props> = ({
   title,
   grayFabric,
   toggleSwitch,
