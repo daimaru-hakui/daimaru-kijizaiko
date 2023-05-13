@@ -7,11 +7,11 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { db } from "../../../firebase";
-import { useAuthStore, useLoadingStore, useProductsStore } from "../../../store";
-import { Product } from "../../../types";
-import { useGetDisp } from "../UseGetDisp";
-import { useUtil } from "../UseUtil";
+import { db } from "../../firebase";
+import { useAuthStore, useLoadingStore, useProductsStore } from "../../store";
+import { Product } from "../../types";
+import { useGetDisp } from "./UseGetDisp";
+import { useUtil } from "./UseUtil";
 
 export const useProducts = () => {
   const router = useRouter();

@@ -30,7 +30,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
-import { useProducts } from "../../hooks/products/useProducts";
+import { useProducts } from "../../hooks/useProducts";
 
 type Users = {
   contents: User[];

@@ -26,7 +26,7 @@ import {
   useProductsStore,
   useSettingStore,
 } from "../../../store";
-import { useProducts } from "../../hooks/products/useProducts";
+import { useProducts } from "../../hooks/useProducts";
 import { Product, User } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { MaterialsModal } from "./MaterialsModal";
