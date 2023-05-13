@@ -19,7 +19,7 @@ import { CommentModal } from "../CommentModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
-import { useGrayFabrics } from "../../hooks/grayfabrics/useGrayFabrics";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 
 export const GrayFabricOrderTable: FC = () => {
   const currentUser = useAuthStore((state) => state.currentUser);

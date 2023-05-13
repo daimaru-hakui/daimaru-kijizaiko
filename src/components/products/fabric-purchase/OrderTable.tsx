@@ -22,7 +22,7 @@ import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { OrderToConfirmModal } from "../../history/OrderToConfirmModal";
-import { useFabricPurchase } from "../../../hooks/products/useFabricPurchase";
+import { useFabricPurchase } from "../../../hooks/useFabricPurchase";
 
 type Props = {
   HOUSE_FACTORY?: string;

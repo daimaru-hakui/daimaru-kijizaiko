@@ -1,12 +1,12 @@
 import React from 'react'
-import { GrayFabric, GrayFabricHistory } from '../../../types';
+import { GrayFabric, GrayFabricHistory } from '../../types';
 import { addDoc, collection, deleteDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { useAuthStore } from '../../../store';
-import { useUtil } from '../UseUtil';
-import { useSWRGrayFavricConfirms } from '../swr/useSWRGrayFavricConfirms';
+import { db } from '../../firebase';
+import { useAuthStore } from '../../store';
+import { useUtil } from './UseUtil';
+import { useSWRGrayFavricConfirms } from './swr/useSWRGrayFavricConfirms';
 import { useRouter } from 'next/router';
-import { useGetDisp } from '../UseGetDisp';
+import { useGetDisp } from './UseGetDisp';
 
 type Inputs = {
   quantity: number,

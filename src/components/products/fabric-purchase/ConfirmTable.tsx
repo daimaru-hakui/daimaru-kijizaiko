@@ -21,7 +21,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { HistoryProductMenu } from "../../tokushima/HistoryProductMenu";
 import { SearchArea } from "../../SearchArea";
 import { useSWRPurchaseConfirms } from "../../../hooks/swr/useSWRPurchaseConfirms";
-import { useFabricPurchase } from "../../../hooks/products/useFabricPurchase";
+import { useFabricPurchase } from "../../../hooks/useFabricPurchase";
 
 type Props = {
   HOUSE_FACTORY?: string;

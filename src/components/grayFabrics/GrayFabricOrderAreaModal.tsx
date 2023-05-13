@@ -23,7 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { GrayFabric } from "../../../types";
-import { useGrayFabrics } from "../../hooks/grayfabrics/useGrayFabrics";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {

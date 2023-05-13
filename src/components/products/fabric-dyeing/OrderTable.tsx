@@ -22,7 +22,7 @@ import {
 } from "../../../../store";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { OrderToConfirmModal } from "../../history/OrderToConfirmModal";
-import { useFabricDyeing } from "../../../hooks/products/useFabricDyeing";
+import { useFabricDyeing } from "../../../hooks/useFabricDyeing";
 
 export const FabricDyeingOrderTable: FC = () => {
   const currentUser = useAuthStore((state) => state.currentUser);

@@ -23,7 +23,7 @@ import {
 import { FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useGrayFabrics } from "../../hooks/grayfabrics/useGrayFabrics";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 import { GrayFabricHistory } from "../../../types";
 
 type Props = {

@@ -1,9 +1,9 @@
 import React from 'react'
-import { EditedHistory, History } from '../../../types';
+import { EditedHistory, History } from '../../types';
 import { collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { useAuthStore, useLoadingStore } from '../../../store';
-import { useUtil } from '../UseUtil';
+import { db } from '../../firebase';
+import { useAuthStore, useLoadingStore } from '../../store';
+import { useUtil } from './UseUtil';
 import { useRouter } from 'next/router';
 
 export const useFabricPurchase = () => {

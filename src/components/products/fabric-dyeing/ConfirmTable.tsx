@@ -20,7 +20,7 @@ import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
 import { SearchArea } from "../../SearchArea";
 import { useSWRFabricDyeingConfirms } from "../../../hooks/swr/useSWRFabricDyeingConfirms";
-import { useFabricDyeing } from "../../../hooks/products/useFabricDyeing";
+import { useFabricDyeing } from "../../../hooks/useFabricDyeing";
 
 type Inputs = {
   start: string;
