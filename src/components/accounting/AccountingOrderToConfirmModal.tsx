@@ -18,70 +18,37 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, FC } from "react";
-import { useAuthStore } from "../../../store";
-import { db } from "../../../firebase";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { FC } from "react";
 import { History } from "../../../types";
-import { useInputHistory } from "../../hooks/UseInputHistory";
-import { useRouter } from "next/router";
-import useSWR from "swr";
+import { useAccounting } from "../../hooks/accounting/useAccounting";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {
   history: History;
+  startDay: string;
+  endDay: string;
 };
 
-export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
-  const router = useRouter();
+type Inputs = {
+  quantity: number,
+  price: number,
+  orderedAt: string;
+  fixedAt: string;
+  comment: string;
+};
+
+export const AccountingOrderToConfirmModal: FC<Props> = ({ history, startDay, endDay }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { items, setItems, handleNumberChange, onReset } = useInputHistory();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const HOUSE_FACTORY = "徳島工場";
-  const { data, mutate, isLoading } = useSWR("/api/fabric-purchase-confirms");
-
-  useEffect(() => {
-    setItems({ ...history });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, isOpen]);
-
-  // 購入状況　確定処理
-  const confirmProcessingAccounting = async (
-    history: History,
-    items: History
-  ) => {
-    const result = window.confirm("確定して宜しいでしょうか");
-    if (!result) return;
-
-    const productDocRef = doc(db, "products", history.productId);
-    const confirmHistoryDocRef = doc(db, "fabricPurchaseConfirms", history.id);
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product does not exist!!";
-
-        if (history.stockPlace === HOUSE_FACTORY) {
-          const stock = productDocSnap.data().tokushimaStock || 0;
-          const newStock = stock - history.quantity + Number(items.quantity);
-          transaction.update(productDocRef, {
-            tokushimaStock: newStock,
-          });
-        }
-
-        transaction.update(confirmHistoryDocRef, {
-          quantity: Number(items.quantity),
-          price: Number(items.price),
-          updateUser: currentUser,
-          updatedAt: serverTimestamp(),
-          accounting: true,
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      mutate("/api/fabric-purchase-confirms");
-      router.push("/accounting-dept/confirms");
+  const { confirmProcessingAccounting } = useAccounting(startDay, endDay);
+  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<Inputs>({
+    defaultValues: {
+      ...history
     }
+  });
+
+  const onSubmit: SubmitHandler<Inputs> = data => {
+    confirmProcessingAccounting(history, data);
+    onClose();
   };
 
   return (
@@ -99,89 +66,88 @@ export const AccountingOrderToConfirmModal: FC<Props> = ({ history }) => {
       <Modal
         isOpen={isOpen}
         onClose={() => {
-          onReset(history);
+          reset();
           onClose();
         }}
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>確定処理</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={6}>
-              <Flex gap={3}>
-                <Box>品　　番</Box>
-                <Flex gap={1}>
-                  <Box>{history.productNumber}</Box>
-                  <Box>{history.productName}</Box>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <ModalHeader>確定処理</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack spacing={6}>
+                <Flex gap={3}>
+                  <Box>品　　番</Box>
+                  <Flex gap={1}>
+                    <Box>{history.productNumber}</Box>
+                    <Box>{history.productName}</Box>
+                  </Flex>
                 </Flex>
-              </Flex>
 
-              <Box>
-                <>
-                  <Box w="100%">
-                    <Text>入荷数量（ｍ）</Text>
-                    <NumberInput
-                      mt={1}
-                      name="quantity"
-                      defaultValue={0}
-                      min={0}
-                      max={100000}
-                      value={items.quantity}
-                      onChange={(e) => handleNumberChange(e, "quantity")}
-                    >
-                      <NumberInputField textAlign="right" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </Box>
-                  <Box w="100%" mt={3}>
-                    <Text>単価（円）</Text>
-                    <NumberInput
-                      mt={1}
-                      name="price"
-                      defaultValue={0}
-                      min={0}
-                      max={100000}
-                      value={items.price}
-                      onChange={(e) => handleNumberChange(e, "price")}
-                    >
-                      <NumberInputField textAlign="right" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </Box>
-                </>
-              </Box>
-            </Stack>
-          </ModalBody>
+                <Box>
+                  <>
+                    <Box w="100%">
+                      <Text>入荷数量（ｍ）</Text>
+                      <NumberInput
+                        mt={1}
+                        name="quantity"
+                        defaultValue={0}
+                        {...register('quantity')}
+                        min={0}
+                        max={100000}
+                        onChange={getValues}
+                      >
+                        <NumberInputField textAlign="right" />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </Box>
+                    <Box w="100%" mt={3}>
+                      <Text>単価（円）</Text>
+                      <NumberInput
+                        mt={1}
+                        name="price"
+                        defaultValue={0}
+                        {...register('price')}
+                        min={0}
+                        max={100000}
+                        onChange={getValues}
+                      >
+                        <NumberInputField textAlign="right" />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </Box>
+                  </>
+                </Box>
+              </Stack>
+            </ModalBody>
 
-          <ModalFooter>
-            <>
-              <Button
-                mr={3}
-                onClick={() => {
-                  onReset(history);
-                  onClose();
-                }}
-              >
-                閉じる
-              </Button>
-              <Button
-                colorScheme="facebook"
-                onClick={() => {
-                  confirmProcessingAccounting(history, items);
-                  onClose();
-                }}
-              >
-                確定
-              </Button>
-            </>
-          </ModalFooter>
+            <ModalFooter>
+              <>
+                <Button
+                  mr={3}
+                  onClick={() => {
+                    reset();
+                    onClose();
+                  }}
+                >
+                  閉じる
+                </Button>
+                <Button
+                  type="submit"
+                  colorScheme="facebook"
+                >
+                  確定
+                </Button>
+              </>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
     </>

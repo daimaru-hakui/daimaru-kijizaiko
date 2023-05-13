@@ -26,8 +26,6 @@ type Inputs = {
   staff: string;
 };
 
-
-
 export const AccountingConfirmTable: FC = () => {
   const [filterHistories, setFilterHistories] = useState<History[]>([]);
   const { getUserName, getSerialNumber } = useGetDisp();
@@ -35,7 +33,7 @@ export const AccountingConfirmTable: FC = () => {
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
-  const { data, mutate } = useSWRPurchaseConfirms(startDay, endDay);
+  const { data } = useSWRPurchaseConfirms(startDay, endDay);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -58,24 +56,12 @@ export const AccountingConfirmTable: FC = () => {
   };
 
   useEffect(() => {
-    if (!staff) {
-      setFilterHistories(
-        data?.contents.filter(
-          (history: History) => history.accounting === true && history
-        )
-      );
-    } else {
-      setFilterHistories(
-        data?.contents
-          ?.filter(
-            (content: History) =>
-              staff === content.createUser || staff === ""
-          )
-          .filter(
-            (history: History) => history.accounting === true && history
-          )
-      );
-    }
+    setFilterHistories(
+      data?.contents
+        ?.filter((history) =>
+          (staff === history.createUser && history.accounting === true) ||
+          (staff === "" && history.accounting === true))
+    );
   }, [data, staff]);
 
   const elementComment = (history: History, collectionName: string) => (
@@ -90,73 +76,81 @@ export const AccountingConfirmTable: FC = () => {
     </Flex>
   );
 
-  const elmentEdit = (history: History) => (
-    <Flex gap={3}>
-      <AccountingEditModal type="order" history={history} />
-    </Flex>
-  );
-
   return (
     <>
       <FormProvider {...methods}>
         <SearchArea onSubmit={onSubmit} onReset={onReset} />
       </FormProvider>
-      <TableContainer p={6} pt={0} w="100%">
-        {filterHistories?.length > 0 ? (
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>発注NO.</Th>
-                <Th>発注日</Th>
-                <Th>入荷日</Th>
-                <Th>担当者</Th>
-                <Th>品番</Th>
-                <Th>色</Th>
-                <Th>品名</Th>
-                <Th>数量</Th>
-                <Th>単価</Th>
-                <Th>金額</Th>
-                <Th>出荷先</Th>
-                <Th>コメント</Th>
-                <Th>編集</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filterHistories?.map((history) => (
-                <Tr key={history.id}>
-                  <Td>{getSerialNumber(history?.serialNumber)}</Td>
-                  <Td>{history?.orderedAt}</Td>
-                  <Td>{history?.fixedAt}</Td>
-                  <Td>{getUserName(history.createUser)}</Td>
-                  <Td>{history.productNumber}</Td>
-                  {history.colorName && <Td>{history.colorName}</Td>}
-                  <Td>{history.productName}</Td>
-                  <Td>{history?.quantity.toLocaleString()}m</Td>
-                  {history.price && (
-                    <>
-                      <Td>{history?.price.toLocaleString()}円</Td>
-                      <Td>
-                        {(history?.quantity * history?.price).toLocaleString()}
-                        円
-                      </Td>
-                    </>
-                  )}
-                  <Td>{history?.stockPlace}</Td>
-                  <Td w="100%" textAlign="center">
-                    {elementComment(history, "fabricPurchaseConfirms")}
-                  </Td>
-                  <Td>
-                    <Flex gap={3}>{elmentEdit(history)}</Flex>
-                  </Td>
+      <TableContainer px={6} pt={6} pb={0} w="100%" overflowX="unset" overflowY="unset">
+        <Box
+          mt={3}
+          w="full"
+          overflowX="auto"
+          position="relative"
+          h={{
+            base: "calc(100vh - 405px)",
+            md: "calc(100vh - 360px)",
+            lg: "calc(100vh - 310px)",
+          }}
+        >
+          {filterHistories?.length > 0 ? (
+            <Table variant="simple" size="sm">
+              <Thead position="sticky" top={0} zIndex="docked" bg="white">
+                <Tr>
+                  <Th>発注NO.</Th>
+                  <Th>発注日</Th>
+                  <Th>入荷日</Th>
+                  <Th>担当者</Th>
+                  <Th>品番</Th>
+                  <Th>色</Th>
+                  <Th>品名</Th>
+                  <Th>数量</Th>
+                  <Th>単価</Th>
+                  <Th>金額</Th>
+                  <Th>出荷先</Th>
+                  <Th>コメント</Th>
+                  <Th>編集</Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        ) : (
-          <Box mt={6} textAlign="center">
-            現在登録された情報はありません。
-          </Box>
-        )}
+              </Thead>
+              <Tbody>
+                {filterHistories?.map((history) => (
+                  <Tr key={history.id}>
+                    <Td>{getSerialNumber(history?.serialNumber)}</Td>
+                    <Td>{history?.orderedAt}</Td>
+                    <Td>{history?.fixedAt}</Td>
+                    <Td>{getUserName(history.createUser)}</Td>
+                    <Td>{history.productNumber}</Td>
+                    {history.colorName && <Td>{history.colorName}</Td>}
+                    <Td>{history.productName}</Td>
+                    <Td isNumeric>{history?.quantity.toLocaleString()}m</Td>
+                    {history.price && (
+                      <>
+                        <Td isNumeric>{history?.price.toLocaleString()}円</Td>
+                        <Td isNumeric>
+                          {(history?.quantity * history?.price).toLocaleString()}
+                          円
+                        </Td>
+                      </>
+                    )}
+                    <Td>{history?.stockPlace}</Td>
+                    <Td w="100%" textAlign="center">
+                      {elementComment(history, "fabricPurchaseConfirms")}
+                    </Td>
+                    <Td>
+                      <Flex gap={3}>
+                        <AccountingEditModal history={history} startDay={startDay} endDay={endDay} />
+                      </Flex>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          ) : (
+            <Box mt={6} textAlign="center">
+              現在登録された情報はありません。
+            </Box>
+          )}
+        </Box>
       </TableContainer>
     </>
   );

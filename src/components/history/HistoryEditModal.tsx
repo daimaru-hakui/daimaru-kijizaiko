@@ -23,9 +23,10 @@ import {
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { History } from "../../../types";
+import { useFabricDyeing } from "../../hooks/products/useFabricDyeing";
 
 type Props = {
-  history: any;
+  history: History;
   type: string;
   onClick: Function;
   items: any;
@@ -42,6 +43,13 @@ export const HistoryEditModal: FC<Props> = ({
   orderType,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    deleteFabricDyeingOrderStock,
+    deleteFabricDyeingOrderRanning,
+    updateFabricDyeingOrderStock,
+    updateFabricDyeingOrderRanning,
+    confirmProcessingFabricDyeing
+  } = useFabricDyeing();
 
   // 初期値をitemsに代入
   useEffect(() => {
@@ -191,7 +199,7 @@ export const HistoryEditModal: FC<Props> = ({
             <Button
               colorScheme="blue"
               onClick={() => {
-                onClick(history);
+                onClick();
                 onClose();
               }}
             >

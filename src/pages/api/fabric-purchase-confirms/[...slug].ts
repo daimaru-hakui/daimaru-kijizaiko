@@ -26,6 +26,7 @@ export default async function handler(
       .get();
     const contents = querySnapshot.docs
       .map((doc) => ({ ...doc.data(), id: doc.id } as History))
+      .filter((doc)=> doc.quantity > 0)
       .sort((a, b) => {
         if (a.fixedAt > b.fixedAt) {
           return -1;

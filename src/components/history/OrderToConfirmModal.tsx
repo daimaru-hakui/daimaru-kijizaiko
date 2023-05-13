@@ -129,7 +129,6 @@ export const OrderToConfirmModal: FC<Props> = ({
                       <NumberInput
                         mt={1}
                         name="quantity"
-                        // defaultValue={0}
                         min={0}
                         max={100000}
                         value={items?.quantity}
@@ -153,6 +152,7 @@ export const OrderToConfirmModal: FC<Props> = ({
                         onChange={handleInputChange}
                       />
                     </Box>
+
                     {items?.orderType === "purchase" && (
                       <Box w="100%" mt={3}>
                         <Text>送り先</Text>
@@ -171,6 +171,13 @@ export const OrderToConfirmModal: FC<Props> = ({
                         </Select>
                       </Box>
                     )}
+                    {items?.comment && (
+                      <Box w="full" mt={3}>
+                        <Text>コメント</Text>
+                        <Box mt={1}> {items?.comment}</Box>
+                      </Box>
+                    )}
+
                   </>
                 )}
                 {status === 2 && (

@@ -9,19 +9,18 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { useAuthStore, useLoadingStore } from "../../../../store";
+import { useAuthStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
-import { db } from "../../../../firebase";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 import { useUtil } from "../../../hooks/UseUtil";
 import { useForm, FormProvider } from "react-hook-form";
 import { SearchArea } from "../../SearchArea";
 import { useSWRFabricDyeingConfirms } from "../../../hooks/swr/useSWRFabricDyeingConfirms";
+import { useFabricDyeing } from "../../../hooks/products/useFabricDyeing";
 
 type Inputs = {
   start: string;
@@ -32,7 +31,6 @@ type Inputs = {
 
 export const FabricDyeingConfirmTable: FC = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [filterHistories, setFilterHistories] = useState<History[]>([]);
   const { isAuths } = useAuthManagement();
@@ -50,6 +48,7 @@ export const FabricDyeingConfirmTable: FC = () => {
   const [staff, setStaff] = useState("");
 
   const { data, mutate } = useSWRFabricDyeingConfirms(startDay, endDay);
+  const { updateFabricDyeingConfirm } = useFabricDyeing();
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,
@@ -71,53 +70,12 @@ export const FabricDyeingConfirmTable: FC = () => {
   };
 
   useEffect(() => {
-    if (!staff) {
-      setFilterHistories(data?.contents);
-    } else {
-      setFilterHistories(
-        data?.contents
-          ?.filter((history) => history.quantity > 0 && history)
-          .filter(
-            (content: History) =>
-              staff === content.createUser || staff === ""
-          )
-      );
-    }
+    setFilterHistories(
+      data?.contents?.filter(
+        (history) => staff === history.createUser || staff === ""
+      )
+    );
   }, [data, staff]);
-
-  const updateFabricDyeingConfirm = async (history: History) => {
-    setIsLoading(true);
-    const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "fabricDyeingConfirms", history.id);
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        const stock = (await productDocSnap.data().externalStock) || 0;
-        const newStock = stock - history.quantity + Number(items.quantity);
-        transaction.update(productDocRef, {
-          externalStock: Number(newStock),
-        });
-
-        transaction.update(historyDocRef, {
-          quantity: Number(items.quantity),
-          price: Number(items.price),
-          fixedAt: items.fixedAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-      mutate({ ...data });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
@@ -181,7 +139,7 @@ export const FabricDyeingConfirmTable: FC = () => {
                           type="confirm"
                           items={items}
                           setItems={setItems}
-                          onClick={() => updateFabricDyeingConfirm(history)}
+                          onClick={() => updateFabricDyeingConfirm(history, items, data, mutate)}
                           orderType=""
                         />
                       )}

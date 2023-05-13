@@ -28,7 +28,7 @@ import {
 } from "../../../store";
 import { Product, User } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useProductFunc } from "../../hooks/UseProductFunc";
+import { useProductFunc } from "../../hooks/products/useProductFunc";
 import { MaterialsModal } from "./MaterialsModal";
 import { useForm } from "react-hook-form";
 import useSWRImmutable from "swr/immutable";

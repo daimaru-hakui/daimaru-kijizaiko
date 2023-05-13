@@ -1,26 +1,20 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-} from "firebase/firestore";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { db } from "../../firebase";
-import { useLoadingStore, useAuthStore } from "../../store";
-import { CuttingProductType, CuttingReportType } from "../../types";
-import { useGetDisp } from "./UseGetDisp";
-import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
+import { collection, deleteDoc, doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import React, { useState } from 'react'
+import { db } from '../../../firebase';
+import { useRouter } from 'next/router';
+import { useAuthStore, useLoadingStore } from '../../../store';
+import { useGetDisp } from '../UseGetDisp';
+import { CuttingProductType, CuttingReportType } from '../../../types';
+import { mutate } from 'swr';
+import { Mutation, useMutation, useQueryClient } from 'react-query';
 
-export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
+export const useMutateCuttingReports = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const currentUser = useAuthStore((state) => state.currentUser);
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getUserName, getProductNumber } = useGetDisp();
   const [csvData, setCsvData] = useState([]);
-  const { data, mutate } = useSWRCuttingReportImutable(startDay, endDay);
 
   // 用尺計算
   const calcScale = (meter: number, totalQuantity: number) => {
@@ -30,7 +24,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   };
 
   // 裁断報告書作成
-  const addCuttingReport = async (data, items) => {
+  const addCuttingReport = async (data:CuttingReportType, items:CuttingProductType[]) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -38,7 +32,6 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
     const serialNumberDocRef = doc(db, "serialNumbers", "cuttingReportNumbers");
     const cuttingReportDocRef = doc(collection(db, "cuttingReports"));
 
-    try {
       await runTransaction(db, async (transaction) => {
         const serialNumberDocSnap = await transaction.get(serialNumberDocRef);
         if (!serialNumberDocSnap.exists())
@@ -77,18 +70,13 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
-
+        console.log('result',result)
       });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-      await router.push("/tokushima/cutting-reports");
-    }
+   
   };
 
   // 裁断報告書更新
-  const updateCuttingReport = async (data: CuttingReportType, items: CuttingProductType[], reportId: string) => {
+  const updateCuttingReport = async ({ data, items, reportId } ) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -119,9 +107,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
             transaction.update(productDocRef, {
               tokushimaStock: Math.round(newTokushimaStock * 100) / 100,
             });
-            if (items.length - 1 === index) {
-              await mutate({ ...data });
-            }
+      
           });
         });
         const products = items.map((product) => ({
@@ -140,8 +126,73 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
       console.log(err);
     } finally {
       setIsLoading(false);
+      const docSnap = getDoc(cuttingReportDocRef);
+      return docSnap;
     }
   };
+
+  const update = useMutation({
+    mutationFn: async (obj:any) => {
+    const result = window.confirm("更新して宜しいでしょうか");
+    if (!result) return;
+    const cuttingReportDocRef = doc(db, "cuttingReports", obj.reportId);
+    const productsRef = collection(db, "products");
+    try {
+      runTransaction(db, async (transaction) => {
+        const cuttingReportDoc = await transaction.get(cuttingReportDocRef);
+
+        obj.items?.map(async (product, index) => {
+          if (!product.productId) return;
+          const productDocRef = doc(productsRef, product.productId);
+          runTransaction(db, async (transaction) => {
+            const productSnap = await transaction.get(productDocRef);
+            if (!productSnap.exists()) throw "productSnap does not exist!";
+
+            const tokushimaStock =
+              (await productSnap.data()?.tokushimaStock) || 0;
+
+            const initValue =
+              (await cuttingReportDoc.data()?.products[index]?.quantity) || 0;
+
+            const newTokushimaStock =
+              Number(tokushimaStock) +
+              Number(initValue) -
+              Number(product.quantity);
+            transaction.update(productDocRef, {
+              tokushimaStock: Math.round(newTokushimaStock * 100) / 100,
+            });
+      
+          });
+        });
+        const products = obj.items.map((product) => ({
+          ...product,
+          quantity: Number(product.quantity),
+        }));
+        transaction.update(cuttingReportDocRef, {
+          ...obj.data,
+          products,
+          createdAt: cuttingReportDoc.data()?.createdAt.toDate(),
+          updatedAt: serverTimestamp(),
+          totalQuantity: Number(obj.data.totalQuantity),
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      const result = {...obj.data, products:[...obj.items]}
+      return result
+    }
+  },
+    onSuccess: async(data) => {
+      const previousPosts = queryClient.getQueryData<CuttingReportType[]>(['cuttingReports']);
+      if (previousPosts) {
+        queryClient.setQueryData<CuttingReportType[]>(['cuttingReports'], previousPosts.map((prev) => (
+          prev.id === data.id ? data : prev 
+        )));
+        queryClient.setQueryData<CuttingReportType>(['cuttingReports',data.id], data);
+      }
+    },
+  })
 
   const deleteCuttingReport = async (reportId: string) => {
     const result = window.confirm("削除して宜しいでしょうか");
@@ -160,53 +211,5 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
     const value = meter / totalQuantity;
     return value ? value.toFixed(2) : 0;
   };
-
-  //CSV作成
-  useEffect(() => {
-    const headers = [
-      "伝票ナンバー",
-      "裁断日",
-      "担当者名",
-      "加工指示書No.",
-      "種別",
-      "品名",
-      "受注先名",
-      "数量",
-      "カテゴリー",
-      "生地品番",
-      "数量",
-      "用尺",
-    ];
-    let body = [];
-    body.push(headers);
-    data?.contents?.forEach((report: CuttingReportType) => {
-      report.products.forEach((product) => {
-        body.push([
-          report.serialNumber,
-          report.cuttingDate,
-          getUserName(report.staff),
-          String(report.processNumber && "No." + report.processNumber),
-          Number(report.itemType) === 1 ? "既製品" : "別注品",
-          report.itemName,
-          report.client,
-          report.totalQuantity,
-          product.category,
-          getProductNumber(product.productId),
-          product.quantity,
-          scaleCalc(product.quantity, report.totalQuantity),
-        ]);
-      });
-    });
-    setCsvData(body);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  return {
-    calcScale,
-    addCuttingReport,
-    updateCuttingReport,
-    deleteCuttingReport,
-    scaleCalc,
-    csvData,
-  };
-};
+  return {update}
+}

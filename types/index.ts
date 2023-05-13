@@ -105,6 +105,15 @@ export type History = {
   accounting: boolean;
 };
 
+  export type EditedHistory = {
+    scheduledAt: string;
+    stockPlaceType:number;
+    quantity: number;
+    price: number;
+    comment: string;
+    fixedAt: string;
+  };
+
 export type CuttingReportType = {
   id: string;
   staff: string;

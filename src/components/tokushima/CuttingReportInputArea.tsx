@@ -27,6 +27,7 @@ import {
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
+import { useMutateCuttingReports } from "../../hooks/cuttingReports/useMutateCuttingReports";
 
 type Props = {
   title: string;
@@ -49,7 +50,7 @@ export const CuttingReportInputArea: FC<Props> = ({
   const [filterUsers, setFilterUsers] = useState<User[]>([]);
   const [isValidate, setIsValidate] = useState(true);
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
-
+  // const { update } = useMutateCuttingReports();
   const [items, setItems] = useState<CuttingProductType[]>([]);
   const { addCuttingReport, updateCuttingReport } = useCuttingReportFunc(
     startDay,
@@ -80,13 +81,14 @@ export const CuttingReportInputArea: FC<Props> = ({
     ]);
   };
 
-  console.log(watch("itemType"));
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: CuttingReportType) => {
     switch (pageType) {
       case "new":
         await addCuttingReport(data, items);
         return;
       case "edit":
+        // const obj: any = { data: data, items: items, reportId: report.id };
+        // update.mutate(obj);
         await updateCuttingReport(data, items, report.id);
         await onClose();
         return;
@@ -124,10 +126,10 @@ export const CuttingReportInputArea: FC<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-        totalQuantity ||
-        category ||
-        productId ||
-        quantity
+      totalQuantity ||
+      category ||
+      productId ||
+      quantity
     );
   }, [items, setItems]);
 

@@ -23,7 +23,6 @@ import { CSVLink } from "react-csv";
 import { User, Product } from "../../../types";
 import { OrderAreaModal } from "../../components/products/OrderAreaModal";
 import { ProductModal } from "../../components/products/ProductModal";
-import { useProductFunc } from "../../hooks/UseProductFunc";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { ProductSearchArea } from "../../components/products/ProductSearchArea";
 import { ProductMenu } from "../../components/products/ProductMenu";
@@ -31,7 +30,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
-import { useProducts } from "../../hooks/Products/useQueryProducts";
+import { useProductFunc } from "../../hooks/products/useProductFunc";
 
 type Users = {
   contents: User[];

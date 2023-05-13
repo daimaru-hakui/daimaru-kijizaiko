@@ -9,9 +9,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { db } from "../../../../firebase";
 import { useAuthStore, useLoadingStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { History } from "../../../../types";
@@ -23,6 +21,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { HistoryProductMenu } from "../../tokushima/HistoryProductMenu";
 import { SearchArea } from "../../SearchArea";
 import { useSWRPurchaseConfirms } from "../../../hooks/swr/useSWRPurchaseConfirms";
+import { useFabricPurchase } from "../../../hooks/products/useFabricPurchase";
 
 type Props = {
   HOUSE_FACTORY?: string;
@@ -35,16 +34,12 @@ type Inputs = {
   staff: string;
 };
 
-type Data = {
-  contents: History[];
-};
-
 export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
-  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const currentUser = useAuthStore((state) => state.currentUser);
   const { getTodayDate, get3monthsAgo } = useUtil();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAuths } = useAuthManagement();
+  const { updateFabricPurchaseConfirm } = useFabricPurchase();
   const [items, setItems] = useState({
     scheduledAt: "",
     stockPlaceType: 1,
@@ -80,62 +75,19 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   };
 
   useEffect(() => {
-    let newHistories: History[];
-    if (!staff) {
-      newHistories = data?.contents;
-    } else {
-      newHistories = data?.contents?.filter(
-        (history: History) => staff === history.createUser || staff === ""
-      );
-    }
+    let newHistories = data?.contents?.filter(
+      (history) => staff === history.createUser || staff === ""
+    );
+
     if (HOUSE_FACTORY) {
-      newHistories = newHistories?.filter((history) => {
-        if (history.stockPlace === HOUSE_FACTORY) {
-          return history;
-        }
-      });
-      setFilterHistories(newHistories);
+      setFilterHistories(newHistories?.filter((history) => (
+        history.stockPlace === HOUSE_FACTORY)
+      ));
     } else {
-      newHistories = newHistories?.filter((history: History) => history);
       setFilterHistories(newHistories);
     }
   }, [data, HOUSE_FACTORY, staff]);
 
-  const updateFabricPurchaseConfirm = async (history: History) => {
-    setIsLoading(true);
-    const productDocRef = doc(db, "products", history.productId);
-    const historyDocRef = doc(db, "fabricPurchaseConfirms", history.id);
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDocSnap = await transaction.get(productDocRef);
-        if (!productDocSnap.exists()) throw "product document does not exist!";
-
-        const historyDocSnap = await transaction.get(historyDocRef);
-        if (!historyDocSnap.exists()) throw "history document does not exist!";
-
-        if (history.stockPlace === "徳島工場") {
-          const stock = (await productDocSnap.data().tokushimaStock) || 0;
-          const newStock = stock - history.quantity + Number(items.quantity);
-          transaction.update(productDocRef, {
-            tokushimaStock: newStock,
-          });
-        }
-
-        transaction.update(historyDocRef, {
-          quantity: Number(items.quantity),
-          price: items.price,
-          fixedAt: items.fixedAt,
-          comment: items.comment,
-          updateUser: currentUser,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      mutate({ ...data });
-      setIsLoading(false);
-    }
-  };
 
   const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
@@ -181,10 +133,6 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                   <Td>
                     <Flex gap={3} alignItems="center">
                       <HistoryProductMenu productId={history.productId} />
-                      {/* <ProductModal
-                        title="生地情報"
-                        productId={history.productId}
-                      /> */}
                     </Flex>
                   </Td>
                   <Td>{getSerialNumber(history?.serialNumber)}</Td>
@@ -213,7 +161,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                           items={items}
                           setItems={setItems}
                           onClick={() => {
-                            updateFabricPurchaseConfirm(history);
+                            updateFabricPurchaseConfirm(history, items, data, mutate);
                           }}
                         />
                       )

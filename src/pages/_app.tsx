@@ -14,6 +14,7 @@ import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const fetcher = (url: string) =>
   axios
@@ -95,6 +96,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </Layout>
           </SWRConfig>
+          {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         </QueryClientProvider>
       </ChakraProvider>
     </>

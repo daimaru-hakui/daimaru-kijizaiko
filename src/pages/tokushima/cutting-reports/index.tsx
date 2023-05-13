@@ -22,7 +22,7 @@ import { CuttingReportModal } from "../../../components/tokushima/CuttingReportM
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 import { NextPage } from "next";
-import { useQueryCuttingReports } from "../../../hooks/CuttingReports/useQueryCuttingReports";
+import { useQueryCuttingReports } from "../../../hooks/cuttingReports/useQueryCuttingReports";
 
 type Inputs = {
   start: string;
@@ -44,8 +44,7 @@ const CuttingReport: NextPage = () => {
     endDay
   );
   const { data } = useSWRCuttingReports(startDay, endDay);
-  const { data: cutting } = useQueryCuttingReports(startDay, endDay);
-  console.log('Data', cutting);
+  // const { data: cuttingReports } = useQueryCuttingReports(startDay, endDay);
   const methods = useForm<Inputs>({
     defaultValues: {
       start: startDay,

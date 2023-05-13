@@ -6,7 +6,7 @@ import { AccountingOrderTable } from "../../../components/accounting/AccountingO
 const AccountingDeptOrders: NextPage = () => {
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
-      <Box w="100%" my={6} bg="white" boxShadow="md" rounded="md">
+      <Box w="100%" h="calc(100vh - 100px)" my={6} bg="white" boxShadow="md" rounded="md">
         <Flex p={6} gap={3} alignItems="center">
           <Box as="h2" fontSize="2xl">
             未処理

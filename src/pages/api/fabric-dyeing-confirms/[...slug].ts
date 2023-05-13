@@ -23,14 +23,15 @@ export default async function handler(
       .startAt(startDay)
       .endAt(endDay)
       .get();
-    const snapshot = querySnapshot.docs
+    const contents = querySnapshot.docs
       .map((doc) => ({ ...doc.data(), id: doc.id } as History))
+      .filter((doc)=> doc.quantity > 0)
       .sort((a, b) => {
         if (a.fixedAt > b.fixedAt) {
           return -1;
         }
       });
     console.log("fabric-dyeing-confirms");
-    return res.status(200).json({ contents: snapshot });
+    return res.status(200).json({ contents });
   }
 }

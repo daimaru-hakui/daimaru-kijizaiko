@@ -3,7 +3,7 @@ import { db } from '../../../firebase';
 import { CuttingReportType } from '../../../types';
 import { useQuery } from 'react-query';
 
-export const useQueryCuttingReports = (startDay:string,endDay:string) => {
+export const useQueryCuttingReports = (startDay:string, endDay:string) => {
    
   const getCuttingReports = async () => {
     let data:CuttingReportType[] = [];
@@ -13,7 +13,7 @@ export const useQueryCuttingReports = (startDay:string,endDay:string) => {
       ,endAt(endDay));
     const snapshot = await getDocs(q)
     data = snapshot.docs.map((doc) =>
-    ({ ...doc.data(), id: doc.id } as CuttingReportType)
+      ({ ...doc.data(), id: doc.id } as CuttingReportType)
     ).sort((a, b) => a.serialNumber > b.serialNumber && -1)
     return data
   };

@@ -83,7 +83,6 @@ export const useDataList = () => {
   };
 
   // products情報;
-
   const getProducts = async () => {
     const q = query(collection(db, "products"), where("deletedAt", "==", ""));
     try {
@@ -149,7 +148,7 @@ export const useDataList = () => {
         setFabricDyeingOrders(
           querySnap.docs
             .map((doc) => ({ ...doc.data(), id: doc?.id } as History))
-            .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
+            .sort((a, b) => b?.serialNumber - a?.serialNumber)
         )
       );
     } catch (err) {
@@ -168,7 +167,7 @@ export const useDataList = () => {
         setFabricPurchaseOrders(
           querySnap.docs
             .map((doc) => ({ ...doc.data(), id: doc?.id } as History))
-            .sort((a: any, b: any) => b?.serialNumber - a?.serialNumber)
+            .sort((a, b) => b?.serialNumber - a?.serialNumber)
         )
       );
     } catch (err) {
