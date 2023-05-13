@@ -23,7 +23,7 @@ export const useProducts = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
-  const obj = (data: Product, materials) => ({
+  const obj = (data: Product, materials:any) => ({
     productType: data?.productType || "1",
     staff: Number(data?.productType) === 2 ? data?.staff : "R&D",
     supplierId: data?.supplierId || "",
@@ -56,7 +56,7 @@ export const useProducts = () => {
   });
 
   // 生地登録
-  const addProduct = async (data: Product, materials) => {
+  const addProduct = async (data: Product, materials:any) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -78,7 +78,7 @@ export const useProducts = () => {
     }
   };
 
-  const updateProduct = async (productId: string, data: Product, materials) => {
+  const updateProduct = async (productId: string, data: Product, materials:any) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);

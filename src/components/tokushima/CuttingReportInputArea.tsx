@@ -131,6 +131,7 @@ export const CuttingReportInputArea: FC<Props> = ({
       productId ||
       quantity
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, setItems]);
 
   return (

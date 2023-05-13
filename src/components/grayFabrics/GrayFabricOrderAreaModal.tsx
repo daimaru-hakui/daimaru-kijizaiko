@@ -42,7 +42,7 @@ type Inputs = {
 export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { orderGrayFabric } = useGrayFabrics();
-  const { register, handleSubmit, watch, getValues, reset, formState: { errors } } = useForm<Inputs>({
+  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<Inputs>({
     defaultValues: {
       orderedAt: "",
       scheduledAt: "",
