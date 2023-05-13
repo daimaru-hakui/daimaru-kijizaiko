@@ -30,7 +30,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
-import { useProductFunc } from "../../hooks/products/useProductFunc";
+import { useProducts } from "../../hooks/products/useProducts";
 
 type Users = {
   contents: User[];
@@ -42,7 +42,7 @@ const Products: NextPage = () => {
   const [filterProducts, setFilterProducts] = useState<Product[]>(null);
   const { getUserName, getMixed, getFabricStd } = useGetDisp();
   const { mathRound2nd } = useUtil();
-  const { csvData, isVisible, deleteProduct } = useProductFunc();
+  const { csvData, isVisible, deleteProduct } = useProducts();
   const { isAuths } = useAuthManagement();
   const { halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);

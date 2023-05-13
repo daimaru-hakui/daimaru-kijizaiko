@@ -13,7 +13,7 @@ import { Product } from "../../../types";
 import { useGetDisp } from "../UseGetDisp";
 import { useUtil } from "../UseUtil";
 
-export const useProductFunc = () => {
+export const useProducts = () => {
   const router = useRouter();
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const currentUser = useAuthStore((state) => state.currentUser);

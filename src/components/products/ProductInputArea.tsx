@@ -31,7 +31,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { MaterialsModal } from "./MaterialsModal";
 import { useForm } from "react-hook-form";
 import useSWRImmutable from "swr/immutable";
-import { useProductFunc } from "../../hooks/products/useProductFunc";
+import { useProducts } from "../../hooks/products/useProducts";
 
 type Props = {
   title: string;
@@ -78,7 +78,7 @@ export const ProductInputArea: FC<Props> = ({
     setMaterials({ ...product?.materials });
   }, [product?.materials]);
 
-  const { addProduct, updateProduct } = useProductFunc();
+  const { addProduct, updateProduct } = useProducts();
 
   const onSubmit = (data: Product) => {
     // console.log(data);
