@@ -23,7 +23,6 @@ import {
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { History } from "../../../types";
-import { useFabricDyeing } from "../../hooks/products/useFabricDyeing";
 
 type Props = {
   history: History;
