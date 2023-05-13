@@ -26,12 +26,12 @@ import {
   useProductsStore,
   useSettingStore,
 } from "../../../store";
+import { useProducts } from "../../hooks/products/useProducts";
 import { Product, User } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { MaterialsModal } from "./MaterialsModal";
 import { useForm } from "react-hook-form";
 import useSWRImmutable from "swr/immutable";
-import { useProducts } from "../../hooks/products/useProducts";
 
 type Props = {
   title: string;
