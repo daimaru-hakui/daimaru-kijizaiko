@@ -24,7 +24,7 @@ import { FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { History } from "../../../types";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAccounting } from "../../hooks/accounting/useAccounting";
+import { useAccounting } from "../../hooks/useAccounting";
 
 type Props = {
   history: History;

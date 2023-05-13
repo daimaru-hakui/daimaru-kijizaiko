@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { History } from "../../../types";
-import { useAccounting } from "../../hooks/accounting/useAccounting";
+import { useAccounting } from "../../hooks/useAccounting";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {

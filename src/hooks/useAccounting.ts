@@ -1,8 +1,8 @@
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { History } from '../../../types';
-import { useAuthStore } from '../../../store';
-import { useSWRPurchaseConfirms } from '../swr/useSWRPurchaseConfirms';
+import { db } from '../../firebase';
+import { History } from '../../types';
+import { useAuthStore } from '../../store';
+import { useSWRPurchaseConfirms } from './swr/useSWRPurchaseConfirms';
 
 
 type Inputs = {

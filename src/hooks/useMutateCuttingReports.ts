@@ -1,10 +1,10 @@
 import { collection, deleteDoc, doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react'
-import { db } from '../../../firebase';
+import { db } from '../../firebase';
 import { useRouter } from 'next/router';
-import { useAuthStore, useLoadingStore } from '../../../store';
-import { useGetDisp } from '../UseGetDisp';
-import { CuttingProductType, CuttingReportType } from '../../../types';
+import { useAuthStore, useLoadingStore } from '../../store';
+import { useGetDisp } from './UseGetDisp';
+import { CuttingProductType, CuttingReportType } from '../../types';
 import { mutate } from 'swr';
 import { Mutation, useMutation, useQueryClient } from 'react-query';
 

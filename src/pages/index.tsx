@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { Box } from "@chakra-ui/react";
-import { useQueryCuttingReports } from "../hooks/cuttingReports/useQueryCuttingReports";
+import { useQueryCuttingReports } from "../hooks/useQueryCuttingReports";
 
 export default function Home() {
 

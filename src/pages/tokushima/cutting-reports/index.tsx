@@ -22,7 +22,7 @@ import { CuttingReportModal } from "../../../components/tokushima/CuttingReportM
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 import { NextPage } from "next";
-import { useQueryCuttingReports } from "../../../hooks/cuttingReports/useQueryCuttingReports";
+import { useQueryCuttingReports } from "../../../hooks/useQueryCuttingReports";
 
 type Inputs = {
   start: string;

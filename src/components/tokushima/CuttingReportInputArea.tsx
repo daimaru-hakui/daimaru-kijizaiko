@@ -27,7 +27,7 @@ import {
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
-import { useMutateCuttingReports } from "../../hooks/cuttingReports/useMutateCuttingReports";
+import { useMutateCuttingReports } from "../../hooks/useMutateCuttingReports";
 
 type Props = {
   title: string;
