@@ -1,6 +1,6 @@
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { Product } from '../../../types';
+import { db } from '../../firebase';
+import { Product } from '../../types';
 import { useQuery } from 'react-query';
 
 export const useProducts = () => {
