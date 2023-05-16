@@ -141,15 +141,15 @@ export const CuttingReportInputArea: FC<Props> = ({
       </Box>
       <Stack spacing={6} mt={6}>
         <RadioGroup
-          value={getValues("itemType")}
+          defaultValue={getValues("itemType")}
           {...register("itemType", { required: true })}
-          onChange={(e: any) => getValues(e)}
+          onChange={getValues}
         >
           <Stack direction="row">
-            <Radio value="1" {...register("itemType")}>
+            <Radio value="1" {...register("itemType")} >
               既製品
             </Radio>
-            <Radio value="2" {...register("itemType")}>
+            <Radio value="2" {...register("itemType")} >
               別注品
             </Radio>
             <Box as="span" color="red">

@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { useAuthStore, useLoadingStore, useProductsStore } from "../../store";
-import { Product } from "../../types";
+import { Materials, Product } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
 
@@ -23,7 +23,7 @@ export const useProducts = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
-  const obj = (data: Product, materials: any) => ({
+  const obj = (data: Product, materials: Materials) => ({
     productType: data?.productType || "1",
     staff: Number(data?.productType) === 2 ? data?.staff : "R&D",
     supplierId: data?.supplierId || "",
@@ -56,7 +56,7 @@ export const useProducts = () => {
   });
 
   // 生地登録
-  const addProduct = async (data: Product, materials: any) => {
+  const addProduct = async (data: Product, materials: Materials) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -78,7 +78,7 @@ export const useProducts = () => {
     }
   };
 
-  const updateProduct = async (productId: string, data: Product, materials: any) => {
+  const updateProduct = async (productId: string, data: Product, materials: Materials) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
