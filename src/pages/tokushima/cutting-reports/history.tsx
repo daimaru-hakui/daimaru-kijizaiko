@@ -1,6 +1,7 @@
 import {
   Box,
   Flex,
+  Spinner,
   Stack,
   Table,
   TableContainer,
@@ -47,7 +48,7 @@ const HistoryCutting: NextPage = () => {
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
-  const { data } = useSWRCuttingReports(startDay, endDay);
+  const { data, isLoading } = useSWRCuttingReports(startDay, endDay);
   const [cuttingList, setCuttingList] = useState([] as CuttingReportType[]);
 
   const methods = useForm<Inputs>({
@@ -79,10 +80,10 @@ const HistoryCutting: NextPage = () => {
         ?.map((report: CuttingReportType) =>
           report?.products.map(
             (product: CuttingProductType) =>
-              ({
-                ...report,
-                ...product,
-              } as CuttingHistoryType)
+            ({
+              ...report,
+              ...product,
+            } as CuttingHistoryType)
           )
         )
         .flat()
@@ -90,6 +91,13 @@ const HistoryCutting: NextPage = () => {
         .filter((report) => report.client.includes(String(client)))
     );
   }, [startDay, endDay, data, staff, client]);
+
+  if (cuttingList === null)
+    return (
+      <Flex w="full" h="100vh" justify="center" align="center">
+        <Spinner />
+      </Flex>
+    );
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Flex,
+  Spinner,
   Stack,
   Table,
   TableContainer,
@@ -43,7 +44,7 @@ const CuttingReport: NextPage = () => {
     startDay,
     endDay
   );
-  const { data } = useSWRCuttingReports(startDay, endDay);
+  const { data, isLoading } = useSWRCuttingReports(startDay, endDay);
   // const { data: cuttingReports } = useQueryCuttingReports(startDay, endDay);
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -83,6 +84,13 @@ const CuttingReport: NextPage = () => {
       );
     }
   }, [data, staff, client]);
+
+  if (isLoading)
+    return (
+      <Flex w="full" h="100vh" justify="center" align="center">
+        <Spinner />
+      </Flex>
+    );
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
