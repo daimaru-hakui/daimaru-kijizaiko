@@ -179,6 +179,7 @@ export const CuttingReportModal: FC<Props> = ({
                       mt={2}
                       border="1px"
                       borderColor="gray.100"
+                      whiteSpace="pre-wrap"
                     >
                       {filterReport?.comment}
                     </Box>
