@@ -1,10 +1,12 @@
 import {
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
   getDoc,
   runTransaction,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -155,6 +157,14 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
     }
   };
 
+  const AlreadyRead = async (report: CuttingReportType) => {
+    if (report.staff !== currentUser) return;
+    const docRef = doc(db, 'cuttingReports', report.id);
+    await updateDoc(docRef, {
+      read: arrayUnion(currentUser)
+    });
+  };
+
   const scaleCalc = (meter: number, totalQuantity: number) => {
     if (meter === 0 || totalQuantity === 0) return 0;
     const value = meter / totalQuantity;
@@ -206,6 +216,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
     addCuttingReport,
     updateCuttingReport,
     deleteCuttingReport,
+    AlreadyRead,
     scaleCalc,
     csvData,
   };

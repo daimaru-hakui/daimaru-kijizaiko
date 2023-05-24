@@ -131,6 +131,7 @@ export type CuttingReportType = {
     productNumber: string;
   }[];
   serialNumber: number;
+  read:string[]
 };
 
 export type CuttingProductType = {

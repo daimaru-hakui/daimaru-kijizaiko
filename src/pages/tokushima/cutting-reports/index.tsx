@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -23,7 +24,8 @@ import { CuttingReportModal } from "../../../components/tokushima/CuttingReportM
 import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 import { NextPage } from "next";
-import { useQueryCuttingReports } from "../../../hooks/useQueryCuttingReports";
+import { useAuthStore } from "../../../../store";
+// import { useQueryCuttingReports } from "../../../hooks/useQueryCuttingReports";
 
 type Inputs = {
   start: string;
@@ -33,18 +35,20 @@ type Inputs = {
 };
 
 const CuttingReport: NextPage = () => {
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
+  const { AlreadyRead } = useCuttingReportFunc();
   const [filterData, setFilterData] = useState([] as CuttingReportType[]);
   const { csvData } = useCuttingReportFunc(
     startDay,
     endDay
   );
-  const { data, isLoading } = useSWRCuttingReports(startDay, endDay);
+  const { data, isLoading, mutate } = useSWRCuttingReports(startDay, endDay);
   // const { data: cuttingReports } = useQueryCuttingReports(startDay, endDay);
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -111,7 +115,8 @@ const CuttingReport: NextPage = () => {
             <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
-                  <Th>詳細</Th>
+                  <Th w="50px">詳細</Th>
+                  <Th w="50px">既読</Th>
                   <Th>裁断報告書NO.</Th>
                   <Th>裁断日</Th>
                   <Th>加工指示書NO.</Th>
@@ -133,6 +138,16 @@ const CuttingReport: NextPage = () => {
                           endDay={endDay}
                         />
                       </Flex>
+                    </Td>
+                    <Td textAlign="center">{report?.read?.length > 0 ?
+                      <Badge variant='solid' colorScheme='blue'>既読</Badge> :
+                      report.staff === currentUser && (
+                        <Button size="xs" onClick={async () => {
+                          if (report.staff !== currentUser) return;
+                          await AlreadyRead(report);
+                          await mutate(data);
+                        }} color="gray">未読</Button>
+                      )}
                     </Td>
                     <Td>{getSerialNumber(report.serialNumber)}</Td>
                     <Td>{report.cuttingDate}</Td>

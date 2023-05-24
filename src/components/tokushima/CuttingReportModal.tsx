@@ -27,6 +27,9 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { CuttingReportEditModal } from "./CuttingReportEditModal";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
+import { useAuthStore } from "../../../store";
+import { arrayUnion, doc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 type Props = {
   report?: CuttingReportType;
@@ -42,7 +45,8 @@ export const CuttingReportModal: FC<Props> = ({
   endDay,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc(null, null);
+  const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc();
+  const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
   const { data, mutate } = useSWRCuttingReports(startDay, endDay);
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
@@ -64,7 +68,7 @@ export const CuttingReportModal: FC<Props> = ({
         size="xs"
         variant="outline"
         colorScheme="facebook"
-        onClick={onOpen}
+        onClick={() => { onOpen(); }}
       >
         詳細
       </Button>
