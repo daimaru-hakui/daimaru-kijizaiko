@@ -22,9 +22,10 @@ export const DisplayStock: FC<Props> = ({ product }) => {
 
   const getTanQuentityEL = (item: number, fabricLength: number) =>
     item > 0 &&
-    Number(fabricLength) > 0 && (
+    Number(fabricLength) > 0 &&
+    Math.floor(item / Number(fabricLength)) > 0 && (
       <Box as="span" pl={0}>
-        【{Math.ceil(item / Number(fabricLength))}反】
+        【{Math.floor(item / Number(fabricLength))}反{Math.floor(item % Number(fabricLength)) > 0 && ("+" + Math.floor(item % Number(fabricLength)) + "m")}】
       </Box>
     );
 

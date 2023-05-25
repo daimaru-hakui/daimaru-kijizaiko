@@ -75,7 +75,6 @@ export const CuttingReportModal: FC<Props> = ({
         isOpen={isOpen}
         size="4xl"
         onClose={async () => {
-          onClose();
           if (
             currentUser === report.staff &&
             (report?.read === undefined || report?.read?.length === 0)
@@ -83,6 +82,7 @@ export const CuttingReportModal: FC<Props> = ({
             await AlreadyRead(report);
             await mutate({ data });
           }
+          onClose();
         }}
       >
         <ModalOverlay />
@@ -235,7 +235,6 @@ export const CuttingReportModal: FC<Props> = ({
               variant="outline"
               mr={3}
               onClick={async () => {
-                onClose();
                 if (
                   currentUser === report.staff &&
                   (report?.read === undefined || report?.read?.length === 0)
@@ -243,6 +242,7 @@ export const CuttingReportModal: FC<Props> = ({
                   await AlreadyRead(report);
                   await mutate({ data });
                 }
+                onClose();
               }}
             >
               閉じる
