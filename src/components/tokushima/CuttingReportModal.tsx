@@ -28,8 +28,6 @@ import { CuttingReportEditModal } from "./CuttingReportEditModal";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { useSWRCuttingReports } from "../../hooks/swr/useSWRCuttingReports";
 import { useAuthStore } from "../../../store";
-import { arrayUnion, doc } from "firebase/firestore";
-import { db } from "../../../firebase";
 
 type Props = {
   report?: CuttingReportType;
@@ -45,8 +43,9 @@ export const CuttingReportModal: FC<Props> = ({
   endDay,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc();
   const currentUser = useAuthStore((state) => state.currentUser);
+  const { scaleCalc, deleteCuttingReport } = useCuttingReportFunc();
+  const { AlreadyRead } = useCuttingReportFunc();
   const { isAuths } = useAuthManagement();
   const { data, mutate } = useSWRCuttingReports(startDay, endDay);
   const [filterReport, setFilterReport] = useState({} as CuttingReportType);
@@ -61,14 +60,13 @@ export const CuttingReportModal: FC<Props> = ({
   useEffect(() => {
     setFilterReport({ ...report });
   }, [report]);
-
   return (
     <>
       <Button
         size="xs"
         variant="outline"
         colorScheme="facebook"
-        onClick={() => { onOpen(); }}
+        onClick={onOpen}
       >
         詳細
       </Button>
@@ -76,8 +74,15 @@ export const CuttingReportModal: FC<Props> = ({
       <Modal
         isOpen={isOpen}
         size="4xl"
-        onClose={() => {
+        onClose={async () => {
           onClose();
+          if (
+            currentUser === report.staff &&
+            (report?.read === undefined || report?.read?.length === 0)
+          ) {
+            await AlreadyRead(report);
+            await mutate({ data });
+          }
         }}
       >
         <ModalOverlay />
@@ -229,8 +234,15 @@ export const CuttingReportModal: FC<Props> = ({
             <Button
               variant="outline"
               mr={3}
-              onClick={() => {
+              onClick={async () => {
                 onClose();
+                if (
+                  currentUser === report.staff &&
+                  (report?.read === undefined || report?.read?.length === 0)
+                ) {
+                  await AlreadyRead(report);
+                  await mutate({ data });
+                }
               }}
             >
               閉じる
