@@ -126,7 +126,11 @@ export const ProductInputArea: FC<Props> = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6} mt={6}>
           <Box w="100%">
-            <RadioGroup value={getValues("productType")}>
+            <RadioGroup
+              defaultValue={getValues("productType")}
+              {...register("productType", { required: true })}
+              onChange={getValues}
+            >
               <Stack direction="row">
                 <Radio value="1" {...register("productType")}>
                   既製品
