@@ -28,6 +28,7 @@ import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
 import { useMutateCuttingReports } from "../../hooks/useMutateCuttingReports";
+import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   title: string;
@@ -52,6 +53,7 @@ export const CuttingReportInputArea: FC<Props> = ({
   const [isLimitQuantity, setIsLimitQuantity] = useState(true);
   // const { update } = useMutateCuttingReports();
   const [items, setItems] = useState<CuttingProductType[]>([]);
+  const [staff, setStaff] = useState(report.staff);
   const { addCuttingReport, updateCuttingReport } = useCuttingReportFunc(
     startDay,
     endDay
@@ -82,14 +84,15 @@ export const CuttingReportInputArea: FC<Props> = ({
   };
 
   const onSubmit = async (data: CuttingReportType) => {
+    const object = { ...data, staff };
     switch (pageType) {
       case "new":
-        await addCuttingReport(data, items);
+        await addCuttingReport(object, items);
         return;
       case "edit":
         // const obj: any = { data: data, items: items, reportId: report.id };
         // update.mutate(obj);
-        await updateCuttingReport(data, items, report.id);
+        await updateCuttingReport(object, items, report.id);
         await onClose();
         return;
       default:
@@ -126,10 +129,10 @@ export const CuttingReportInputArea: FC<Props> = ({
     );
     setIsValidate(
       productNumberValidate() ||
-      totalQuantity ||
-      category ||
-      productId ||
-      quantity
+        totalQuantity ||
+        category ||
+        productId ||
+        quantity
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, setItems]);
@@ -146,10 +149,10 @@ export const CuttingReportInputArea: FC<Props> = ({
           onChange={getValues}
         >
           <Stack direction="row">
-            <Radio value="1" {...register("itemType")} >
+            <Radio value="1" {...register("itemType")}>
               既製品
             </Radio>
-            <Radio value="2" {...register("itemType")} >
+            <Radio value="2" {...register("itemType")}>
               別注品
             </Radio>
             <Box as="span" color="red">
@@ -168,7 +171,11 @@ export const CuttingReportInputArea: FC<Props> = ({
           </Box>
           <Box w="full">
             <Text fontWeight="bold">担当者</Text>
-            <Select mt={1} placeholder="担当者名を選択" {...register("staff")}>
+            <Select
+              mt={1}
+              value={staff}
+              onChange={(e) => setStaff(e.target.value)}
+            >
               {filterUsers?.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
