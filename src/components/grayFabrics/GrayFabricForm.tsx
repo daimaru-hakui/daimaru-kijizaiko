@@ -11,10 +11,10 @@ import {
 import { useEffect, useState, FC } from "react";
 import { useSettingStore } from "../../../store";
 import { GrayFabric } from "../../../types";
-import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useForm } from "react-hook-form";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 
 type Props = {
   title: string;
@@ -31,7 +31,7 @@ export const GrayFabricForm: FC<Props> = ({
 }) => {
   const [grayFabrics, setGrayFabrics] = useState([] as GrayFabric[]);
   const suppliers = useSettingStore((state) => state.suppliers);
-  const { addGrayFabric, updateGrayFabric } = useGrayFabricFunc();
+  const { addGrayFabric, updateGrayFabric } = useGrayFabrics();
   const [flag, setFlag] = useState(false);
   const {
     register,

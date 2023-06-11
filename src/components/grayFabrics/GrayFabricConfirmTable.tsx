@@ -9,10 +9,8 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useState, useEffect, FC } from "react";
-import { db } from "../../../firebase";
-import { GrayFabric, GrayFabricHistory, History } from "../../../types";
+import { GrayFabricHistory } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";

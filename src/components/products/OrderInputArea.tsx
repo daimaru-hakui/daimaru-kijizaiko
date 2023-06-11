@@ -19,7 +19,7 @@ import { FC } from "react";
 import { useSettingStore } from "../../../store";
 import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useInputHistory } from "../../hooks/UseInputHistory";
+import { useInputHistory } from "../../hooks/useInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
 

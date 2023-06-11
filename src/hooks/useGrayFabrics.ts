@@ -1,8 +1,7 @@
-import React from 'react'
 import { GrayFabric, GrayFabricHistory } from '../../types';
-import { addDoc, collection, deleteDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, runTransaction, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useLoadingStore } from '../../store';
 import { useUtil } from './UseUtil';
 import { useSWRGrayFavricConfirms } from './swr/useSWRGrayFavricConfirms';
 import { useRouter } from 'next/router';
@@ -17,15 +16,114 @@ type Inputs = {
   comment: string;
 };
 
-export const useGrayFabrics = (startDay?:string, endDay?:string) => {
+export const useGrayFabrics = (startDay?: string, endDay?: string) => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  const router = useRouter()
-  const { getTodayDate } = useUtil();
+  const router = useRouter();
+  const { getTodayDate, mathRound2nd } = useUtil();
   const { data, mutate } = useSWRGrayFavricConfirms(startDay, endDay);
-  const {getSupplierName} = useGetDisp()
+  const { getSupplierName } = useGetDisp();
+  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
 
-   // キバタ仕掛発注
-  const orderGrayFabric = async (items:Inputs, grayFabric:GrayFabric) => {
+  const addGrayFabric = async (data: GrayFabric) => {
+    const result = window.confirm("登録して宜しいでしょうか。");
+    if (!result) return;
+    const grayFabricsCollectionRef = collection(db, "grayFabrics");
+    const userRef = doc(db, 'users', currentUser);
+    const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
+    try {
+      setIsLoading(true);
+      await addDoc(grayFabricsCollectionRef, {
+        productName: data?.productName || "",
+        productNumber: data?.productNumber || "",
+        supplierId: data?.supplierId || "",
+        supplierRef,
+        comment: data?.comment || "",
+        wip: 0,
+        stock: 0,
+        createUser: currentUser,
+        createUserRef: userRef,
+        updateUser: currentUser,
+        updateUserRef: userRef,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      router.push("/gray-fabrics");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateGrayFabric = async (
+    data: GrayFabric,
+    grayFabricId: string
+  ) => {
+    const result = window.confirm("更新して宜しいでしょうか。");
+    if (!result) return;
+    const grayFabricsDocnRef = doc(db, "grayFabrics", grayFabricId);
+    const userRef = doc(db, 'users', currentUser);
+    const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
+    try {
+      setIsLoading(true);
+      await updateDoc(grayFabricsDocnRef, {
+        productName: data?.productName || "",
+        productNumber: data?.productNumber || "",
+        supplierId: data?.supplierId || "",
+        supplierRef,
+        comment: data?.comment || "",
+        updateUser: currentUser,
+        updateUserRef: userRef,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteGrayFabric = async (id: string) => {
+    let result = window.confirm("削除して宜しいでしょうか。");
+    if (!result) return;
+
+    result = window.confirm("本当に削除して宜しいでしょうか。");
+    if (!result) return;
+
+    const docRef = doc(db, "grayFabrics", id);
+    await deleteDoc(docRef);
+  };
+
+  const updateAjustmentGrayFabric = async (
+    data: GrayFabric,
+    grayFabricId: string
+  ) => {
+    setIsLoading(true);
+    try {
+      const docRef = doc(db, "grayFabrics", grayFabricId);
+      const userRef = doc(db, 'users', currentUser);
+      const createUserRef = doc(db, 'users', data.createUser);
+      const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
+      await updateDoc(docRef, {
+        price: Number(data.price),
+        wip: mathRound2nd(Number(data.wip)),
+        stock: mathRound2nd(Number(data.stock)),
+        updatedAt: serverTimestamp(),
+        updateUser: currentUser,
+        updateUserRef: userRef,
+        createUserRef, // 一時的
+        supplierRef// 一時的
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  // キバタ仕掛発注
+  const orderGrayFabric = async (items: Inputs, grayFabric: GrayFabric) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     const grayFabricDocRef = doc(db, "grayFabrics", grayFabric.id);
@@ -79,7 +177,7 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
     }
   };
 
-   // キバタ仕掛から削除
+  // キバタ仕掛から削除
   const deleteGrayFabricOrder = async (history: GrayFabricHistory) => {
     const result = window.confirm("削除して宜しいでしょうか");
     if (!result) return;
@@ -106,7 +204,7 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
     }
   };
 
-  const updateOrderHistory = async (history: GrayFabricHistory, items:Inputs) => {
+  const updateOrderHistory = async (history: GrayFabricHistory, items: Inputs) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
@@ -143,7 +241,7 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
     }
   };
 
-  const updateConfirmHistory = async (history: GrayFabricHistory, items:Inputs) => {
+  const updateConfirmHistory = async (history: GrayFabricHistory, items: Inputs) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
 
@@ -162,7 +260,7 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
           (await grayFabricDocSnap.data()?.stock) -
           history.quantity +
           Number(items.quantity) || 0;
-        
+
         transaction.update(grayFabricDocRef, {
           stock: newStock,
         });
@@ -183,7 +281,7 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
   };
 
   // 確定処理　キバタ仕掛⇒キバタ在庫
-  const confirmProcessing = async (history: GrayFabricHistory,items) => {
+  const confirmProcessing = async (history: GrayFabricHistory, items) => {
     const result = window.confirm("確定して宜しいでしょうか");
     if (!result) return;
 
@@ -237,10 +335,14 @@ export const useGrayFabrics = (startDay?:string, endDay?:string) => {
     }
   };
   return {
+    addGrayFabric,
+    updateGrayFabric,
+    deleteGrayFabric,
+    updateAjustmentGrayFabric,
     orderGrayFabric,
     deleteGrayFabricOrder,
     updateOrderHistory,
     updateConfirmHistory,
     confirmProcessing
   };
-}
+};
