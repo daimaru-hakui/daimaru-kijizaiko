@@ -19,9 +19,9 @@ import { FC } from "react";
 import { useSettingStore } from "../../../store";
 import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useInputHistory } from "../../hooks/useInputHistory";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
+import { useInputHistory } from "../../hooks/useInputHistory";
 
 type Props = {
   product: Product;
