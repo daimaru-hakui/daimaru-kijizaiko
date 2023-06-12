@@ -21,7 +21,7 @@ import { Product } from "../../../types";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useOrderFabricFunc } from "../../hooks/UseOrderFabricFunc";
 import { useUtil } from "../../hooks/UseUtil";
-import { useInputHistory } from "../../hooks/useInputHistory";
+import { useInputHandler } from "../../hooks/useInputHandler";
 
 type Props = {
   product: Product;
@@ -35,7 +35,7 @@ export const OrderInputArea: FC<Props> = ({ product, orderType, onClose }) => {
   const { getTodayDate } = useUtil();
   const { getGrayFabricStock } = useGetDisp();
   const { items, handleInputChange, handleNumberChange, handleRadioChange } =
-    useInputHistory();
+    useInputHandler();
   const {
     orderFabricDyeingFromStock,
     orderFabricDyeingFromRanning,

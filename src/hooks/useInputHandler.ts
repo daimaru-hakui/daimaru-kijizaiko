@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { History } from "../../types";
 
-export const useInputHistory = () => {
+export const useInputHandler = () => {
   const [items, setItems] = useState({} as History);
 
   const handleInputChange = (
