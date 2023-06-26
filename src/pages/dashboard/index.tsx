@@ -41,6 +41,7 @@ const Dashboard: NextPage = () => {
     return total;
   };
 
+
   return (
     <Box w="100%" mt={12} px={{ base: 0, md: 3 }}>
       <Container maxW="100%" my={6}>

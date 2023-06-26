@@ -34,6 +34,7 @@ export type Product = {
   noteEtc: string;
   interfacing: boolean;
   lining: boolean;
+  cuttingSchedules:string[],
   wip: number;
   externalStock: number;
   arrivingQuantity: number;
@@ -196,3 +197,15 @@ export type Location = {
   order: number;
   comment: string;
 };
+
+export type CuttingSchedule = {
+  id:string;
+  staff:string,
+  userRef: string,
+  processNumber: string,
+  productId: string,
+  productRef: string,
+  itemName:string,
+  quantity: number,
+  scheduledAt: string,
+}

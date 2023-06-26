@@ -31,6 +31,7 @@ import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
 import { useProducts } from "../../hooks/useProducts";
+import { ProductCuttingScheduleModal } from "../../components/products/ProductCuttingScheduleModal";
 
 type Users = {
   contents: User[];
@@ -46,7 +47,6 @@ const Products: NextPage = () => {
   const { isAuths } = useAuthManagement();
   const { halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
-
 
   const [search, setSearch] = useState<Product>({
     productNumber: "",
@@ -203,6 +203,7 @@ const Products: NextPage = () => {
                     <Th>生地品番</Th>
                     <Th>色</Th>
                     <Th>品名</Th>
+                    <Th>使用予定</Th>
                     <Th>単価</Th>
                     <Th>染め仕掛</Th>
                     <Th>外部在庫</Th>
@@ -229,6 +230,13 @@ const Products: NextPage = () => {
                       <Td>{product.productNumber}</Td>
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
+                      <Td>
+                        {product?.cuttingSchedules && (
+                          <ProductCuttingScheduleModal
+                            scheduleList={product.cuttingSchedules}
+                          />
+                        )}
+                      </Td>
                       <Td isNumeric>{product?.price.toLocaleString()}円</Td>
                       <Td
                         isNumeric
@@ -247,7 +255,9 @@ const Products: NextPage = () => {
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={product?.arrivingQuantity ? "bold" : "normal"}
+                        fontWeight={
+                          product?.arrivingQuantity ? "bold" : "normal"
+                        }
                       >
                         {mathRound2nd(
                           product?.arrivingQuantity || 0
@@ -291,7 +301,7 @@ const Products: NextPage = () => {
                       </Td>
                       <Td>
                         {isAuths(["rd"]) ||
-                          product?.createUser === currentUser ? (
+                        product?.createUser === currentUser ? (
                           <FaTrashAlt
                             cursor="pointer"
                             onClick={() => deleteProduct(product.id)}
