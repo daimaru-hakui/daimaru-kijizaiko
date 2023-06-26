@@ -17,7 +17,7 @@ import GrayFabricEditModal from "../../components/grayFabrics/GrayFabricEditModa
 import { CommentModal } from "../../components/CommentModal";
 import { GrayFabricOrderAreaModal } from "../../components/grayFabrics/GrayFabricOrderAreaModal";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { NextPage } from "next";
 
@@ -27,7 +27,7 @@ const GrayFabrics: NextPage = () => {
   const { isAuths } = useAuthManagement();
   const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabric[]>([]);
   const { getSupplierName } = useGetDisp();
-  const { deleteGrayFabric } = useGrayFabricFunc();
+  const { deleteGrayFabric } = useGrayFabrics();
 
   useEffect(() => {
     const getFilterGrayFabrics = async () => {

@@ -25,7 +25,7 @@ export const useFabricPurchase = () => {
         const historyDocSnap = await transaction.get(historyDocRef);
         if (!historyDocSnap.exists()) throw "history document does not exist!";
 
-        if (history.stockPlace === "徳島工場") {
+        if (history.stockPlace === STOCK_PLACE) {
           const stock = (await productDocSnap.data().tokushimaStock) || 0;
           const newStock = stock - history.quantity + Number(items.quantity);
           transaction.update(productDocRef, {

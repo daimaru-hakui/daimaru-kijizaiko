@@ -60,11 +60,18 @@ export const useProducts = () => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
+    const userRef = doc(db, 'users', currentUser);
+    const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
+    const grayFabricRef = data.grayFabricId ? doc(db, "grayFabrics", data.grayFabricId) : "";
     const docRef = collection(db, "products");
     const object = obj(data, materials);
     try {
       await addDoc(docRef, {
         ...object,
+        supplierRef,
+        grayFabricRef,
+        createUserRef: userRef,
+        updateUserRef: userRef,
         createUser: currentUser,
         updateUser: currentUser,
         createdAt: serverTimestamp(),
@@ -82,16 +89,24 @@ export const useProducts = () => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
+    const userRef = doc(db, 'users', currentUser);
+    const createUserRef = doc(db, 'users', data.createUser);
+    const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
+    const grayFabricRef = data.grayFabricId ? doc(db, "grayFabrics", data.grayFabricId) : "";
     const docRef = doc(db, "products", `${productId}`);
     const object = obj(data, materials);
     try {
       await updateDoc(docRef, {
         ...object,
+        supplierRef,
+        grayFabricRef,
         wip: Number(data?.wip) || 0,
         externalStock: Number(data.externalStock) || 0,
         arrivingQuantity: Number(data?.arrivingQuantity) || 0,
         tokushimaStock: Number(data?.tokushimaStock) || 0,
+        createUserRef,
         updateUser: currentUser,
+        updateUserRef: userRef, //リファレンス
         updatedAt: serverTimestamp(),
       });
     } catch (err) {

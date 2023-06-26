@@ -14,7 +14,7 @@ import { useEffect, useState, FC } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabric } from "../../../types";
-import { useGrayFabricFunc } from "../../hooks/UseGrayFabricFunc";
+import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 
 type Props = {
   grayFabric: GrayFabric;
@@ -22,7 +22,7 @@ type Props = {
 
 export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
   const { getUserName } = useGetDisp(); //// ？
-  const { updateAjustmentGrayFabric } = useGrayFabricFunc();
+  const { updateAjustmentGrayFabric } = useGrayFabrics();
 
   const { quantityValueBold } = useUtil();
   const [items, setItems] = useState<GrayFabric>();
