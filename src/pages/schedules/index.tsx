@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Table,
   TableContainer,
@@ -17,6 +16,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { arrayRemove, doc, runTransaction } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { CuttingSchedule } from "../../../types";
+import { FaTrashAlt } from "react-icons/fa";
 
 const Schedules = () => {
   const { getUserName, getProductNumber, getColorName } = useGetDisp();
@@ -35,7 +35,6 @@ const Schedules = () => {
         if (!docSnap.exists) {
           throw "データが登録されていません。";
         }
-        console.log(data);
         transaction.update(productRef, {
           cuttingSchedules: arrayRemove(data?.id),
         });
@@ -81,57 +80,59 @@ const Schedules = () => {
             </Box>
           </Flex>
 
-          <TableContainer  w="100%" overflowX="unset" overflowY="unset">
-          <Box
-            mt={3}
-            w="100%"
-            overflowX="auto"
-            position="relative"
-            h={{
-              base: "calc(100vh - 210px)",
-              lg: "calc(100vh - 210px)",
-            }}
-          >
-          <Table variant="simple" size="sm" w="100%">
+          <TableContainer w="100%" overflowX="unset" overflowY="unset">
+            <Box
+              mt={3}
+              w="100%"
+              overflowX="auto"
+              position="relative"
+              h={{
+                base: "calc(100vh - 210px)",
+                lg: "calc(100vh - 210px)",
+              }}
+            >
+              <Table variant="simple" size="sm" w="100%">
                 <Thead position="sticky" top={0} zIndex="docked" bg="white">
-                <Tr>
-                  <Th>担当</Th>
-                  <Th>加工指示書NO.</Th>
-                  <Th>生地品番</Th>
-                  <Th>アイテム名</Th>
-                  <Th isNumeric>使用予定（m）</Th>
-                  <Th>製品納期</Th>
-                  <Th>処理</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {cuttingSchedules.map((schedule) => (
-                  <Tr key={schedule.id}>
-                    <Td>{getUserName(schedule.staff)}</Td>
-                    <Td>{schedule.processNumber}</Td>
-                    <Td>
-                      {getProductNumber(schedule.productId)}{" "}
-                      {getColorName(schedule.productId)}
-                    </Td>
-                    <Td>{schedule.itemName}</Td>
-                    <Td isNumeric>{schedule?.quantity}</Td>
-                    <Td>{schedule.scheduledAt}</Td>
-                    <Td>
-                      <Flex gap={3}>
-                        {/* <ScheduleModal title="編集" mode="edit" size="sm" /> */}
-                        <Button
-                          colorScheme="red"
-                          size="sm"
-                          onClick={() => deleteSchedule(schedule)}
-                        >
-                          削除
-                        </Button>
-                      </Flex>
-                    </Td>
+                  <Tr>
+                    <Th>担当</Th>
+                    <Th>加工指示書NO.</Th>
+                    <Th>生地品番</Th>
+                    <Th>アイテム名</Th>
+                    <Th isNumeric>使用予定（m）</Th>
+                    <Th>製品納期</Th>
+                    <Th>処理</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {cuttingSchedules.map((schedule) => (
+                    <Tr key={schedule.id}>
+                      <Td>{getUserName(schedule.staff)}</Td>
+                      <Td>{schedule.processNumber}</Td>
+                      <Td>
+                        {getProductNumber(schedule.productId)}{" "}
+                        {getColorName(schedule.productId)}
+                      </Td>
+                      <Td>{schedule.itemName}</Td>
+                      <Td isNumeric>{schedule?.quantity}</Td>
+                      <Td>{schedule.scheduledAt}</Td>
+                      <Td>
+                        <Flex gap={3} align="center">
+                          <ScheduleModal
+                            title="編集"
+                            mode="edit"
+                            size="sm"
+                            initData={schedule}
+                          />
+                          <FaTrashAlt
+                            cursor="pointer"
+                            onClick={() => deleteSchedule(schedule)}
+                          />
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
             </Box>
           </TableContainer>
         </Flex>
