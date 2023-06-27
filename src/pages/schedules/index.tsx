@@ -37,7 +37,7 @@ const Schedules = () => {
         }
         console.log(data);
         transaction.update(productRef, {
-          cuttingSchedules: arrayRemove(data?.productId),
+          cuttingSchedules: arrayRemove(data?.id),
         });
         transaction.delete(scheduleRef);
       });

@@ -231,7 +231,7 @@ const Products: NextPage = () => {
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
                       <Td>
-                        {product?.cuttingSchedules && (
+                        {product?.cuttingSchedules?.length > 0 && (
                           <ProductCuttingScheduleModal
                             scheduleList={product.cuttingSchedules}
                           />
