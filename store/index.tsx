@@ -77,6 +77,7 @@ export const useProductsStore = create<ProductsState>((set) => ({
       noteEtc: "",
       interfacing: false,
       lining: false,
+      cuttingSchedules:[],
       wip: 0,
       externalStock: 0,
       arrivingQuantity: 0,
