@@ -119,12 +119,13 @@ export const ProductSearchArea: FC<Props> = ({
               </Box>
               <Box>
                 <FormControl display="flex" alignItems="center">
-                  <FormLabel htmlFor="cuttingScheduleSwitch" mb="0">
+                  <FormLabel htmlFor="cuttingScheduleSwitch" mb="0" fontWeight="normal">
                     使用予定
                   </FormLabel>
                   <Switch
                     id="cuttingScheduleSwitch"
                     defaultChecked={cuttingScheduleSearch}
+                    isChecked={cuttingScheduleSearch}
                     onChange={(e) =>
                       setCuttingScheduleSearch(!cuttingScheduleSearch)
                     }
