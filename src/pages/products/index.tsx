@@ -54,23 +54,38 @@ const Products: NextPage = () => {
     colorName: "",
     productName: "",
     materialName: "",
+    cuttingSchedules: [],
   } as Product);
+  const [cuttingScheduleSearch, setCuttingScheduleSearch] = useState(false);
 
   useEffect(() => {
     setFilterProducts(
-      products?.filter(
-        (product) =>
-          product.productNumber.includes(
-            halfToFullChar(search.productNumber.toUpperCase())
-          ) &&
-          product.staff.includes(search.staff) &&
-          product.colorName.includes(search.colorName) &&
-          product.productName.includes(search.productName) &&
-          product.materialName.includes(search.materialName)
-      )
+      products
+        ?.filter(
+          (product) =>
+            product.productNumber.includes(
+              halfToFullChar(search.productNumber.toUpperCase())
+            ) &&
+            product.staff.includes(search.staff) &&
+            product.colorName.includes(search.colorName) &&
+            product.productName.includes(search.productName) &&
+            product.materialName.includes(search.materialName)
+        )
+        .filter((product) => {
+          if (cuttingScheduleSearch === false) {
+            return true;
+          } else if (cuttingScheduleSearch === true) {
+            if (
+              product.cuttingSchedules &&
+              product.cuttingSchedules.length > 0
+            ) {
+              return true;
+            }
+          }
+        })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, products]);
+  }, [search, products, cuttingScheduleSearch]);
 
   const onReset = () => {
     setSearch({
@@ -80,6 +95,7 @@ const Products: NextPage = () => {
       productName: "",
       materialName: "",
     } as Product);
+    setCuttingScheduleSearch(false)
   };
 
   const filterBtnEl = () => (
@@ -87,6 +103,8 @@ const Products: NextPage = () => {
       <ProductSearchArea
         search={search}
         setSearch={setSearch}
+        cuttingScheduleSearch={cuttingScheduleSearch}
+        setCuttingScheduleSearch={setCuttingScheduleSearch}
         onReset={onReset}
       />
     </Flex>
