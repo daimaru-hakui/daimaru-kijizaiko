@@ -8,6 +8,8 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  FormControl,
+  FormLabel,
   Input,
   Select,
   Stack,
@@ -18,10 +20,13 @@ import { FC } from "react";
 import { BsFilter } from "react-icons/bs";
 import { useSettingStore } from "../../../store";
 import { Product } from "../../../types";
+import { Switch } from "@chakra-ui/react";
 
 type Props = {
   search: Product;
   setSearch: Function;
+  cuttingScheduleSearch: boolean;
+  setCuttingScheduleSearch: (paiload: boolean) => void;
   onReset: Function;
 };
 
@@ -29,6 +34,8 @@ export const ProductSearchArea: FC<Props> = ({
   search,
   setSearch,
   onReset,
+  cuttingScheduleSearch,
+  setCuttingScheduleSearch,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const colors = useSettingStore((state) => state.colors);
@@ -109,6 +116,20 @@ export const ProductSearchArea: FC<Props> = ({
                     <option key={materialName}>{materialName}</option>
                   ))}
                 </Select>
+              </Box>
+              <Box>
+                <FormControl display="flex" alignItems="center">
+                  <FormLabel htmlFor="cuttingScheduleSwitch" mb="0">
+                    使用予定
+                  </FormLabel>
+                  <Switch
+                    id="cuttingScheduleSwitch"
+                    defaultChecked={cuttingScheduleSearch}
+                    onChange={(e) =>
+                      setCuttingScheduleSearch(!cuttingScheduleSearch)
+                    }
+                  />
+                </FormControl>
               </Box>
               <Button onClick={() => onReset()}>リセット</Button>
             </Stack>
