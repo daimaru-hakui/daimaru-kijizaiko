@@ -50,7 +50,7 @@ const Schedules = () => {
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box
         w="full"
-        maxW="850px"
+        maxW="1100px"
         h="calc(100vh - 100px)"
         my={6}
         mx="auto"
@@ -81,9 +81,19 @@ const Schedules = () => {
             </Box>
           </Flex>
 
-          <TableContainer mt={6}>
-            <Table variant="simple" size="sm">
-              <Thead>
+          <TableContainer  w="100%" overflowX="unset" overflowY="unset">
+          <Box
+            mt={3}
+            w="100%"
+            overflowX="auto"
+            position="relative"
+            h={{
+              base: "calc(100vh - 210px)",
+              lg: "calc(100vh - 210px)",
+            }}
+          >
+          <Table variant="simple" size="sm" w="100%">
+                <Thead position="sticky" top={0} zIndex="docked" bg="white">
                 <Tr>
                   <Th>担当</Th>
                   <Th>加工指示書NO.</Th>
@@ -122,6 +132,7 @@ const Schedules = () => {
                 ))}
               </Tbody>
             </Table>
+            </Box>
           </TableContainer>
         </Flex>
       </Box>
