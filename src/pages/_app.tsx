@@ -14,7 +14,6 @@ import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 
 const fetcher = (url: string) =>
   axios
@@ -37,6 +36,7 @@ export default function App({ Component, pageProps }: AppProps) {
     getLocations,
     getColors,
     getMaterialNames,
+    getCuttingSchedules,
   } = useDataList();
   const router = useRouter();
   const session = useAuthStore((state) => state.session);
@@ -57,6 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
     getLocations();
     getColors();
     getMaterialNames();
+    getCuttingSchedules()
     console.log("getproduct");
   }, []);
 
