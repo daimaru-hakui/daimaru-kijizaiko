@@ -21,13 +21,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { FC, useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuthStore, useProductsStore } from "../../../store";
-import { db } from "../../../firebase";
-import { arrayUnion, doc, runTransaction, updateDoc } from "firebase/firestore";
 import { CuttingSchedule } from "../../../types";
 import { FaEdit } from "react-icons/fa";
+import { useCuttingSchedules } from "../../hooks/useCuttingSchedules";
 
 type Props = {
   title: string;
@@ -56,6 +54,7 @@ export const ScheduleModal: FC<Props> = ({
   const users = useAuthStore((state) => state.users);
   const [filterUsers, setFilterUsers] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {addSchedule,updateSchedule} = useCuttingSchedules()
   const {
     register,
     handleSubmit,
@@ -74,55 +73,6 @@ export const ScheduleModal: FC<Props> = ({
       await updateSchedule(data);
     }
     onClose();
-  };
-
-  const addSchedule = async (data: Inputs) => {
-    const userRef = doc(db, "users", data.staff);
-    const productRef = doc(db, "products", data.productId);
-    const uuid = uuidv4();
-    const scheduleRef = doc(db, "cuttingSchedules", uuid);
-    try {
-      await runTransaction(db, async (transaction) => {
-        const productDoc = await transaction.get(productRef);
-        if (!productDoc.exists) {
-          throw "生地が登録されていません。";
-        }
-        transaction.update(productRef, {
-          cuttingSchedules: arrayUnion(uuid),
-        });
-
-        transaction.set(scheduleRef, {
-          staff: data.staff,
-          userRef: userRef,
-          processNumber: data.processNumber,
-          productId: data.productId,
-          productRef: productRef,
-          itemName: data.itemName,
-          quantity: Number(data.quantity) || 0,
-          scheduledAt: data.scheduledAt,
-        });
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const updateSchedule = async (data: Inputs) => {
-    const userRef = doc(db, "users", data.staff);
-    const scheduleRef = doc(db, "cuttingSchedules", data.id);
-    try {
-      await updateDoc(scheduleRef, {
-        staff: data.staff,
-        userRef: userRef,
-        processNumber: data.processNumber,
-        itemName: data.itemName,
-        quantity: Number(data.quantity) || 0,
-        scheduledAt: data.scheduledAt,
-      });
-      console.log("成功");
-    } catch (e) {
-      console.log(e);
-    }
   };
 
   useEffect(() => {
