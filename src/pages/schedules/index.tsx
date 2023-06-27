@@ -13,37 +13,15 @@ import React from "react";
 import { ScheduleModal } from "../../components/schedules/ScheduleModal";
 import { useCuttingScheduleStore } from "../../../store";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { arrayRemove, doc, runTransaction } from "firebase/firestore";
-import { db } from "../../../firebase";
-import { CuttingSchedule } from "../../../types";
 import { FaTrashAlt } from "react-icons/fa";
+import { useCuttingSchedules } from "../../hooks/useCuttingSchedules";
 
 const Schedules = () => {
   const { getUserName, getProductNumber, getColorName } = useGetDisp();
   const cuttingSchedules = useCuttingScheduleStore(
     (state) => state.cuttingSchedules
   );
-
-  const deleteSchedule = async (data: CuttingSchedule) => {
-    const result = confirm("削除して宜しいでしょうか");
-    if (!result) return;
-    const scheduleRef = doc(db, "cuttingSchedules", `${data.id}`);
-    const productRef = doc(db, "products", `${data?.productId}`);
-    try {
-      await runTransaction(db, async (transaction) => {
-        const docSnap = await transaction.get(scheduleRef);
-        if (!docSnap.exists) {
-          throw "データが登録されていません。";
-        }
-        transaction.update(productRef, {
-          cuttingSchedules: arrayRemove(data?.id),
-        });
-        transaction.delete(scheduleRef);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { deleteSchedule } = useCuttingSchedules();
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
@@ -125,7 +103,9 @@ const Schedules = () => {
                           />
                           <FaTrashAlt
                             cursor="pointer"
-                            onClick={() => deleteSchedule(schedule)}
+                            onClick={() =>
+                              deleteSchedule(schedule.id, schedule.productId)
+                            }
                           />
                         </Flex>
                       </Td>
