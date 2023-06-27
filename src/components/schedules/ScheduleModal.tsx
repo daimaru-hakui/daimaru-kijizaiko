@@ -25,25 +25,33 @@ import { v4 as uuidv4 } from "uuid";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuthStore, useProductsStore } from "../../../store";
 import { db } from "../../../firebase";
-import { arrayUnion, doc, runTransaction } from "firebase/firestore";
+import { arrayUnion, doc, runTransaction, updateDoc } from "firebase/firestore";
+import { CuttingSchedule } from "../../../types";
+import { FaEdit } from "react-icons/fa";
 
 type Props = {
   title: string;
   mode: "new" | "edit";
   size?: "xs" | "sm" | "md" | "lg";
+  initData?: CuttingSchedule;
 };
 
 type Inputs = {
+  id: string;
   staff: string;
   processNumber: string;
   productId: string;
   itemName: string;
   quantity: number;
   scheduledAt: string;
-  initData: {};
 };
 
-export const ScheduleModal: FC<Props> = ({ title, mode, size = "md" }) => {
+export const ScheduleModal: FC<Props> = ({
+  title,
+  mode,
+  size = "md",
+  initData = {},
+}) => {
   const products = useProductsStore((state) => state.products);
   const users = useAuthStore((state) => state.users);
   const [filterUsers, setFilterUsers] = useState([]);
@@ -54,12 +62,17 @@ export const ScheduleModal: FC<Props> = ({ title, mode, size = "md" }) => {
     getValues,
     reset,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    defaultValues: initData,
+  });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
-    await addSchedule(data);
-    reset();
+    if (mode === "new") {
+      await addSchedule(data);
+    }
+    if (mode === "edit") {
+      await updateSchedule(data);
+    }
     onClose();
   };
 
@@ -94,21 +107,50 @@ export const ScheduleModal: FC<Props> = ({ title, mode, size = "md" }) => {
     }
   };
 
+  const updateSchedule = async (data: Inputs) => {
+    const userRef = doc(db, "users", data.staff);
+    const scheduleRef = doc(db, "cuttingSchedules", data.id);
+    try {
+      await updateDoc(scheduleRef, {
+        staff: data.staff,
+        userRef: userRef,
+        processNumber: data.processNumber,
+        itemName: data.itemName,
+        quantity: Number(data.quantity) || 0,
+        scheduledAt: data.scheduledAt,
+      });
+      console.log("成功");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     setFilterUsers(users.filter((user) => user.sales === true));
   }, [users]);
 
   return (
     <>
-      <Button
-        colorScheme={mode === "new" ? "facebook" : "gray"}
-        size={size}
-        onClick={onOpen}
-      >
-        {title}
-      </Button>
+      {mode === "new" ? (
+        <Button
+          colorScheme="facebook"
+          size={size}
+          onClick={onOpen}
+        >
+          {title}
+        </Button>
+      ) : (
+        <FaEdit cursor="pointer" onClick={onOpen} />
+      )}
 
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          reset();
+        }}
+        size="md"
+      >
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -172,7 +214,7 @@ export const ScheduleModal: FC<Props> = ({ title, mode, size = "md" }) => {
                     </NumberInput>
                   </Box>
                   <Box flexGrow={1}>
-                    <Text mb="8px">納期</Text>
+                    <Text mb="8px">製品納期</Text>
                     <Input
                       type="date"
                       placeholder=""
@@ -184,11 +226,17 @@ export const ScheduleModal: FC<Props> = ({ title, mode, size = "md" }) => {
             </ModalBody>
             <ModalFooter>
               <Flex gap={3}>
-                <Button variant="outline" onClick={onClose}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    onClose();
+                    reset();
+                  }}
+                >
                   閉じる
                 </Button>
                 <Button colorScheme="facebook" type="submit">
-                  {mode === "new" ? "登録" : "編集"}
+                  {mode === "new" ? "登録" : "更新"}
                 </Button>
               </Flex>
             </ModalFooter>
