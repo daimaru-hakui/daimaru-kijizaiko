@@ -41,7 +41,8 @@ const Products: NextPage = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const products = useProductsStore((state) => state.products);
   const [filterProducts, setFilterProducts] = useState<Product[]>(null);
-  const { getUserName, getMixed, getFabricStd } = useGetDisp();
+  const { getUserName, getMixed, getFabricStd, getCuttingScheduleTotal } =
+    useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProducts();
   const { isAuths } = useAuthManagement();
@@ -95,7 +96,7 @@ const Products: NextPage = () => {
       productName: "",
       materialName: "",
     } as Product);
-    setCuttingScheduleSearch(false)
+    setCuttingScheduleSearch(false);
   };
 
   const filterBtnEl = () => (
@@ -285,11 +286,24 @@ const Products: NextPage = () => {
                       <Td
                         isNumeric
                         fontWeight={product?.tokushimaStock ? "bold" : "normal"}
+                        color={
+                          product?.tokushimaStock <
+                          getCuttingScheduleTotal(product.cuttingSchedules) ? "red" : "inherit"
+                        }
                       >
-                        {mathRound2nd(
-                          product?.tokushimaStock || 0
-                        ).toLocaleString()}
-                        m
+                        <Flex>
+                          {mathRound2nd(
+                            product?.tokushimaStock || 0
+                          ).toLocaleString()}
+                          m
+                          {product.cuttingSchedules?.length > 0 && (
+                            <Box as="span" ml={2}>
+                              {`(${getCuttingScheduleTotal(
+                                product.cuttingSchedules
+                              )}m)`}
+                            </Box>
+                          )}
+                        </Flex>
                       </Td>
                       <Td>{product.materialName}</Td>
                       <Td>

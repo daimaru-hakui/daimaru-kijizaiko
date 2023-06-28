@@ -1,5 +1,6 @@
 import {
   useAuthStore,
+  useCuttingScheduleStore,
   useGrayFabricStore,
   useProductsStore,
   useSettingStore,
@@ -13,6 +14,9 @@ export const useGetDisp = () => {
   const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
   const suppliers = useSettingStore((state) => state.suppliers);
   const locations = useSettingStore((state) => state.locations);
+  const cuttingSchedules = useCuttingScheduleStore(
+    (state) => state.cuttingSchedules
+  );
   const { mathRound2nd } = useUtil();
 
   // 混率の表示
@@ -126,6 +130,17 @@ export const useGetDisp = () => {
     return location?.name || "";
   };
 
+  const getCuttingScheduleTotal = (array: string[]) => {
+    const filterSchedules = cuttingSchedules.filter((schedule) =>
+      array?.includes(schedule.id)
+    );
+    let total = 0;
+    filterSchedules.forEach(({ quantity }) => {
+      total += quantity;
+    });
+    return total || 0;
+  };
+
   return {
     getSerialNumber,
     getUserName,
@@ -141,5 +156,6 @@ export const useGetDisp = () => {
     getTokushimaStock,
     getPrice,
     getLocation,
+    getCuttingScheduleTotal
   };
 };

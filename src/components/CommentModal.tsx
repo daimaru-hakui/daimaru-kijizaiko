@@ -51,7 +51,7 @@ export const CommentModal: FC<Props> = ({ comment }) => {
           <ModalHeader>コメント</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Box>{newComment}</Box>
+            <Box whiteSpace="pre-wrap">{newComment}</Box>
           </ModalBody>
           <ModalFooter>
             <Button
