@@ -10,7 +10,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
-import { useAuthStore, useLoadingStore } from "../../../../store";
+import { useAuthStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
