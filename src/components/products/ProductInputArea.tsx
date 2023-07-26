@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Box,
   Button,
@@ -96,21 +97,35 @@ export const ProductInputArea: FC<Props> = ({
   };
 
   useEffect(() => {
-    let [productNum, colorNum, colorName] = [
+    let [productNum, colorNum, colorName, supplierId] = [
       watch("productNum"),
       watch("colorNum"),
       watch("colorName"),
+      watch("supplierId"),
     ];
     if (!productNum) productNum = "noValue";
     if (!colorNum) colorNum = "";
     if (!colorName) colorName = "noValue";
-    const base = products?.map(
-      (product) => product.productNum + product.colorNum + product.colorName
-    );
-    const result = base?.includes(productNum + colorNum + colorName);
+    // const base = products?.map(
+    //   (product) => product.productNum + product.colorNum + product.colorName
+    // );
+    // const result = base?.includes(productNum + colorNum + colorName);
+    const result = products?.some((product) => {
+      const result1 = product.productNum === productNum ? true : false;
+      const result2 = product.colorNum === colorNum ? true : false;
+      const result3 = product.colorName === colorName ? true : false;
+      const result4 = product.supplierId === supplierId ? true : false;
+      return result1 && result2 && result3 && result4
+    });
+
     !result ? setFlag(false) : setFlag(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("productNum"), watch("colorNum"), watch("colorName")]);
+  }, [
+    watch("productNum"),
+    watch("colorNum"),
+    watch("colorName"),
+    watch("supplierId"),
+  ]);
 
   useEffect(() => {
     const locationArray = watch("locations");
