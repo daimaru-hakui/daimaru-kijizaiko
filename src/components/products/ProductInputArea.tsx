@@ -103,13 +103,6 @@ export const ProductInputArea: FC<Props> = ({
       watch("colorName"),
       watch("supplierId"),
     ];
-    if (!productNum) productNum = "noValue";
-    if (!colorNum) colorNum = "";
-    if (!colorName) colorName = "noValue";
-    // const base = products?.map(
-    //   (product) => product.productNum + product.colorNum + product.colorName
-    // );
-    // const result = base?.includes(productNum + colorNum + colorName);
     const result = products?.some((product) => {
       const result1 = product.productNum === productNum ? true : false;
       const result2 = product.colorNum === colorNum ? true : false;
