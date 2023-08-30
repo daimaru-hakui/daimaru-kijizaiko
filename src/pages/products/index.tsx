@@ -55,6 +55,7 @@ const Products: NextPage = () => {
     colorName: "",
     productName: "",
     materialName: "",
+    supplierId:"",
     cuttingSchedules: [],
   } as Product);
   const [cuttingScheduleSearch, setCuttingScheduleSearch] = useState(false);
@@ -70,7 +71,8 @@ const Products: NextPage = () => {
             product.staff.includes(search.staff) &&
             product.colorName.includes(search.colorName) &&
             product.productName.includes(search.productName) &&
-            product.materialName.includes(search.materialName)
+            product.materialName.includes(search.materialName)  &&
+            product.supplierId.includes(search.supplierId) 
         )
         .filter((product) => {
           if (cuttingScheduleSearch === false) {
@@ -95,6 +97,7 @@ const Products: NextPage = () => {
       colorName: "",
       productName: "",
       materialName: "",
+      supplierId:""
     } as Product);
     setCuttingScheduleSearch(false);
   };
