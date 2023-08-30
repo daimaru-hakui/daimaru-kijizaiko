@@ -40,6 +40,8 @@ export const ProductSearchArea: FC<Props> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const colors = useSettingStore((state) => state.colors);
   const materialNames = useSettingStore((state) => state.materialNames);
+  const suppliers = useSettingStore((state) => state.suppliers);
+
   return (
     <>
       <Button
@@ -113,13 +115,37 @@ export const ProductSearchArea: FC<Props> = ({
                   }
                 >
                   {materialNames.map((materialName: string) => (
-                    <option key={materialName}>{materialName}</option>
+                    <option key={materialName} value={materialName}>
+                      {materialName}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+              <Box>
+                <Text>仕入先名</Text>
+                <Select
+                  mt={1}
+                  name="supplier"
+                  placeholder="仕入先を検索..."
+                  value={search.supplierId}
+                  onChange={(e) =>
+                    setSearch({ ...search, supplierId: e.target.value })
+                  }
+                >
+                  {suppliers.map((supplier) => (
+                    <option key={supplier.id} value={supplier.id}>
+                      {supplier.name}
+                    </option>
                   ))}
                 </Select>
               </Box>
               <Box>
                 <FormControl display="flex" alignItems="center">
-                  <FormLabel htmlFor="cuttingScheduleSwitch" mb="0" fontWeight="normal">
+                  <FormLabel
+                    htmlFor="cuttingScheduleSwitch"
+                    mb="0"
+                    fontWeight="normal"
+                  >
                     使用予定
                   </FormLabel>
                   <Switch
