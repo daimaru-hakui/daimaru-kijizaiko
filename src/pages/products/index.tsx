@@ -57,18 +57,23 @@ const Products: NextPage = () => {
   } as Product);
 
   useEffect(() => {
-    setFilterProducts(
-      products?.filter(
-        (product) =>
-          product.productNumber.includes(
-            halfToFullChar(search.productNumber.toUpperCase())
-          ) &&
-          product.staff.includes(search.staff) &&
-          product.colorName.includes(search.colorName) &&
-          product.productName.includes(search.productName) &&
-          product.materialName.includes(search.materialName)
-      )
-    );
+    const timeoutID = setTimeout(() => {
+      setFilterProducts(
+        products?.filter(
+          (product) =>
+            product.productNumber.includes(
+              halfToFullChar(search.productNumber.toUpperCase())
+            ) &&
+            product.staff.includes(search.staff) &&
+            product.colorName.includes(search.colorName) &&
+            product.productName.includes(search.productName) &&
+            product.materialName.includes(search.materialName)
+        )
+      );
+    }, 500);
+    return () => {
+      clearTimeout(timeoutID);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, products]);
 
