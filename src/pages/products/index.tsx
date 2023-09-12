@@ -31,6 +31,7 @@ import { useUtil } from "../../hooks/UseUtil";
 import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
 import { useProducts } from "../../hooks/useProducts";
+import { ProductCuttingScheduleModal } from "../../components/products/ProductCuttingScheduleModal";
 
 type Users = {
   contents: User[];
@@ -40,13 +41,13 @@ const Products: NextPage = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const products = useProductsStore((state) => state.products);
   const [filterProducts, setFilterProducts] = useState<Product[]>(null);
-  const { getUserName, getMixed, getFabricStd } = useGetDisp();
+  const { getUserName, getMixed, getFabricStd, getCuttingScheduleTotal } =
+    useGetDisp();
   const { mathRound2nd } = useUtil();
   const { csvData, isVisible, deleteProduct } = useProducts();
   const { isAuths } = useAuthManagement();
   const { halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
-
 
   const [search, setSearch] = useState<Product>({
     productNumber: "",
@@ -54,28 +55,46 @@ const Products: NextPage = () => {
     colorName: "",
     productName: "",
     materialName: "",
+    supplierId: "",
+    cuttingSchedules: [],
   } as Product);
+  const [cuttingScheduleSearch, setCuttingScheduleSearch] = useState(false);
 
   useEffect(() => {
-    const timeoutID = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setFilterProducts(
-        products?.filter(
-          (product) =>
-            product.productNumber.includes(
-              halfToFullChar(search.productNumber.toUpperCase())
-            ) &&
-            product.staff.includes(search.staff) &&
-            product.colorName.includes(search.colorName) &&
-            product.productName.includes(search.productName) &&
-            product.materialName.includes(search.materialName)
-        )
+        products
+          ?.filter(
+            (product) =>
+              product.productNumber.includes(
+                halfToFullChar(search.productNumber.toUpperCase())
+              ) &&
+              product.staff.includes(search.staff) &&
+              product.colorName.includes(search.colorName) &&
+              product.productName.includes(search.productName) &&
+              product.materialName.includes(search.materialName) &&
+              product.supplierId.includes(search.supplierId)
+          )
+          .filter((product) => {
+            if (cuttingScheduleSearch === false) {
+              return true;
+            } else if (cuttingScheduleSearch === true) {
+              if (
+                product.cuttingSchedules &&
+                product.cuttingSchedules.length > 0
+              ) {
+                return true;
+              }
+            }
+          })
       );
     }, 500);
+
     return () => {
-      clearTimeout(timeoutID);
+      clearInterval(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, products]);
+  }, [search, products, cuttingScheduleSearch]);
 
   const onReset = () => {
     setSearch({
@@ -84,7 +103,9 @@ const Products: NextPage = () => {
       colorName: "",
       productName: "",
       materialName: "",
+      supplierId: ""
     } as Product);
+    setCuttingScheduleSearch(false);
   };
 
   const filterBtnEl = () => (
@@ -92,6 +113,8 @@ const Products: NextPage = () => {
       <ProductSearchArea
         search={search}
         setSearch={setSearch}
+        cuttingScheduleSearch={cuttingScheduleSearch}
+        setCuttingScheduleSearch={setCuttingScheduleSearch}
         onReset={onReset}
       />
     </Flex>
@@ -208,6 +231,7 @@ const Products: NextPage = () => {
                     <Th>生地品番</Th>
                     <Th>色</Th>
                     <Th>品名</Th>
+                    <Th>使用予定</Th>
                     <Th>単価</Th>
                     <Th>染め仕掛</Th>
                     <Th>外部在庫</Th>
@@ -234,6 +258,13 @@ const Products: NextPage = () => {
                       <Td>{product.productNumber}</Td>
                       <Td>{product?.colorName}</Td>
                       <Td>{product?.productName}</Td>
+                      <Td>
+                        {product?.cuttingSchedules?.length > 0 && (
+                          <ProductCuttingScheduleModal
+                            scheduleList={product.cuttingSchedules}
+                          />
+                        )}
+                      </Td>
                       <Td isNumeric>{product?.price.toLocaleString()}円</Td>
                       <Td
                         isNumeric
@@ -252,7 +283,9 @@ const Products: NextPage = () => {
                       </Td>
                       <Td
                         isNumeric
-                        fontWeight={product?.arrivingQuantity ? "bold" : "normal"}
+                        fontWeight={
+                          product?.arrivingQuantity ? "bold" : "normal"
+                        }
                       >
                         {mathRound2nd(
                           product?.arrivingQuantity || 0
@@ -262,11 +295,24 @@ const Products: NextPage = () => {
                       <Td
                         isNumeric
                         fontWeight={product?.tokushimaStock ? "bold" : "normal"}
+                        color={
+                          product?.tokushimaStock <
+                            getCuttingScheduleTotal(product.cuttingSchedules) ? "red" : "inherit"
+                        }
                       >
-                        {mathRound2nd(
-                          product?.tokushimaStock || 0
-                        ).toLocaleString()}
-                        m
+                        <Flex>
+                          {mathRound2nd(
+                            product?.tokushimaStock || 0
+                          ).toLocaleString()}
+                          m
+                          {product.cuttingSchedules?.length > 0 && (
+                            <Box as="span" ml={2}>
+                              {`(${getCuttingScheduleTotal(
+                                product.cuttingSchedules
+                              )}m)`}
+                            </Box>
+                          )}
+                        </Flex>
                       </Td>
                       <Td>{product.materialName}</Td>
                       <Td>
@@ -295,15 +341,13 @@ const Products: NextPage = () => {
                         </Flex>
                       </Td>
                       <Td>
-                        {isAuths(["rd"]) ||
-                          product?.createUser === currentUser ? (
-                          <FaTrashAlt
-                            cursor="pointer"
-                            onClick={() => deleteProduct(product.id)}
-                          />
-                        ) : (
-                          ""
-                        )}
+                        {(isAuths(["rd"]) ||
+                          product?.createUser === currentUser) && (
+                            <FaTrashAlt
+                              cursor="pointer"
+                              onClick={() => deleteProduct(product.id)}
+                            />
+                          )}
                       </Td>
                     </Tr>
                   ))}

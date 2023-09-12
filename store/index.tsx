@@ -9,6 +9,7 @@ import {
   Supplier,
   Location,
   GrayFabricHistory,
+  CuttingSchedule,
 } from "../types";
 
 type AuthState = {
@@ -44,9 +45,9 @@ export const useLoadingStore = create<LoadingState>((set) => ({
 type ProductsState = {
   products: Product[];
   setProducts: (payload: Product[]) => void;
-  fabricDyeingOrders: History[],
+  fabricDyeingOrders: History[];
   setFabricDyeingOrders: (payload: History[]) => void;
-  fabricPurchaseOrders: History[],
+  fabricPurchaseOrders: History[];
   setFabricPurchaseOrders: (payload: History[]) => void;
 };
 
@@ -76,6 +77,7 @@ export const useProductsStore = create<ProductsState>((set) => ({
       noteEtc: "",
       interfacing: false,
       lining: false,
+      cuttingSchedules:[],
       wip: 0,
       externalStock: 0,
       arrivingQuantity: 0,
@@ -147,37 +149,63 @@ type GrayFabricsState = {
 };
 
 export const useGrayFabricStore = create<GrayFabricsState>((set) => ({
-  grayFabrics: [{
-    id: "",
-    supplierId: "",
-    productNumber: "",
-    productName: "",
-    price: 0,
-    comment: "",
-    wip: 0,
-    stock: 0,
-    createUser: ""
-  }],
+  grayFabrics: [
+    {
+      id: "",
+      supplierId: "",
+      productNumber: "",
+      productName: "",
+      price: 0,
+      comment: "",
+      wip: 0,
+      stock: 0,
+      createUser: "",
+    },
+  ],
   setGrayFabrics: (payload) => set({ grayFabrics: payload }),
-  grayFabricOrders: [{
-    id: "",
-    serialNumber: 0,
-    orderType: "",
-    grayFabricId: "",
-    supplierId: "",
-    supplierName: "",
-    productNumber: "",
-    productName: "",
-    price: 0,
-    quantity: 0,
-    comment: "",
-    orderedAt: "",
-    scheduledAt: "",
-    fixedAt: "",
-    createUser: "",
-    updateUser: "",
-    createdAt: null,
-    updatedAt: null
-  }],
+  grayFabricOrders: [
+    {
+      id: "",
+      serialNumber: 0,
+      orderType: "",
+      grayFabricId: "",
+      supplierId: "",
+      supplierName: "",
+      productNumber: "",
+      productName: "",
+      price: 0,
+      quantity: 0,
+      comment: "",
+      orderedAt: "",
+      scheduledAt: "",
+      fixedAt: "",
+      createUser: "",
+      updateUser: "",
+      createdAt: null,
+      updatedAt: null,
+    },
+  ],
   setGrayFabricOrders: (payload) => set({ grayFabricOrders: payload }),
+}));
+
+type CuttingSchedulesState = {
+  cuttingSchedules: CuttingSchedule[];
+  setCuttingSchedules: (payload: CuttingSchedule[]) => void;
+};
+
+export const useCuttingScheduleStore = create<CuttingSchedulesState>((set) => ({
+  cuttingSchedules: [
+    {
+      id: "",
+      staff: "",
+      userRef: "",
+      processNumber: "",
+      productId: "",
+      productRef: "",
+      itemName: "",
+      quantity: 0,
+      scheduledAt: "",
+    },
+  ],
+  setCuttingSchedules: (payload) => set({ cuttingSchedules: payload }),
 }));

@@ -90,7 +90,7 @@ export const useProducts = () => {
     if (!result) return;
     setIsLoading(true);
     const userRef = doc(db, 'users', currentUser);
-    const createUserRef = doc(db, 'users', data.createUser);
+    // const createUserRef = doc(db, 'users', data.createUser) 
     const supplierRef = data.supplierId ? doc(db, "suppliers", data.supplierId) : "";
     const grayFabricRef = data.grayFabricId ? doc(db, "grayFabrics", data.grayFabricId) : "";
     const docRef = doc(db, "products", `${productId}`);
@@ -104,7 +104,8 @@ export const useProducts = () => {
         externalStock: Number(data.externalStock) || 0,
         arrivingQuantity: Number(data?.arrivingQuantity) || 0,
         tokushimaStock: Number(data?.tokushimaStock) || 0,
-        createUserRef,
+        createUser: data.createUser || currentUser,
+        // createUserRef,
         updateUser: currentUser,
         updateUserRef: userRef, //リファレンス
         updatedAt: serverTimestamp(),

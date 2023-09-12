@@ -87,6 +87,7 @@ export const Charts: FC = () => {
     }
   }, [fabricPurchaseConfirms, staff]);
 
+
   return (
     <>
       <Flex

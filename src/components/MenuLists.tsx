@@ -78,6 +78,7 @@ export const MenuLists: FC<Props> = ({ onClose }) => {
         {menuItemEL("裁断報告書一覧", "/tokushima/cutting-reports")}
         {isAuths(["tokushima", "rd"]) &&
           menuItemEL("裁断報告書作成", "/tokushima/cutting-reports/new")}
+          {menuItemEL("使用予定一覧", "/schedules")}
       </List>
       <Divider />
 

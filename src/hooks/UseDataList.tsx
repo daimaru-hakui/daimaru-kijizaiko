@@ -12,6 +12,7 @@ import {
 import { db } from "../../firebase";
 import {
   useAuthStore,
+  useCuttingScheduleStore,
   useGrayFabricStore,
   useProductsStore,
   useSettingStore,
@@ -24,6 +25,7 @@ import {
   StockPlace,
   Location,
   Product,
+  CuttingSchedule,
 } from "../../types";
 
 export const useDataList = () => {
@@ -46,6 +48,9 @@ export const useDataList = () => {
   const setFabricPurchaseOrders = useProductsStore(
     (state) => state.setFabricPurchaseOrders
   );
+  const setCuttingSchedules = useCuttingScheduleStore(
+    (state) => state.setCuttingSchedules
+  );
 
   // users情報;
   const getUsers = () => {
@@ -55,10 +60,10 @@ export const useDataList = () => {
       setUsers(
         querySnapshot.docs.map(
           (doc) =>
-          ({
-            ...doc.data(),
-            id: doc.id,
-          } as User)
+            ({
+              ...doc.data(),
+              id: doc.id,
+            } as User)
         )
       )
     );
@@ -89,9 +94,8 @@ export const useDataList = () => {
       onSnapshot(q, (querySnap) =>
         setProducts(
           querySnap.docs
-            .map((doc) => ({ ...doc.data(), id: doc.id } as Product)).sort((a, b) => (
-              a.productNumber < b.productNumber && -1
-            ))
+            .map((doc) => ({ ...doc.data(), id: doc.id } as Product))
+            .sort((a, b) => a.productNumber < b.productNumber && -1)
         )
       );
     } catch (err) {
@@ -207,6 +211,25 @@ export const useDataList = () => {
     }
   };
 
+  
+  const getCuttingSchedules = async () => {
+    const q = query(
+      collection(db, "cuttingSchedules"),
+      orderBy("scheduledAt", "desc")
+    );
+    try {
+      onSnapshot(q, (querySnap) =>
+        setCuttingSchedules(
+          querySnap.docs.map(
+            (doc) => ({ ...doc.data(), id: doc.id } as CuttingSchedule)
+          )
+        )
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // 徳島工場保管場所;
   const getLocations = async () => {
     const q = query(collection(db, "locations"), orderBy("order", "asc"));
@@ -229,7 +252,6 @@ export const useDataList = () => {
     );
   };
 
-
   const getMaterialNames = async () => {
     onSnapshot(doc(db, "components", "materialNames"), (querySnap) =>
       setMaterialNames([...querySnap?.data()?.data])
@@ -249,5 +271,6 @@ export const useDataList = () => {
     getLocations,
     getColors,
     getMaterialNames,
+    getCuttingSchedules,
   };
 };

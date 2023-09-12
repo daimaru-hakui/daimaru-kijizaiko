@@ -22,13 +22,10 @@ import {
   User,
   CuttingProductType,
   CuttingReportType,
-  Product,
 } from "../../../types";
 import { FabricsUsedInput } from "./FabricsUsedInput";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useForm } from "react-hook-form";
-import { useMutateCuttingReports } from "../../hooks/useMutateCuttingReports";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 
 type Props = {
   title: string;
@@ -174,6 +171,7 @@ export const CuttingReportInputArea: FC<Props> = ({
             <Select
               mt={1}
               value={staff}
+              placeholder="担当者を選択"
               onChange={(e) => setStaff(e.target.value)}
             >
               {filterUsers?.map((user) => (
