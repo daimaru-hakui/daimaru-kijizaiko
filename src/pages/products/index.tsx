@@ -44,7 +44,7 @@ const Products: NextPage = () => {
   const { getUserName, getMixed, getFabricStd, getCuttingScheduleTotal } =
     useGetDisp();
   const { mathRound2nd } = useUtil();
-  const { csvData, isVisible, deleteProduct } = useProducts();
+  const { csvData, deleteProduct } = useProducts();
   const { isAuths } = useAuthManagement();
   const { halfToFullChar, getTodayDate } = useUtil();
   const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
@@ -108,17 +108,6 @@ const Products: NextPage = () => {
     setCuttingScheduleSearch(false);
   };
 
-  const filterBtnEl = () => (
-    <Flex gap={3}>
-      <ProductSearchArea
-        search={search}
-        setSearch={setSearch}
-        cuttingScheduleSearch={cuttingScheduleSearch}
-        setCuttingScheduleSearch={setCuttingScheduleSearch}
-        onReset={onReset}
-      />
-    </Flex>
-  );
   if (filterProducts === null)
     return (
       <Flex w="full" h="100vh" justify="center" align="center">
@@ -147,24 +136,19 @@ const Products: NextPage = () => {
           <Box as="h2" fontSize="2xl">
             生地一覧
           </Box>
-          <Flex gap={3} style={isVisible ? { opacity: 0 } : { opacity: 1 }}>
+          <Flex gap={3} >
             <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
               <Button size="sm">CSV</Button>
             </CSVLink>
-            {filterBtnEl()}
-          </Flex>
-          <Flex
-            gap={3}
-            transition="0.2s"
-            style={isVisible ? { opacity: 1 } : { opacity: 0 }}
-            position="fixed"
-            bottom="20px"
-            right={12}
-          >
-            <CSVLink data={csvData}>
-              <Button size="sm">CSV</Button>
-            </CSVLink>
-            {filterBtnEl()}
+            <Flex gap={3}>
+              <ProductSearchArea
+                search={search}
+                setSearch={setSearch}
+                cuttingScheduleSearch={cuttingScheduleSearch}
+                setCuttingScheduleSearch={setCuttingScheduleSearch}
+                onReset={onReset}
+              />
+            </Flex>
           </Flex>
         </Flex>
         <Flex

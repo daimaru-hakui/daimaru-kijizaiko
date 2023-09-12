@@ -180,9 +180,9 @@ export const useProducts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
-  const toggleVisibility = () => {
-    window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);
-  };
+  // const toggleVisibility = () => {
+  //   window.scrollY > 500 ? setIsVisible(true) : setIsVisible(false);
+  // };
 
   const throttle = (fn: Function, interval: number) => {
     let lastTime = Date.now() - interval;
@@ -194,10 +194,10 @@ export const useProducts = () => {
     };
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", throttle(toggleVisibility, 100));
-    return () => window.removeEventListener("scroll", toggleVisibility);
-  }, []);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", throttle(toggleVisibility, 100));
+  //   return () => window.removeEventListener("scroll", toggleVisibility);
+  // }, []);
 
   return {
     addProduct,
