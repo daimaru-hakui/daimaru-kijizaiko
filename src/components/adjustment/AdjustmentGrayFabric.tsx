@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import {
   Button,
   Flex,
@@ -10,7 +11,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC, memo } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabric } from "../../../types";
@@ -20,7 +21,7 @@ type Props = {
   grayFabric: GrayFabric;
 };
 
-export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
+export const AdjustmentGrayFabric: FC<Props> = memo(({ grayFabric }) => {
   const { getUserName } = useGetDisp(); //// ？
   const { updateAjustmentGrayFabric } = useGrayFabrics();
 
@@ -107,4 +108,4 @@ export const AdjustmentGrayFabric: FC<Props> = ({ grayFabric }) => {
       </Td>
     </Tr>
   );
-};
+});

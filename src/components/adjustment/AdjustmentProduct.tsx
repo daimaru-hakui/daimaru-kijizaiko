@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import {
   Button,
   Flex,
@@ -10,7 +11,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC, memo } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { Product } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
@@ -23,7 +24,7 @@ type Props = {
   product: Product;
 };
 
-export const AdjustmentProduct: FC<Props> = ({ product }) => {
+export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
   const { getUserName } = useGetDisp();
   const currentUser = useAuthStore((state) => state.currentUser);
   const { quantityValueBold } = useUtil();
@@ -191,4 +192,4 @@ export const AdjustmentProduct: FC<Props> = ({ product }) => {
       </Td>
     </Tr>
   );
-};
+});
