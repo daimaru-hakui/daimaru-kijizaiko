@@ -7,6 +7,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Spinner,
   Td,
   Tr,
 } from "@chakra-ui/react";
@@ -66,6 +67,8 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
   const onReset = (product: Product) => {
     setItems({ ...product });
   };
+
+  if (product === null) return;
 
   return (
     <Tr key={product.id}>
