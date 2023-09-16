@@ -27,6 +27,9 @@ import { NextPage } from "next";
 const Colors: NextPage = () => {
   const [colors, setColors] = useState([]);
   const [color, setColor] = useState("");
+  const [dragIdx, setDragIdx] = useState(null);
+  const [enterIdx, setEnterIdx] = useState(null);
+  const [sortColors, setSortColors] = useState([]);
 
   useEffect(() => {
     const getColors = async () => {
@@ -51,6 +54,26 @@ const Colors: NextPage = () => {
       data: arrayRemove(color),
     });
     setColor("");
+  };
+
+  const dragStart = (idx: number) => {
+    setDragIdx(idx);
+  };
+
+  const dragEnter = async (idx: number) => {
+    setEnterIdx(idx);
+    if (dragIdx === idx) return;
+    const deleteIndex = colors.splice(dragIdx, 1)[0];
+    colors.splice(idx, 0, deleteIndex);
+    setSortColors(colors);
+  };
+
+  const dragEnd = async () => {
+    await updateDoc(doc(db, "components", "colors"), {
+      data: sortColors,
+    });
+    setDragIdx(null);
+    setEnterIdx(null);
   };
 
   return (
@@ -89,9 +112,19 @@ const Colors: NextPage = () => {
             </Thead>
             <Tbody>
               {Object.values(colors)
-                ?.sort()
-                .map((color, index: number) => (
-                  <Tr key={index}>
+                .map((color, idx: number) => (
+                  <Tr
+                    key={idx}
+                    draggable={true}
+                    onDragStart={() => dragStart(idx)}
+                    onDragEnter={() => dragEnter(idx)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDragEnd={dragEnd}
+                    borderTop={
+                      enterIdx === idx ? "2px solid#aee9ff" : "1px solid transparent"}
+
+                    cursor="pointer"
+                  >
                     <Td w="100%">{color}</Td>
                     <Td w="20px">
                       <Flex alignItems="center" justifyContent="center" gap={3}>
@@ -108,7 +141,7 @@ const Colors: NextPage = () => {
           </Table>
         </TableContainer>
       </Container>
-    </Box>
+    </Box >
   );
 };
 
