@@ -2,37 +2,24 @@ import {
   Box,
   Flex,
   Button,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Select,
   Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useProductsStore } from "../../../store";
-import { FaSearch } from "react-icons/fa";
 import { CSVLink } from "react-csv";
-import { User, Product } from "../../../types";
-import { ProductSearchArea } from "../../components/products/ProductSearchArea";
-import { useGetDisp } from "../../hooks/UseGetDisp";
+import { Product } from "../../../types";
+import { ProductSearchDrawer } from "../../components/products/ProductSearchDrawer";
 import { useUtil } from "../../hooks/UseUtil";
-import useSWRImmutable from "swr/immutable";
 import { NextPage } from "next";
 import { useProducts } from "../../hooks/useProducts";
-import { ProductList } from "../../components/products/ProductList";
-
-type Users = {
-  contents: User[];
-};
+import { ProductTable } from "../../components/products/ProductTable";
+import { ProductSearchBar } from "../../components/products/ProductSearchBar";
 
 const Products: NextPage = () => {
   const products = useProductsStore((state) => state.products);
   const [filterProducts, setFilterProducts] = useState<Product[]>(null);
-  const { getUserName } =
-    useGetDisp();
   const { csvData } = useProducts();
   const { halfToFullChar, getTodayDate } = useUtil();
-  const { data: users } = useSWRImmutable<Users>(`/api/users/sales`);
 
   const [search, setSearch] = useState<Product>({
     productNumber: "",
@@ -82,7 +69,6 @@ const Products: NextPage = () => {
   }, [search, products, cuttingScheduleSearch]);
 
   const onReset = () => {
-    setFilterProducts(products);
     setSearch({
       productNumber: "",
       staff: "",
@@ -126,58 +112,22 @@ const Products: NextPage = () => {
             <CSVLink data={csvData} filename={`生地一覧_${getTodayDate()}`}>
               <Button size="sm">CSV</Button>
             </CSVLink>
-            <Flex gap={3}>
-              <ProductSearchArea
-                search={search}
-                setSearch={setSearch}
-                cuttingScheduleSearch={cuttingScheduleSearch}
-                setCuttingScheduleSearch={setCuttingScheduleSearch}
-                onReset={onReset}
-              />
-            </Flex>
+            <ProductSearchDrawer
+              search={search}
+              setSearch={setSearch}
+              cuttingScheduleSearch={cuttingScheduleSearch}
+              setCuttingScheduleSearch={setCuttingScheduleSearch}
+              onReset={onReset}
+            />
           </Flex>
         </Flex>
-        <Flex
-          mt={3}
-          gap={3}
-          justify="center"
-          align="center"
-          flexDirection={{ base: "column", lg: "row" }}
-        >
-          <Select
-            placeholder="担当者で検索"
-            maxW={300}
-            onChange={(e) => setSearch({ ...search, staff: e.target.value })}
-            value={search.staff}
-          >
-            <option value="R&D">R&D</option>
-            {users?.contents.map((user) => (
-              <option key={user.id} value={user.id}>
-                {getUserName(user.id)}
-              </option>
-            ))}
-          </Select>
-          <InputGroup maxW={300}>
-            <InputLeftElement pointerEvents="none">
-              <FaSearch />
-            </InputLeftElement>
-            <Input
-              type="text"
-              name="productNumber"
-              placeholder="生地の品番を検索..."
-              value={search.productNumber}
-              onChange={(e) =>
-                setSearch({ ...search, productNumber: e.target.value })
-              }
-            />
-          </InputGroup>
-          {products?.length !== filterProducts?.length && (
-            <Button size="md" colorScheme="facebook" onClick={onReset}>
-              解除
-            </Button>
-          )}
-        </Flex>
-        <ProductList filterProducts={filterProducts} />
+        <ProductSearchBar
+          filterProducts={filterProducts}
+          search={search}
+          setSearch={setSearch}
+          onReset={onReset}
+        />
+        <ProductTable filterProducts={filterProducts} />
       </Box>
     </Box>
   );

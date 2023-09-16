@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useEffect, useState, FC, memo } from "react";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { GrayFabric } from "../../../types";
 import { useGrayFabrics } from "../../hooks/useGrayFabrics";
@@ -21,11 +20,8 @@ type Props = {
   grayFabric: GrayFabric;
 };
 
-export const AdjustmentGrayFabric: FC<Props> = memo(({ grayFabric }) => {
-  const { getUserName } = useGetDisp(); //// ？
+export const AdjustmentGrayFabricRow: FC<Props> = memo(({ grayFabric }) => {
   const { updateAjustmentGrayFabric } = useGrayFabrics();
-
-  const { quantityValueBold } = useUtil();
   const [items, setItems] = useState<GrayFabric>();
 
   const handleNumberChange = (e: string, name: string) => {
@@ -61,7 +57,7 @@ export const AdjustmentGrayFabric: FC<Props> = memo(({ grayFabric }) => {
           </NumberInputStepper>
         </NumberInput>
       </Td>
-      <Td p={1} isNumeric fontWeight={quantityValueBold(grayFabric?.wip)}>
+      <Td p={1}>
         <NumberInput
           mt={1}
           w="90px"
@@ -77,7 +73,7 @@ export const AdjustmentGrayFabric: FC<Props> = memo(({ grayFabric }) => {
           </NumberInputStepper>
         </NumberInput>
       </Td>
-      <Td p={1} isNumeric fontWeight={quantityValueBold(grayFabric?.stock)}>
+      <Td p={1}>
         <NumberInput
           mt={1}
           w="90px"

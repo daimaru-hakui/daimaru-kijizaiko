@@ -7,34 +7,32 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Spinner,
   Td,
   Tr,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useEffect, useState, FC, memo } from "react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
-import { Product } from "../../../types";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useAuthStore, useLoadingStore } from "../../../store";
+import { Product } from "../../../types";
 
 type Props = {
   product: Product;
 };
 
-export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
-  const { getUserName } = useGetDisp();
+export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  const { quantityValueBold } = useUtil();
-  const { isAuths } = useAuthManagement();
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
-  const { mathRound2nd } = useUtil();
+  const { getUserName } = useGetDisp();
+  const { isAuths } = useAuthManagement();
   const [items, setItems] = useState<Product>();
+  const { mathRound2nd } = useUtil();
 
-  const handleNumberChange = (e: any, name: string) => {
+  const handleNumberChange = (e: string, name: string) => {
     const value = e;
     setItems({ ...items, [name]: value });
   };
@@ -77,7 +75,7 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
       <Td>{product?.colorName}</Td>
       {isAuths(["rd"]) && (
         <>
-          <Td p={1} isNumeric>
+          <Td p={1}>
             <NumberInput
               mt={1}
               w="90px"
@@ -95,7 +93,7 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
               </NumberInputStepper>
             </NumberInput>
           </Td>
-          <Td p={1} isNumeric fontWeight={quantityValueBold(product?.wip)}>
+          <Td p={1} >
             <NumberInput
               mt={1}
               w="90px"
@@ -113,11 +111,7 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
               </NumberInputStepper>
             </NumberInput>
           </Td>
-          <Td
-            p={1}
-            isNumeric
-            fontWeight={quantityValueBold(product?.externalStock)}
-          >
+          <Td p={1}>
             <NumberInput
               mt={1}
               w="90px"
@@ -135,11 +129,7 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
               </NumberInputStepper>
             </NumberInput>
           </Td>
-          <Td
-            p={1}
-            isNumeric
-            fontWeight={quantityValueBold(product?.arrivingQuantity)}
-          >
+          <Td p={1}>
             <NumberInput
               mt={1}
               w="90px"
@@ -159,11 +149,7 @@ export const AdjustmentProduct: FC<Props> = memo(({ product }) => {
           </Td>
         </>
       )}
-      <Td
-        p={1}
-        isNumeric
-        fontWeight={quantityValueBold(product?.tokushimaStock)}
-      >
+      <Td p={1} >
         <NumberInput
           mt={1}
           w="90px"

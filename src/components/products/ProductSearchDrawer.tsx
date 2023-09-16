@@ -8,6 +8,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   FormControl,
   FormLabel,
   Input,
@@ -30,7 +31,7 @@ type Props = {
   onReset: Function;
 };
 
-export const ProductSearchArea: FC<Props> = ({
+export const ProductSearchDrawer: FC<Props> = ({
   search,
   setSearch,
   onReset,
@@ -43,7 +44,7 @@ export const ProductSearchArea: FC<Props> = ({
   const suppliers = useSettingStore((state) => state.suppliers);
 
   return (
-    <>
+    <Flex gap={3}>
       <Button
         size="sm"
         colorScheme="facebook"
@@ -169,6 +170,6 @@ export const ProductSearchArea: FC<Props> = ({
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </>
+    </Flex>
   );
 };
