@@ -9,6 +9,7 @@ import {
   Flex,
   Container,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
@@ -20,7 +21,7 @@ import { NextPage } from "next";
 
 const AdjustmentGrayFabrics: NextPage = () => {
   const grayFabrics = useGrayFabricStore((state) => state.grayFabrics);
-  const [filterProducts, setFilterProducts] = useState<GrayFabric[]>([]);
+  const [filterProducts, setFilterProducts] = useState<GrayFabric[]>(null);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
 
@@ -38,6 +39,13 @@ const AdjustmentGrayFabrics: NextPage = () => {
   const reset = () => {
     setSearchText("");
   };
+
+  if (filterProducts === null)
+    return (
+      <Flex w="full" h="100vh" justify="center" align="center">
+        <Spinner />
+      </Flex>
+    );
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

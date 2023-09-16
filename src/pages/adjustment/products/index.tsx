@@ -9,6 +9,7 @@ import {
   Flex,
   Container,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
 import { GiCancel } from "react-icons/gi";
 import { useState, useEffect } from "react";
@@ -21,7 +22,7 @@ import { NextPage } from "next";
 
 const AdjustmentProducts: NextPage = () => {
   const products = useProductsStore((state) => state.products);
-  const [filterProducts, setFilterProducts] = useState<Product[]>([]);
+  const [filterProducts, setFilterProducts] = useState<Product[]>(null);
   const [searchText, setSearchText] = useState("");
   const { halfToFullChar } = useUtil();
   const { isAuths } = useAuthManagement();
@@ -38,6 +39,14 @@ const AdjustmentProducts: NextPage = () => {
   const reset = () => {
     setSearchText("");
   };
+
+
+  if (filterProducts === null)
+    return (
+      <Flex w="full" h="100vh" justify="center" align="center">
+        <Spinner />
+      </Flex>
+    );
 
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">

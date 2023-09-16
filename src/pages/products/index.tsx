@@ -82,6 +82,7 @@ const Products: NextPage = () => {
   }, [search, products, cuttingScheduleSearch]);
 
   const onReset = () => {
+    setFilterProducts(products);
     setSearch({
       productNumber: "",
       staff: "",
