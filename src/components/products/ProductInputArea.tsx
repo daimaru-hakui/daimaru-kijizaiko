@@ -108,7 +108,7 @@ export const ProductInputArea: FC<Props> = ({
       const result2 = product.colorNum === colorNum ? true : false;
       const result3 = product.colorName === colorName ? true : false;
       const result4 = product.supplierId === supplierId ? true : false;
-      return result1 && result2 && result3 && result4
+      return result1 && result2 && result3 && result4;
     });
 
     !result ? setFlag(false) : setFlag(true);
@@ -262,7 +262,6 @@ export const ProductInputArea: FC<Props> = ({
                 {...register("colorName", { required: true })}
               >
                 {Object.values(colors)
-                  ?.sort()
                   .map((color) => (
                     <option key={color} value={color}>
                       {color}
