@@ -45,6 +45,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
     stockPlaceType: 1,
     quantity: 0,
     price: 0,
+    stockPlace:"",
     comment: "",
     fixedAt: "",
   });

@@ -30,7 +30,7 @@ type Props = {
   history: History;
   type: string;
   onClick: Function;
-  items: History;
+  items: any;
   setItems: Function;
   orderType?: string;
 };
