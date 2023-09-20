@@ -12,10 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import {
-  useAuthStore,
-  useProductsStore,
-} from "../../../../store";
+import { useAuthStore, useProductsStore } from "../../../../store";
 import { CommentModal } from "../../CommentModal";
 import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
@@ -33,7 +30,9 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const [items, setItems] = useState({} as History);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
-  const fabricPurchaseOrders = useProductsStore((state) => state.fabricPurchaseOrders);
+  const fabricPurchaseOrders = useProductsStore(
+    (state) => state.fabricPurchaseOrders
+  );
   const [filterFabricPurchaseOrders, setFilterFabricPurchaseOrders] = useState(
     [] as History[]
   );
@@ -41,7 +40,7 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
   const {
     deleteFabricPurchaseOrder,
     updateFabricPurchaseOrder,
-    confirmProcessingFabricPurchase
+    confirmProcessingFabricPurchase,
   } = useFabricPurchase();
 
   useEffect(() => {
@@ -54,42 +53,6 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
       setFilterFabricPurchaseOrders(fabricPurchaseOrders);
     }
   }, [fabricPurchaseOrders, HOUSE_FACTORY]);
-
-  const elementComment = (history: History, collectionName: string) => (
-    <Flex gap={3}>
-      <CommentModal
-        id={history.id}
-        comment={history.comment}
-        collectionName={collectionName}
-      />
-      {history?.comment.slice(0, 20) +
-        (history.comment.length >= 1 ? "..." : "")}
-    </Flex>
-  );
-
-  const elmentEditDelete = (
-    history: History,
-    items,
-    onClickUpdate: Function,
-    onClickDelete: Function
-  ) => (
-    <Flex gap={3}>
-      <HistoryEditModal
-        history={history}
-        type="order"
-        onClick={() => onClickUpdate(history, items)}
-        items={items}
-        setItems={setItems}
-      />
-      {isAdminAuth() && (
-        <FaTrashAlt
-          color="#444"
-          cursor="pointer"
-          onClick={() => onClickDelete(history)}
-        />
-      )}
-    </Flex>
-  );
 
   return (
     <>
@@ -119,12 +82,14 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                 <Tr key={history.id}>
                   <Td>
                     {isAuths(["rd", "tokushima"]) ||
-                      history.createUser === currentUser ? (
+                    history.createUser === currentUser ? (
                       <OrderToConfirmModal
                         history={history}
                         items={items}
                         setItems={setItems}
-                        onClick={() => confirmProcessingFabricPurchase(history, items)}
+                        onClick={() =>
+                          confirmProcessingFabricPurchase(history, items)
+                        }
                       />
                     ) : (
                       <Button size="xs" disabled={true}>
@@ -151,21 +116,45 @@ export const FabricPurchaseOrderTable: FC<Props> = ({ HOUSE_FACTORY }) => {
                   )}
                   <Td>{history?.stockPlace}</Td>
                   <Td w="100%" textAlign="center">
-                    {elementComment(history, "fabricDyeingOrders")}
+                    <Flex gap={3}>
+                      <CommentModal
+                        id={history.id}
+                        comment={history.comment}
+                        collectionName={"fabricDyeingOrders"}
+                      />
+                      {history?.comment.slice(0, 20) +
+                        (history.comment.length >= 1 ? "..." : "")}
+                    </Flex>
                   </Td>
                   <Td>
                     {(isAuths(["rd"]) ||
                       history?.createUser === currentUser) && (
-                        <Flex gap={3}>
-                          {history.orderType === "purchase" &&
-                            elmentEditDelete(
-                              history,
-                              items,
-                              updateFabricPurchaseOrder,
-                              deleteFabricPurchaseOrder
+                      <Flex gap={3}>
+                        {history.orderType === "purchase" && (
+                          <Flex gap={3}>
+                            <HistoryEditModal
+                              history={history}
+                              type="order"
+                              onClick={() =>
+                                updateFabricPurchaseOrder(history, items)
+                              }
+                              items={items}
+                              setItems={setItems}
+                              orderType="purchase"
+                            />
+                            {isAdminAuth() && (
+                              <FaTrashAlt
+                                color="#444"
+                                cursor="pointer"
+                                onClick={() =>
+                                  deleteFabricPurchaseOrder(history)
+                                }
+                              />
                             )}
-                        </Flex>
-                      )}
+                          </Flex>
+                        )}
+                      </Flex>
+                    )}
                   </Td>
                 </Tr>
               ))}

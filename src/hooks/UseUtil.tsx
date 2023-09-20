@@ -1,3 +1,4 @@
+import {useCallback} from "react"
 export const useUtil = () => {
   const quantityValueBold = (quantity: number) => {
     return quantity > 0 ? "bold" : "normal";
@@ -54,9 +55,9 @@ export const useUtil = () => {
     });
   }
 
-  const mathRound2nd = (num: number) => {
+  const mathRound2nd = useCallback((num: number) => {
     return Math.round(num * 100) / 100;
-  };
+  },[]);
 
   return { quantityValueBold, getTodayDate, get3monthsAgo, getNow, halfToFullChar, mathRound2nd };
 };

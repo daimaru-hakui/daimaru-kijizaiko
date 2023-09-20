@@ -15,6 +15,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Select,
   Stack,
   Text,
   Textarea,
@@ -23,12 +24,13 @@ import {
 import { useEffect, FC } from "react";
 import { FaEdit } from "react-icons/fa";
 import { History } from "../../../types";
+import { useSettingStore } from "../../../store";
 
 type Props = {
   history: History;
   type: string;
   onClick: Function;
-  items: any;
+  items: History;
   setItems: Function;
   orderType?: string;
 };
@@ -42,15 +44,17 @@ export const HistoryEditModal: FC<Props> = ({
   orderType,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const stockPlaces = useSettingStore((state) => state.stockPlaces);
 
   // 初期値をitemsに代入
   useEffect(() => {
     setItems({ ...history });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, isOpen]);
+  console.log("history")
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -97,7 +101,7 @@ export const HistoryEditModal: FC<Props> = ({
                   name="quantity"
                   defaultValue={0}
                   min={0}
-                  max={10000}
+                  max={100000}
                   value={items?.quantity}
                   onChange={(e) => handleNumberChange(e, "quantity")}
                 >
@@ -116,7 +120,7 @@ export const HistoryEditModal: FC<Props> = ({
                     name="price"
                     defaultValue={0}
                     min={0}
-                    max={10000}
+                    max={100000}
                     value={items?.price === 0 ? "" : items?.price}
                     onChange={(e) => handleNumberChange(e, "price")}
                   >
@@ -152,6 +156,22 @@ export const HistoryEditModal: FC<Props> = ({
                   />
                 </Box>
               )}
+              {type === "order" && orderType === "purchase" && (
+                <Box w="100%">
+                  <Text>送り先</Text>
+                  <Select
+                    name="stockPlace"
+                    value={items?.stockPlace}
+                    onChange={handleInputChange}
+                  >
+                    {stockPlaces.map((stockPlace) => (
+                      <option key={stockPlace.id} value={stockPlace.name}>
+                        {stockPlace.name}
+                      </option>
+                    ))}
+                  </Select>
+                </Box>
+              )}
               {type === "confirm" && (
                 <Box w="100%">
                   <Text>仕上日</Text>
@@ -175,7 +195,6 @@ export const HistoryEditModal: FC<Props> = ({
               </Box>
             </Stack>
           </ModalBody>
-
           <ModalFooter>
             <Button
               variant="ghost"
@@ -187,7 +206,6 @@ export const HistoryEditModal: FC<Props> = ({
             >
               閉じる
             </Button>
-
             <Button
               colorScheme="blue"
               onClick={() => {

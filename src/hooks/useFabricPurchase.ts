@@ -141,6 +141,7 @@ export const useFabricPurchase = () => {
           price: Number(items.price),
           orderedAt: items.orderedAt,
           scheduledAt: items.scheduledAt,
+          stockPlace:items.stockPlace,
           comment: items.comment,
           updateUser: currentUser,
           updatedAt: serverTimestamp(),

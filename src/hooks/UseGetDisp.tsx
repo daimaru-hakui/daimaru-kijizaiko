@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   useAuthStore,
   useCuttingScheduleStore,
@@ -60,6 +61,7 @@ export const useGetDisp = () => {
 
   // 担当者の表示
   const getUserName = (userId: string) => {
+    console.log("user")
     if (userId === "R&D") {
       return "R&D";
     } else {
@@ -118,10 +120,10 @@ export const useGetDisp = () => {
     return mathRound2nd(stock?.tokushimaStock) || 0;
   };
 
-  const getPrice = (productId: string) => {
+  const getPrice = useCallback((productId: string) => {
     const product = products.find((product) => product.id === productId);
     return product?.price || 0;
-  };
+  },[products]);
 
   const getLocation = (locationId: string) => {
     const location = locations.find(
