@@ -16,10 +16,7 @@ import { CommentModal } from "../../CommentModal";
 import { History } from "../../../../types";
 import { useGetDisp } from "../../../hooks/UseGetDisp";
 import { useAuthManagement } from "../../../hooks/UseAuthManagement";
-import {
-  useAuthStore,
-  useProductsStore,
-} from "../../../../store";
+import { useAuthStore, useProductsStore } from "../../../../store";
 import { HistoryEditModal } from "../../history/HistoryEditModal";
 import { OrderToConfirmModal } from "../../history/OrderToConfirmModal";
 import { useFabricDyeing } from "../../../hooks/useFabricDyeing";
@@ -29,56 +26,24 @@ export const FabricDyeingOrderTable: FC = () => {
   const [items, setItems] = useState<History>();
   const { getSerialNumber, getUserName } = useGetDisp();
   const { isAdminAuth, isAuths } = useAuthManagement();
-  const fabricDyeingOrders = useProductsStore((state) => state.fabricDyeingOrders);
-  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<History[]>([]);
+  const fabricDyeingOrders = useProductsStore(
+    (state) => state.fabricDyeingOrders
+  );
+  const [filterfabricDyeingOrders, setFilterfabricDyeingOrders] = useState<
+    History[]
+  >([]);
   const {
     deleteFabricDyeingOrderStock,
     deleteFabricDyeingOrderRanning,
     updateFabricDyeingOrderStock,
     updateFabricDyeingOrderRanning,
-    confirmProcessingFabricDyeing
+    confirmProcessingFabricDyeing,
   } = useFabricDyeing();
 
   useEffect(() => {
     setFilterfabricDyeingOrders(fabricDyeingOrders);
   }, [fabricDyeingOrders]);
 
-  const elementComment = (history: History, collectionName: string) => (
-    <Flex gap={3}>
-      <CommentModal
-        id={history.id}
-        comment={history.comment}
-        collectionName={collectionName}
-      />
-      {history?.comment.slice(0, 20) +
-        (history.comment.length >= 1 ? "..." : "")}
-    </Flex>
-  );
-
-  const elmentEditDelete = (
-    history: History,
-    items,
-    onClickUpdate: Function,
-    onClickDelete: Function
-  ) => (
-    <Flex gap={3}>
-      <HistoryEditModal
-        history={history}
-        type="order"
-        onClick={() => onClickUpdate(history, items)}
-        items={items}
-        setItems={setItems}
-        orderType="dyeing"
-      />
-      {isAdminAuth() && (
-        <FaTrashAlt
-          color="#444"
-          cursor="pointer"
-          onClick={() => onClickDelete(history)}
-        />
-      )}
-    </Flex>
-  );
 
   return (
     <>
@@ -111,7 +76,9 @@ export const FabricDyeingOrderTable: FC = () => {
                         history={history}
                         items={items}
                         setItems={setItems}
-                        onClick={() => confirmProcessingFabricDyeing(history, items)}
+                        onClick={() =>
+                          confirmProcessingFabricDyeing(history, items)
+                        }
                       />
                     ) : (
                       <Button size="xs" disabled={true}>
@@ -137,7 +104,15 @@ export const FabricDyeingOrderTable: FC = () => {
                     </>
                   )}
                   <Td w="100%" textAlign="center">
-                    {elementComment(history, "historyFabricDyeingOrders")}
+                    <Flex gap={3}>
+                      <CommentModal
+                        id={history.id}
+                        comment={history.comment}
+                        collectionName={"historyFabricDyeingOrders"}
+                      />
+                      {history?.comment.slice(0, 20) +
+                        (history.comment.length >= 1 ? "..." : "")}
+                    </Flex>
                   </Td>
                   <Td>
                     <Flex gap={3}>
@@ -145,20 +120,55 @@ export const FabricDyeingOrderTable: FC = () => {
                         history?.createUser === currentUser) &&
                         history.orderType === "dyeing" && (
                           <>
-                            {history.stockType === "stock" &&
-                              elmentEditDelete(
-                                history,
-                                items,
-                                updateFabricDyeingOrderStock,
-                                deleteFabricDyeingOrderStock
-                              )}
-                            {history.stockType === "ranning" &&
-                              elmentEditDelete(
-                                history,
-                                items,
-                                updateFabricDyeingOrderRanning,
-                                deleteFabricDyeingOrderRanning
-                              )}
+                            {history.stockType === "stock" && (
+                              <Flex gap={3}>
+                                <HistoryEditModal
+                                  history={history}
+                                  type="order"
+                                  onClick={() =>
+                                    updateFabricDyeingOrderStock(history, items)
+                                  }
+                                  items={items}
+                                  setItems={setItems}
+                                  orderType="dyeing"
+                                />
+                                {isAdminAuth() && (
+                                  <FaTrashAlt
+                                    color="#444"
+                                    cursor="pointer"
+                                    onClick={() =>
+                                      deleteFabricDyeingOrderStock(history)
+                                    }
+                                  />
+                                )}
+                              </Flex>
+                            )}
+                            {history.stockType === "ranning" && (
+                              <Flex gap={3}>
+                                <HistoryEditModal
+                                  history={history}
+                                  type="order"
+                                  onClick={() =>
+                                    updateFabricDyeingOrderRanning(
+                                      history,
+                                      items
+                                    )
+                                  }
+                                  items={items}
+                                  setItems={setItems}
+                                  orderType="dyeing"
+                                />
+                                {isAdminAuth() && (
+                                  <FaTrashAlt
+                                    color="#444"
+                                    cursor="pointer"
+                                    onClick={() =>
+                                      deleteFabricDyeingOrderRanning(history)
+                                    }
+                                  />
+                                )}
+                              </Flex>
+                            )}
                           </>
                         )}
                     </Flex>

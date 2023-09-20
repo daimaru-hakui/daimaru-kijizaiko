@@ -110,6 +110,7 @@ export type History = {
     scheduledAt: string;
     stockPlaceType:number;
     quantity: number;
+    stockPlace:string;
     price: number;
     comment: string;
     fixedAt: string;

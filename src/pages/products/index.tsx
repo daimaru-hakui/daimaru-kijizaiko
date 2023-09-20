@@ -60,7 +60,7 @@ const Products: NextPage = () => {
             }
           })
       );
-    }, 300);
+    }, 500);
 
     return () => {
       clearInterval(timeoutId);
