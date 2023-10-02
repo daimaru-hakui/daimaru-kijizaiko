@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Product } from "../../../types";
-import { AdjustmentProductRow } from "./AdjustmentProductRow";
+import { AdjustmentProductTableRow } from "./AdjustmentProductTableRow";
 import { FC } from "react";
 import { AdjustmentProductHeader } from "./AdjustmentProductHeader";
 import { AdjustmentProductSearchBar } from "./AdjustmentProductSearchBar";
@@ -41,7 +41,7 @@ export const AdjustmentProductTable: FC<Props> = ({
           <AdjustmentProductHeader />
           <Tbody>
             {filterProducts.map((product) => (
-              <AdjustmentProductRow key={product.id} product={product} />
+              <AdjustmentProductTableRow key={product.id} product={product} />
             ))}
           </Tbody>
         </Table>

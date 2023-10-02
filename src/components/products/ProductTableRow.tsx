@@ -5,11 +5,11 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import React, { FC } from 'react';
+import React, { FC} from 'react';
 import { FaTrashAlt } from "react-icons/fa";
-import { OrderAreaModal } from "./OrderAreaModal";
-import { ProductModal } from "./ProductModal";
-import { ProductMenu } from "./ProductMenu";
+import OrderAreaModal from "./OrderAreaModal";
+import ProductModal from "./ProductModal";
+import  ProductMenu  from "./ProductMenu";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
 import { Product } from "../../../types";
 import { useProducts } from "../../hooks/useProducts";
@@ -22,20 +22,21 @@ type Props = {
   product: Product;
 };
 
-export const ProductTableRow: FC<Props> = ({ product }) => {
+
+const ProductTableRow: FC<Props> = ({ product }) => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const { deleteProduct } = useProducts();
-  const { getUserName, getMixed, getFabricStd, getCuttingScheduleTotal } =
-    useGetDisp();
+  const {  getUserName,getMixed, getFabricStd, getCuttingScheduleTotal } =
+  useGetDisp();
   const { mathRound2nd } = useUtil();
   const { isAuths } = useAuthManagement();
   return (
     <Tr>
       <Td>
         <Flex align="center" gap={3}>
-          <ProductMenu product={product} />
+        <ProductMenu product={product} />
           <ProductModal product={product} />
-          <OrderAreaModal product={product} buttonSize="xs" />
+          <OrderAreaModal product={product} buttonSize="xs" /> 
         </Flex>
       </Td>
       <Td>{getUserName(product.staff)}</Td>
@@ -91,9 +92,9 @@ export const ProductTableRow: FC<Props> = ({ product }) => {
           m
           {product.cuttingSchedules?.length > 0 && (
             <Box as="span" ml={2}>
-              {`(${getCuttingScheduleTotal(
+              {`(${mathRound2nd(getCuttingScheduleTotal(
                 product.cuttingSchedules
-              )}m)`}
+              ))}m)`}
             </Box>
           )}
         </Flex>
@@ -136,3 +137,5 @@ export const ProductTableRow: FC<Props> = ({ product }) => {
     </Tr>
   );
 };
+
+export default React.memo(ProductTableRow)

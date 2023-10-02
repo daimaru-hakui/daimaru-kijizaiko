@@ -21,7 +21,7 @@ export const useGetDisp = () => {
   const { mathRound2nd } = useUtil();
 
   // 混率の表示
-  const getMixed = (materials: Materials) => {
+  const getMixed = useCallback((materials: Materials) => {
     let array = [];
     const t = materials?.t ? `ポリエステル${materials.t}% ` : "";
     const c = materials?.c ? `綿${materials.c}% ` : "";
@@ -38,110 +38,150 @@ export const useGetDisp = () => {
     const f = materials?.f ? `複合繊維${materials.f}% ` : "";
     array.push(t, c, n, r, h, pu, w, ac, cu, si, as, z, f);
     return array.filter((item) => item);
-  };
+  }, []);
 
   // 規格の表示
-  const getFabricStd = (
-    fabricWidth: number,
-    fabricLength: number,
-    fabricWeight: number | null
-  ) => {
-    const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
-    const length = fabricLength ? `長さ:${fabricLength}m` : "";
-    const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
-    const mark = width && length ? "×" : "";
-    const space = weigth ? " " : "";
-    return width + mark + length + space + weigth;
-  };
+  const getFabricStd = useCallback(
+    (
+      fabricWidth: number,
+      fabricLength: number,
+      fabricWeight: number | null
+    ) => {
+      const width = fabricWidth ? `巾:${fabricWidth}cm` : "";
+      const length = fabricLength ? `長さ:${fabricLength}m` : "";
+      const weigth = fabricWeight ? `重さ:${fabricWeight}` : "";
+      const mark = width && length ? "×" : "";
+      const space = weigth ? " " : "";
+      return width + mark + length + space + weigth;
+    },
+    []
+  );
 
-  const getSerialNumber = (serialNumber: number) => {
+  const getSerialNumber = useCallback((serialNumber: number) => {
     const str = "0000000000" + String(serialNumber);
     return str.slice(-10);
-  };
+  }, []);
 
+  console.log("user");
   // 担当者の表示
-  const getUserName = (userId: string) => {
-    console.log("user")
-    if (userId === "R&D") {
-      return "R&D";
-    } else {
+  const getUserName = useCallback(
+    (userId: string) => {
+      if (userId === "R&D") return "R&D";
       const user = users.find((user) => userId === user.uid);
-      return user?.name || "";
-    }
-  };
+      if (user) {
+        return user.name;
+      } else {
+        return "";
+      }
+    },
+    [users]
+  );
 
   // 仕入れ先の表示
-  const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find((supplier) => supplier.id === supplierId);
-    return supplier?.name || "";
-  };
+  const getSupplierName = useCallback(
+    (supplierId: string) => {
+      const supplier = suppliers.find((supplier) => supplier.id === supplierId);
+      return supplier?.name || "";
+    },
+    [suppliers]
+  );
 
-  const getProductNumber = (productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return result?.productNumber || productId;
-  };
+  const getProductNumber = useCallback(
+    (productId: string) => {
+      const result = products.find((product) => product.id === productId);
+      return result?.productNumber || productId;
+    },
+    [products]
+  );
 
-  const getProductName = (productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return result?.productName || "";
-  };
+  const getProductName = useCallback(
+    (productId: string) => {
+      const result = products.find((product) => product.id === productId);
+      return result?.productName || "";
+    },
+    [products]
+  );
 
-  const getColorName = (productId: string) => {
-    const result = products.find((product) => product.id === productId);
-    return result?.colorName || productId;
-  };
+  const getColorName = useCallback(
+    (productId: string) => {
+      const result = products.find((product) => product.id === productId);
+      return result?.colorName || productId;
+    },
+    [products]
+  );
 
-  const getGrayFabricNumber = (grayFabricId: string) => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric) => grayFabricId === grayFabric.id
-    );
-    return grayFabric?.productNumber || grayFabricId;
-  };
+  const getGrayFabricNumber = useCallback(
+    (grayFabricId: string) => {
+      const grayFabric = grayFabrics.find(
+        (grayFabric) => grayFabricId === grayFabric.id
+      );
+      return grayFabric?.productNumber || grayFabricId;
+    },
+    [grayFabrics]
+  );
 
-  const getGrayFabricName = (grayFabricId: string) => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric) => grayFabricId === grayFabric.id
-    );
-    return grayFabric?.productName || grayFabricId;
-  };
+  const getGrayFabricName = useCallback(
+    (grayFabricId: string) => {
+      const grayFabric = grayFabrics.find(
+        (grayFabric) => grayFabricId === grayFabric.id
+      );
+      return grayFabric?.productName || grayFabricId;
+    },
+    [grayFabrics]
+  );
 
   // キバタ在庫を取得
-  const getGrayFabricStock = (grayFabricId: string) => {
-    const grayFabric = grayFabrics.find(
-      (grayFabric) => grayFabric.id === grayFabricId
-    );
-    const stock = grayFabric?.stock || 0;
-    return stock;
-  };
+  const getGrayFabricStock = useCallback(
+    (grayFabricId: string) => {
+      const grayFabric = grayFabrics.find(
+        (grayFabric) => grayFabric.id === grayFabricId
+      );
+      const stock = grayFabric?.stock || 0;
+      return stock;
+    },
+    [grayFabrics]
+  );
 
   // 徳島在庫数を取得
-  const getTokushimaStock = (productId: string) => {
-    const stock = products.find((product) => product.id === productId);
-    return mathRound2nd(stock?.tokushimaStock) || 0;
-  };
+  const getTokushimaStock = useCallback(
+    (productId: string) => {
+      const stock = products.find((product) => product.id === productId);
+      return mathRound2nd(stock?.tokushimaStock) || 0;
+    },
+    [mathRound2nd, products]
+  );
 
-  const getPrice = useCallback((productId: string) => {
-    const product = products.find((product) => product.id === productId);
-    return product?.price || 0;
-  },[products]);
+  const getPrice = useCallback(
+    (productId: string) => {
+      const product = products.find((product) => product.id === productId);
+      return product?.price || 0;
+    },
+    [products]
+  );
 
-  const getLocation = (locationId: string) => {
-    const location = locations.find(
-      (location: Location) => location.id === locationId
-    );
-    return location?.name || "";
-  };
+  const getLocation = useCallback(
+    (locationId: string) => {
+      const location = locations.find(
+        (location: Location) => location.id === locationId
+      );
+      return location?.name || "";
+    },
+    [locations]
+  );
 
-  const getCuttingScheduleTotal = (array: string[]) => {
-    const filterSchedules = cuttingSchedules.filter((schedule) =>
-      array?.includes(schedule.id)
-    );
-    let total = 0;
-    filterSchedules.forEach(({ quantity }) => {
-      total += quantity;
-    });
-    return total || 0;
-  };
+  const getCuttingScheduleTotal = useCallback(
+    (array: string[]) => {
+      const filterSchedules = cuttingSchedules.filter((schedule) =>
+        array?.includes(schedule.id)
+      );
+      let total = 0;
+      filterSchedules.forEach(({ quantity }) => {
+        total += quantity;
+      });
+      return total || 0;
+    },
+    [cuttingSchedules]
+  );
 
   return {
     getSerialNumber,
@@ -158,6 +198,6 @@ export const useGetDisp = () => {
     getTokushimaStock,
     getPrice,
     getLocation,
-    getCuttingScheduleTotal
+    getCuttingScheduleTotal,
   };
 };

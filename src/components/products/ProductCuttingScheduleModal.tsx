@@ -23,6 +23,7 @@ import { useCuttingScheduleStore } from "../../../store";
 import { useCuttingSchedules } from "../../hooks/useCuttingSchedules";
 import { FaTrashAlt } from "react-icons/fa";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
+import { useUtil } from "../../hooks/UseUtil";
 
 type Props = {
   scheduleList: string[];
@@ -30,6 +31,7 @@ type Props = {
 
 export const ProductCuttingScheduleModal: FC<Props> = ({ scheduleList }) => {
   const { getUserName, getProductNumber, getColorName } = useGetDisp();
+  const {mathRound2nd} =useUtil()
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [data, setData] = useState([]);
   const [sum, setSum] = useState(0);
@@ -52,8 +54,10 @@ export const ProductCuttingScheduleModal: FC<Props> = ({ scheduleList }) => {
   useEffect(() => {
     let total = 0;
     data.forEach((data) => (total += data.quantity));
-    setSum(total);
-  }, [data]);
+    setSum(mathRound2nd(total));
+  }, [data,mathRound2nd]);
+
+  // console.log(sum)
 
   return (
     <>

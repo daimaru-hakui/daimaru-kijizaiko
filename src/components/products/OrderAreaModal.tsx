@@ -18,7 +18,7 @@ import {
   keyframes,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC,memo } from "react";
 import { Product } from "../../../types";
 import { DisplayStock } from "./DisplayStock";
 import { OrderInputArea } from "./OrderInputArea";
@@ -37,7 +37,7 @@ type Props = {
   buttonSize: string;
 };
 
-export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
+const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -130,3 +130,5 @@ export const OrderAreaModal: FC<Props> = ({ product, buttonSize }) => {
     </>
   );
 };
+
+export default memo(OrderAreaModal)
