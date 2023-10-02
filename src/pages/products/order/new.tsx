@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useProductsStore } from "../../../../store";
 import { Product } from "../../../../types";
-import { OrderAreaModal } from "../../../components/products/OrderAreaModal";
+import  OrderAreaModal  from "../../../components/products/OrderAreaModal";
 
 const OrderNew: NextPage = () => {
   const products = useProductsStore((state) => state.products);
