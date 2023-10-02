@@ -56,17 +56,21 @@ export const useDataList = () => {
   const getUsers = () => {
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("rank", "asc"));
-    onSnapshot(q, (querySnapshot) =>
-      setUsers(
-        querySnapshot.docs.map(
-          (doc) =>
-            ({
-              ...doc.data(),
-              id: doc.id,
-            } as User)
+    try {
+      onSnapshot(q, (querySnapshot) =>
+        setUsers(
+          querySnapshot.docs.map(
+            (doc) =>
+              ({
+                ...doc.data(),
+                id: doc.id,
+              } as User)
+          )
         )
-      )
-    );
+      );
+    } catch(error) {
+      console.log(error)
+    }
   };
 
   // 未登録であればauthorityに登録;

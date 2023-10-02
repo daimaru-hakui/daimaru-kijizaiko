@@ -87,6 +87,8 @@ const Products: NextPage = () => {
       </Flex>
     );
 
+    console.log(filterProducts)
+
   return (
     <Box width="calc(100% - 250px)" px={6} mt={12} flex="1">
       <Box

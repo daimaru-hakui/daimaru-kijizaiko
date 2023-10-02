@@ -12,7 +12,7 @@ type Props = {
   product: Product;
 };
 
-export const ProductMenu: FC<Props> = ({ product }) => {
+const ProductMenu: FC<Props> = ({ product }) => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const { isAuths } = useAuthManagement();
 
@@ -37,3 +37,5 @@ export const ProductMenu: FC<Props> = ({ product }) => {
     </Menu>
   );
 };
+
+export default React.memo(ProductMenu)

@@ -11,14 +11,13 @@ import {
 import { Product } from "../../../types";
 import { FC, memo } from "react";
 import { useProductsStore } from "../../../store";
-import { ProductTableRow } from "./ProductTableRow";
+import  ProductTableRow from "./ProductTableRow";
 
 type Props = {
   filterProducts: Product[];
 };
 
-// eslint-disable-next-line react/display-name
-export const ProductTable: FC<Props> = memo(({ filterProducts }) => {
+export const ProductTable: FC<Props> = ({ filterProducts }) => {
   const products = useProductsStore((state) => state.products);
   return (
     <TableContainer p={6} w="100%" overflowX="unset" overflowY="unset">
@@ -72,5 +71,5 @@ export const ProductTable: FC<Props> = memo(({ filterProducts }) => {
       </Box>
     </TableContainer>
   );
-});
+};
 

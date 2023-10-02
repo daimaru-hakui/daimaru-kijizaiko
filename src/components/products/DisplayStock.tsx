@@ -84,7 +84,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             <Text fontSize="sm">外部在庫</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.externalStock || 0}
+                {mathRound2nd(product?.externalStock) || 0}
               </Box>
               m{getTanQuentityEL(product?.externalStock, product?.fabricLength)}
             </Box>
@@ -95,7 +95,7 @@ export const DisplayStock: FC<Props> = ({ product }) => {
             <Text fontSize="sm">入荷待ち</Text>
             <Box>
               <Box as="span" fontSize="2xl">
-                {product?.arrivingQuantity || 0}
+                {mathRound2nd(product?.arrivingQuantity) || 0}
               </Box>
               m
               {getTanQuentityEL(

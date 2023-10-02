@@ -26,7 +26,7 @@ type Props = {
   product?: Product;
 };
 
-export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
+const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
@@ -258,3 +258,5 @@ export const ProductModal: FC<Props> = ({ title = "詳細", product }) => {
     </>
   );
 };
+
+export default React.memo(ProductModal)

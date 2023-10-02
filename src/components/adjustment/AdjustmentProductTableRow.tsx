@@ -24,7 +24,7 @@ type Props = {
   product: Product;
 };
 
-export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
+export const AdjustmentProductTableRow: FC<Props> = memo(({ product }) => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getUserName } = useGetDisp();
@@ -96,12 +96,12 @@ export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
           <Td p={1} >
             <NumberInput
               mt={1}
-              w="90px"
+              w="100px"
               name="wip"
               defaultValue={0}
               min={0}
               max={100000}
-              value={items?.wip}
+              value={mathRound2nd(items?.wip)}
               onChange={(e) => handleNumberChange(e, "wip")}
             >
               <NumberInputField textAlign="right" />
@@ -114,12 +114,12 @@ export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
           <Td p={1}>
             <NumberInput
               mt={1}
-              w="90px"
+              w="100px"
               name="externalStock"
               defaultValue={0}
               min={0}
               max={100000}
-              value={items?.externalStock}
+              value={mathRound2nd(items?.externalStock)}
               onChange={(e) => handleNumberChange(e, "externalStock")}
             >
               <NumberInputField textAlign="right" />
@@ -132,12 +132,12 @@ export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
           <Td p={1}>
             <NumberInput
               mt={1}
-              w="90px"
+              w="100px"
               name="arrivingQuantity"
               defaultValue={0}
               min={0}
               max={100000}
-              value={items?.arrivingQuantity}
+              value={mathRound2nd(items?.arrivingQuantity)}
               onChange={(e) => handleNumberChange(e, "arrivingQuantity")}
             >
               <NumberInputField textAlign="right" />
@@ -152,12 +152,12 @@ export const AdjustmentProductRow: FC<Props> = memo(({ product }) => {
       <Td p={1} >
         <NumberInput
           mt={1}
-          w="90px"
+          w="100px"
           name="tokushimaStock"
           defaultValue={0}
           min={0}
           max={100000}
-          value={items?.tokushimaStock}
+          value={mathRound2nd(items?.tokushimaStock)}
           onChange={(e) => handleNumberChange(e, "tokushimaStock")}
         >
           <NumberInputField textAlign="right" />
