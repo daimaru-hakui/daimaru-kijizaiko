@@ -71,6 +71,7 @@ export const SearchArea: FC<Props> = ({ onSubmit, onReset, client }) => {
             flexDirection={{ base: "column", lg: "row" }}
           >
             <Select placeholder="担当者を選択" {...register("staff")}>
+            <option value="R&D">R&D</option>
               {users?.contents?.map((user) => (
                 <option key={user.id} value={user.id}>
                   {getUserName(user.id)}
