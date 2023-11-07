@@ -25,6 +25,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useSWRCuttingReports } from "../../../hooks/swr/useSWRCuttingReports";
 import { NextPage } from "next";
 import { useAuthStore } from "../../../../store";
+import { useAuthManagement } from "../../../hooks/UseAuthManagement";
 // import { useQueryCuttingReports } from "../../../hooks/useQueryCuttingReports";
 
 type Inputs = {
@@ -38,16 +39,14 @@ const CuttingReport: NextPage = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const { getSerialNumber, getUserName } = useGetDisp();
   const { getTodayDate, get3monthsAgo } = useUtil();
+  const { isAuths } = useAuthManagement();
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [client, setClient] = useState("");
   const { AlreadyRead } = useCuttingReportFunc();
   const [filterData, setFilterData] = useState([] as CuttingReportType[]);
-  const { csvData } = useCuttingReportFunc(
-    startDay,
-    endDay
-  );
+  const { csvData } = useCuttingReportFunc(startDay, endDay);
   const { data, isLoading, mutate } = useSWRCuttingReports(startDay, endDay);
   // const { data: cuttingReports } = useQueryCuttingReports(startDay, endDay);
   const methods = useForm<Inputs>({
@@ -139,14 +138,26 @@ const CuttingReport: NextPage = () => {
                         />
                       </Flex>
                     </Td>
-                    <Td textAlign="center">{report?.read?.length > 0 ?
-                      <Badge variant='solid' colorScheme='blue'>既読</Badge> :
-                      report.staff === currentUser && (
-                        <Button size="xs" onClick={async () => {
-                          if (report.staff !== currentUser) return;
-                          await AlreadyRead(report);
-                          await mutate(data);
-                        }} color="gray">未読</Button>
+                    <Td textAlign="center">
+                      {report?.read?.length > 0 ? (
+                        <Badge variant="solid" colorScheme="blue">
+                          既読
+                        </Badge>
+                      ) : (
+                        (report.staff === currentUser ||
+                          (report.staff === "R&D" && isAuths(["rd"]))) && (
+                          <Button
+                            size="xs"
+                            onClick={async () => {
+                              if (report.staff !== currentUser) return;
+                              await AlreadyRead(report);
+                              await mutate(data);
+                            }}
+                            color="gray"
+                          >
+                            未読
+                          </Button>
+                        )
                       )}
                     </Td>
                     <Td>{getSerialNumber(report.serialNumber)}</Td>

@@ -174,6 +174,7 @@ export const CuttingReportInputArea: FC<Props> = ({
               placeholder="担当者を選択"
               onChange={(e) => setStaff(e.target.value)}
             >
+              <option value="R&D">R&D</option>
               {filterUsers?.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
