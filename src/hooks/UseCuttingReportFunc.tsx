@@ -15,12 +15,14 @@ import { useLoadingStore, useAuthStore } from "../../store";
 import { CuttingProductType, CuttingReportType } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
+import { useAuthManagement } from "./UseAuthManagement";
 
 export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   const router = useRouter();
   const currentUser = useAuthStore((state) => state.currentUser);
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
   const { getUserName, getProductNumber } = useGetDisp();
+  const { isAuths } = useAuthManagement();
   const [csvData, setCsvData] = useState([]);
   const { data, mutate } = useSWRCuttingReportImutable(startDay, endDay);
 
@@ -79,7 +81,6 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
-
       });
     } catch (err) {
       console.log(err);
@@ -90,7 +91,11 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   };
 
   // 裁断報告書更新
-  const updateCuttingReport = async (data: CuttingReportType, items: CuttingProductType[], reportId: string) => {
+  const updateCuttingReport = async (
+    data: CuttingReportType,
+    items: CuttingProductType[],
+    reportId: string
+  ) => {
     const result = window.confirm("更新して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -158,11 +163,18 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   };
 
   const AlreadyRead = async (report: CuttingReportType) => {
-    if (report.staff !== currentUser) return;
-    const docRef = doc(db, 'cuttingReports', report.id);
-    await updateDoc(docRef, {
-      read: arrayUnion(currentUser)
-    });
+    if (report.staff === currentUser) {
+      const docRef = doc(db, "cuttingReports", report.id);
+      await updateDoc(docRef, {
+        read: arrayUnion(currentUser),
+      });
+    }
+    if (report.staff === "R&D" && isAuths(["rd"])) {
+      const docRef = doc(db, "cuttingReports", report.id);
+      await updateDoc(docRef, {
+        read: arrayUnion( "R&D"),
+      });
+    }
   };
 
   const scaleCalc = (meter: number, totalQuantity: number) => {

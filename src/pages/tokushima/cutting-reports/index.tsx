@@ -149,9 +149,14 @@ const CuttingReport: NextPage = () => {
                           <Button
                             size="xs"
                             onClick={async () => {
-                              if (report.staff !== currentUser) return;
-                              await AlreadyRead(report);
-                              await mutate(data);
+                              if (
+                                report.staff == currentUser ||
+                                (report.staff === "R&D" && isAuths(["rd"]))
+                              ) {
+                                console.log("1");
+                                await AlreadyRead(report);
+                                await mutate(data);
+                              }
                             }}
                             color="gray"
                           >
