@@ -54,7 +54,7 @@ export const ScheduleModal: FC<Props> = ({
   const users = useAuthStore((state) => state.users);
   const [filterUsers, setFilterUsers] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {addSchedule,updateSchedule} = useCuttingSchedules()
+  const { addSchedule, updateSchedule } = useCuttingSchedules();
   const {
     register,
     handleSubmit,
@@ -82,11 +82,7 @@ export const ScheduleModal: FC<Props> = ({
   return (
     <>
       {mode === "new" ? (
-        <Button
-          colorScheme="facebook"
-          size={size}
-          onClick={onOpen}
-        >
+        <Button colorScheme="facebook" size={size} onClick={onOpen}>
           {title}
         </Button>
       ) : (
@@ -114,6 +110,7 @@ export const ScheduleModal: FC<Props> = ({
                     placeholder="担当者の選択"
                     {...register("staff", { required: true })}
                   >
+                    <option value="R&D">R&D</option>
                     {filterUsers.map((user) => (
                       <option key={user.id} value={user.id}>
                         {user.name}
