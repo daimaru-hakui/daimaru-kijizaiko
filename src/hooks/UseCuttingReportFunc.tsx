@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { useLoadingStore, useAuthStore } from "../../store";
-import { CuttingProductType, CuttingReportType } from "../../types";
+import { CuttingProductType, CuttingReportType, Product } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useSWRCuttingReportImutable } from "./swr/useSWRCuttingReportsImutable";
 import { useAuthManagement } from "./UseAuthManagement";
@@ -34,7 +34,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
   };
 
   // 裁断報告書作成
-  const addCuttingReport = async (data, items) => {
+  const addCuttingReport = async (data:CuttingReportType, items: CuttingProductType[]) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -48,7 +48,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
         if (!serialNumberDocSnap.exists())
           throw "serialNumberDocSnap does not exist!";
 
-        items.map(async (product) => {
+        for (let product of items) {
           if (!product.productId) return;
           const productDocRef = doc(db, "products", product.productId);
           runTransaction(db, async (transaction) => {
@@ -60,7 +60,21 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
               tokushimaStock: tokushimaStock - Number(product.quantity),
             });
           });
-        });
+        }
+
+        // items.map(async (product) => {
+        //   if (!product.productId) return;
+        //   const productDocRef = doc(db, "products", product.productId);
+        //   runTransaction(db, async (transaction) => {
+        //     const productSnap = await transaction.get(productDocRef);
+        //     if (!productSnap.exists()) throw "productSnap does not exist!";
+        //     const tokushimaStock =
+        //       (await productSnap.data()?.tokushimaStock) || 0;
+        //     transaction.update(productDocRef, {
+        //       tokushimaStock: tokushimaStock - Number(product.quantity),
+        //     });
+        //   });
+        // });
 
         const newSerialNumber = serialNumberDocSnap.data().serialNumber + 1;
         transaction.update(serialNumberDocRef, {
@@ -172,7 +186,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
     if (report.staff === "R&D" && isAuths(["rd"])) {
       const docRef = doc(db, "cuttingReports", report.id);
       await updateDoc(docRef, {
-        read: arrayUnion( "R&D"),
+        read: arrayUnion("R&D"),
       });
     }
   };

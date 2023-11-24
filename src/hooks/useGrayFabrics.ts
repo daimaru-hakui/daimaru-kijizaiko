@@ -149,7 +149,7 @@ export const useGrayFabrics = (startDay?: string, endDay?: string) => {
         });
 
         const newWipGrayFabric =
-          grayFabricDocSnap.data()?.wip + items.quantity || 0;
+          Number(grayFabricDocSnap.data()?.wip) + Number(items.quantity) || 0;
         transaction.update(grayFabricDocRef, {
           wip: newWipGrayFabric,
         });
