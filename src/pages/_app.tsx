@@ -13,7 +13,7 @@ import { useAuthStore } from "../../store";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 const fetcher = (url: string) =>
   axios
@@ -46,7 +46,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     getUsers();
-    registerUser();
     getProducts();
     getFabricPurchaseOrders();
     getGrayfabrics();
@@ -57,9 +56,14 @@ export default function App({ Component, pageProps }: AppProps) {
     getLocations();
     getColors();
     getMaterialNames();
-    getCuttingSchedules()
+    getCuttingSchedules();
     console.log("getproduct");
   }, []);
+
+  // useEffect(() => {
+  //   console.log("users")
+  //   registerUser();
+  // }, [session]);
 
   useEffect(() => {
     console.log("session");
