@@ -45,11 +45,11 @@ export const ProductTable: FC<Props> = ({ filterProducts }) => {
                 <Th>色</Th>
                 <Th>品名</Th>
                 <Th>使用予定</Th>
+                <Th>徳島在庫</Th>
                 <Th>単価</Th>
                 <Th>染め仕掛</Th>
                 <Th>外部在庫</Th>
                 <Th>入荷待ち</Th>
-                <Th>徳島在庫</Th>
                 <Th>組織名</Th>
                 <Th>混率</Th>
                 <Th>規格</Th>

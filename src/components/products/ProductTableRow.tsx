@@ -50,6 +50,29 @@ const ProductTableRow: FC<Props> = ({ product }) => {
           />
         )}
       </Td>
+      
+      <Td
+        isNumeric
+        fontWeight={product?.tokushimaStock ? "bold" : "normal"}
+        color={
+          product?.tokushimaStock <
+            getCuttingScheduleTotal(product.cuttingSchedules) ? "red" : "inherit"
+        }
+      >
+        <Flex>
+          {mathRound2nd(
+            product?.tokushimaStock || 0
+          ).toLocaleString()}
+          m
+          {product.cuttingSchedules?.length > 0 && (
+            <Box as="span" ml={2}>
+              {`(${mathRound2nd(getCuttingScheduleTotal(
+                product.cuttingSchedules
+              ))}m)`}
+            </Box>
+          )}
+        </Flex>
+      </Td>
       <Td isNumeric>{product?.price.toLocaleString()}円</Td>
       <Td
         isNumeric
@@ -77,28 +100,7 @@ const ProductTableRow: FC<Props> = ({ product }) => {
         ).toLocaleString()}
         m
       </Td>
-      <Td
-        isNumeric
-        fontWeight={product?.tokushimaStock ? "bold" : "normal"}
-        color={
-          product?.tokushimaStock <
-            getCuttingScheduleTotal(product.cuttingSchedules) ? "red" : "inherit"
-        }
-      >
-        <Flex>
-          {mathRound2nd(
-            product?.tokushimaStock || 0
-          ).toLocaleString()}
-          m
-          {product.cuttingSchedules?.length > 0 && (
-            <Box as="span" ml={2}>
-              {`(${mathRound2nd(getCuttingScheduleTotal(
-                product.cuttingSchedules
-              ))}m)`}
-            </Box>
-          )}
-        </Flex>
-      </Td>
+     
       <Td>{product.materialName}</Td>
       <Td>
         <Flex gap={1}>

@@ -48,7 +48,7 @@ export const useCuttingReportFunc = (startDay?: string, endDay?: string) => {
         if (!serialNumberDocSnap.exists())
           throw "serialNumberDocSnap does not exist!";
 
-        for (let product of items) {
+        for await (let product of items) {
           if (!product.productId) return;
           const productDocRef = doc(db, "products", product.productId);
           runTransaction(db, async (transaction) => {
