@@ -10,9 +10,9 @@ import { useAuthStore, useLoadingStore } from "../../store";
 import { Product, History } from "../../types";
 import { useGetDisp } from "./UseGetDisp";
 import { useUtil } from "./UseUtil";
+import { OrderInputs } from "../components/products/OrderInputArea";
 
 export const useOrderFabricFunc = (
-  items: History,
   product: Product,
   orderType: string
 ) => {
@@ -24,28 +24,28 @@ export const useOrderFabricFunc = (
   const grayFabricId = product?.grayFabricId || "";
   const productId = product?.id || "";
 
-  const Obj = {
-    stockType: items.stockType,
-    orderType: orderType,
-    productId: product?.id,
-    productNumber: product?.productNumber,
-    productName: product?.productName,
-    colorName: product?.colorName,
-    quantity: Number(items?.quantity),
-    price: items.price || product.price,
-    comment: items.comment || "",
-    supplierId: product.supplierId,
-    supplierName: getSupplierName(product?.supplierId),
-    orderedAt: items.orderedAt || getTodayDate(),
-    scheduledAt: items.scheduledAt || getTodayDate(),
-    createUser: currentUser,
-    updateUser: currentUser,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
+  // const Obj = {
+  //   stockType: items.stockType,
+  //   orderType: orderType,
+  //   productId: product?.id,
+  //   productNumber: product?.productNumber,
+  //   productName: product?.productName,
+  //   colorName: product?.colorName,
+  //   quantity: Number(items?.quantity),
+  //   price: items.price || product.price,
+  //   comment: items.comment || "",
+  //   supplierId: product.supplierId,
+  //   supplierName: getSupplierName(product?.supplierId),
+  //   orderedAt: items.orderedAt || getTodayDate(),
+  //   scheduledAt: items.scheduledAt || getTodayDate(),
+  //   createUser: currentUser,
+  //   updateUser: currentUser,
+  //   createdAt: serverTimestamp(),
+  //   updatedAt: serverTimestamp(),
+  // };
 
   //////////// キバタ在庫から染めOrder依頼 関数//////////////
-  const orderFabricDyeingFromStock = async () => {
+  const orderFabricDyeingFromStock = async (data: OrderInputs) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -77,20 +77,36 @@ export const useOrderFabricFunc = (
         });
 
         const stockGrayFabric = (await grayFabricDocSnap.data().stock) || 0;
-        const newStockGrayFabric = stockGrayFabric - Number(items?.quantity);
+        const newStockGrayFabric = stockGrayFabric - Number(data?.quantity);
         transaction.update(grayFabricDocRef, {
           stock: newStockGrayFabric,
         });
 
         const wipProduct = (await productDocSnap.data().wip) || 0;
-        const newWipProduct = wipProduct + Number(items?.quantity);
+        const newWipProduct = wipProduct + Number(data?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
 
         transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
-          ...Obj,
+          stockType: data.stockType,
+          orderType: orderType,
+          productId: product?.id,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: Number(data?.quantity),
+          price: data.price || product.price,
+          comment: data.comment || "",
+          supplierId: product.supplierId,
+          supplierName: getSupplierName(product?.supplierId),
+          orderedAt: data.orderedAt || getTodayDate(),
+          scheduledAt: data.scheduledAt || getTodayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
           grayFabricId: grayFabricDocSnap.id,
         });
       });
@@ -103,7 +119,7 @@ export const useOrderFabricFunc = (
   };
 
   //////////// ランニングキバタから染色Order依頼 関数//////////////
-  const orderFabricDyeingFromRanning = async () => {
+  const orderFabricDyeingFromRanning = async (data: OrderInputs) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -131,14 +147,30 @@ export const useOrderFabricFunc = (
         });
 
         const wipProduct = (await productDocSnap.data().wip) || 0;
-        const newWipProduct = wipProduct + Number(items?.quantity);
+        const newWipProduct = wipProduct + Number(data?.quantity);
         transaction.update(productDocRef, {
           wip: newWipProduct,
         });
 
         transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
-          ...Obj,
+          stockType: data.stockType,
+          orderType: orderType,
+          productId: product?.id,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: Number(data?.quantity),
+          price: data.price || product.price,
+          comment: data.comment || "",
+          supplierId: product.supplierId,
+          supplierName: getSupplierName(product?.supplierId),
+          orderedAt: data.orderedAt || getTodayDate(),
+          scheduledAt: data.scheduledAt || getTodayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
           grayFabricId: "",
         });
       });
@@ -150,7 +182,7 @@ export const useOrderFabricFunc = (
     }
   };
 
-  const orderFabricPurchase = async (stockType: string) => {
+  const orderFabricPurchase = async (data: OrderInputs, stockType: string) => {
     const result = window.confirm("登録して宜しいでしょうか");
     if (!result) return;
     setIsLoading(true);
@@ -181,7 +213,7 @@ export const useOrderFabricFunc = (
         if (stockType === "stock") {
           const externalStock =
             (await productDocSnap.data().externalStock) || 0;
-          const newEternalStock = externalStock - Number(items?.quantity);
+          const newEternalStock = externalStock - Number(data?.quantity);
           transaction.update(productDocRef, {
             externalStock: newEternalStock,
           });
@@ -189,16 +221,32 @@ export const useOrderFabricFunc = (
 
         const arrivingQuantity =
           (await productDocSnap.data().arrivingQuantity) || 0;
-        const newArrivingQuantity = arrivingQuantity + Number(items?.quantity);
+        const newArrivingQuantity = arrivingQuantity + Number(data?.quantity);
         transaction.update(productDocRef, {
           arrivingQuantity: newArrivingQuantity,
         });
 
         transaction.set(historyDocRef, {
           serialNumber: newSerialNumber,
-          ...Obj,
+          stockType: data.stockType,
+          orderType: orderType,
+          productId: product?.id,
+          productNumber: product?.productNumber,
+          productName: product?.productName,
+          colorName: product?.colorName,
+          quantity: Number(data?.quantity),
+          price: data.price || product.price,
+          comment: data.comment || "",
+          supplierId: product.supplierId,
+          supplierName: getSupplierName(product?.supplierId),
+          orderedAt: data.orderedAt || getTodayDate(),
+          scheduledAt: data.scheduledAt || getTodayDate(),
+          createUser: currentUser,
+          updateUser: currentUser,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
           grayFabricId: "",
-          stockPlace: items.stockPlace || "徳島工場",
+          stockPlace: data.stockPlace || "徳島工場",
           accounting: false,
         });
       });
@@ -211,10 +259,10 @@ export const useOrderFabricFunc = (
         pathname: `/complete/${productId}`,
         query: {
           productId: productId || "",
-          quantity: items.quantity || 0,
-          scheduledAt: items.scheduledAt,
+          quantity: data.quantity || 0,
+          scheduledAt: data.scheduledAt,
           serialNumber,
-          stockPlace: items.stockPlace || "徳島工場",
+          stockPlace: data.stockPlace || "徳島工場",
           createUser: getUserName(currentUser),
         },
       });
