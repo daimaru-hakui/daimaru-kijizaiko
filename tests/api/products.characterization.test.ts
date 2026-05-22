@@ -6,12 +6,15 @@ const mockWhere = vi.fn()
 const mockCollection = vi.fn()
 
 vi.mock('@/lib/firebase/admin', () => ({
-  getAdminDb: vi.fn(() => ({
-    collection: mockCollection,
-  })),
+  getAdminDb: vi.fn(() => ({ collection: mockCollection })),
+  getAdminAuth: vi.fn(() => ({ verifySessionCookie: vi.fn() })),
 }))
 
-// モック req/res を生成するヘルパー
+const mockVerifySession = vi.fn()
+vi.mock('@/lib/auth/session', () => ({
+  verifySession: mockVerifySession,
+}))
+
 function createMocks(overrides?: Partial<NextApiRequest>) {
   const res = {
     status: vi.fn().mockReturnThis(),
@@ -19,36 +22,36 @@ function createMocks(overrides?: Partial<NextApiRequest>) {
   } as unknown as NextApiResponse
   const req = {
     method: 'GET',
-    query: { API_KEY: 'test-key' },
+    query: {},
+    cookies: {},
     ...overrides,
   } as unknown as NextApiRequest
   return { req, res }
 }
 
-describe('GET /api/products (characterization)', () => {
+describe('GET /api/products (Phase 3: session auth)', () => {
   beforeEach(() => {
-    vi.resetAllMocks()
-    process.env.BACKEND_API_KEY = 'test-key'
+    vi.clearAllMocks()
     mockWhere.mockReturnThis()
     mockGet.mockResolvedValue({ docs: [] })
     mockCollection.mockReturnValue({ where: mockWhere, get: mockGet })
     mockWhere.mockReturnValue({ get: mockGet })
   })
 
-  it('現状: API_KEY 一致のとき 200 と空 contents を返す', async () => {
-    const { req, res } = createMocks()
+  it('有効な __session で 200 と空 contents を返す', async () => {
+    mockVerifySession.mockResolvedValue({ uid: 'user-123' })
+    const { req, res } = createMocks({ cookies: { __session: 'valid' } })
     const { default: handler } = await import('../../src/pages/api/products/index')
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith({ contents: [] })
   })
 
-  it('現状: API_KEY 不一致のとき 405 を返す', async () => {
-    const { req, res } = createMocks({ query: { API_KEY: 'wrong' } })
+  it('Phase 3: 認証なしアクセスは 401 を返す', async () => {
+    mockVerifySession.mockResolvedValue(null)
+    const { req, res } = createMocks({ query: {} })
     const { default: handler } = await import('../../src/pages/api/products/index')
     await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(405)
+    expect(res.status).toHaveBeenCalledWith(401)
   })
-
-  it.todo('Phase 3: 認証なしアクセスは 401 を返す')
 })

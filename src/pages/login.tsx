@@ -5,9 +5,11 @@ import { NextPage } from "next";
 import { auth } from "@/lib/firebase/client";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 
 const Login: NextPage = () => {
   const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -17,19 +19,29 @@ const Login: NextPage = () => {
   const onSubmit = (data: { email: string; password: string }) => {
     signInUser(data.email, data.password);
   };
-  const signInUser = (email: string, password: string) => {
+
+  const signInUser = async (email: string, password: string) => {
     setIsLoading(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-      })
-      .catch((error) => {
-        console.log(error.message);
-        window.alert("失敗しました");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      const res = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
       });
+      if (!res.ok) {
+        window.alert("セッションの作成に失敗しました");
+        return;
+      }
+      const from = typeof router.query.from === "string" ? router.query.from : "/dashboard";
+      router.push(from);
+    } catch (error: unknown) {
+      if (error instanceof Error) console.error(error.message);
+      window.alert("ログインに失敗しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

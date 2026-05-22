@@ -1,18 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { withAuth } from "@/lib/auth/with-auth";
 import { User } from "../../../../types";
 
-type Data = {
-  contents: User[];
-};
+type Data = { contents: User[] };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data | string>
-) {
-  const db = getAdminDb()
-  if (req.query.API_KEY !== process.env.BACKEND_API_KEY)
-    return res.status(405).json("error");
+async function handler(req: NextApiRequest, res: NextApiResponse<Data | string>) {
+  const db = getAdminDb();
   if (req.method === "GET") {
     const querySnapshot = await db
       .collection("users")
@@ -20,11 +14,9 @@ export default async function handler(
       .get();
     const contents = querySnapshot.docs
       .map((doc) => ({ ...doc.data(), id: doc.id } as User))
-      .sort((a, b) => {
-        if (a.rank < b.rank) {
-          return -1;
-        }
-      });
+      .sort((a, b) => (a.rank < b.rank ? -1 : 1));
     return res.status(200).json({ contents });
   }
 }
+
+export default withAuth(handler);
