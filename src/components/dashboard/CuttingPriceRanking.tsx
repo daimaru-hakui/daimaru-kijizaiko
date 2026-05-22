@@ -12,7 +12,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Product, CuttingReportType } from "../../../types";
-import useSWRImmutable from "swr/immutable";
+import { getProductsAction } from "@/app/products/actions";
 
 ChartJS.register(
   CategoryScale,
@@ -31,10 +31,6 @@ type Props = {
   productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
-type Data = {
-  contents: Product[];
-};
-
 export const CuttingPriceRanking: FC<Props> = ({
   data,
   startDay,
@@ -43,13 +39,17 @@ export const CuttingPriceRanking: FC<Props> = ({
   productsMap,
 }) => {
   const [chartDataList, setChartDataList] = useState<{ productId: string; price: number }[]>([]);
-  const { data: products } = useSWRImmutable<Data>("/api/products");
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProductsAction().then((result) => {
+      if (result.ok) setProducts(result.contents);
+    });
+  }, []);
 
   useEffect(() => {
     const getPrice = (productId: string) => {
-      const product = products?.contents.find(
-        (product) => product.id === productId
-      );
+      const product = products.find((p) => p.id === productId);
       return product?.price || 0;
     };
 
@@ -100,6 +100,7 @@ export const CuttingPriceRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -133,7 +134,7 @@ export const CuttingPriceRanking: FC<Props> = ({
   };
 
   return (
-    <div className="p-3 w-full h-full rounded-md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
     </div>
   );

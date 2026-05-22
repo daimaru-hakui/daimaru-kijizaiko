@@ -94,6 +94,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -127,7 +128,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
   };
 
   return (
-    <div className="p-3 w-full h-full rounded-md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
     </div>
   );
