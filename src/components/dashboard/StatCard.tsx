@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Box, Stat, StatLabel, StatNumber } from "@chakra-ui/react";
+
 type Props = {
   title: string;
   quantity: string | number;
@@ -9,16 +9,12 @@ type Props = {
 
 export const StatCard: FC<Props> = ({ title, quantity, unit, fontSize }) => {
   return (
-    <>
-      <Stat p={3} bg="white" rounded="md" boxShadow="md">
-        <StatLabel>{title}</StatLabel>
-        <StatNumber fontSize={{ base: "2xl", sm: fontSize }}>
-          {quantity}
-          <Box as="span" fontSize="sm" ml={1}>
-            {unit}
-          </Box>
-        </StatNumber>
-      </Stat>
-    </>
+    <div className="p-3 bg-white rounded-md shadow-md flex-1">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className={fontSize === '4xl' ? 'font-bold text-4xl' : 'font-bold text-3xl'}>
+        {quantity}
+        <span className="text-sm ml-1">{unit}</span>
+      </p>
+    </div>
   );
 };

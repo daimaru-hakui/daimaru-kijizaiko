@@ -1,14 +1,6 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-} from "@chakra-ui/react";
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
@@ -19,6 +11,7 @@ import { SearchArea } from "../SearchArea";
 import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 import { CuttingReportType, History } from "../../../types";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
+import { NumberInput } from "@/components/ui/number-input";
 
 type Inputs = {
   start: string;
@@ -65,24 +58,24 @@ export const Charts: FC = () => {
 
   useEffect(() => {
     if (!staff) {
-      setFilterCuttingReports(cuttingReports?.contents);
+      setFilterCuttingReports(cuttingReports?.contents ?? []);
     } else {
       setFilterCuttingReports(
         cuttingReports?.contents?.filter(
-          (report) => staff === report.staff || staff === ""
-        )
+          (report: CuttingReportType) => staff === report.staff || staff === ""
+        ) ?? []
       );
     }
   }, [cuttingReports, staff]);
 
   useEffect(() => {
     if (!staff) {
-      setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents);
+      setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents ?? []);
     } else {
       setFilterPurchaseCofirms(
         fabricPurchaseConfirms?.contents?.filter(
-          (report) => staff === report.createUser || staff === ""
-        )
+          (report: History) => staff === report.createUser || staff === ""
+        ) ?? []
       );
     }
   }, [fabricPurchaseConfirms, staff]);
@@ -90,49 +83,26 @@ export const Charts: FC = () => {
 
   return (
     <>
-      <Flex
-        py={6}
-        mt={{ base: 3, md: 6 }}
-        gap={{ base: 3, md: 3 }}
-        flexDirection={{ base: "column", lg: "row" }}
-        justifyContent="space-between"
-        rounded="md"
-        shadow="md"
-        bg="white"
-      >
+      <div className="py-6 mt-6 gap-3 flex flex-col lg:flex-row justify-between rounded-md shadow-md bg-white">
         <FormProvider {...methods}>
           <SearchArea onSubmit={onSubmit} onReset={onReset} />
         </FormProvider>
-        <Box px={6}>
-          <Heading as="h4" fontSize="md">
+        <div className="px-6">
+          <h4 className="text-base font-semibold">
             件数
-          </Heading>
-          <Flex mt={3} gap={3} alignItems="center">
+          </h4>
+          <div className="mt-3 flex gap-3 items-center">
             <NumberInput
-              w={{ base: "full", lg: "80px" }}
               min={1}
               max={100}
               value={limitNum}
-              onChange={(e) => setLimitNum(Number(e))}
-            >
-              <NumberInputField textAlign="right" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Flex>
-        </Box>
-      </Flex>
-      <Flex
-        rounded="md"
-        shadow="md"
-        bg="white"
-        mt={{ base: 3, md: 6 }}
-        gap={{ base: 3, md: 6 }}
-        justifyContent="center"
-        flexDirection={{ base: "column", md: "row" }}
-      >
+              onChange={(_str, num) => setLimitNum(num)}
+              width="80px"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="rounded-md shadow-md bg-white mt-6 gap-6 flex flex-col md:flex-row justify-center">
         <CuttingQuantityRanking
           data={filterCuttingReports}
           startDay={startDay}
@@ -145,16 +115,8 @@ export const Charts: FC = () => {
           endDay={endDay}
           rankingNumber={limitNum}
         />
-      </Flex>
-      <Flex
-        rounded="md"
-        shadow="md"
-        bg="white"
-        mt={{ base: 3, md: 6 }}
-        gap={{ base: 3, md: 6 }}
-        justifyContent="center"
-        flexDirection={{ base: "column", md: "row" }}
-      >
+      </div>
+      <div className="rounded-md shadow-md bg-white mt-6 gap-6 flex flex-col md:flex-row justify-center">
         <PurchaseQuantityRanking
           data={filterPurchaseCofirms}
           startDay={startDay}
@@ -167,7 +129,7 @@ export const Charts: FC = () => {
           endDay={endDay}
           rankingNumber={limitNum}
         />
-      </Flex>
+      </div>
     </>
   );
 };

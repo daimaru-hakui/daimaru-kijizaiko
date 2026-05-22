@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
 import {
   CuttingReportType,
   CuttingHistoryType,
@@ -80,11 +81,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
         });
         return { productId: header, quantity: sum };
       });
-      const result: any = newArray.sort((a, b) => {
-        if (a.quantity > b.quantity) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.quantity - a.quantity);
       setChartDataList(result);
     };
     getArray();
@@ -134,8 +131,8 @@ export const CuttingQuantityRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full h-full rounded-md">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };

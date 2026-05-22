@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { History } from "../../../types";
 
@@ -62,11 +63,7 @@ export const PurchasePriceRanking: FC<Props> = ({
         return { productId: header, price: sum };
       });
 
-      const result = newArray.sort((a, b) => {
-        if (a.price > b.price) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.price - a.price);
       setChartDataList(result);
     };
     getArray();
@@ -115,8 +112,8 @@ export const PurchasePriceRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full h-full rounded-md">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };
