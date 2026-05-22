@@ -1,7 +1,13 @@
 import { vi, describe, it, expect } from 'vitest'
 
+type MockUser = {
+  uid: string
+  admin?: boolean
+  [key: string]: unknown
+}
+
 type MockAuthState = {
-  users: unknown[]
+  users: MockUser[]
   currentUser: string
   session: null
   setSession: () => void
@@ -21,36 +27,42 @@ const mockUseAuthStore = vi.fn((selector: (s: MockAuthState) => unknown) =>
 )
 
 vi.mock('../../store', () => ({
-  // @ts-expect-error - mock does not need full Zustand type signature
+  // @ts-expect-error TODO(phase5) - mock does not need full Zustand type signature
   useAuthStore: (selector: (s: MockAuthState) => unknown) => mockUseAuthStore(selector),
 }))
 
-describe('useAuthManagement (characterization)', () => {
-  it('現状: 管理者 UID 3 件がハードコードされており、一致すれば isAdminAuth = true', async () => {
-    const HARDCODED_ADMIN_UIDS = [
-      'fgzmLExAiAcFcikzqHpqe7avIfu2',
-      'EE7aC3Q3O8Q7dB7sKlFXqfQaZO22',
-      'B6W7Ux55Ffbsyf9hc7RoTsVtOln1',
-    ]
-
-    for (const uid of HARDCODED_ADMIN_UIDS) {
-      mockUseAuthStore.mockImplementation((selector: (s: MockAuthState) => unknown) =>
-        selector({ users: [], currentUser: uid, session: null, setSession: vi.fn(), setCurrentUser: vi.fn(), setUsers: vi.fn() })
-      )
-      const { useAuthManagement } = await import('../../src/hooks/UseAuthManagement')
-      const { isAdminAuth } = useAuthManagement()
-      expect(isAdminAuth()).toBe(true)
-    }
+describe('useAuthManagement (Phase 3: admin フラグ)', () => {
+  it('Phase 3: Firestore users.admin=true のユーザーは isAdminAuth = true', async () => {
+    mockUseAuthStore.mockImplementation((selector: (s: MockAuthState) => unknown) =>
+      selector({
+        users: [{ uid: 'user-with-admin', admin: true }],
+        currentUser: 'user-with-admin',
+        session: null,
+        setSession: vi.fn(),
+        setCurrentUser: vi.fn(),
+        setUsers: vi.fn(),
+      })
+    )
+    const { useAuthManagement } = await import('../../src/hooks/UseAuthManagement')
+    const { isAdminAuth } = useAuthManagement()
+    expect(isAdminAuth()).toBe(true)
   })
 
-  it('現状: 管理者 UID 以外のユーザーは isAdminAuth = false', async () => {
+  it('Phase 3: admin フラグのないユーザーは isAdminAuth = false', async () => {
     mockUseAuthStore.mockImplementation((selector: (s: MockAuthState) => unknown) =>
-      selector({ users: [], currentUser: 'other-uid', session: null, setSession: vi.fn(), setCurrentUser: vi.fn(), setUsers: vi.fn() })
+      selector({
+        users: [{ uid: 'regular-user', admin: false }],
+        currentUser: 'regular-user',
+        session: null,
+        setSession: vi.fn(),
+        setCurrentUser: vi.fn(),
+        setUsers: vi.fn(),
+      })
     )
     const { useAuthManagement } = await import('../../src/hooks/UseAuthManagement')
     const { isAdminAuth } = useAuthManagement()
     expect(isAdminAuth()).toBe(false)
   })
 
-  it.todo('Phase 3: 管理者 UID ハードコードは Firestore users.admin フラグに置き換える')
+  it.todo('Phase 3: 管理者 UID ハードコードは Firestore users.admin フラグに置き換える (完了済み)')
 })

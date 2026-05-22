@@ -5,13 +5,8 @@ export const useAuthManagement = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
 
   const isAdminAuth = () => {
-    const array = [
-      "fgzmLExAiAcFcikzqHpqe7avIfu2",
-      "EE7aC3Q3O8Q7dB7sKlFXqfQaZO22",
-      "B6W7Ux55Ffbsyf9hc7RoTsVtOln1",
-    ];
-    const result = array.includes(currentUser);
-    return result;
+    const user = users.find((u) => u.uid === currentUser);
+    return !!user?.admin;
   };
 
   const isAuth = (prop: string) => {
