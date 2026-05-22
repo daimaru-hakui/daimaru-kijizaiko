@@ -1,112 +1,105 @@
+'use client'
+
+import { useTransition } from 'react'
+import { FaTrashAlt } from 'react-icons/fa'
 import {
-  Box,
-  Button,
-  Flex,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useState, FC } from "react";
-import { FaTrashAlt } from "react-icons/fa";
-import { useAuthStore, useGrayFabricStore } from "../../../store";
-import { History } from "../../../types";
-import { OrderToConfirmModal } from "../history/OrderToConfirmModal";
-import { CommentModal } from "../CommentModal";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
-import { useGrayFabrics } from "../../hooks/useGrayFabrics";
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { CommentModal } from '@/components/CommentModal'
+import { GrayFabricOrderToConfirmModal } from './GrayFabricOrderToConfirmModal'
+import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
+import { deleteGrayFabricOrderAction } from '@/app/gray-fabrics/actions'
+import type { GrayFabricHistory } from '../../../types'
 
-export const GrayFabricOrderTable: FC = () => {
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const [items, setItems] = useState<History>();
-  const { isAuths } = useAuthManagement();
-  const { getSerialNumber, getUserName } = useGetDisp();
-  const grayFabricOrders = useGrayFabricStore((state) => state.grayFabricOrders);
-  const { confirmProcessing, deleteGrayFabricOrder } = useGrayFabrics();
+type Props = {
+  orders: GrayFabricHistory[]
+  currentUserId: string
+  isRD: boolean
+  users: Record<string, string>
+}
 
+export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Props) {
+  const [, startTransition] = useTransition()
+
+  const handleDelete = (history: GrayFabricHistory) => {
+    if (!confirm('削除して宜しいでしょうか')) return
+    startTransition(() => {
+      void deleteGrayFabricOrderAction(history.id, history.grayFabricId, history.quantity).then(
+        (result) => { if (!result.ok) alert(result.error) }
+      )
+    })
+  }
+
+  const formatSerial = (n: number) => String(n).padStart(10, '0')
+
+  if (orders.length === 0) {
+    return <div className="p-6 text-center text-muted-foreground">現在登録された情報はありません。</div>
+  }
 
   return (
-    <>
-      <TableContainer p={6} pt={0} w="100%">
-        {grayFabricOrders?.length > 0 ? (
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>処理</Th>
-                <Th>発注NO.</Th>
-                <Th>発注日</Th>
-                <Th>予定納期</Th>
-                <Th>担当者</Th>
-                <Th>品番</Th>
-                <Th>品名</Th>
-                <Th>仕入先</Th>
-                <Th>数量</Th>
-                <Th>コメント</Th>
-                <Th>編集/削除</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {grayFabricOrders?.map((history) => (
-                <Tr key={history.id}>
-                  <Td>
-                    {isAuths(["rd"]) || history.createUser === currentUser ? (
-                      <OrderToConfirmModal
-                        history={history}
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => confirmProcessing(history, items)}
-                      />
-                    ) : (
-                      <Button size="xs" disabled={true}>
-                        確定
-                      </Button>
-                    )}
-                  </Td>
-                  <Td>{getSerialNumber(history.serialNumber)}</Td>
-                  <Td>{history.orderedAt}</Td>
-                  <Td>{history.scheduledAt}</Td>
-                  <Td>{getUserName(history.createUser)}</Td>
-                  <Td>{history.productNumber}</Td>
-                  <Td>{history.productName}</Td>
-                  <Td>{history.supplierName}</Td>
-                  <Td isNumeric>{history?.quantity}m</Td>
-                  <Td w="100%">
-                    <Flex gap={3}>
-                      <CommentModal comment={history.comment} />
-                      {history?.comment.slice(0, 20) +
-                        (history.comment.length >= 1 ? "..." : "")}
-                    </Flex>
-                  </Td>
-                  <Td>
-
-                    {(isAuths(["rd"]) || history.createUser === currentUser)
-                      && (
-                        <Flex alignItems="center" gap={3}>
-                          <GrayFabricHistoryEditModal
-                            history={history}
-                            type="order"
-                          />
-                          <FaTrashAlt
-                            color="#444"
-                            cursor="pointer"
-                            onClick={() => deleteGrayFabricOrder(history)}
-                          />
-                        </Flex>
-                      )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        ) : (
-          <Box textAlign="center">現在登録された情報はありません。</Box>
-        )}
-      </TableContainer>
-    </>
-  );
-};
+    <div className="p-6 pt-0 overflow-x-auto">
+      <Table className="mt-6">
+        <TableHeader>
+          <TableRow>
+            <TableHead>処理</TableHead>
+            <TableHead>発注NO.</TableHead>
+            <TableHead>発注日</TableHead>
+            <TableHead>予定納期</TableHead>
+            <TableHead>担当者</TableHead>
+            <TableHead>品番</TableHead>
+            <TableHead>品名</TableHead>
+            <TableHead>仕入先</TableHead>
+            <TableHead>数量</TableHead>
+            <TableHead>コメント</TableHead>
+            <TableHead>編集/削除</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((history) => (
+            <TableRow key={history.id}>
+              <TableCell>
+                <GrayFabricOrderToConfirmModal
+                  history={history}
+                  canEdit={isRD || history.createUser === currentUserId}
+                />
+              </TableCell>
+              <TableCell className="font-mono">{formatSerial(history.serialNumber)}</TableCell>
+              <TableCell>{history.orderedAt}</TableCell>
+              <TableCell>{history.scheduledAt}</TableCell>
+              <TableCell>{users[history.createUser] ?? history.createUser}</TableCell>
+              <TableCell>{history.productNumber}</TableCell>
+              <TableCell>{history.productName}</TableCell>
+              <TableCell>{history.supplierName}</TableCell>
+              <TableCell className="text-right">{history.quantity}m</TableCell>
+              <TableCell>
+                <div className="flex gap-3 items-center">
+                  <CommentModal comment={history.comment} />
+                  <span className="text-sm text-muted-foreground">
+                    {history.comment.length > 20 ? history.comment.slice(0, 20) + '...' : history.comment}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                {(isRD || history.createUser === currentUserId) && (
+                  <div className="flex items-center gap-3">
+                    <GrayFabricHistoryEditModal history={history} type="order" />
+                    <FaTrashAlt
+                      color="#444"
+                      cursor="pointer"
+                      onClick={() => handleDelete(history)}
+                    />
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}

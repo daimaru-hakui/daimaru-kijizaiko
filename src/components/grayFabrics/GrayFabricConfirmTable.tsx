@@ -1,133 +1,124 @@
+'use client'
 
+import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
 import {
-  Box,
-  Flex,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useState, useEffect, FC } from "react";
-import { GrayFabricHistory } from "../../../types";
-import { useUtil } from "../../hooks/UseUtil";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { CommentModal } from "../CommentModal";
-import { SearchArea } from "../SearchArea";
-import { useForm, FormProvider } from "react-hook-form";
-import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
-import { useAuthStore } from "../../../store";
-import { GrayFabricEditModal } from "./GrayFabricEditModal";
-import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { CommentModal } from '@/components/CommentModal'
+import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
+import type { GrayFabricHistory } from '../../../types'
 
-type Inputs = {
-  start: string;
-  end: string;
-  client: string;
-  staff: string;
-};
+type Props = {
+  confirms: GrayFabricHistory[]
+  currentUserId: string
+  isRD: boolean
+  users: Record<string, string>
+  defaultStart: string
+  defaultEnd: string
+}
 
-export const GrayFabricConfirmTable: FC = () => {
-  const { getSerialNumber, getUserName } = useGetDisp();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const { isAuths } = useAuthManagement();
-  const { getTodayDate, get3monthsAgo } = useUtil();
-  const [startDay, setStartDay] = useState(get3monthsAgo());
-  const [endDay, setEndDay] = useState(getTodayDate());
-  const [staff, setStaff] = useState("");
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabricHistory[]>([]);
-  const { data } = useSWRGrayFavricConfirms(startDay, endDay);
+type SearchForm = {
+  start: string
+  end: string
+}
 
-  const methods = useForm<Inputs>({
-    defaultValues: {
-      start: startDay,
-      end: endDay,
-      staff: "",
-    },
-  });
+export function GrayFabricConfirmTable({
+  confirms,
+  currentUserId,
+  isRD,
+  users,
+  defaultStart,
+  defaultEnd,
+}: Props) {
+  const router = useRouter()
+  const { register, handleSubmit, reset } = useForm<SearchForm>({
+    defaultValues: { start: defaultStart, end: defaultEnd },
+  })
 
-  const onSubmit = (data: Inputs) => {
-    setStartDay(data.start);
-    setEndDay(data.end);
-    setStaff(data.staff);
-  };
+  const onSearch = (data: SearchForm) => {
+    router.push(`/gray-fabrics/confirms?start=${data.start}&end=${data.end}`)
+  }
+
   const onReset = () => {
-    setStartDay(get3monthsAgo());
-    setEndDay(getTodayDate());
-    setStaff("");
-    methods.reset();
-  };
+    reset()
+    router.push('/gray-fabrics/confirms')
+  }
 
-  useEffect(() => {
-    setFilterGrayFabrics(
-      data?.contents.filter(
-        (content) => staff === content.createUser || staff === ""));
-  }, [data, staff]);
+  const formatSerial = (n: number) => String(n).padStart(10, '0')
 
   return (
     <>
-      <FormProvider {...methods}>
-        <SearchArea onSubmit={onSubmit} onReset={onReset} />
-      </FormProvider>
-      <TableContainer p={6} pt={0} w="100%">
-        {filterGrayFabrics?.length > 0 ? (
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>発注NO.</Th>
-                <Th>発注日</Th>
-                <Th>仕上日</Th>
-                <Th>担当者</Th>
-                <Th>品番</Th>
-                <Th>品名</Th>
-                <Th>仕入先</Th>
-                <Th>数量</Th>
-                <Th>コメント</Th>
-                <Th>編集</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filterGrayFabrics?.map((history) => (
-                <Tr key={history.id}>
-                  <Td>{getSerialNumber(history.serialNumber)}</Td>
-                  <Td>{history.orderedAt}</Td>
-                  <Td>{history.fixedAt}</Td>
-                  <Td>{getUserName(history.createUser)}</Td>
-                  <Td>{history.productNumber}</Td>
-                  <Td>{history.productName}</Td>
-                  <Td>{history.supplierName}</Td>
-                  <Td isNumeric>{history?.quantity}m</Td>
-                  <Td w="100%">
-                    <Flex gap={3}>
+      <form onSubmit={handleSubmit(onSearch)} className="flex flex-wrap items-end gap-4 p-6 pb-0">
+        <div>
+          <Label>開始日</Label>
+          <Input type="date" className="mt-1" {...register('start')} />
+        </div>
+        <div>
+          <Label>終了日</Label>
+          <Input type="date" className="mt-1" {...register('end')} />
+        </div>
+        <Button type="submit">検索</Button>
+        <Button type="button" variant="outline" onClick={onReset}>リセット</Button>
+      </form>
+
+      <div className="p-6 pt-0 overflow-x-auto">
+        {confirms.length > 0 ? (
+          <Table className="mt-6">
+            <TableHeader>
+              <TableRow>
+                <TableHead>発注NO.</TableHead>
+                <TableHead>発注日</TableHead>
+                <TableHead>仕上日</TableHead>
+                <TableHead>担当者</TableHead>
+                <TableHead>品番</TableHead>
+                <TableHead>品名</TableHead>
+                <TableHead>仕入先</TableHead>
+                <TableHead>数量</TableHead>
+                <TableHead>コメント</TableHead>
+                <TableHead>編集</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {confirms.map((history) => (
+                <TableRow key={history.id}>
+                  <TableCell className="font-mono">{formatSerial(history.serialNumber)}</TableCell>
+                  <TableCell>{history.orderedAt}</TableCell>
+                  <TableCell>{history.fixedAt}</TableCell>
+                  <TableCell>{users[history.createUser] ?? history.createUser}</TableCell>
+                  <TableCell>{history.productNumber}</TableCell>
+                  <TableCell>{history.productName}</TableCell>
+                  <TableCell>{history.supplierName}</TableCell>
+                  <TableCell className="text-right">{history.quantity}m</TableCell>
+                  <TableCell>
+                    <div className="flex gap-3 items-center">
                       <CommentModal comment={history.comment} />
-                      {history?.comment.slice(0, 20) +
-                        (history.comment.length >= 1 ? "..." : "")}
-                    </Flex>
-                  </Td>
-                  <Td>
-                    {(isAuths(["rd"]) ||
-                      history.createUser === currentUser) && (
-                        <GrayFabricHistoryEditModal
-                          history={history}
-                          startDay={startDay}
-                          endDay={endDay}
-                          type="confirm"
-                        />
-                      )}
-                  </Td>
-                </Tr>
+                      <span className="text-sm text-muted-foreground">
+                        {history.comment.length > 20 ? history.comment.slice(0, 20) + '...' : history.comment}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {(isRD || history.createUser === currentUserId) && (
+                      <GrayFabricHistoryEditModal history={history} type="confirm" />
+                    )}
+                  </TableCell>
+                </TableRow>
               ))}
-            </Tbody>
+            </TableBody>
           </Table>
         ) : (
-          <Box mt={6} textAlign="center">
-            現在登録された情報はありません。
-          </Box>
+          <div className="mt-6 text-center text-muted-foreground">現在登録された情報はありません。</div>
         )}
-      </TableContainer>
+      </div>
     </>
-  );
-};
+  )
+}
