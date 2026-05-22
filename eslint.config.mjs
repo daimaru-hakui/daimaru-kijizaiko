@@ -7,9 +7,10 @@ export default [
       reportUnusedDisableDirectives: 'off',
     },
     rules: {
-      // Phase 4 (shadcn/ui 移行) で既存コードを整理するまで warn に下げる
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/immutability': 'warn',
+      // react-hook-form の watch() は React Compiler と非互換だが動作上の問題なし
+      'react-hooks/incompatible-library': 'off',
     },
   },
 ]

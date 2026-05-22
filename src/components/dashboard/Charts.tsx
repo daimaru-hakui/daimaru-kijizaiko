@@ -1,119 +1,106 @@
 "use client";
 
-import { useEffect, useState, FC } from "react";
+import { useMemo, useState, FC } from "react";
 import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
 import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
-import { useForm, FormProvider } from "react-hook-form";
-import { useUtil } from "../../hooks/UseUtil";
-import { SearchArea } from "../SearchArea";
+import { getTodayDate, get3monthsAgo } from "@/lib/dates";
 import { useSWRCuttingReportImutable } from "../../hooks/swr/useSWRCuttingReportsImutable";
 import { CuttingReportType, History } from "../../../types";
 import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
 import { NumberInput } from "@/components/ui/number-input";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
-type Inputs = {
-  start: string;
-  end: string;
-  staff: string;
-};
+type Props = {
+  productsMap: Record<string, { productNumber: string; colorName: string }>
+}
 
-export const Charts: FC = () => {
+export const Charts: FC<Props> = ({ productsMap }) => {
   const [limitNum, setLimitNum] = useState(5);
-  const { getTodayDate, get3monthsAgo } = useUtil();
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
+  const [inputStart, setInputStart] = useState(startDay);
+  const [inputEnd, setInputEnd] = useState(endDay);
   const [staff, setStaff] = useState("");
-  const { data: cuttingReports } = useSWRCuttingReportImutable(
-    startDay,
-    endDay
-  );
-  const { data: fabricPurchaseConfirms } = useSWRPurchaseConfirms(
-    startDay,
-    endDay
-  );
-  const [filterCuttingReports, setFilterCuttingReports] = useState<CuttingReportType[]>([]);
-  const [filterPurchaseCofirms, setFilterPurchaseCofirms] = useState<History[]>([]);
 
-  const methods = useForm<Inputs>({
-    defaultValues: {
-      start: startDay,
-      end: endDay,
-      staff: "",
-    },
-  });
+  const { data: cuttingReports } = useSWRCuttingReportImutable(startDay, endDay);
+  const { data: fabricPurchaseConfirms } = useSWRPurchaseConfirms(startDay, endDay);
 
-  const onSubmit = (data: Inputs) => {
-    setStartDay(data.start);
-    setEndDay(data.end);
-    setStaff(data.staff);
-  };
-  const onReset = () => {
-    setStartDay(get3monthsAgo());
-    setEndDay(getTodayDate());
-    setStaff("");
-    methods.reset();
-  };
-
-  useEffect(() => {
-    if (!staff) {
-      setFilterCuttingReports(cuttingReports?.contents ?? []);
-    } else {
-      setFilterCuttingReports(
-        cuttingReports?.contents?.filter(
-          (report: CuttingReportType) => staff === report.staff || staff === ""
-        ) ?? []
-      );
-    }
+  const filterCuttingReports = useMemo<CuttingReportType[]>(() => {
+    const contents: CuttingReportType[] = cuttingReports?.contents ?? [];
+    return staff ? contents.filter((r) => r.staff === staff) : contents;
   }, [cuttingReports, staff]);
 
-  useEffect(() => {
-    if (!staff) {
-      setFilterPurchaseCofirms(fabricPurchaseConfirms?.contents ?? []);
-    } else {
-      setFilterPurchaseCofirms(
-        fabricPurchaseConfirms?.contents?.filter(
-          (report: History) => staff === report.createUser || staff === ""
-        ) ?? []
-      );
-    }
+  const filterPurchaseCofirms = useMemo<History[]>(() => {
+    const contents: History[] = fabricPurchaseConfirms?.contents ?? [];
+    return staff ? contents.filter((r) => r.createUser === staff) : contents;
   }, [fabricPurchaseConfirms, staff]);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStartDay(inputStart);
+    setEndDay(inputEnd);
+  };
+
+  const handleReset = () => {
+    const s = get3monthsAgo();
+    const e = getTodayDate();
+    setStartDay(s);
+    setEndDay(e);
+    setInputStart(s);
+    setInputEnd(e);
+    setStaff('');
+  };
 
   return (
     <>
-      <div className="py-6 mt-6 gap-3 flex flex-col lg:flex-row justify-between rounded-md shadow-md bg-white">
-        <FormProvider {...methods}>
-          <SearchArea onSubmit={onSubmit} onReset={onReset} />
-        </FormProvider>
-        <div className="px-6">
-          <h4 className="text-base font-semibold">
-            件数
-          </h4>
-          <div className="mt-3 flex gap-3 items-center">
+      <div className="py-6 mt-6 gap-3 flex flex-col lg:flex-row justify-between rounded-md shadow-md bg-white px-6">
+        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
+          <div>
+            <Label className="text-xs">開始日</Label>
+            <Input type="date" className="mt-1 w-36" value={inputStart}
+              onChange={(e) => setInputStart(e.target.value)} />
+          </div>
+          <div>
+            <Label className="text-xs">終了日</Label>
+            <Input type="date" className="mt-1 w-36" value={inputEnd}
+              onChange={(e) => setInputEnd(e.target.value)} />
+          </div>
+          <div className="flex gap-2">
+            <Button type="submit" size="sm">検索</Button>
+            <Button type="button" size="sm" variant="outline" onClick={handleReset}>クリア</Button>
+          </div>
+        </form>
+        <div>
+          <Label className="text-xs">件数</Label>
+          <div className="mt-1">
             <NumberInput
               min={1}
               max={100}
               value={limitNum}
               onChange={(_str, num) => setLimitNum(num)}
-              width="80px"
             />
           </div>
         </div>
       </div>
+
       <div className="rounded-md shadow-md bg-white mt-6 gap-6 flex flex-col md:flex-row justify-center">
         <CuttingQuantityRanking
           data={filterCuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
+          productsMap={productsMap}
         />
         <CuttingPriceRanking
           data={filterCuttingReports}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
+          productsMap={productsMap}
         />
       </div>
       <div className="rounded-md shadow-md bg-white mt-6 gap-6 flex flex-col md:flex-row justify-center">
@@ -122,12 +109,14 @@ export const Charts: FC = () => {
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
+          productsMap={productsMap}
         />
         <PurchasePriceRanking
           data={filterPurchaseCofirms}
           startDay={startDay}
           endDay={endDay}
           rankingNumber={limitNum}
+          productsMap={productsMap}
         />
       </div>
     </>

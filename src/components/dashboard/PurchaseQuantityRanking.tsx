@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import { History } from "../../../types";
 
 ChartJS.register(
@@ -28,6 +27,7 @@ type Props = {
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 export const PurchaseQuantityRanking: FC<Props> = ({
@@ -35,11 +35,9 @@ export const PurchaseQuantityRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; quantity: number }[]>([]);
 
   useEffect(() => {
     const getArray = async () => {
@@ -93,9 +91,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {

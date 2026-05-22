@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { FaWindowClose } from 'react-icons/fa'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockEditDialog } from './StockEditDialog'
@@ -27,7 +27,8 @@ export function CuttingReportFabricRow({
   isEdit,
 }: Props) {
   const [searchText, setSearchText] = useState('')
-  const [maxStock, setMaxStock] = useState(0)
+  // StockEditDialog で在庫を更新した際のローカル上書き値 (productId とセットで管理)
+  const [stockEdit, setStockEdit] = useState<{ productId: string; stock: number } | null>(null)
 
   const selectedProduct = products.find((p) => p.id === item.productId)
 
@@ -38,13 +39,13 @@ export function CuttingReportFabricRow({
     return matchText
   })
 
-  useEffect(() => {
-    if (!selectedProduct) { setMaxStock(0); return }
-    const base = selectedProduct.tokushimaStock ?? 0
-    // 編集時: 既存の quantity を在庫として戻す
-    const stock = isEdit ? base + (item.quantity ?? 0) : base
-    setMaxStock(stock)
-  }, [selectedProduct, isEdit, item.quantity])
+  const effectiveStock =
+    stockEdit?.productId === item.productId
+      ? stockEdit.stock
+      : selectedProduct?.tokushimaStock ?? 0
+
+  // 編集時: 既存の quantity を在庫として戻す
+  const maxStock = !selectedProduct ? 0 : isEdit ? effectiveStock + (item.quantity ?? 0) : effectiveStock
 
   const updateItem = (patch: Partial<CuttingProductType>) => {
     setItems((prev) =>
@@ -118,14 +119,13 @@ export function CuttingReportFabricRow({
             {selectedProduct && (
               <>
                 <span className="text-muted-foreground font-normal">
-                  (在庫 {selectedProduct.tokushimaStock ?? 0}m)
+                  (在庫 {effectiveStock}m)
                 </span>
                 <StockEditDialog
                   productId={selectedProduct.id}
-                  currentStock={selectedProduct.tokushimaStock ?? 0}
+                  currentStock={effectiveStock}
                   onUpdated={(s) => {
-                    selectedProduct.tokushimaStock = s
-                    setMaxStock(isEdit ? s + (item.quantity ?? 0) : s)
+                    setStockEdit({ productId: selectedProduct.id, stock: s })
                   }}
                 />
               </>

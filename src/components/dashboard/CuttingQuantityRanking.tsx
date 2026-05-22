@@ -16,7 +16,6 @@ import {
   CuttingHistoryType,
   CuttingProductType,
 } from "../../../types";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 
 ChartJS.register(
   CategoryScale,
@@ -32,6 +31,7 @@ type Props = {
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 export const CuttingQuantityRanking: FC<Props> = ({
@@ -39,11 +39,9 @@ export const CuttingQuantityRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0, price: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; quantity: number }[]>([]);
 
   useEffect(() => {
     const getArray = () => {
@@ -111,9 +109,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking: { productId: string }) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {

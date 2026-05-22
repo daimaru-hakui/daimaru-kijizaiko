@@ -29,8 +29,10 @@ export default async function DashboardPage() {
     db.collection('fabricPurchaseOrders').where('quantity', '>', 0).get(),
   ])
 
-  // @ts-expect-error TODO(phase5): Firestore DocumentData → Product 型変換
-  const products: Product[] = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+  const products: Product[] = productsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
+  const productsMap = Object.fromEntries(
+    products.map(p => [p.id, { productNumber: p.productNumber, colorName: p.colorName }])
+  )
   const grayFabricCount = grayFabricsSnap.size
 
   const qKeys = [...QUANTITY_KEYS] as QKey[]
@@ -110,7 +112,7 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <Charts />
+        <Charts productsMap={productsMap} />
       </div>
     </div>
   )

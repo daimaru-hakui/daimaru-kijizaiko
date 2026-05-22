@@ -15,8 +15,7 @@ function makeNextRequest(pathname: string, sessionCookie?: string) {
 async function runProxy(pathname: string, sessionCookie?: string) {
   const req = makeNextRequest(pathname, sessionCookie)
   const { proxy } = await import('../src/proxy')
-  // @ts-expect-error NextRequest 型ではなく Request で代替
-  return proxy(req)
+  return proxy(req as unknown as Parameters<typeof proxy>[0])
 }
 
 describe('proxy', () => {

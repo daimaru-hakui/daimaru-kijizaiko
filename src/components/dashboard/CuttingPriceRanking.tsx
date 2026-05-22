@@ -12,7 +12,6 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Product, CuttingReportType } from "../../../types";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import useSWRImmutable from "swr/immutable";
 
 ChartJS.register(
@@ -29,6 +28,7 @@ type Props = {
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 type Data = {
@@ -40,11 +40,9 @@ export const CuttingPriceRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0, price: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; price: number }[]>([]);
   const { data: products } = useSWRImmutable<Data>("/api/products");
 
   useEffect(() => {
@@ -117,9 +115,7 @@ export const CuttingPriceRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FC } from "react";
+import { useState, FC } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import {
   Dialog,
@@ -17,11 +17,6 @@ type Props = {
 
 export const CommentModal: FC<Props> = ({ comment }) => {
   const [open, setOpen] = useState(false);
-  const [newComment, setNewComment] = useState(comment);
-
-  useEffect(() => {
-    setNewComment(comment);
-  }, [comment]);
 
   return (
     <>
@@ -34,14 +29,14 @@ export const CommentModal: FC<Props> = ({ comment }) => {
         />
       )}
 
-      <Dialog open={open} onOpenChange={(v) => { if (!v) setNewComment(comment); setOpen(v); }}>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>コメント</DialogTitle>
           </DialogHeader>
-          <div className="whitespace-pre-wrap">{newComment}</div>
+          <div className="whitespace-pre-wrap">{comment}</div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setNewComment(comment); setOpen(false); }}>
+            <Button variant="outline" onClick={() => setOpen(false)}>
               閉じる
             </Button>
           </DialogFooter>
