@@ -1,0 +1,34 @@
+import { redirect } from 'next/navigation'
+import { verifyServerSession } from '@/lib/auth/session'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { ProductOrderSearch } from '@/components/products/ProductOrderSearch'
+import type { Product, StockPlace } from '../../../../../types'
+
+export default async function ProductOrderNewPage() {
+  const user = await verifyServerSession()
+  if (!user) redirect('/login')
+
+  const db = getAdminDb()
+  const [productsSnap, stockPlacesSnap] = await Promise.all([
+    db.collection('products').orderBy('productNumber').get(),
+    db.collection('stockPlaces').orderBy('kana').get(),
+  ])
+
+  const products = productsSnap.docs
+    .filter((d) => !d.data().deletedAt)
+    .map((d) => ({ ...(d.data() as Omit<Product, 'id'>), id: d.id }))
+
+  const stockPlaces = stockPlacesSnap.docs.map((d) => ({
+    ...(d.data() as Omit<StockPlace, 'id'>),
+    id: d.id,
+  }))
+
+  return (
+    <div className="w-full mt-12 px-6">
+      <div className="max-w-lg mx-auto my-6 p-6 bg-white rounded-md shadow-md">
+        <h2 className="text-2xl font-bold mb-6">生地発注</h2>
+        <ProductOrderSearch products={products} stockPlaces={stockPlaces} userId={user.uid} />
+      </div>
+    </div>
+  )
+}
