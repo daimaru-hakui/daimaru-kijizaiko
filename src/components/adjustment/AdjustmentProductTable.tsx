@@ -1,51 +1,46 @@
-/* eslint-disable react/display-name */
-import {
-  Box,
-  Table,
-  Tbody,
-  TableContainer,
-} from "@chakra-ui/react";
+'use client'
 
-import { Product } from "../../../types";
-import { AdjustmentProductTableRow } from "./AdjustmentProductTableRow";
-import { FC } from "react";
-import { AdjustmentProductHeader } from "./AdjustmentProductHeader";
-import { AdjustmentProductSearchBar } from "./AdjustmentProductSearchBar";
+import { useState } from 'react'
+import { Table, TableBody } from '@/components/ui/table'
+import { AdjustmentProductHeader } from './AdjustmentProductHeader'
+import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
+import { AdjustmentProductSearchBar } from './AdjustmentProductSearchBar'
+import { halfToFullChar } from '@/lib/utils'
+import type { Product } from '../../../types'
 
 type Props = {
-  filterProducts: Product[];
-  searchText: string;
-  setSearchText: (payload: string) => void;
-};
+  products: Product[]
+  usersMap: Record<string, string>
+  isRD: boolean
+  isTokushima: boolean
+}
 
-export const AdjustmentProductTable: FC<Props> = ({
-  filterProducts,
-  searchText,
-  setSearchText
-}) => {
+export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }: Props) {
+  const [searchText, setSearchText] = useState('')
+
+  const filtered = products.filter((p) =>
+    p.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
+  )
 
   return (
-    <TableContainer w="100%" overflowX="unset" overflowY="unset">
-      <AdjustmentProductSearchBar
-        searchText={searchText}
-        setSearchText={setSearchText}
-      />
-      <Box
-        mt={6}
-        w="100%"
-        overflowX="auto"
-        position="relative"
-        maxH="calc(100vh - 255px)"
-      >
-        <Table w="100%" variant="simple" size="sm">
-          <AdjustmentProductHeader />
-          <Tbody>
-            {filterProducts.map((product) => (
-              <AdjustmentProductTableRow key={product.id} product={product} />
+    <div className="w-full">
+      <AdjustmentProductSearchBar searchText={searchText} setSearchText={setSearchText} />
+      <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
+        <Table className="w-full">
+          <AdjustmentProductHeader isRD={isRD} isTokushima={isTokushima} />
+          <TableBody>
+            {filtered.map((product) => (
+              <AdjustmentProductTableRow
+                key={product.id}
+                product={product}
+                usersMap={usersMap}
+                isRD={isRD}
+                isTokushima={isTokushima}
+              />
             ))}
-          </Tbody>
+          </TableBody>
         </Table>
-      </Box>
-    </TableContainer>
-  );
-};
+      </div>
+    </div>
+  )
+}

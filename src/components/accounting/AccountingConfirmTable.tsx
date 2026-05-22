@@ -1,153 +1,151 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-  Box,
-  Flex,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useEffect, useState, FC } from "react";
-import { CommentModal } from "../CommentModal";
-import { History } from "../../../types";
-import { AccountingEditModal } from "./AccountingEditModal";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { SearchArea } from "../SearchArea";
-import { useForm, FormProvider } from "react-hook-form";
-import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
-import { useUtil } from "../../hooks/UseUtil";
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { AccountingEditModal } from './AccountingEditModal'
+import type { History } from '../../../types'
 
-type Inputs = {
-  start: string;
-  end: string;
-  client: string;
-  staff: string;
-};
+type Props = {
+  histories: History[]
+  usersMap: Record<string, string>
+  startDay: string
+  endDay: string
+}
 
-export const AccountingConfirmTable: FC = () => {
-  const [filterHistories, setFilterHistories] = useState<History[]>([]);
-  const { getUserName, getSerialNumber } = useGetDisp();
-  const { getTodayDate, get3monthsAgo } = useUtil();
-  const [startDay, setStartDay] = useState(get3monthsAgo());
-  const [endDay, setEndDay] = useState(getTodayDate());
-  const [staff, setStaff] = useState("");
-  const { data } = useSWRPurchaseConfirms(startDay, endDay);
+export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }: Props) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [, startTransition] = useTransition()
+  const [localStart, setLocalStart] = useState(startDay)
+  const [localEnd, setLocalEnd] = useState(endDay)
+  const [staff, setStaff] = useState('')
 
-  const methods = useForm<Inputs>({
-    defaultValues: {
-      start: startDay,
-      end: endDay,
-      staff: "",
-    },
-  });
+  const handleSearch = () => {
+    const params = new URLSearchParams({ start: localStart, end: localEnd })
+    startTransition(() => router.push(`${pathname ?? '/accounting-dept/confirms'}?${params}`))
+  }
 
-  const onSubmit = (data: Inputs) => {
-    setStartDay(data.start);
-    setEndDay(data.end);
-    setStaff(data.staff);
-  };
-  const onReset = () => {
-    setStartDay(get3monthsAgo());
-    setEndDay(getTodayDate());
-    setStaff("");
-    methods.reset();
-  };
+  const handleReset = () => {
+    setStaff('')
+    setLocalStart(startDay)
+    setLocalEnd(endDay)
+    startTransition(() => router.push(pathname ?? '/accounting-dept/confirms'))
+  }
 
-  useEffect(() => {
-    setFilterHistories(
-      data?.contents
-        ?.filter((history) =>
-          (staff === history.createUser && history.accounting === true) ||
-          (staff === "" && history.accounting === true))
-    );
-  }, [data, staff]);
-
-  const elementComment = (history: History, collectionName: string) => (
-    <Flex gap={3}>
-      <CommentModal comment={history.comment} />
-      {history?.comment.slice(0, 20) +
-        (history.comment.length >= 1 ? "..." : "")}
-    </Flex>
-  );
+  const filtered = staff
+    ? histories.filter((h) => h.createUser === staff)
+    : histories
 
   return (
-    <>
-      <FormProvider {...methods}>
-        <SearchArea onSubmit={onSubmit} onReset={onReset} />
-      </FormProvider>
-      <TableContainer px={6} pt={6} pb={0} w="100%" overflowX="unset" overflowY="unset">
-        <Box
-          mt={3}
-          w="full"
-          overflowX="auto"
-          position="relative"
-          h={{
-            base: "calc(100vh - 405px)",
-            md: "calc(100vh - 360px)",
-            lg: "calc(100vh - 310px)",
-          }}
-        >
-          {filterHistories?.length > 0 ? (
-            <Table variant="simple" size="sm">
-              <Thead position="sticky" top={0} zIndex="docked" bg="white">
-                <Tr>
-                  <Th>発注NO.</Th>
-                  <Th>発注日</Th>
-                  <Th>入荷日</Th>
-                  <Th>担当者</Th>
-                  <Th>品番</Th>
-                  <Th>色</Th>
-                  <Th>品名</Th>
-                  <Th>数量</Th>
-                  <Th>単価</Th>
-                  <Th>金額</Th>
-                  <Th>出荷先</Th>
-                  <Th>コメント</Th>
-                  <Th>編集</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filterHistories?.map((history) => (
-                  <Tr key={history.id}>
-                    <Td>{getSerialNumber(history?.serialNumber)}</Td>
-                    <Td>{history?.orderedAt}</Td>
-                    <Td>{history?.fixedAt}</Td>
-                    <Td>{getUserName(history.createUser)}</Td>
-                    <Td>{history.productNumber}</Td>
-                    {history.colorName && <Td>{history.colorName}</Td>}
-                    <Td>{history.productName}</Td>
-                    <Td isNumeric>{history?.quantity.toLocaleString()}m</Td>
-                    {history.price && (
-                      <>
-                        <Td isNumeric>{history?.price.toLocaleString()}円</Td>
-                        <Td isNumeric>
-                          {(history?.quantity * history?.price).toLocaleString()}
-                          円
-                        </Td>
-                      </>
-                    )}
-                    <Td>{history?.stockPlace}</Td>
-                    <Td w="100%" textAlign="center">
-                      {elementComment(history, "fabricPurchaseConfirms")}
-                    </Td>
-                    <Td>
-                      <Flex gap={3}>
-                        <AccountingEditModal history={history} startDay={startDay} endDay={endDay} />
-                      </Flex>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          ) : (
-            <Box mt={6} textAlign="center">
-              現在登録された情報はありません。
-            </Box>
-          )}
-        </Box>
-      </TableContainer>
-    </>
-  );
-};
+    <div>
+      <div className="flex items-center gap-3 p-6">
+        <h2 className="text-2xl font-bold">処理済み</h2>
+        <Link href="/accounting-dept/orders">
+          <Button variant="outline" size="sm">未処理</Button>
+        </Link>
+      </div>
+
+      <div className="flex flex-wrap gap-4 px-6 pb-4">
+        <div>
+          <div className="text-sm font-medium mb-1">期間を選択</div>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="date"
+              value={localStart}
+              onChange={(e) => setLocalStart(e.target.value)}
+              className="w-36"
+            />
+            <span className="text-sm">〜</span>
+            <Input
+              type="date"
+              value={localEnd}
+              onChange={(e) => setLocalEnd(e.target.value)}
+              className="w-36"
+            />
+          </div>
+        </div>
+        <div>
+          <div className="text-sm font-medium mb-1">担当者を選択</div>
+          <select
+            value={staff}
+            onChange={(e) => setStaff(e.target.value)}
+            className="h-9 rounded-md border border-input px-3 text-sm"
+          >
+            <option value="">全員</option>
+            {Object.entries(usersMap).map(([id, name]) => (
+              <option key={id} value={id}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-end gap-2">
+          <Button size="sm" onClick={handleSearch}>検索</Button>
+          <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+        </div>
+      </div>
+
+      <div className="px-6 overflow-x-auto" style={{ maxHeight: 'calc(100vh - 310px)', overflowY: 'auto' }}>
+        {filtered.length > 0 ? (
+          <Table>
+            <TableHeader className="sticky top-0 bg-white z-10">
+              <TableRow>
+                <TableHead>発注NO.</TableHead>
+                <TableHead>発注日</TableHead>
+                <TableHead>入荷日</TableHead>
+                <TableHead>担当者</TableHead>
+                <TableHead>品番</TableHead>
+                <TableHead>色</TableHead>
+                <TableHead>品名</TableHead>
+                <TableHead className="text-right">数量</TableHead>
+                <TableHead className="text-right">単価</TableHead>
+                <TableHead className="text-right">金額</TableHead>
+                <TableHead>出荷先</TableHead>
+                <TableHead>コメント</TableHead>
+                <TableHead>編集</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((h) => (
+                <TableRow key={h.id}>
+                  <TableCell>{h.serialNumber}</TableCell>
+                  <TableCell>{h.orderedAt}</TableCell>
+                  <TableCell>{h.fixedAt}</TableCell>
+                  <TableCell>{usersMap[h.createUser] ?? h.createUser}</TableCell>
+                  <TableCell>{h.productNumber}</TableCell>
+                  <TableCell>{h.colorName}</TableCell>
+                  <TableCell>{h.productName}</TableCell>
+                  <TableCell className="text-right">{h.quantity.toLocaleString()}m</TableCell>
+                  <TableCell className="text-right">
+                    {h.price != null ? `${h.price.toLocaleString()}円` : ''}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {h.price != null ? `${(h.quantity * h.price).toLocaleString()}円` : ''}
+                  </TableCell>
+                  <TableCell>{h.stockPlace}</TableCell>
+                  <TableCell className="max-w-[180px] truncate">{h.comment}</TableCell>
+                  <TableCell>
+                    <AccountingEditModal history={h} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="text-center py-8 text-sm text-muted-foreground">
+            現在登録された情報はありません。
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

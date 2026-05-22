@@ -1,68 +1,50 @@
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  TableContainer,
-} from "@chakra-ui/react";
+'use client'
 
-import { FC } from "react";
-import { GrayFabric } from "../../../types";
-import { AdjustmentGrayFabricRow } from "./AdjustmentGrayFabricRow";
-import { AdjustmentGrayFabricSearchBar } from "./AdjustmentGrayFabricSearchBar";
+import { useState } from 'react'
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
+import { AdjustmentGrayFabricSearchBar } from './AdjustmentGrayFabricSearchBar'
+import { halfToFullChar } from '@/lib/utils'
+import type { GrayFabric } from '../../../types'
 
 type Props = {
-  filterGrayFabrics: GrayFabric[];
-  searchText: string;
-  setSearchText: (payload: string) => void;
-};
+  grayFabrics: GrayFabric[]
+}
 
-export const AdjustmentGrayFabricTable: FC<Props> = ({
-  filterGrayFabrics,
-  searchText,
-  setSearchText
-}) => {
+export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
+  const [searchText, setSearchText] = useState('')
+
+  const filtered = grayFabrics.filter((g) =>
+    g.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
+  )
+
   return (
-    <TableContainer w="100%" overflowX="unset" overflowY="unset">
-      <AdjustmentGrayFabricSearchBar
-        searchText={searchText}
-        setSearchText={setSearchText}
-      />
-      <Box
-        mt={6}
-        w="100%"
-        overflowX="auto"
-        position="relative"
-        maxH="calc(100vh - 255px)"
-      >
-        <Table mt={6} variant="simple" size="sm">
-          <Thead
-            w="100%"
-            position="sticky"
-            top={0}
-            zIndex="docked"
-            bg="white"
-          >
-            <Tr>
-              <Th>生地品番</Th>
-              <Th>単価（円）</Th>
-              <Th>キバタ仕掛(m)</Th>
-              <Th>キバタ在庫(m)</Th>
-              <Th>処理</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {filterGrayFabrics?.map((grayFabric) => (
-              <AdjustmentGrayFabricRow
-                key={grayFabric.id}
-                grayFabric={grayFabric}
-              />
+    <div className="w-full">
+      <AdjustmentGrayFabricSearchBar searchText={searchText} setSearchText={setSearchText} />
+      <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
+        <Table>
+          <TableHeader className="sticky top-0 bg-white z-10">
+            <TableRow>
+              <TableHead>生地品番</TableHead>
+              <TableHead className="text-right">単価（円）</TableHead>
+              <TableHead className="text-right">キバタ仕掛(m)</TableHead>
+              <TableHead className="text-right">キバタ在庫(m)</TableHead>
+              <TableHead>処理</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((grayFabric) => (
+              <AdjustmentGrayFabricRow key={grayFabric.id} grayFabric={grayFabric} />
             ))}
-          </Tbody>
+          </TableBody>
         </Table>
-      </Box>
-    </TableContainer>
-  );
-};
+      </div>
+    </div>
+  )
+}

@@ -1,30 +1,24 @@
-import { Flex, Input } from '@chakra-ui/react';
-import React, { FC } from 'react';
-import { GiCancel } from "react-icons/gi";
+'use client'
+
+import { GiCancel } from 'react-icons/gi'
+import { Input } from '@/components/ui/input'
 
 type Props = {
-  searchText: string;
-  setSearchText: (payload: string) => void;
-};
+  searchText: string
+  setSearchText: (v: string) => void
+}
 
-export const AdjustmentGrayFabricSearchBar: FC<Props> = ({ searchText, setSearchText }) => {
-
-  const reset = () => {
-    setSearchText("");
-  };
-
+export function AdjustmentGrayFabricSearchBar({ searchText, setSearchText }: Props) {
   return (
-    <Flex mt={6} gap={1} align="center">
+    <div className="flex items-center gap-1 mt-4">
       <Input
         type="text"
-        size="xs"
-        w="32"
-        mr={1}
+        className="w-32 h-7 text-xs"
         value={searchText}
         placeholder="品番絞り込み"
         onChange={(e) => setSearchText(e.target.value)}
       />
-      <GiCancel cursor="pointer" onClick={reset} />
-    </Flex>
-  );
-};
+      <GiCancel className="cursor-pointer" onClick={() => setSearchText('')} />
+    </div>
+  )
+}
