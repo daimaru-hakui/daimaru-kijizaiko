@@ -105,11 +105,7 @@ export const FabricDyeingOrderTable: FC = () => {
                   )}
                   <Td w="100%" textAlign="center">
                     <Flex gap={3}>
-                      <CommentModal
-                        id={history.id}
-                        comment={history.comment}
-                        collectionName={"historyFabricDyeingOrders"}
-                      />
+                      <CommentModal comment={history.comment} />
                       {history?.comment.slice(0, 20) +
                         (history.comment.length >= 1 ? "..." : "")}
                     </Flex>

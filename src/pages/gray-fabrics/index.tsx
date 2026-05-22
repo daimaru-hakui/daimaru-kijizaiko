@@ -85,11 +85,7 @@ const GrayFabrics: NextPage = () => {
                   </Td>
                   <Td w="100%">
                     <Flex gap={3}>
-                      <CommentModal
-                        id={fabric.id}
-                        comment={fabric.comment}
-                        collectionName="grayFabrics"
-                      />
+                      <CommentModal comment={fabric.comment} />
                       {fabric?.comment.slice(0, 10) +
                         (fabric?.comment.length >= 1 ? "..." : "")}
                     </Flex>

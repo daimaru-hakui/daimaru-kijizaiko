@@ -1,114 +1,68 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  Stack,
-  Text,
-  Textarea,
-} from "@chakra-ui/react";
-import React, { useState, useEffect, FC } from "react";
+"use client";
+
+import { useState, useEffect, FC } from "react";
+import { useRouter } from "next/navigation";
 import { Supplier } from "../../../../types";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { addSupplierAction, updateSupplierAction } from "@/app/settings/actions";
 
 type Props = {
-  type: string;
+  type: "new" | "edit";
   supplier: Supplier;
-  addSupplier?: Function;
-  updateSupplier?: Function;
+  onSuccess?: () => void;
 };
 
-type Inputs = Supplier;
+type Inputs = Pick<Supplier, "name" | "kana" | "comment">;
 
-export const SupplierInputArea: FC<Props> = ({
-  type,
-  supplier,
-  addSupplier,
-  updateSupplier,
-}: Props) => {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+export const SupplierInputArea: FC<Props> = ({ type, supplier, onSuccess }) => {
+  const router = useRouter();
   const [flag, setFlag] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      ...supplier,
-    },
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>({
+    defaultValues: { name: supplier.name, kana: supplier.kana, comment: supplier.comment },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    switch (type) {
-      case "new":
-        addSupplier(data);
-        return;
-      case "edit":
-        updateSupplier(data);
-        return;
-      default:
-        return;
+  const nameValue = watch("name");
+  useEffect(() => { setFlag(false); }, [nameValue]);
+
+  const handleFormSubmit: SubmitHandler<Inputs> = async (data) => {
+    if (type === "new") {
+      const result = window.confirm("登録して宜しいでしょうか");
+      if (!result) return;
+      const addResult = await addSupplierAction(data);
+      if (!addResult.ok) { alert(addResult.error); return; }
+      router.push("/settings/suppliers");
+    } else {
+      const result = window.confirm("変更して宜しいでしょうか");
+      if (!result) return;
+      const updateResult = await updateSupplierAction(supplier.id, data);
+      if (!updateResult.ok) { alert(updateResult.error); return; }
+      router.refresh();
+      onSuccess?.();
     }
   };
 
-  // 登録しているかのチェック
-  useEffect(() => {
-    if (type === "edit") return;
-    let item = watch("name");
-    if (!item) item = "noValue";
-    const base = suppliers?.map((supplier) => supplier.name);
-    const result = base?.includes(item);
-    if (!result) {
-      setFlag(false);
-    } else {
-      setFlag(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("name")]);
-
-  useEffect(() => {
-    const getData = async () => {
-      const collectionRef = collection(db, "suppliers");
-      const docSnap = await getDocs(collectionRef);
-      setSuppliers(docSnap.docs.map((doc) => ({ ...doc.data() } as Supplier)));
-    };
-    getData();
-  }, []);
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={6} mt={6}>
-        <Flex gap={6} flexDirection={{ base: "column" }}>
-          <Box w="100%" flex={2}>
-            <Text>仕入先名</Text>
-            <Input mt={1} {...register("name", { required: true })} />
-            {errors.name && (
-              <Box color="red" fontWeight="bold">
-                ※仕入れ先を入力してください
-              </Box>
-            )}
-            {flag && (
-              <Box color="red" fontWeight="bold">
-                ※すでに登録されています。
-              </Box>
-            )}
-          </Box>
-          <Box w="100%" flex={1}>
-            <Text>フリガナ</Text>
-            <Input mt={1} {...register("kana")} />
-          </Box>
-          <Box w="100%" flex={1}>
-            <Text>備考</Text>
-            <Textarea mt={1} {...register("comment")} />
-          </Box>
-        </Flex>
-        <Button type="submit" disabled={flag} colorScheme="facebook">
-          {type === "new" ? "登録" : "更新"}
-        </Button>
-      </Stack>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <div className="flex flex-col gap-6 mt-6">
+        <div>
+          <p className="text-sm mb-1">仕入先名</p>
+          <Input {...register("name", { required: true })} />
+          {errors.name && <p className="text-red-600 font-bold text-sm mt-1">※仕入れ先を入力してください</p>}
+          {flag && <p className="text-red-600 font-bold text-sm mt-1">※すでに登録されています。</p>}
+        </div>
+        <div>
+          <p className="text-sm mb-1">フリガナ</p>
+          <Input {...register("kana")} />
+        </div>
+        <div>
+          <p className="text-sm mb-1">備考</p>
+          <Textarea {...register("comment")} />
+        </div>
+        <Button type="submit" disabled={flag}>{type === "new" ? "登録" : "更新"}</Button>
+      </div>
     </form>
   );
 };

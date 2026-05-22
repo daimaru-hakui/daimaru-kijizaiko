@@ -92,11 +92,7 @@ export const FabricPurchaseConfirmTable: FC<Props> = ({ HOUSE_FACTORY }) => {
 
   const elementComment = (history: History, collectionName: string) => (
     <Flex gap={3}>
-      <CommentModal
-        id={history.id}
-        comment={history.comment}
-        collectionName={collectionName}
-      />
+      <CommentModal comment={history.comment} />
       {history?.comment.slice(0, 20) +
         (history.comment.length >= 1 ? "..." : "")}
     </Flex>

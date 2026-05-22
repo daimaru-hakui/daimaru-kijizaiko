@@ -102,11 +102,7 @@ export const GrayFabricConfirmTable: FC = () => {
                   <Td isNumeric>{history?.quantity}m</Td>
                   <Td w="100%">
                     <Flex gap={3}>
-                      <CommentModal
-                        id={history.id}
-                        comment={history.comment}
-                        collectionName="historyGrayFabricConfirms"
-                      />
+                      <CommentModal comment={history.comment} />
                       {history?.comment.slice(0, 20) +
                         (history.comment.length >= 1 ? "..." : "")}
                     </Flex>
