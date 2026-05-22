@@ -8,6 +8,7 @@ export type User = {
   accounting: boolean;
   tokushima: boolean;
   order: boolean;
+  admin?: boolean;
 };
 
 export type Product = {
