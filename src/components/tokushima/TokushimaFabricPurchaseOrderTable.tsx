@@ -67,9 +67,9 @@ export function TokushimaFabricPurchaseOrderTable({
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl font-bold">入荷予定</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷予定</h2>
         <Link href="/tokushima/fabric-purchase/confirms">
-          <Button size="sm" variant="outline">履歴</Button>
+          <Button size="sm" variant="outline" className="border-slate-200 text-slate-600">履歴</Button>
         </Link>
       </div>
 
@@ -77,21 +77,21 @@ export function TokushimaFabricPurchaseOrderTable({
         {orders.length > 0 ? (
           <Table className="text-sm">
             <TableHeader>
-              <TableRow>
-                <TableHead>確定</TableHead>
-                <TableHead>発注NO.</TableHead>
-                <TableHead>発注日</TableHead>
-                <TableHead>入荷予定</TableHead>
-                <TableHead>担当者</TableHead>
-                <TableHead>品番</TableHead>
-                <TableHead>色</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead className="text-right">数量</TableHead>
-                <TableHead className="text-right">単価</TableHead>
-                <TableHead className="text-right">金額</TableHead>
-                <TableHead>出荷先</TableHead>
-                <TableHead>コメント</TableHead>
-                <TableHead>編集/削除</TableHead>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">確定</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷予定</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">単価</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">金額</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集/削除</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -99,7 +99,7 @@ export function TokushimaFabricPurchaseOrderTable({
                 <TableRow key={order.id}>
                   <TableCell>
                     {canConfirmOrEdit(order) ? (
-                      <Button size="sm" variant="outline" onClick={() => setConfirmOrder(order)}>
+                      <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={() => setConfirmOrder(order)}>
                         入荷確定
                       </Button>
                     ) : (
@@ -128,7 +128,7 @@ export function TokushimaFabricPurchaseOrderTable({
                     <div className="flex items-center gap-2">
                       {canConfirmOrEdit(order) && order.orderType === 'purchase' && (
                         <>
-                          <Button size="sm" variant="outline" onClick={() => setEditOrder(order)}>
+                          <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => setEditOrder(order)}>
                             編集
                           </Button>
                           {canDelete(order) && (
@@ -157,7 +157,7 @@ export function TokushimaFabricPurchaseOrderTable({
         <TokushimaOrderToConfirmDialog
           order={confirmOrder}
           open={Boolean(confirmOrder)}
-          onClose={() => setConfirmOrder(null)}
+          onCloseAction={() => setConfirmOrder(null)}
         />
       )}
       {editOrder && (
@@ -165,7 +165,7 @@ export function TokushimaFabricPurchaseOrderTable({
           history={editOrder}
           type="order"
           open={Boolean(editOrder)}
-          onClose={() => setEditOrder(null)}
+          onCloseAction={() => setEditOrder(null)}
         />
       )}
     </div>

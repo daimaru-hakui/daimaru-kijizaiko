@@ -18,18 +18,16 @@ export default async function LocationsPage() {
   const locations: Location[] = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="max-w-lg mx-auto my-6 rounded-md bg-white shadow-md">
-        <div className="p-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">徳島保管場所一覧</h2>
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-4xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">徳島保管場所一覧</h2>
             <Link href="/settings/locations/new">
-              <Button size="sm">新規登録</Button>
+              <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white">新規登録</Button>
             </Link>
           </div>
-          <div className="mt-6">
-            <LocationsTable locations={locations} />
-          </div>
+          <LocationsTable locations={locations} />
         </div>
       </div>
     </div>

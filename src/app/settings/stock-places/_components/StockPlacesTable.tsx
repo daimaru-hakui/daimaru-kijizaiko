@@ -36,14 +36,14 @@ export const StockPlacesTable: FC<Props> = ({ stockPlaces }) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>送り先名</TableHead>
-          <TableHead>フリガナ</TableHead>
-          <TableHead>住所</TableHead>
-          <TableHead>TEL</TableHead>
-          <TableHead>FAX</TableHead>
-          <TableHead className="w-full">コメント</TableHead>
-          <TableHead>編集/削除</TableHead>
+        <TableRow className="bg-slate-50">
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">送り先名</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">フリガナ</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">住所</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">TEL</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">FAX</TableHead>
+          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集/削除</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

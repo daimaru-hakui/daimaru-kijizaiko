@@ -30,12 +30,12 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
       <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
         <Table>
           <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow>
-              <TableHead>生地品番</TableHead>
-              <TableHead className="text-right">単価（円）</TableHead>
-              <TableHead className="text-right">キバタ仕掛(m)</TableHead>
-              <TableHead className="text-right">キバタ在庫(m)</TableHead>
-              <TableHead>処理</TableHead>
+            <TableRow className="bg-slate-50">
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+              <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価（円）</TableHead>
+              <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">キバタ仕掛(m)</TableHead>
+              <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">キバタ在庫(m)</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

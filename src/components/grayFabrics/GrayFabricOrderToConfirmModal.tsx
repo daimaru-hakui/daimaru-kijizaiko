@@ -65,12 +65,12 @@ export function GrayFabricOrderToConfirmModal({ history, canEdit }: Props) {
   }
 
   if (!canEdit) {
-    return <Button size="sm" variant="outline" disabled>確定</Button>
+    return <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" disabled>確定</Button>
   }
 
   return (
     <>
-      <Button size="sm" onClick={handleOpen}>確定</Button>
+      <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleOpen}>確定</Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent>
           <DialogHeader>
@@ -160,16 +160,16 @@ export function GrayFabricOrderToConfirmModal({ history, canEdit }: Props) {
           <DialogFooter>
             {status === 1 && (
               <>
-                <Button variant="outline" onClick={handleClose}>閉じる</Button>
-                <Button onClick={handleNext}>次へ</Button>
+                <Button variant="outline" className="border-slate-200 text-slate-600" onClick={handleClose}>閉じる</Button>
+                <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleNext}>次へ</Button>
               </>
             )}
             {status === 2 && (
               <>
-                <Button variant="outline" onClick={() => { setRemainingOrder(0); setStatus(1) }}>
+                <Button variant="outline" className="border-slate-200 text-slate-600" onClick={() => { setRemainingOrder(0); setStatus(1) }}>
                   戻る
                 </Button>
-                <Button disabled={isSubmitting} onClick={handleConfirm}>確定</Button>
+                <Button className="bg-blue-800 hover:bg-blue-900 text-white" disabled={isSubmitting} onClick={handleConfirm}>確定</Button>
               </>
             )}
           </DialogFooter>

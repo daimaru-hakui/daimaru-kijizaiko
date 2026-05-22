@@ -12,7 +12,7 @@ const CATEGORIES = ['表地', '裏地', '芯地', '配色', 'その他']
 type Props = {
   item: CuttingProductType
   rowIndex: number
-  setItems: React.Dispatch<React.SetStateAction<CuttingProductType[]>>
+  setItemsAction: React.Dispatch<React.SetStateAction<CuttingProductType[]>>
   products: Product[]
   totalQuantity: number
   isEdit: boolean
@@ -21,7 +21,7 @@ type Props = {
 export function CuttingReportFabricRow({
   item,
   rowIndex,
-  setItems,
+  setItemsAction,
   products,
   totalQuantity,
   isEdit,
@@ -48,7 +48,7 @@ export function CuttingReportFabricRow({
   const maxStock = !selectedProduct ? 0 : isEdit ? effectiveStock + (item.quantity ?? 0) : effectiveStock
 
   const updateItem = (patch: Partial<CuttingProductType>) => {
-    setItems((prev) =>
+    setItemsAction((prev) =>
       prev.map((it, i) => (i === rowIndex ? { ...it, ...patch } : it))
     )
   }
@@ -68,13 +68,13 @@ export function CuttingReportFabricRow({
 
   const deleteRow = () => {
     if (!window.confirm('削除してよろしいですか？')) return
-    setItems((prev) => prev.filter((_, i) => i !== rowIndex))
+    setItemsAction((prev) => prev.filter((_, i) => i !== rowIndex))
   }
 
   const isOverStock = item.quantity > maxStock
 
   return (
-    <div className="border rounded-md p-3 space-y-3">
+    <div className="border border-slate-200 rounded-xl shadow-sm p-3 space-y-3">
       <div className="flex items-center justify-between">
         <span className="font-semibold text-sm">使用生地 {rowIndex + 1}</span>
         <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export function CuttingReportFabricRow({
                 <StockEditDialog
                   productId={selectedProduct.id}
                   currentStock={effectiveStock}
-                  onUpdated={(s) => {
+                  onUpdatedAction={(s: number) => {
                     setStockEdit({ productId: selectedProduct.id, stock: s })
                   }}
                 />

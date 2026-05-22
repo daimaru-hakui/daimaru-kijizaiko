@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase/client'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,8 +44,8 @@ function NavLinks({
       href={href}
       onClick={onClose}
       className={cn(
-        'block px-2 py-1 rounded text-sm hover:bg-accent transition-colors',
-        pathname === href && 'bg-accent font-medium'
+        'block px-2 py-1 rounded text-sm hover:bg-slate-100 transition-colors text-slate-700',
+        pathname === href && 'bg-blue-50 text-blue-800 font-semibold'
       )}
     >
       {title}
@@ -178,9 +178,9 @@ export function AppShell({ userName, roles, children }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Fixed header */}
-      <header className="fixed top-0 left-0 right-0 h-12 bg-white shadow-sm z-10 flex items-center px-4">
+      <header className="fixed top-0 left-0 right-0 h-12 bg-white border-b border-slate-200 z-10 flex items-center px-4">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <Sheet open={open} onOpenChange={setOpen}>
@@ -190,6 +190,10 @@ export function AppShell({ userName, roles, children }: Props) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 pt-0">
+                <SheetTitle className="sr-only">メインメニュー</SheetTitle>
+                <SheetDescription className="sr-only">
+                  アプリ全体のナビゲーションメニュー
+                </SheetDescription>
                 <NavLinks
                   roles={roles}
                   pathname={pathname}
@@ -197,16 +201,16 @@ export function AppShell({ userName, roles, children }: Props) {
                 />
               </SheetContent>
             </Sheet>
-            <Link href="/dashboard" className="text-xl font-bold">
+            <Link href="/dashboard" className="text-base font-bold text-blue-900 tracking-tight">
               生地在庫WEB
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-sm hidden 2xl:block">{userName}</span>
+            <span className="text-sm text-slate-500 hidden 2xl:block">{userName}</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="border-slate-200">
                   <Settings size={18} />
                 </Button>
               </DropdownMenuTrigger>
@@ -226,7 +230,7 @@ export function AppShell({ userName, roles, children }: Props) {
       {/* Body */}
       <div className="flex">
         {/* Desktop sidebar */}
-        <aside className="hidden 2xl:block w-60 min-h-screen bg-white shadow-md sticky top-0 flex-shrink-0 pl-4 pt-12">
+        <aside className="hidden 2xl:block w-60 min-h-screen bg-white border-r border-slate-200 sticky top-0 flex-shrink-0 pl-4 pt-12">
           <NavLinks roles={roles} pathname={pathname} />
         </aside>
 

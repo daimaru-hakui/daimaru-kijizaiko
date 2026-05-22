@@ -61,7 +61,7 @@ export const SupplierInputArea: FC<Props> = ({ type, supplier, onSuccess }) => {
           <p className="text-sm mb-1">備考</p>
           <Textarea {...register("comment")} />
         </div>
-        <Button type="submit" disabled={flag}>{type === "new" ? "登録" : "更新"}</Button>
+        <Button type="submit" disabled={flag} className="bg-blue-800 hover:bg-blue-900 text-white">{type === "new" ? "登録" : "更新"}</Button>
       </div>
     </form>
   );

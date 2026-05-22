@@ -67,9 +67,9 @@ export function TokushimaFabricPurchaseConfirmTable({
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl font-bold">入荷履歴</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷履歴</h2>
         <Link href="/tokushima/fabric-purchase/orders">
-          <Button size="sm" variant="outline">入荷予定</Button>
+          <Button size="sm" variant="outline" className="border-slate-200 text-slate-600">入荷予定</Button>
         </Link>
       </div>
 
@@ -95,28 +95,28 @@ export function TokushimaFabricPurchaseConfirmTable({
             ))}
           </select>
         </div>
-        <Button size="sm" onClick={handleSearch}>検索</Button>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
+        <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 
       <div className="overflow-x-auto">
         {filtered.length > 0 ? (
           <Table className="text-sm">
             <TableHeader>
-              <TableRow>
-                <TableHead>発注NO.</TableHead>
-                <TableHead>発注日</TableHead>
-                <TableHead>入荷日</TableHead>
-                <TableHead>担当者</TableHead>
-                <TableHead>生地品番</TableHead>
-                <TableHead>色</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead className="text-right">数量</TableHead>
-                <TableHead className="text-right">単価</TableHead>
-                <TableHead className="text-right">金額</TableHead>
-                <TableHead>出荷先</TableHead>
-                <TableHead>コメント</TableHead>
-                <TableHead>編集</TableHead>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">単価</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">金額</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -138,7 +138,7 @@ export function TokushimaFabricPurchaseConfirmTable({
                   <TableCell className="max-w-[200px] truncate">{h.comment}</TableCell>
                   <TableCell>
                     {canEdit(h) ? (
-                      <Button size="sm" variant="outline" onClick={() => setEditConfirm(h)}>
+                      <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => setEditConfirm(h)}>
                         編集
                       </Button>
                     ) : h.accounting ? (
@@ -159,7 +159,7 @@ export function TokushimaFabricPurchaseConfirmTable({
           history={editConfirm}
           type="confirm"
           open={Boolean(editConfirm)}
-          onClose={() => setEditConfirm(null)}
+          onCloseAction={() => setEditConfirm(null)}
         />
       )}
     </div>

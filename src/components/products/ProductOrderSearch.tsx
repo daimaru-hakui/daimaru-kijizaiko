@@ -14,7 +14,7 @@ type Props = {
   userId: string
 }
 
-export function ProductOrderSearch({ products, stockPlaces, userId }: Props) {
+export function ProductOrderSearch({ products, stockPlaces }: Props) {
   const [search, setSearch] = useState('')
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [orderOpen, setOrderOpen] = useState(false)
@@ -48,6 +48,7 @@ export function ProductOrderSearch({ products, stockPlaces, userId }: Props) {
         <Button variant="outline" onClick={() => setSearch('')}>リセット</Button>
         {filtered ? (
           <Button
+            className="bg-blue-800 hover:bg-blue-900 text-white"
             onClick={() => {
               setSelectedProduct(filtered)
               setOrderOpen(true)
@@ -65,7 +66,7 @@ export function ProductOrderSearch({ products, stockPlaces, userId }: Props) {
           product={selectedProduct}
           stockPlaces={stockPlaces}
           open={orderOpen}
-          onClose={() => setOrderOpen(false)}
+          onCloseAction={() => setOrderOpen(false)}
         />
       )}
     </div>

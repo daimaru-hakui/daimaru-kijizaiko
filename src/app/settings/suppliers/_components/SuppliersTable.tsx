@@ -34,11 +34,11 @@ export const SuppliersTable: FC<Props> = ({ suppliers }) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>仕入先名</TableHead>
-          <TableHead>フリガナ</TableHead>
-          <TableHead className="w-full">コメント</TableHead>
-          <TableHead>編集</TableHead>
+        <TableRow className="bg-slate-50">
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先名</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">フリガナ</TableHead>
+          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

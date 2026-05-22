@@ -34,20 +34,20 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">使用予定一覧</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">使用予定一覧</h2>
         <ScheduleModal mode="new" salesUsers={salesUsers} products={products} />
       </div>
       <div className="w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
         <Table className="w-full text-sm">
           <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow>
-              <TableHead>担当</TableHead>
-              <TableHead>加工指示書NO.</TableHead>
-              <TableHead>生地品番</TableHead>
-              <TableHead>アイテム名</TableHead>
-              <TableHead className="text-right">使用予定（m）</TableHead>
-              <TableHead>製品納期</TableHead>
-              <TableHead>処理</TableHead>
+            <TableRow className="bg-slate-50">
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">加工指示書NO.</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">アイテム名</TableHead>
+              <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">使用予定（m）</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">製品納期</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

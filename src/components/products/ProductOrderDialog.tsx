@@ -25,12 +25,12 @@ type Props = {
   product: Product
   stockPlaces: StockPlace[]
   open: boolean
-  onClose: () => void
+  onCloseAction: () => void
 }
 
 type Tab = 'dyeing' | 'purchase'
 
-export function ProductOrderDialog({ product, stockPlaces, open, onClose }: Props) {
+export function ProductOrderDialog({ product, stockPlaces, open, onCloseAction }: Props) {
   const router = useRouter()
   const today = getTodayDate()
   const [tab, setTab] = useState<Tab>('purchase')
@@ -89,7 +89,7 @@ export function ProductOrderDialog({ product, stockPlaces, open, onClose }: Prop
     }
 
     if (result.ok) {
-      onClose()
+      onCloseAction()
       router.refresh()
     } else {
       alert(result.error)
@@ -97,7 +97,7 @@ export function ProductOrderDialog({ product, stockPlaces, open, onClose }: Prop
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>発注</DialogTitle>
@@ -264,8 +264,8 @@ export function ProductOrderDialog({ product, stockPlaces, open, onClose }: Prop
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>閉じる</Button>
-          <Button onClick={handleSubmit}>発注</Button>
+          <Button variant="outline" onClick={onCloseAction}>閉じる</Button>
+          <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSubmit}>発注</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

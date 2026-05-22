@@ -34,11 +34,11 @@ export const LocationsTable: FC<Props> = ({ locations }) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>順番</TableHead>
-          <TableHead>保管場所</TableHead>
-          <TableHead className="w-full">コメント</TableHead>
-          <TableHead>編集</TableHead>
+        <TableRow className="bg-slate-50">
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">順番</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">保管場所</TableHead>
+          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

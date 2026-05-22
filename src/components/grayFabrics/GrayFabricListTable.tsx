@@ -41,26 +41,27 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
   }
 
   return (
-    <div className="w-full mt-12">
-      <div className="w-full my-6 mx-auto rounded-md bg-white shadow-md">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-2xl font-bold">キバタ一覧</h2>
-            <Link href="/gray-fabrics/new">
-              <Button size="sm">新規登録</Button>
-            </Link>
-          </div>
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">キバタ一覧</h2>
+              <Link href="/gray-fabrics/new">
+                <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white">新規登録</Button>
+              </Link>
+            </div>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>発注</TableHead>
-                <TableHead>品番</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead>仕入先</TableHead>
-                <TableHead className="w-24">キバタ仕掛</TableHead>
-                <TableHead className="w-24">キバタ在庫</TableHead>
-                <TableHead>コメント</TableHead>
-                <TableHead>編集</TableHead>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
+                <TableHead className="w-24 text-xs font-semibold text-slate-500 tracking-wider">キバタ仕掛</TableHead>
+                <TableHead className="w-24 text-xs font-semibold text-slate-500 tracking-wider">キバタ在庫</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,6 +103,7 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
               ))}
             </TableBody>
           </Table>
+          </div>
         </div>
       </div>
     </div>

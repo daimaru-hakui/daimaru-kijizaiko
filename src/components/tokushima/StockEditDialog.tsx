@@ -16,17 +16,17 @@ import { updateTokushimaStockAction } from '@/app/tokushima/cutting-reports/acti
 type Props = {
   productId: string
   currentStock: number
-  onUpdated?: (newStock: number) => void
+  onUpdatedAction?: (newStock: number) => void
 }
 
-export function StockEditDialog({ productId, currentStock, onUpdated }: Props) {
+export function StockEditDialog({ productId, currentStock, onUpdatedAction }: Props) {
   const [open, setOpen] = useState(false)
   const [stock, setStock] = useState(currentStock)
 
   const handleSave = async () => {
     if (!window.confirm('更新してよろしいでしょうか')) return
     await updateTokushimaStockAction(productId, stock)
-    onUpdated?.(stock)
+    onUpdatedAction?.(stock)
     setOpen(false)
   }
 
@@ -47,8 +47,8 @@ export function StockEditDialog({ productId, currentStock, onUpdated }: Props) {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>閉じる</Button>
-            <Button onClick={handleSave}>更新</Button>
+            <Button variant="outline" className="border-slate-200 text-slate-600" onClick={() => setOpen(false)}>閉じる</Button>
+            <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSave}>更新</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

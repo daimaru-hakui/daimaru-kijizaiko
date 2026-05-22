@@ -45,7 +45,7 @@ export function GrayFabricOrderAreaModal({ grayFabric }: Props) {
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}>発注</Button>
+      <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={() => setOpen(true)}>発注</Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent className="max-w-xl">
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -81,10 +81,10 @@ export function GrayFabricOrderAreaModal({ grayFabric }: Props) {
                 <Label>備考</Label>
                 <Textarea className="mt-1" {...register('comment')} />
               </div>
-              <Button type="submit" disabled={isSubmitting}>登録する</Button>
+              <Button type="submit" disabled={isSubmitting} className="bg-blue-800 hover:bg-blue-900 text-white">登録する</Button>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>閉じる</Button>
+              <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={handleClose}>閉じる</Button>
             </DialogFooter>
           </form>
         </DialogContent>

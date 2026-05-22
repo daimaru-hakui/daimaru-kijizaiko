@@ -14,33 +14,33 @@ import type { Product } from '../../../types'
 type Props = {
   product: Product
   open: boolean
-  onClose: () => void
+  onCloseAction: () => void
   suppliersMap: Record<string, string>
   locationsMap: Record<string, string>
   grayFabricsMap: Record<string, { productNumber: string; productName: string }>
-  onEdit?: () => void
+  onEditAction?: () => void
 }
 
 export function ProductDetailDialog({
   product,
   open,
-  onClose,
+  onCloseAction,
   suppliersMap,
   locationsMap,
   grayFabricsMap,
-  onEdit,
+  onEditAction,
 }: Props) {
   const mixed = getMixed(product.materials as any)
   const fabricStd = getFabricStd(product.fabricWidth, product.fabricLength, product.fabricWeight)
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             生地詳細
-            {onEdit && (
-              <Button size="sm" variant="outline" onClick={onEdit}>
+            {onEditAction && (
+              <Button size="sm" variant="outline" onClick={onEditAction}>
                 編集
               </Button>
             )}
@@ -194,7 +194,7 @@ export function ProductDetailDialog({
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>閉じる</Button>
+          <Button variant="outline" onClick={onCloseAction}>閉じる</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

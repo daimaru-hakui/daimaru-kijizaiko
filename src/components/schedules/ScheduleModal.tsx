@@ -66,7 +66,7 @@ export function ScheduleModal({ mode, salesUsers, products, initData = {} }: Pro
   return (
     <>
       {mode === 'new' ? (
-        <Button size="sm" onClick={() => setOpen(true)}>新規</Button>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={() => setOpen(true)}>新規</Button>
       ) : (
         <FaEdit className="cursor-pointer" onClick={() => setOpen(true)} />
       )}

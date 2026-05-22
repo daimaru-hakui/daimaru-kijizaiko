@@ -61,10 +61,10 @@ export const AuthEditModal: FC<Props> = ({ uid, initialRank, initialName }) => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setRank(initialRank); setName(initialName); setOpen(false); }}>
+            <Button variant="outline" className="border-slate-200 text-slate-600" onClick={() => { setRank(initialRank); setName(initialName); setOpen(false); }}>
               キャンセル
             </Button>
-            <Button onClick={handleSave}>OK</Button>
+            <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSave}>OK</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

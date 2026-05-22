@@ -38,25 +38,25 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
   const formatSerial = (n: number) => String(n).padStart(10, '0')
 
   if (orders.length === 0) {
-    return <div className="p-6 text-center text-muted-foreground">現在登録された情報はありません。</div>
+    return <div className="p-6 pt-0 text-center text-muted-foreground">現在登録された情報はありません。</div>
   }
 
   return (
     <div className="p-6 pt-0 overflow-x-auto">
       <Table className="mt-6">
         <TableHeader>
-          <TableRow>
-            <TableHead>処理</TableHead>
-            <TableHead>発注NO.</TableHead>
-            <TableHead>発注日</TableHead>
-            <TableHead>予定納期</TableHead>
-            <TableHead>担当者</TableHead>
-            <TableHead>品番</TableHead>
-            <TableHead>品名</TableHead>
-            <TableHead>仕入先</TableHead>
-            <TableHead>数量</TableHead>
-            <TableHead>コメント</TableHead>
-            <TableHead>編集/削除</TableHead>
+          <TableRow className="bg-slate-50">
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">予定納期</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集/削除</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

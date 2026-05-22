@@ -66,25 +66,25 @@ export function GrayFabricConfirmTable({
           <Label>終了日</Label>
           <Input type="date" className="mt-1" {...register('end')} />
         </div>
-        <Button type="submit">検索</Button>
-        <Button type="button" variant="outline" onClick={onReset}>リセット</Button>
+        <Button type="submit" className="bg-blue-800 hover:bg-blue-900 text-white">検索</Button>
+        <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={onReset}>リセット</Button>
       </form>
 
       <div className="p-6 pt-0 overflow-x-auto">
         {confirms.length > 0 ? (
           <Table className="mt-6">
             <TableHeader>
-              <TableRow>
-                <TableHead>発注NO.</TableHead>
-                <TableHead>発注日</TableHead>
-                <TableHead>仕上日</TableHead>
-                <TableHead>担当者</TableHead>
-                <TableHead>品番</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead>仕入先</TableHead>
-                <TableHead>数量</TableHead>
-                <TableHead>コメント</TableHead>
-                <TableHead>編集</TableHead>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕上日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -20,10 +20,10 @@ import { getTodayDate } from '@/lib/dates'
 type Props = {
   order: History
   open: boolean
-  onClose: () => void
+  onCloseAction: () => void
 }
 
-export function TokushimaOrderToConfirmDialog({ order, open, onClose }: Props) {
+export function TokushimaOrderToConfirmDialog({ order, open, onCloseAction }: Props) {
   const router = useRouter()
   const today = getTodayDate()
   const [quantity, setQuantity] = useState(order.quantity)
@@ -55,7 +55,7 @@ export function TokushimaOrderToConfirmDialog({ order, open, onClose }: Props) {
       fixedAt,
     })
     if (result.ok) {
-      onClose()
+      onCloseAction()
       router.refresh()
     } else {
       alert(result.error)
@@ -63,7 +63,7 @@ export function TokushimaOrderToConfirmDialog({ order, open, onClose }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>入荷確定</DialogTitle>
@@ -114,8 +114,8 @@ export function TokushimaOrderToConfirmDialog({ order, open, onClose }: Props) {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>閉じる</Button>
-          <Button onClick={handleConfirm}>確定</Button>
+          <Button variant="outline" className="border-slate-200 text-slate-600" onClick={onCloseAction}>閉じる</Button>
+          <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleConfirm}>確定</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

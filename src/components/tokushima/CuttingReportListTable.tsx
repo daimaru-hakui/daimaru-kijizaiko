@@ -137,10 +137,10 @@ export function CuttingReportListTable({
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">裁断報告書</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断報告書</h2>
         <Button
           size="sm"
-          variant="outline"
+          className="bg-blue-800 hover:bg-blue-900 text-white"
           onClick={() => downloadCsv(buildCsvData(reports, usersMap, productMap), `裁断報告書_${startDay}`)}
         >
           CSV
@@ -178,23 +178,23 @@ export function CuttingReportListTable({
             onChange={(e) => setClientFilter(e.target.value)}
           />
         </div>
-        <Button size="sm" onClick={handleSearch}>検索</Button>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
+        <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 
       <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 280px)', overflowY: 'auto' }}>
         <Table className="text-sm">
           <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow>
-              <TableHead>詳細</TableHead>
-              <TableHead>既読</TableHead>
-              <TableHead>裁断報告書NO.</TableHead>
-              <TableHead>裁断日</TableHead>
-              <TableHead>加工指示書NO.</TableHead>
-              <TableHead>品名</TableHead>
-              <TableHead>受注先名</TableHead>
-              <TableHead className="text-right">数量</TableHead>
-              <TableHead>担当者名</TableHead>
+            <TableRow className="bg-slate-50">
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">詳細</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">既読</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断報告書NO.</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断日</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">加工指示書NO.</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">受注先名</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者名</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -205,7 +205,7 @@ export function CuttingReportListTable({
               return (
                 <TableRow key={report.serialNumber}>
                   <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => setDetailReport(report)}>
+                    <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => setDetailReport(report)}>
                       詳細
                     </Button>
                   </TableCell>
@@ -243,7 +243,7 @@ export function CuttingReportListTable({
         <CuttingReportDetailDialog
           report={detailReport}
           open={Boolean(detailReport)}
-          onClose={() => setDetailReport(null)}
+          onCloseAction={() => setDetailReport(null)}
           usersMap={usersMap}
           isTokushima={isTokushima}
           isRD={isRD}

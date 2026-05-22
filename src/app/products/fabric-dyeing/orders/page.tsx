@@ -28,15 +28,17 @@ export default async function FabricDyeingOrdersPage() {
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="w-full my-6 bg-white shadow-md rounded-md">
-        <FabricDyeingOrderTable
-          orders={orders}
-          usersMap={usersMap}
-          userId={user.uid}
-          isRD={isRD}
-          isAdmin={isAdmin}
-        />
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <FabricDyeingOrderTable
+            orders={orders}
+            usersMap={usersMap}
+            userId={user.uid}
+            isRD={isRD}
+            isAdmin={isAdmin}
+          />
+        </div>
       </div>
     </div>
   )

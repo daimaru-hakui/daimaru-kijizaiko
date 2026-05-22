@@ -26,7 +26,7 @@ type UserOption = { id: string; name: string }
 type Props = {
   report: CuttingReportType
   open: boolean
-  onClose: () => void
+  onCloseAction: () => void
   usersMap: Record<string, string>
   isTokushima: boolean
   isRD: boolean
@@ -47,7 +47,7 @@ function calcScale(meter: number, total: number) {
 export function CuttingReportDetailDialog({
   report,
   open,
-  onClose,
+  onCloseAction,
   usersMap,
   isTokushima,
   isRD,
@@ -63,25 +63,25 @@ export function CuttingReportDetailDialog({
   const handleDelete = async () => {
     if (!window.confirm('削除してよろしいですか？')) return
     await deleteCuttingReportAction(report.id)
-    onClose()
+    onCloseAction()
   }
 
   const staffName = report.staff === 'R&D' ? 'R&D' : (usersMap[report.staff] ?? report.staff)
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+      <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               裁断報告書
               {canEdit && (
-                <Button size="sm" variant="outline" onClick={() => { onClose(); setEditOpen(true) }}>
+                <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => { onCloseAction(); setEditOpen(true) }}>
                   編集
                 </Button>
               )}
               {canDelete && (
-                <Button size="sm" variant="outline" className="text-destructive" onClick={handleDelete}>
+                <Button size="sm" variant="outline" className="border-slate-200 text-destructive" onClick={handleDelete}>
                   削除
                 </Button>
               )}
@@ -138,13 +138,13 @@ export function CuttingReportDetailDialog({
 
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>種別</TableHead>
-                  <TableHead>生地品番</TableHead>
-                  <TableHead>色</TableHead>
-                  <TableHead>品名</TableHead>
-                  <TableHead className="text-right">数量</TableHead>
-                  <TableHead className="text-right">用尺</TableHead>
+                <TableRow className="bg-slate-50">
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">種別</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">用尺</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -168,18 +168,19 @@ export function CuttingReportDetailDialog({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={onClose}>閉じる</Button>
+            <Button variant="outline" className="border-slate-200 text-slate-600" onClick={onCloseAction}>閉じる</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={(v) => { if (!v) setEditOpen(false) }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogTitle className="sr-only">裁断報告書 編集</DialogTitle>
           <CuttingReportForm
             products={products}
             salesUsers={salesUsers}
             initData={report}
-            onClose={() => setEditOpen(false)}
+            onCloseAction={() => setEditOpen(false)}
           />
         </DialogContent>
       </Dialog>

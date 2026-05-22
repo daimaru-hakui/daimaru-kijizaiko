@@ -29,15 +29,17 @@ export default async function AdjustmentProductsPage() {
   }))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="max-w-5xl my-6 p-6 bg-white rounded-md shadow-md min-h-[300px]">
-        <h2 className="text-2xl font-bold mb-4">生地在庫調整</h2>
-        <AdjustmentProductTable
-          products={products}
-          usersMap={usersMap}
-          isRD={isRD}
-          isTokushima={isTokushima}
-        />
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 min-h-[300px]">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">生地在庫調整</h2>
+          <AdjustmentProductTable
+            products={products}
+            usersMap={usersMap}
+            isRD={isRD}
+            isTokushima={isTokushima}
+          />
+        </div>
       </div>
     </div>
   )

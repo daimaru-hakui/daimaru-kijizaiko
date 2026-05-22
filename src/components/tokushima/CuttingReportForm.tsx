@@ -19,10 +19,10 @@ type Props = {
   products: Product[]
   salesUsers: UserOption[]
   initData?: CuttingReportType
-  onClose?: () => void
+  onCloseAction?: () => void
 }
 
-export function CuttingReportForm({ products, salesUsers, initData, onClose }: Props) {
+export function CuttingReportForm({ products, salesUsers, initData, onCloseAction }: Props) {
   const router = useRouter()
   const isEdit = Boolean(initData?.id)
 
@@ -87,7 +87,7 @@ export function CuttingReportForm({ products, salesUsers, initData, onClose }: P
     if (isEdit) {
       const result = await updateCuttingReportAction({ id: initData!.id, ...payload })
       if (result.ok) {
-        onClose?.()
+        onCloseAction?.()
       } else {
         alert(result.error)
       }
@@ -103,7 +103,7 @@ export function CuttingReportForm({ products, salesUsers, initData, onClose }: P
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h1 className="text-2xl font-bold">{isEdit ? '裁断報告書 編集' : '裁断報告書作成'}</h1>
+      <h1 className="text-xl font-bold text-slate-900 tracking-tight mb-6">{isEdit ? '裁断報告書 編集' : '裁断報告書作成'}</h1>
 
       <div className="flex gap-4">
         <label className="flex items-center gap-2 text-sm">
@@ -197,14 +197,14 @@ export function CuttingReportForm({ products, salesUsers, initData, onClose }: P
             key={index}
             item={item}
             rowIndex={index}
-            setItems={setItems}
+            setItemsAction={setItems}
             products={products}
             totalQuantity={totalQuantity}
             isEdit={isEdit}
           />
         ))}
         <div className="flex justify-center">
-          <Button type="button" variant="outline" onClick={addRow}>
+          <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={addRow}>
             <FaPlus className="mr-2" /> 追加
           </Button>
         </div>
@@ -212,7 +212,7 @@ export function CuttingReportForm({ products, salesUsers, initData, onClose }: P
 
       <Button
         type="submit"
-        className="w-full"
+        className="w-full bg-blue-800 hover:bg-blue-900 text-white"
         disabled={isInvalid}
       >
         {isEdit ? '更新する' : '登録する'}

@@ -30,20 +30,22 @@ export default async function GrayFabricOrdersPage() {
   }))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="my-6 bg-white shadow-md rounded-md">
-        <div className="flex items-center gap-3 p-6">
-          <h2 className="text-2xl font-bold">キバタ仕掛一覧</h2>
-          <Link href="/gray-fabrics/confirms">
-            <Button variant="outline" size="sm">履歴</Button>
-          </Link>
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 p-6">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">キバタ仕掛一覧</h2>
+            <Link href="/gray-fabrics/confirms">
+              <Button variant="outline" size="sm" className="border-slate-200 text-slate-600">履歴</Button>
+            </Link>
+          </div>
+          <GrayFabricOrderTable
+            orders={orders}
+            currentUserId={user.uid}
+            isRD={isRD}
+            users={users}
+          />
         </div>
-        <GrayFabricOrderTable
-          orders={orders}
-          currentUserId={user.uid}
-          isRD={isRD}
-          users={users}
-        />
       </div>
     </div>
   )

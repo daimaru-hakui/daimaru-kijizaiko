@@ -19,7 +19,7 @@ type Props = {
   salesUsers: { id: string; name: string }[]
   features: string[]
   product?: Product
-  onClose?: () => void
+  onCloseAction?: () => void
 }
 
 export function ProductForm({
@@ -31,7 +31,7 @@ export function ProductForm({
   salesUsers,
   features,
   product,
-  onClose,
+  onCloseAction,
 }: Props) {
   const router = useRouter()
   const isEdit = Boolean(product)
@@ -116,8 +116,8 @@ export function ProductForm({
     }
 
     if (result.ok) {
-      if (onClose) {
-        onClose()
+      if (onCloseAction) {
+        onCloseAction()
         router.refresh()
       } else {
         router.push('/products')
@@ -408,12 +408,12 @@ export function ProductForm({
       </div>
 
       <div className="flex gap-3">
-        {isEdit && onClose && (
-          <Button variant="outline" className="flex-1" onClick={onClose}>
+        {isEdit && onCloseAction && (
+          <Button variant="outline" className="flex-1" onClick={onCloseAction}>
             キャンセル
           </Button>
         )}
-        <Button className="flex-1" onClick={handleSubmit}>
+        <Button className="flex-1 bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSubmit}>
           {isEdit ? '更新' : '登録'}
         </Button>
       </div>

@@ -90,7 +90,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
 
   return (
     <div className="p-6 space-y-4">
-      <h2 className="text-2xl font-bold">裁断生地一覧</h2>
+      <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
 
       <div className="flex flex-wrap gap-3 items-end">
         <div>
@@ -123,26 +123,26 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
             onChange={(e) => setClientFilter(e.target.value)}
           />
         </div>
-        <Button size="sm" onClick={handleSearch}>検索</Button>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
+        <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 
       <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 280px)', overflowY: 'auto' }}>
         <Table className="text-sm">
           <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow>
-              <TableHead>裁断日</TableHead>
-              <TableHead>生地品番</TableHead>
-              <TableHead>色番</TableHead>
-              <TableHead>品名</TableHead>
-              <TableHead className="text-right">数量</TableHead>
-              <TableHead>裁断報告書NO.</TableHead>
-              <TableHead>加工指示書NO.</TableHead>
-              <TableHead>受注先名</TableHead>
-              <TableHead>製品名</TableHead>
-              <TableHead className="text-right">総枚数</TableHead>
-              <TableHead className="text-right">用尺</TableHead>
-              <TableHead>担当者名</TableHead>
+            <TableRow className="bg-slate-50">
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断日</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色番</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断報告書NO.</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">加工指示書NO.</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">受注先名</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">製品名</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">総枚数</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">用尺</TableHead>
+              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者名</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

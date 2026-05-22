@@ -33,25 +33,27 @@ export default async function SerialNumbersPage() {
   }));
 
   return (
-    <div className="w-full mt-12">
-      <div className="max-w-lg mx-auto my-6 p-6 rounded-md bg-white shadow-md">
-        <h2 className="text-2xl font-bold mb-6">発注ナンバー</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>種類</TableHead>
-              <TableHead>伝票ナンバー</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {serialNumbers.map((sn) => (
-              <TableRow key={sn.id}>
-                <TableCell>{sn.name}</TableCell>
-                <TableCell className="font-mono">{formatSerialNumber(sn.serialNumber)}</TableCell>
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-lg mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">発注ナンバー</h2>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">種類</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">伝票ナンバー</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {serialNumbers.map((sn) => (
+                <TableRow key={sn.id}>
+                  <TableCell>{sn.name}</TableCell>
+                  <TableCell className="font-mono">{formatSerialNumber(sn.serialNumber)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

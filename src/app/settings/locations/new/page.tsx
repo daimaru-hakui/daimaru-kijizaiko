@@ -16,15 +16,17 @@ export default async function LocationNewPage() {
   const emptyLocation: Location = { id: "", name: "", order: nextOrder, comment: "" };
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="max-w-lg mx-auto my-6 p-6 rounded-md bg-white shadow-md">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">徳島保管場所登録</h2>
-          <Link href="/settings/locations">
-            <Button size="sm" variant="outline">戻る</Button>
-          </Link>
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">徳島保管場所登録</h2>
+            <Link href="/settings/locations">
+              <Button size="sm" variant="outline" className="border-slate-200 text-slate-600">戻る</Button>
+            </Link>
+          </div>
+          <LocationInputArea type="new" location={emptyLocation} />
         </div>
-        <LocationInputArea type="new" location={emptyLocation} />
       </div>
     </div>
   );

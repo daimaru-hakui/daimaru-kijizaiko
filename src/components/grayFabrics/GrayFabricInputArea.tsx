@@ -94,7 +94,7 @@ export function GrayFabricInputArea({ mode, grayFabric, suppliers, onSuccessActi
         <Textarea className="mt-1" {...register('comment')} />
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-blue-800 hover:bg-blue-900 text-white">
         {mode === 'new' ? '登録' : '更新'}
       </Button>
     </form>

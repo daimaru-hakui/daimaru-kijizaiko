@@ -50,7 +50,7 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
   return (
     <div>
       <div className="flex items-center gap-3 p-6">
-        <h2 className="text-2xl font-bold">処理済み</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">処理済み</h2>
         <Link href="/accounting-dept/orders">
           <Button variant="outline" size="sm">未処理</Button>
         </Link>
@@ -89,7 +89,7 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
           </select>
         </div>
         <div className="flex items-end gap-2">
-          <Button size="sm" onClick={handleSearch}>検索</Button>
+          <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
           <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
         </div>
       </div>
@@ -98,20 +98,20 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
         {filtered.length > 0 ? (
           <Table>
             <TableHeader className="sticky top-0 bg-white z-10">
-              <TableRow>
-                <TableHead>発注NO.</TableHead>
-                <TableHead>発注日</TableHead>
-                <TableHead>入荷日</TableHead>
-                <TableHead>担当者</TableHead>
-                <TableHead>品番</TableHead>
-                <TableHead>色</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead className="text-right">数量</TableHead>
-                <TableHead className="text-right">単価</TableHead>
-                <TableHead className="text-right">金額</TableHead>
-                <TableHead>出荷先</TableHead>
-                <TableHead>コメント</TableHead>
-                <TableHead>編集</TableHead>
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷日</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">金額</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

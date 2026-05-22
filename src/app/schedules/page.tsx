@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { SchedulesTable } from '@/components/schedules/SchedulesTable'
-import type { CuttingSchedule, Product } from '../../../types'
+import type { CuttingSchedule } from '../../../types'
 
 type UserOption = { id: string; name: string }
 type ProductOption = { id: string; productNumber: string; colorName: string }
@@ -49,15 +49,17 @@ export default async function SchedulesPage() {
   }))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="w-full max-w-5xl mx-auto my-6 bg-white rounded-md shadow-md overflow-hidden">
-        <SchedulesTable
-          schedules={schedules}
-          usersMap={usersMap}
-          salesUsers={salesUsers}
-          products={products}
-          productMap={productMap}
-        />
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <SchedulesTable
+            schedules={schedules}
+            usersMap={usersMap}
+            salesUsers={salesUsers}
+            products={products}
+            productMap={productMap}
+          />
+        </div>
       </div>
     </div>
   )

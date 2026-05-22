@@ -106,8 +106,8 @@ export function GrayFabricHistoryEditModal({ history, type }: Props) {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>閉じる</Button>
-              <Button type="submit" disabled={isSubmitting}>更新</Button>
+              <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={handleClose}>閉じる</Button>
+              <Button type="submit" disabled={isSubmitting} className="bg-blue-800 hover:bg-blue-900 text-white">更新</Button>
             </DialogFooter>
           </form>
         </DialogContent>

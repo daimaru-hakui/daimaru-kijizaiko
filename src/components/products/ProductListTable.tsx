@@ -31,9 +31,7 @@ export function ProductListTable({
   products,
   usersMap,
   suppliersMap,
-  userId,
   isAdmin,
-  isRD,
 }: Props) {
   const router = useRouter()
   const [searchNum, setSearchNum] = useState('')
@@ -94,7 +92,7 @@ export function ProductListTable({
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">生地一覧</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">生地一覧</h2>
         <Button size="sm" variant="outline" onClick={handleCsv}>CSV</Button>
       </div>
 
@@ -130,18 +128,18 @@ export function ProductListTable({
         {filtered.length > 0 ? (
           <Table className="text-sm">
             <TableHeader>
-              <TableRow>
-                <TableHead>品番</TableHead>
-                <TableHead>色</TableHead>
-                <TableHead>品名</TableHead>
-                <TableHead>仕入先</TableHead>
-                <TableHead className="text-right">単価</TableHead>
-                <TableHead className="text-right">仕掛</TableHead>
-                <TableHead className="text-right">外部</TableHead>
-                <TableHead className="text-right">入荷待</TableHead>
-                <TableHead className="text-right">徳島</TableHead>
-                <TableHead>詳細</TableHead>
-                {isAdmin && <TableHead>削除</TableHead>}
+              <TableRow className="bg-slate-50">
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">仕掛</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">外部</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">入荷待</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">徳島</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">詳細</TableHead>
+                {isAdmin && <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">削除</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -186,7 +184,7 @@ export function ProductListTable({
         <ProductDetailDialog
           product={detailProduct}
           open={Boolean(detailProduct)}
-          onClose={() => setDetailProduct(null)}
+          onCloseAction={() => setDetailProduct(null)}
           suppliersMap={suppliersMap}
           locationsMap={{}}
           grayFabricsMap={{}}

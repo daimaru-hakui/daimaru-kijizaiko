@@ -45,8 +45,9 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="w-full my-6 bg-white shadow-md rounded-md">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-7xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <TokushimaFabricPurchaseConfirmTable
           confirms={confirms}
           usersMap={usersMap}
@@ -56,6 +57,7 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
           startDay={startDay}
           endDay={endDay}
         />
+        </div>
       </div>
     </div>
   )

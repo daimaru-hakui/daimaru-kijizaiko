@@ -24,9 +24,11 @@ export default async function CuttingReportNewPage() {
     .map((d) => ({ id: d.id, name: (d.data().name ?? d.id) as string }))
 
   return (
-    <div className="w-full mt-12 px-6">
-      <div className="w-full max-w-3xl mx-auto my-6 p-6 bg-white shadow-md rounded-md">
-        <CuttingReportForm products={products} salesUsers={salesUsers} />
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+      <div className="max-w-3xl mx-auto pt-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <CuttingReportForm products={products} salesUsers={salesUsers} />
+        </div>
       </div>
     </div>
   )
