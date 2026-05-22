@@ -24,7 +24,7 @@ const pathRoleMatrix: Array<{ pattern: RegExp; rule: RouteRule }> = [
   { pattern: /^\/gray-fabrics/, rule: { authenticated: true } },
   { pattern: /^\/products/, rule: { authenticated: true } },
   { pattern: /^\/schedules/, rule: { authenticated: true } },
-  { pattern: /^\/serialnumbers/, rule: { authenticated: true } },
+  { pattern: /^\/serialnumbers/, rule: { roles: ['admin'] } },
   { pattern: /^\/adjustment/, rule: { authenticated: true } },
   { pattern: /^\/complete/, rule: { authenticated: true } },
 ]

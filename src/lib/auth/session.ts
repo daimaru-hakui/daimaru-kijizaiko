@@ -1,6 +1,6 @@
 import type { NextApiRequest } from 'next'
 import type { DecodedIdToken } from 'firebase-admin/auth'
-import { getAdminAuth } from '@/lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { cookies } from 'next/headers'
 
 export async function verifySession(req: NextApiRequest): Promise<DecodedIdToken | null> {
@@ -26,4 +26,12 @@ export async function verifyServerSession(): Promise<DecodedIdToken | null> {
   } catch {
     return null
   }
+}
+
+export async function verifyAdminSession(): Promise<DecodedIdToken | null> {
+  const token = await verifyServerSession()
+  if (!token) return null
+  const userDoc = await getAdminDb().collection('users').doc(token.uid).get()
+  if (!userDoc.exists || !userDoc.data()?.admin) return null
+  return token
 }
