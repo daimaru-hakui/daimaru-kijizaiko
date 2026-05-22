@@ -1,7 +1,7 @@
 import { collection, endAt, getDocs, onSnapshot, orderBy, query, startAt, where } from 'firebase/firestore';
 import { db } from "@/lib/firebase/client";
 import { CuttingReportType } from '../../types';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 export const useQueryCuttingReports = (startDay:string, endDay:string) => {
    

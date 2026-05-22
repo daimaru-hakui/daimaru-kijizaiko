@@ -13,7 +13,7 @@ import { useAuthStore } from "../../store";
 import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const fetcher = (url: string) =>
   axios

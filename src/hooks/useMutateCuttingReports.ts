@@ -6,7 +6,7 @@ import { useAuthStore, useLoadingStore } from '../../store';
 import { useGetDisp } from './UseGetDisp';
 import { CuttingProductType, CuttingReportType } from '../../types';
 import { mutate } from 'swr';
-import { Mutation, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useMutateCuttingReports = () => {
   const router = useRouter();
