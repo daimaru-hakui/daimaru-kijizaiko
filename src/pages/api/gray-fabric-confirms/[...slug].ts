@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "../../../../firebase/sever";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { History } from "../../../../types";
 
 type Data = {
@@ -10,6 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data | string>
 ) {
+  const db = getAdminDb()
   if (req.query.API_KEY !== process.env.BACKEND_API_KEY)
     return res.status(405).json("error");
   if (req.method === "GET") {

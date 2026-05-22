@@ -2,7 +2,7 @@ import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { History } from "../../../types";
 import { AccountingConfirmTable } from "../../components/accounting/AccountingConfirmTable";
 import { AccountingOrderTable } from "../../components/accounting/AccountingOrderTable";

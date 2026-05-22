@@ -3,7 +3,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { Location } from "../../../../types";
 import { useSettingStore } from "../../../../store";
 import { LocationInputArea } from "../../../components/settings/locations/LocationInputArea";

@@ -1,7 +1,7 @@
 import React from 'react'
 import { EditedHistory, History } from '../../types';
 import { collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from "@/lib/firebase/client";
 import { useAuthStore, useLoadingStore } from '../../store';
 import { useRouter } from 'next/router';
 import { useUtil } from './UseUtil';

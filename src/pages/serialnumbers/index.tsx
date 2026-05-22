@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useGetDisp } from "../../hooks/UseGetDisp";
 import { NextPage } from "next";
 

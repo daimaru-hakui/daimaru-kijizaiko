@@ -15,7 +15,7 @@ import {
 import React, { useState, useEffect, FC } from "react";
 import { Location } from "../../../../types";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type Props = {

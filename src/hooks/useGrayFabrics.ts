@@ -1,6 +1,6 @@
 import { GrayFabric, GrayFabricHistory } from '../../types';
 import { addDoc, collection, deleteDoc, doc, runTransaction, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from "@/lib/firebase/client";
 import { useAuthStore, useLoadingStore } from '../../store';
 import { useUtil } from './UseUtil';
 import { useSWRGrayFavricConfirms } from './swr/useSWRGrayFavricConfirms';

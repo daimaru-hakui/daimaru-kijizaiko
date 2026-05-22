@@ -5,10 +5,10 @@ const mockGet = vi.fn()
 const mockWhere = vi.fn()
 const mockCollection = vi.fn()
 
-vi.mock('../../firebase/sever', () => ({
-  db: {
+vi.mock('@/lib/firebase/admin', () => ({
+  getAdminDb: vi.fn(() => ({
     collection: mockCollection,
-  },
+  })),
 }))
 
 // モック req/res を生成するヘルパー

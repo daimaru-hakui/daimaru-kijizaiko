@@ -19,7 +19,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { User } from "../../../../types";
 import { AuthEditModal } from "../../../components/settings/auth/AuthEditModal";
 import { NextPage } from "next";

@@ -5,7 +5,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { db } from "../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useAuthStore, useLoadingStore } from "../../store";
 import { Product, History } from "../../types";
 import { useGetDisp } from "./UseGetDisp";

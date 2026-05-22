@@ -3,7 +3,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { Supplier } from "../../../../types";
 import { SupplierInputArea } from "../../../components/settings/suppliers/SupplierInputArea";
 import { NextPage } from "next";

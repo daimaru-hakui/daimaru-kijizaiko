@@ -13,7 +13,7 @@ import { FC } from "react";
 import { MdOutlineSettings } from "react-icons/md";
 import Link from "next/link";
 import { useAuthStore } from "../../store";
-import { auth } from "../../firebase";
+import { auth } from "@/lib/firebase/client";
 import { MenuDrawerButton } from "./MenuDrawerButton";
 
 export const Header: FC = () => {

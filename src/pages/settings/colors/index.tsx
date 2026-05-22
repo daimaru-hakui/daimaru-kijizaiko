@@ -21,7 +21,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { NextPage } from "next";
 
 const Colors: NextPage = () => {

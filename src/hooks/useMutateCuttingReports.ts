@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react'
-import { db } from '../../firebase';
+import { db } from "@/lib/firebase/client";
 import { useRouter } from 'next/router';
 import { useAuthStore, useLoadingStore } from '../../store';
 import { useGetDisp } from './UseGetDisp';

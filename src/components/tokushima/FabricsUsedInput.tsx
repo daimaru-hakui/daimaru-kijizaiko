@@ -17,7 +17,7 @@ import { FaWindowClose } from "react-icons/fa";
 import { useEffect, useState, FC } from "react";
 import { useAuthStore, useProductsStore } from "../../../store";
 import { Product, CuttingProductType, CuttingReportType } from "../../../types";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { useCuttingReportFunc } from "../../hooks/UseCuttingReportFunc";
 import { useUtil } from "../../hooks/UseUtil";

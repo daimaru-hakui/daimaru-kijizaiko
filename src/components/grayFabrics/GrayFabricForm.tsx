@@ -12,7 +12,7 @@ import { useEffect, useState, FC } from "react";
 import { useSettingStore } from "../../../store";
 import { GrayFabric } from "../../../types";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useForm } from "react-hook-form";
 import { useGrayFabrics } from "../../hooks/useGrayFabrics";
 

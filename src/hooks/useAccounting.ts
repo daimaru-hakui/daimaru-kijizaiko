@@ -1,5 +1,5 @@
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from "@/lib/firebase/client";
 import { History } from '../../types';
 import { useAuthStore } from '../../store';
 import { useSWRPurchaseConfirms } from './swr/useSWRPurchaseConfirms';

@@ -5,7 +5,7 @@ import {
   runTransaction,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "@/lib/firebase/client";
 import { v4 as uuidv4 } from "uuid";
 
 type Inputs = {

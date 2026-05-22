@@ -16,7 +16,7 @@ import { useGetDisp } from "../../hooks/UseGetDisp";
 import { useUtil } from "../../hooks/UseUtil";
 import { useAuthManagement } from "../../hooks/UseAuthManagement";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useAuthStore, useLoadingStore } from "../../../store";
 import { Product } from "../../../types";
 

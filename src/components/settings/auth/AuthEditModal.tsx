@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState, FC } from "react";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 
 type Props = {
   uid: string;

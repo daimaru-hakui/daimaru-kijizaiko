@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useSettingStore } from "../../../../store";
 import { FaTrashAlt } from "react-icons/fa";
 import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { CommentModal } from "../../../components/CommentModal";
 import { EditModal } from "../../../components/settings/suppliers/EditModal";
 import { NextPage } from "next";

@@ -2,7 +2,7 @@ import { Box, Button, Container, Flex, Input, Stack } from "@chakra-ui/react";
 import { FaLock } from "react-icons/fa";
 import { useLoadingStore } from "../../store";
 import { NextPage } from "next";
-import { auth } from "../../firebase/index";
+import { auth } from "@/lib/firebase/client";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
 

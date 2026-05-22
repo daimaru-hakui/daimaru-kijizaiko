@@ -18,7 +18,7 @@ import {
 import { useState, useEffect, FC } from "react";
 import useSWR from "swr";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useLoadingStore } from "../../../store";
 import { FaEdit } from "react-icons/fa";
 

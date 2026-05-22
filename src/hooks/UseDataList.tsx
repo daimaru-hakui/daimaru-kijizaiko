@@ -9,7 +9,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "@/lib/firebase/client";
 import {
   useAuthStore,
   useCuttingScheduleStore,

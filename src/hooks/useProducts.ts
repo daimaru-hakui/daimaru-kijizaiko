@@ -7,7 +7,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { db } from "../../firebase";
+import { db } from "@/lib/firebase/client";
 import { useAuthStore, useLoadingStore, useProductsStore } from "../../store";
 import { Materials, Product } from "../../types";
 import { useGetDisp } from "./UseGetDisp";

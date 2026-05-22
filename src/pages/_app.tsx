@@ -10,7 +10,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "../../store";
-import { auth } from "../../firebase";
+import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDataList } from "../hooks/UseDataList";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";

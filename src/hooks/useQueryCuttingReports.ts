@@ -1,5 +1,5 @@
 import { collection, endAt, getDocs, onSnapshot, orderBy, query, startAt, where } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from "@/lib/firebase/client";
 import { CuttingReportType } from '../../types';
 import { useQuery } from 'react-query';
 

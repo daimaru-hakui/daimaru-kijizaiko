@@ -12,7 +12,7 @@ import {
 import { FC } from "react";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
-import { db } from "../../../../firebase";
+import { db } from "@/lib/firebase/client";
 import { Location } from "../../../../types";
 import { LocationInputArea } from "./LocationInputArea";
 import { useAuthStore } from "../../../../store";
