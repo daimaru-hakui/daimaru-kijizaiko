@@ -11,19 +11,25 @@ import {
   addProductAction,
   updateProductAction,
   deleteProductAction,
+  getProductsAction,
 } from './actions'
 
 const mockSet = vi.fn()
 const mockUpdate = vi.fn()
 const mockGet = vi.fn()
+const mockCollectionGet = vi.fn()
 
 const makeMockDb = () => ({
-  collection: (name: string) => ({
+  collection: (_name: string) => ({
     doc: (id?: string) => ({
       id: id || 'auto-id',
       get: mockGet,
       set: mockSet,
       update: mockUpdate,
+    }),
+    get: mockCollectionGet,
+    where: (_field: string, _op: string, _val: any) => ({
+      get: mockCollectionGet,
     }),
   }),
 })
@@ -32,6 +38,58 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
+})
+
+// ----------------------------------------------------------------
+// getProductsAction (B2)
+// ----------------------------------------------------------------
+describe('getProductsAction', () => {
+  it('未認証の場合は { ok: false } を返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue(null)
+    const result = await getProductsAction()
+    expect(result).toEqual({ ok: false, error: '認証が必要です' })
+  })
+
+  it('deletedAt が truthy な商品は除外される', async () => {
+    mockCollectionGet.mockResolvedValueOnce({
+      docs: [
+        { id: 'p1', data: () => ({ productNumber: 'A', deletedAt: '', createdAt: null, updatedAt: null }) },
+        { id: 'p2', data: () => ({ productNumber: 'B', deletedAt: '2026-01-01', createdAt: null, updatedAt: null }) },
+        { id: 'p3', data: () => ({ productNumber: 'C', createdAt: null, updatedAt: null }) },
+      ],
+    })
+    const result = await getProductsAction()
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.contents).toHaveLength(2)
+    expect(result.contents.map((c) => c.id)).toEqual(['p1', 'p3'])
+  })
+
+  it('ドキュメントに循環参照フィールドがあっても JSON.stringify-able な結果を返す', async () => {
+    const circularStore: Record<string, unknown> = {}
+    const ref = { path: 'suppliers/sup1', id: 'sup1', firestore: circularStore }
+    circularStore.ref = ref
+
+    mockCollectionGet.mockResolvedValueOnce({
+      docs: [
+        {
+          id: 'p1',
+          data: () => ({
+            productNumber: 'M2000-G1',
+            deletedAt: '',
+            supplierRef: ref, // 循環参照フィールド
+            createdAt: null,
+            updatedAt: null,
+          }),
+        },
+      ],
+    })
+    const result = await getProductsAction()
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(() => JSON.stringify(result.contents)).not.toThrow()
+    expect(typeof result.contents[0].id).toBe('string')
+  })
 })
 
 // ----------------------------------------------------------------
@@ -89,6 +147,15 @@ describe('addProductAction', () => {
     expect(setData.supplierName).toBe('仕入先A')
     expect(setData.wip).toBe(0)
     expect(setData.arrivingQuantity).toBe(0)
+  })
+
+  // B2: 新規商品に deletedAt: '' が設定される
+  it('新規商品に deletedAt が空文字で設定される', async () => {
+    mockGet.mockResolvedValueOnce({ exists: true, data: () => ({ name: '仕入先A' }) })
+    mockSet.mockResolvedValueOnce(undefined)
+    await addProductAction(base)
+    const setData = mockSet.mock.calls[0][0]
+    expect(setData.deletedAt).toBe('')
   })
 
   it('colorNum が空の場合 productNumber は productNum のみ', async () => {

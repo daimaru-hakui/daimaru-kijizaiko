@@ -12,6 +12,7 @@ import {
   updateFabricPurchaseOrderAction,
   deleteFabricPurchaseOrderAction,
   updateFabricPurchaseConfirmAction,
+  getFabricPurchaseConfirmsByDateAction,
 } from './actions'
 
 const mockTransactionGet = vi.fn()
@@ -251,5 +252,64 @@ describe('updateFabricPurchaseConfirmAction', () => {
     const result = await updateFabricPurchaseConfirmAction(base)
     expect(result).toEqual({ ok: true })
     expect(mockRunTransaction).toHaveBeenCalledOnce()
+  })
+})
+
+// ----------------------------------------------------------------
+// getFabricPurchaseConfirmsByDateAction
+// ----------------------------------------------------------------
+describe("getFabricPurchaseConfirmsByDateAction", () => {
+  it("未認証の場合は { ok: false } を返す", async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue(null)
+    const result = await getFabricPurchaseConfirmsByDateAction("2026-01-01", "2026-12-31")
+    expect(result).toEqual({ ok: false, error: "認証が必要です" })
+  })
+
+  it("ドキュメントに循環参照フィールドがあっても JSON.stringify-able な結果を返す", async () => {
+    const circularStore: Record<string, unknown> = {}
+    const ref = { path: "products/p1", id: "p1", firestore: circularStore }
+    circularStore.ref = ref
+
+    const mockDoc = {
+      id: "confirm1",
+      data: () => ({
+        serialNumber: 1,
+        orderType: "purchase",
+        grayFabricId: "",
+        productId: "p1",
+        productNumber: "M2000-G1",
+        productName: "test",
+        colorName: "白",
+        supplierId: "sup1",
+        supplierName: "仕入先A",
+        price: 1500,
+        quantity: 50,
+        stockPlace: "徳島工場",
+        comment: "",
+        orderedAt: "2026-01-01",
+        fixedAt: "2026-02-01",
+        createUser: "user1",
+        updateUser: "user1",
+        accounting: false,
+        productRef: ref, // 循環参照フィールド
+        createdAt: { seconds: 1000, nanoseconds: 0 },
+        updatedAt: { seconds: 1001, nanoseconds: 0 },
+      }),
+    }
+    vi.mocked(getAdminDb).mockReturnValueOnce({
+      collection: () => ({
+        orderBy: () => ({
+          startAt: () => ({
+            endAt: () => ({ get: vi.fn().mockResolvedValue({ docs: [mockDoc] }) }),
+          }),
+        }),
+      }),
+    } as any)
+
+    const result = await getFabricPurchaseConfirmsByDateAction("2026-01-01", "2026-12-31")
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(() => JSON.stringify(result.contents)).not.toThrow()
+    expect(typeof result.contents[0].productId).toBe("string")
   })
 })

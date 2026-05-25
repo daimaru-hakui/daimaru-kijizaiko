@@ -4,8 +4,34 @@ import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
+import { mathRound2nd } from '@/lib/utils'
+import { toPlainData } from '@/lib/firestore/serialize'
+import type { CuttingReportType } from '../../../../types'
 
 type ActionResult = { ok: true } | { ok: false; error: string }
+
+export async function getCuttingReportsByDateAction(
+  startDay: string,
+  endDay: string,
+): Promise<{ ok: true; contents: CuttingReportType[] } | { ok: false; error: string }> {
+  const user = await verifyServerSession()
+  if (!user) return { ok: false, error: '認証が必要です' }
+
+  const db = getAdminDb()
+  const snap = await db
+    .collection('cuttingReports')
+    .orderBy('cuttingDate')
+    .startAt(startDay)
+    .endAt(endDay)
+    .get()
+  const contents = snap.docs
+    .map((doc) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = doc.data()
+      return { ...toPlainData(data) as object, id: doc.id } as CuttingReportType
+    })
+    .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
+  return { ok: true, contents }
+}
 
 async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
   const user = await verifyServerSession()
@@ -37,21 +63,30 @@ export async function addCuttingReportAction(
 
   try {
     await db.runTransaction(async (tx) => {
+      // step1: net集計 Map を作る（同一 productId の重複対応）
+      const delta = new Map<string, number>()
+      for (const p of data.products) {
+        delta.set(p.productId, (delta.get(p.productId) ?? 0) + p.quantity)
+      }
+
+      // step2: 全read
       const serialSnap = await tx.get(serialNumberRef)
       const currentSerial: number = serialSnap.data()?.serialNumber ?? 0
       const newSerial = currentSerial + 1
 
-      tx.update(serialNumberRef, { serialNumber: newSerial })
-
-      for (const product of data.products) {
-        const productRef = db.collection('products').doc(product.productId)
-        const productSnap = await tx.get(productRef)
-        const currentStock: number = productSnap.data()?.tokushimaStock ?? 0
-        tx.update(productRef, {
-          tokushimaStock: currentStock - product.quantity,
-        })
+      const stockByProduct: Record<string, number> = {}
+      for (const [productId] of delta) {
+        const ref = db.collection('products').doc(productId)
+        const snap = await tx.get(ref)
+        stockByProduct[productId] = snap.data()?.tokushimaStock ?? 0
       }
 
+      // step3: 全write
+      tx.update(serialNumberRef, { serialNumber: newSerial })
+      for (const [productId, qty] of delta) {
+        const ref = db.collection('products').doc(productId)
+        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] - qty) })
+      }
       tx.set(reportRef, {
         staff: data.staff,
         processNumber: data.processNumber,
@@ -105,30 +140,33 @@ export async function updateCuttingReportAction(
 
   try {
     await db.runTransaction(async (tx) => {
+      // step1: report を read して旧 products を取得
       const reportSnap = await tx.get(reportRef)
       const oldProducts: { productId: string; quantity: number }[] =
         reportSnap.data()?.products ?? []
 
-      // 旧在庫を戻す
-      for (const oldProduct of oldProducts) {
-        const productRef = db.collection('products').doc(oldProduct.productId)
-        const productSnap = await tx.get(productRef)
-        const currentStock: number = productSnap.data()?.tokushimaStock ?? 0
-        tx.update(productRef, {
-          tokushimaStock: currentStock + oldProduct.quantity,
-        })
+      // step2: net delta を集計（旧: 在庫を戻す方向、新: 減算する方向）
+      const delta = new Map<string, number>()
+      for (const op of oldProducts) {
+        delta.set(op.productId, (delta.get(op.productId) ?? 0) + op.quantity)
+      }
+      for (const np of data.products) {
+        delta.set(np.productId, (delta.get(np.productId) ?? 0) - np.quantity)
       }
 
-      // 新在庫を減算
-      for (const newProduct of data.products) {
-        const productRef = db.collection('products').doc(newProduct.productId)
-        const productSnap = await tx.get(productRef)
-        const currentStock: number = productSnap.data()?.tokushimaStock ?? 0
-        tx.update(productRef, {
-          tokushimaStock: currentStock - newProduct.quantity,
-        })
+      // step3: 全 product を read
+      const stockByProduct: Record<string, number> = {}
+      for (const [productId] of delta) {
+        const ref = db.collection('products').doc(productId)
+        const snap = await tx.get(ref)
+        stockByProduct[productId] = snap.data()?.tokushimaStock ?? 0
       }
 
+      // step4: 全 write
+      for (const [productId, deltaQty] of delta) {
+        const ref = db.collection('products').doc(productId)
+        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] + deltaQty) })
+      }
       tx.update(reportRef, {
         staff: data.staff,
         processNumber: data.processNumber,
@@ -143,6 +181,7 @@ export async function updateCuttingReportAction(
           productId: p.productId,
           quantity: Number(p.quantity),
         })),
+        updateUser: auth.uid,
         updatedAt: FieldValue.serverTimestamp(),
       })
     })
@@ -160,7 +199,42 @@ export async function deleteCuttingReportAction(id: string): Promise<ActionResul
   if ('ok' in auth) return auth
 
   const db = getAdminDb()
-  await db.collection('cuttingReports').doc(id).delete()
+  const reportRef = db.collection('cuttingReports').doc(id)
+
+  try {
+    await db.runTransaction(async (tx) => {
+      // step1: report を read
+      const reportSnap = await tx.get(reportRef)
+      if (!reportSnap.exists) throw new Error('レポートが見つかりません')
+
+      const products: { productId: string; quantity: number }[] =
+        reportSnap.data()?.products ?? []
+
+      // step2: net集計（同一 productId の重複対応）
+      const delta = new Map<string, number>()
+      for (const p of products) {
+        delta.set(p.productId, (delta.get(p.productId) ?? 0) + p.quantity)
+      }
+
+      // step3: 全 product を read
+      const stockByProduct: Record<string, number> = {}
+      for (const [productId] of delta) {
+        const ref = db.collection('products').doc(productId)
+        const snap = await tx.get(ref)
+        stockByProduct[productId] = snap.data()?.tokushimaStock ?? 0
+      }
+
+      // step4: 全 write（在庫を戻す）
+      for (const [productId, qty] of delta) {
+        const ref = db.collection('products').doc(productId)
+        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] + qty) })
+      }
+      tx.delete(reportRef)
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : '削除に失敗しました'
+    return { ok: false, error: msg }
+  }
 
   revalidatePath('/tokushima/cutting-reports')
   return { ok: true }

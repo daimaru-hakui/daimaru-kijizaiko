@@ -3,16 +3,35 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
+import { ensureAuth } from '@/lib/actions'
+import { toPlainData } from '@/lib/firestore/serialize'
+import type { ActionResult } from '@/lib/actions'
+import type { History } from '../../../../types'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+export async function getFabricPurchaseConfirmsByDateAction(
+  startDay: string,
+  endDay: string,
+): Promise<{ ok: true; contents: Omit<History, 'createdAt' | 'updatedAt'>[] } | { ok: false; error: string }> {
+  const auth = await ensureAuth()
+  if (!auth.ok) return auth
 
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
+  const db = getAdminDb()
+  const snap = await db
+    .collection('fabricPurchaseConfirms')
+    .orderBy('fixedAt')
+    .startAt(startDay)
+    .endAt(endDay)
+    .get()
+  const contents = snap.docs
+    .map((doc) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = doc.data()
+      return { ...toPlainData(data) as object, id: doc.id } as Omit<History, 'createdAt' | 'updatedAt'>
+    })
+    .filter((doc) => doc.quantity > 0)
+    .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
+  return { ok: true, contents }
 }
 
 export type OrderFabricPurchaseInput = {
@@ -36,7 +55,7 @@ export async function orderFabricPurchaseAction(
   data: OrderFabricPurchaseInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const serialNumberRef = db.collection('serialNumbers').doc('fabricPurchaseOrderNumbers')
@@ -122,7 +141,7 @@ export async function confirmFabricPurchaseAction(
   data: ConfirmFabricPurchaseInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -209,7 +228,7 @@ export async function updateFabricPurchaseOrderAction(
   data: UpdateFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -265,7 +284,7 @@ export async function deleteFabricPurchaseOrderAction(
   data: DeleteFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -314,7 +333,7 @@ export async function updateFabricPurchaseConfirmAction(
   data: UpdateFabricPurchaseConfirmInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)

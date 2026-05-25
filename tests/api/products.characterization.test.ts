@@ -1,5 +1,4 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import type { NextApiRequest, NextApiResponse } from 'next'
 
 const mockGet = vi.fn()
 const mockWhere = vi.fn()
@@ -7,51 +6,39 @@ const mockCollection = vi.fn()
 
 vi.mock('@/lib/firebase/admin', () => ({
   getAdminDb: vi.fn(() => ({ collection: mockCollection })),
-  getAdminAuth: vi.fn(() => ({ verifySessionCookie: vi.fn() })),
 }))
 
 const mockVerifySession = vi.fn()
 vi.mock('@/lib/auth/session', () => ({
-  verifySession: mockVerifySession,
+  verifyServerSession: mockVerifySession,
 }))
 
-function createMocks(overrides?: Partial<NextApiRequest>) {
-  const res = {
-    status: vi.fn().mockReturnThis(),
-    json: vi.fn().mockReturnThis(),
-  } as unknown as NextApiResponse
-  const req = {
-    method: 'GET',
-    query: {},
-    cookies: {},
-    ...overrides,
-  } as unknown as NextApiRequest
-  return { req, res }
-}
-
-describe('GET /api/products (Phase 3: session auth)', () => {
+describe('getProductsAction', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockWhere.mockReturnThis()
-    mockGet.mockResolvedValue({ docs: [] })
-    mockCollection.mockReturnValue({ where: mockWhere, get: mockGet })
+    vi.resetModules()
+    // B2修正後: where 句なし。collection().get() を直接呼ぶ
+    mockCollection.mockReturnValue({ get: mockGet, where: mockWhere })
     mockWhere.mockReturnValue({ get: mockGet })
   })
 
-  it('有効な __session で 200 と空 contents を返す', async () => {
+  it('認証済みユーザーに products を返す', async () => {
     mockVerifySession.mockResolvedValue({ uid: 'user-123' })
-    const { req, res } = createMocks({ cookies: { __session: 'valid' } })
-    const { default: handler } = await import('../../src/pages/api/products/index')
-    await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(200)
-    expect(res.json).toHaveBeenCalledWith({ contents: [] })
+    mockGet.mockResolvedValue({
+      docs: [{ data: () => ({ productNumber: 'P001', deletedAt: '', createdAt: null, updatedAt: null }), id: 'prod-1' }],
+    })
+    const { getProductsAction } = await import('@/app/products/actions')
+    const result = await getProductsAction()
+    expect(result).toEqual({
+      ok: true,
+      contents: [{ productNumber: 'P001', deletedAt: '', id: 'prod-1', createdAt: null, updatedAt: null }],
+    })
   })
 
-  it('Phase 3: 認証なしアクセスは 401 を返す', async () => {
+  it('未認証のとき ok: false を返す', async () => {
     mockVerifySession.mockResolvedValue(null)
-    const { req, res } = createMocks({ query: {} })
-    const { default: handler } = await import('../../src/pages/api/products/index')
-    await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(401)
+    const { getProductsAction } = await import('@/app/products/actions')
+    const result = await getProductsAction()
+    expect(result).toEqual({ ok: false, error: '認証が必要です' })
   })
 })

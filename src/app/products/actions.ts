@@ -3,15 +3,33 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
 import { getTodayDate } from '@/lib/dates'
+import { ensureAuth } from '@/lib/actions'
+import { toPlainData } from '@/lib/firestore/serialize'
+import type { ActionResult } from '@/lib/actions'
+import type { Product } from '../../../types'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+export async function getProductsAction(): Promise<
+  { ok: true; contents: Product[] } | { ok: false; error: string }
+> {
+  const auth = await ensureAuth()
+  if (!auth.ok) return auth
 
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
+  const db = getAdminDb()
+  // B2修正: where 句を外し JS 側で !deletedAt フィルタ（欠落/''/null を統一処理）
+  const snap = await db.collection('products').get()
+  const contents = snap.docs
+    .filter((doc) => !doc.data().deletedAt)
+    .map((doc) => {
+      const data = doc.data()
+      return {
+        ...toPlainData(data) as object,
+        id: doc.id,
+        createdAt: data.createdAt?.toDate?.() ?? null,
+        updatedAt: data.updatedAt?.toDate?.() ?? null,
+      } as Product
+    })
+  return { ok: true, contents }
 }
 
 export type AddProductInput = {
@@ -42,11 +60,10 @@ export type AddProductInput = {
 
 export async function addProductAction(data: AddProductInput): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
 
-  // 仕入先名を取得
   const supplierSnap = await db.collection('suppliers').doc(data.supplierId).get()
   if (!supplierSnap.exists) return { ok: false, error: '仕入先が見つかりません' }
   const supplierName: string = supplierSnap.data()?.name ?? ''
@@ -88,6 +105,7 @@ export async function addProductAction(data: AddProductInput): Promise<ActionRes
       arrivingQuantity: 0,
       tokushimaStock: Number(data.tokushimaStock) || 0,
       locations: data.locations ?? [],
+      deletedAt: '',
       createUser: auth.uid,
       updateUser: auth.uid,
       createdAt: FieldValue.serverTimestamp(),
@@ -110,7 +128,7 @@ export type UpdateProductInput = AddProductInput & {
 
 export async function updateProductAction(data: UpdateProductInput): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
 
@@ -167,7 +185,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<Act
 
 export async function deleteProductAction(productId: string): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   try {
