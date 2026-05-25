@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { CuttingReportForm } from '@/components/tokushima/CuttingReportForm'
-import type { Product } from '../../../../../types'
+import type { SerializableProduct } from '../../../../../types'
 
 export default async function CuttingReportNewPage() {
   const user = await verifyServerSession()
@@ -14,10 +14,10 @@ export default async function CuttingReportNewPage() {
     db.collection('users').get(),
   ])
 
-  const products = productsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Product, 'id'>),
-    id: d.id,
-  }))
+  const products = productsSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    return { ...data, id: d.id } as unknown as SerializableProduct
+  })
 
   const salesUsers = usersSnap.docs
     .filter((d) => d.data().sales === true)

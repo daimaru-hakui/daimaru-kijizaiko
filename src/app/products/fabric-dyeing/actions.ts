@@ -3,16 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
 import { getTodayDate } from '@/lib/dates'
-
-type ActionResult = { ok: true } | { ok: false; error: string }
-
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
-}
+import { mathRound2nd } from '@/lib/utils'
+import { ensureAuth } from '@/lib/actions'
+import type { ActionResult } from '@/lib/actions'
 
 export type OrderFabricDyeingInput = {
   productId: string
@@ -35,7 +29,7 @@ export async function orderFabricDyeingFromStockAction(
   data: OrderFabricDyeingInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const serialNumberRef = db.collection('serialNumbers').doc('fabricDyeingOrderNumbers')
@@ -93,7 +87,7 @@ export async function orderFabricDyeingFromRanningAction(
   data: OrderFabricDyeingInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const serialNumberRef = db.collection('serialNumbers').doc('fabricDyeingOrderNumbers')
@@ -166,7 +160,7 @@ export async function confirmFabricDyeingAction(
   data: ConfirmFabricDyeingInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -180,9 +174,10 @@ export async function confirmFabricDyeingAction(
       const wip: number = productSnap.data()?.wip ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
+      // B12: mathRound2nd で purchase 側と一致させる
       tx.update(productRef, {
-        wip: wip - data.quantity + data.remainingOrder,
-        externalStock: externalStock + data.quantity,
+        wip: mathRound2nd(wip - data.quantity + data.remainingOrder),
+        externalStock: mathRound2nd(externalStock + data.quantity),
       })
 
       tx.update(orderRef, {
@@ -194,6 +189,7 @@ export async function confirmFabricDyeingAction(
         updatedAt: FieldValue.serverTimestamp(),
       })
 
+      // B10: updateUser を追加（purchase 側と対称）
       tx.set(confirmRef, {
         serialNumber: data.serialNumber,
         orderType: data.orderType,
@@ -210,6 +206,7 @@ export async function confirmFabricDyeingAction(
         orderedAt: data.orderedAt || getTodayDate(),
         fixedAt: data.fixedAt || getTodayDate(),
         createUser: auth.uid,
+        updateUser: auth.uid,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       })
@@ -241,7 +238,7 @@ export async function updateFabricDyeingOrderAction(
   data: UpdateFabricDyeingOrderInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -250,20 +247,18 @@ export async function updateFabricDyeingOrderAction(
 
   try {
     await db.runTransaction(async (tx) => {
+      // B9修正: 全 read を全 write より前に実行
+      const productSnap = await tx.get(productRef)
+      const wip: number = productSnap.data()?.wip ?? 0
+
       if (data.stockType === 'stock' && data.grayFabricId) {
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
         tx.update(grayFabricRef, { stock: stock + diff })
-
-        const productSnap = await tx.get(productRef)
-        const wip: number = productSnap.data()?.wip ?? 0
-        tx.update(productRef, { wip: wip - diff })
-      } else {
-        const productSnap = await tx.get(productRef)
-        const wip: number = productSnap.data()?.wip ?? 0
-        tx.update(productRef, { wip: wip - diff })
       }
+
+      tx.update(productRef, { wip: wip - diff })
 
       tx.update(orderRef, {
         quantity: data.quantity,
@@ -296,7 +291,7 @@ export async function deleteFabricDyeingOrderAction(
   data: DeleteFabricDyeingOrderInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -304,21 +299,18 @@ export async function deleteFabricDyeingOrderAction(
 
   try {
     await db.runTransaction(async (tx) => {
+      // B9修正: 全 read を全 write より前に実行
+      const productSnap = await tx.get(productRef)
+      const wip: number = productSnap.data()?.wip ?? 0
+
       if (data.stockType === 'stock' && data.grayFabricId) {
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
         tx.update(grayFabricRef, { stock: stock + data.quantity })
-
-        const productSnap = await tx.get(productRef)
-        const wip: number = productSnap.data()?.wip ?? 0
-        tx.update(productRef, { wip: wip - data.quantity })
-      } else {
-        const productSnap = await tx.get(productRef)
-        const wip: number = productSnap.data()?.wip ?? 0
-        tx.update(productRef, { wip: wip - data.quantity })
       }
 
+      tx.update(productRef, { wip: wip - data.quantity })
       tx.delete(orderRef)
     })
   } catch (e) {
@@ -344,7 +336,7 @@ export async function updateFabricDyeingConfirmAction(
   data: UpdateFabricDyeingConfirmInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)

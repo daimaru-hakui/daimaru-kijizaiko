@@ -5,7 +5,7 @@ import { FaWindowClose } from 'react-icons/fa'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockEditDialog } from './StockEditDialog'
 import { halfToFullChar } from '@/lib/utils'
-import type { Product, CuttingProductType } from '../../../types'
+import type { SerializableProduct, CuttingProductType } from '../../../types'
 
 const CATEGORIES = ['表地', '裏地', '芯地', '配色', 'その他']
 
@@ -13,7 +13,7 @@ type Props = {
   item: CuttingProductType
   rowIndex: number
   setItemsAction: React.Dispatch<React.SetStateAction<CuttingProductType[]>>
-  products: Product[]
+  products: SerializableProduct[]
   totalQuantity: number
   isEdit: boolean
 }

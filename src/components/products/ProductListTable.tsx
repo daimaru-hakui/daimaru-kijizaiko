@@ -19,7 +19,7 @@ import { ProductDetailDialog } from './ProductDetailDialog'
 import type { Product } from '../../../types'
 
 type Props = {
-  products: Product[]
+  products: Omit<Product, 'createdAt' | 'updatedAt'>[]
   usersMap: Record<string, string>
   suppliersMap: Record<string, string>
   userId: string
@@ -37,7 +37,7 @@ export function ProductListTable({
   const [searchNum, setSearchNum] = useState('')
   const [searchColor, setSearchColor] = useState('')
   const [searchName, setSearchName] = useState('')
-  const [detailProduct, setDetailProduct] = useState<Product | null>(null)
+  const [detailProduct, setDetailProduct] = useState<Omit<Product, 'createdAt' | 'updatedAt'> | null>(null)
 
   const filtered = useMemo(() => {
     const num = halfToFullChar(searchNum.toUpperCase())
@@ -49,7 +49,7 @@ export function ProductListTable({
     )
   }, [products, searchNum, searchColor, searchName])
 
-  const handleDelete = async (product: Product) => {
+  const handleDelete = async (product: Omit<Product, 'createdAt' | 'updatedAt'>) => {
     if (!window.confirm(`${product.productNumber} を削除しますか？`)) return
     const result = await deleteProductAction(product.id)
     if (result.ok) {

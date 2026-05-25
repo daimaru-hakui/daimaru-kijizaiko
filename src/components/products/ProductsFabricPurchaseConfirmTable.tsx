@@ -23,10 +23,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricPurchaseConfirmAction } from '@/app/products/fabric-purchase/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  confirms: History[]
+  confirms: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
   isTokushima: boolean
@@ -44,7 +44,7 @@ function EditConfirmDialog({
   open,
   onClose,
 }: {
-  history: History
+  history: SerializableHistory
   open: boolean
   onClose: () => void
 }) {
@@ -125,7 +125,7 @@ export function ProductsFabricPurchaseConfirmTable({
   const [start, setStart] = useState(startDay)
   const [end, setEnd] = useState(endDay)
   const [staffFilter, setStaffFilter] = useState('')
-  const [editConfirm, setEditConfirm] = useState<History | null>(null)
+  const [editConfirm, setEditConfirm] = useState<SerializableHistory | null>(null)
 
   const filtered = confirms.filter(
     (h) => !staffFilter || h.createUser === staffFilter
@@ -142,7 +142,7 @@ export function ProductsFabricPurchaseConfirmTable({
     router.push('/products/fabric-purchase/confirms')
   }
 
-  const canEdit = (h: History) =>
+  const canEdit = (h: SerializableHistory) =>
     (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
 
   return (

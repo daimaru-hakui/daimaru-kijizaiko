@@ -41,7 +41,10 @@ export default async function CuttingReportHistoryPage({ searchParams }: Props) 
     )
 
   const reports = reportsSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<CuttingReportType, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as CuttingReportType
+    })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (

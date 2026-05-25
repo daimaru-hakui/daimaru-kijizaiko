@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { ProductForm } from '@/components/products/ProductForm'
 import type { GrayFabric, Location, Supplier } from '../../../../types'
 import { features } from '../../../../datalist'
@@ -20,20 +21,20 @@ export default async function ProductsNewPage() {
       db.collection('users').get(),
     ])
 
-  const suppliers = suppliersSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Supplier, 'id'>),
-    id: d.id,
-  }))
+  const suppliers = suppliersSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = toPlainData(d.data()) as Record<string, unknown>
+    return { ...data, id: d.id } as Supplier
+  })
 
-  const grayFabrics = grayFabricsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<GrayFabric, 'id'>),
-    id: d.id,
-  }))
+  const grayFabrics = grayFabricsSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = toPlainData(d.data()) as Record<string, unknown>
+    return { ...data, id: d.id } as GrayFabric
+  })
 
-  const locations = locationsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Location, 'id'>),
-    id: d.id,
-  }))
+  const locations = locationsSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = toPlainData(d.data()) as Record<string, unknown>
+    return { ...data, id: d.id } as Location
+  })
 
   const colors: string[] = colorsSnap.docs.map((d) => d.data().name as string)
 

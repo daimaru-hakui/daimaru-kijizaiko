@@ -25,11 +25,14 @@ export default async function GrayFabricsPage() {
 
   const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s.name]))
 
-  const grayFabrics = fabricsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<GrayFabric, 'id'>),
-    id: d.id,
-    supplierName: supplierMap[d.data().supplierId as string] ?? '',
-  }))
+  const grayFabrics = fabricsSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    return {
+      ...data,
+      id: d.id,
+      supplierName: supplierMap[data.supplierId as string] ?? '',
+    } as GrayFabric & { supplierName: string }
+  })
 
   return (
     <GrayFabricListTable

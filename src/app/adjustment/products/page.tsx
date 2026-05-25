@@ -23,10 +23,15 @@ export default async function AdjustmentProductsPage() {
     usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
   )
 
-  const products = productsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Product, 'id'>),
-    id: d.id,
-  }))
+  const products = productsSnap.docs.map((d) => {
+    const { createdAt, updatedAt, ...data } = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: createdAt?.toDate?.() ?? null,
+      updatedAt: updatedAt?.toDate?.() ?? null,
+    } as Product
+  })
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">

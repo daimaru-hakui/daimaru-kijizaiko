@@ -33,7 +33,7 @@
     "eslint-plugin-react": "^7.32.2",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.10.0",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^0.469.0",
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-chartjs-2": "^5.3.1",

@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 type Props = {
-  data: History[];
+  data: Omit<History, 'createdAt' | 'updatedAt'>[];
   startDay: string;
   endDay: string;
   rankingNumber: number;

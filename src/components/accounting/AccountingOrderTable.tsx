@@ -15,10 +15,10 @@ import {
 } from '@/components/ui/table'
 import { AccountingEditModal } from './AccountingEditModal'
 import { AccountingOrderToConfirmModal } from './AccountingOrderToConfirmModal'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  histories: History[]
+  histories: SerializableHistory[]
   usersMap: Record<string, string>
   startDay: string
   endDay: string

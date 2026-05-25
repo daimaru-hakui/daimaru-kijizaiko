@@ -14,6 +14,9 @@ type RouteRule =
   | { roles: (keyof Omit<UserClaims, 'uid'>)[] }
 
 const pathRoleMatrix: Array<{ pattern: RegExp; rule: RouteRule }> = [
+  { pattern: /^\/_next\//, rule: { public: true } },
+  { pattern: /^\/api\/session/, rule: { public: true } },
+  { pattern: /^\/favicon\.ico$/, rule: { public: true } },
   { pattern: /^\/$/, rule: { public: true } },
   { pattern: /^\/login$/, rule: { public: true } },
   { pattern: /^\/dashboard/, rule: { authenticated: true } },

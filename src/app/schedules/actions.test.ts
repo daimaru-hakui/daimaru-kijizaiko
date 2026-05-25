@@ -86,11 +86,11 @@ describe('addScheduleAction', () => {
     expect(result).toEqual({ ok: false, error: '生地が登録されていません' })
   })
 
-  it('schedule doc に createUser が設定される', async () => {
+  it('schedule doc に createUser と updateUser が設定される', async () => {
     mockTransactionGet.mockResolvedValue({ exists: true })
     await addScheduleAction(base)
     const [, setData] = mockTransactionSet.mock.calls[0]
-    expect(setData).toMatchObject({ createUser: 'user1' })
+    expect(setData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
   })
 })
 

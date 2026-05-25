@@ -200,6 +200,9 @@ export type Location = {
   comment: string;
 };
 
+export type SerializableHistory = Omit<History, 'createdAt' | 'updatedAt'>
+export type SerializableProduct = Omit<Product, 'createdAt' | 'updatedAt'>
+
 export type CuttingSchedule = {
   id:string;
   staff:string,

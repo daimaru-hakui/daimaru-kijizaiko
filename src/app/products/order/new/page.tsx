@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { ProductOrderSearch } from '@/components/products/ProductOrderSearch'
-import type { Product, StockPlace } from '../../../../../types'
+import type { SerializableProduct, StockPlace } from '../../../../../types'
 
 export default async function ProductOrderNewPage() {
   const user = await verifyServerSession()
@@ -16,7 +16,10 @@ export default async function ProductOrderNewPage() {
 
   const products = productsSnap.docs
     .filter((d) => !d.data().deletedAt)
-    .map((d) => ({ ...(d.data() as Omit<Product, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as unknown as SerializableProduct
+    })
 
   const stockPlaces = stockPlacesSnap.docs.map((d) => ({
     ...(d.data() as Omit<StockPlace, 'id'>),

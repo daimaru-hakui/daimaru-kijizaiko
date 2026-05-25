@@ -43,10 +43,10 @@ export default async function SchedulesPage() {
     colorName: (d.data().colorName ?? '') as string,
   }))
 
-  const schedules = schedulesSnap.docs.map((d) => ({
-    ...(d.data() as Omit<CuttingSchedule, 'id'>),
-    id: d.id,
-  }))
+  const schedules = schedulesSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    return { ...data, id: d.id } as CuttingSchedule
+  })
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">

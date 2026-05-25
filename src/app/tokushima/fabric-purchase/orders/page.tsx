@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { TokushimaFabricPurchaseOrderTable } from '@/components/tokushima/TokushimaFabricPurchaseOrderTable'
-import type { History } from '../../../../../types'
+import type { SerializableHistory } from '../../../../../types'
 
 const HOUSE_FACTORY = '徳島工場'
 
@@ -27,7 +27,10 @@ export default async function TokushimaFabricPurchaseOrdersPage() {
   const isAdmin = Boolean(userData?.admin)
 
   const orders = ordersSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<History, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as unknown as SerializableHistory
+    })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (

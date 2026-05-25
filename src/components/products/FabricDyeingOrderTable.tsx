@@ -29,10 +29,10 @@ import {
   deleteFabricDyeingOrderAction,
 } from '@/app/products/fabric-dyeing/actions'
 import { getTodayDate } from '@/lib/dates'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  orders: History[]
+  orders: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
   isRD: boolean
@@ -48,7 +48,7 @@ function ConfirmDialog({
   open,
   onClose,
 }: {
-  order: History
+  order: SerializableHistory
   open: boolean
   onClose: () => void
 }) {
@@ -145,7 +145,7 @@ function EditDialog({
   open,
   onClose,
 }: {
-  order: History
+  order: SerializableHistory
   open: boolean
   onClose: () => void
 }) {
@@ -231,12 +231,12 @@ export function FabricDyeingOrderTable({
   isAdmin,
 }: Props) {
   const router = useRouter()
-  const [confirmOrder, setConfirmOrder] = useState<History | null>(null)
-  const [editOrder, setEditOrder] = useState<History | null>(null)
+  const [confirmOrder, setConfirmOrder] = useState<SerializableHistory | null>(null)
+  const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
 
-  const canEdit = (o: History) => isRD || o.createUser === userId
+  const canEdit = (o: SerializableHistory) => isRD || o.createUser === userId
 
-  const handleDelete = async (order: History) => {
+  const handleDelete = async (order: SerializableHistory) => {
     if (!window.confirm('削除してよろしいでしょうか')) return
     const result = await deleteFabricDyeingOrderAction({
       historyId: order.id,

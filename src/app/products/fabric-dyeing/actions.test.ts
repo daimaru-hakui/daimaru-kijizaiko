@@ -32,15 +32,33 @@ const makeMockDb = () => ({
 })
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
+  // Firestore の「全 read を全 write より前に」制約を再現するモック
   mockRunTransaction.mockImplementation(async (fn: any) => {
+    let hasWritten = false
     const tx = {
-      get: mockTransactionGet,
-      update: mockTransactionUpdate,
-      set: mockTransactionSet,
-      delete: mockTransactionDelete,
+      get: vi.fn(async (...args: any[]) => {
+        if (hasWritten) {
+          throw new Error(
+            'Firestore transactions require all reads to be executed before all writes',
+          )
+        }
+        return mockTransactionGet(...args)
+      }),
+      update: vi.fn((...args: any[]) => {
+        hasWritten = true
+        return mockTransactionUpdate(...args)
+      }),
+      set: vi.fn((...args: any[]) => {
+        hasWritten = true
+        return mockTransactionSet(...args)
+      }),
+      delete: vi.fn((...args: any[]) => {
+        hasWritten = true
+        return mockTransactionDelete(...args)
+      }),
     }
     return fn(tx)
   })
@@ -204,6 +222,34 @@ describe('confirmFabricDyeingAction', () => {
     expect(productUpdate[1].wip).toBe(30)
     expect(productUpdate[1].externalStock).toBe(50)
   })
+
+  // B12: mathRound2nd が適用されること
+  it('浮動小数点の丸め: wip と externalStock が小数第2位まで丸められる', async () => {
+    mockTransactionGet.mockResolvedValueOnce({
+      data: () => ({ wip: 10, externalStock: 5 }),
+    })
+    // wip = 10 - 3.3333 + 0 = 6.6667 → mathRound2nd → 6.67
+    // externalStock = 5 + 3.3333 = 8.3333 → mathRound2nd → 8.33
+    const result = await confirmFabricDyeingAction({
+      ...base,
+      quantity: 3.3333,
+      remainingOrder: 0,
+    })
+    expect(result).toEqual({ ok: true })
+    const productUpdate = mockTransactionUpdate.mock.calls[0]
+    expect(productUpdate[1].wip).toBe(6.67)
+    expect(productUpdate[1].externalStock).toBe(8.33)
+  })
+
+  // B10: confirm doc に updateUser が含まれること
+  it('confirm ドキュメントに updateUser が設定される', async () => {
+    mockTransactionGet.mockResolvedValueOnce({
+      data: () => ({ wip: 50, externalStock: 20 }),
+    })
+    await confirmFabricDyeingAction(base)
+    const setCall = mockTransactionSet.mock.calls[0]
+    expect(setCall[1]).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
+  })
 })
 
 // ----------------------------------------------------------------
@@ -230,14 +276,15 @@ describe('updateFabricDyeingOrderAction', () => {
   })
 
   it('stockType=stock: grayFabric.stock と product.wip が更新される', async () => {
+    // B9修正後の read 順序: product 先, grayFabric 後
     mockTransactionGet
-      .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })
-      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
+      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })     // product
+      .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })  // grayFabric
     const result = await updateFabricDyeingOrderAction(base)
     expect(result).toEqual({ ok: true })
-    // grayFabric: stock + (old - new) = 100 + (50-30) = 120
+    // update[0]=grayFabric: stock + (old - new) = 100 + (50-30) = 120
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 120 })
-    // product: wip - (old - new) = 60 - (50-30) = 40
+    // update[1]=product: wip - (old - new) = 60 - (50-30) = 40
     expect(mockTransactionUpdate.mock.calls[1][1].wip).toBe(40)
   })
 
@@ -268,14 +315,15 @@ describe('deleteFabricDyeingOrderAction', () => {
   })
 
   it('stockType=stock: grayFabric.stock が戻り order が削除される', async () => {
+    // B9修正後の read 順序: product 先, grayFabric 後
     mockTransactionGet
-      .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })
-      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
+      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })     // product
+      .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })  // grayFabric
     const result = await deleteFabricDyeingOrderAction(base)
     expect(result).toEqual({ ok: true })
-    // grayFabric: stock + quantity = 100 + 40 = 140
+    // update[0]=grayFabric: stock + quantity = 100 + 40 = 140
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 140 })
-    // product: wip - quantity = 60 - 40 = 20
+    // update[1]=product: wip - quantity = 60 - 40 = 20
     expect(mockTransactionUpdate.mock.calls[1][1]).toEqual({ wip: 20 })
     expect(mockTransactionDelete).toHaveBeenCalledOnce()
   })

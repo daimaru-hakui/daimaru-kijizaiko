@@ -19,10 +19,10 @@ import {
 } from '@/app/products/fabric-dyeing/actions'
 import { orderFabricPurchaseAction } from '@/app/products/fabric-purchase/actions'
 import { getTodayDate } from '@/lib/dates'
-import type { Product, StockPlace } from '../../../types'
+import type { SerializableProduct, StockPlace } from '../../../types'
 
 type Props = {
-  product: Product
+  product: SerializableProduct
   stockPlaces: StockPlace[]
   open: boolean
   onCloseAction: () => void

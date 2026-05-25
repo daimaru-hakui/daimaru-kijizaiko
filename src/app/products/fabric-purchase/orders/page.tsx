@@ -25,7 +25,15 @@ export default async function ProductsFabricPurchaseOrdersPage() {
   const isAdmin = Boolean(userData?.admin)
 
   const orders = ordersSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<History, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt, updatedAt, ...data } = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: createdAt?.toDate?.() ?? null,
+        updatedAt: updatedAt?.toDate?.() ?? null,
+      } as History
+    })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (

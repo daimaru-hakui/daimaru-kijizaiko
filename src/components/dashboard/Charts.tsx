@@ -27,7 +27,7 @@ export const Charts: FC<Props> = ({ productsMap }) => {
   const [inputEnd, setInputEnd] = useState(endDay);
   const [staff, setStaff] = useState("");
   const [cuttingReports, setCuttingReports] = useState<CuttingReportType[]>([]);
-  const [fabricPurchaseConfirms, setFabricPurchaseConfirms] = useState<History[]>([]);
+  const [fabricPurchaseConfirms, setFabricPurchaseConfirms] = useState<Omit<History, 'createdAt' | 'updatedAt'>[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +38,7 @@ export const Charts: FC<Props> = ({ productsMap }) => {
       if (cancelled) return;
       if (reportsResult.ok) setCuttingReports(reportsResult.contents);
       if (confirmsResult.ok) setFabricPurchaseConfirms(confirmsResult.contents);
-    });
+    }).catch(() => {});
     return () => { cancelled = true; };
   }, [startDay, endDay]);
 
@@ -46,7 +46,7 @@ export const Charts: FC<Props> = ({ productsMap }) => {
     return staff ? cuttingReports.filter((r) => r.staff === staff) : cuttingReports;
   }, [cuttingReports, staff]);
 
-  const filterPurchaseCofirms = useMemo<History[]>(() => {
+  const filterPurchaseCofirms = useMemo<Omit<History, 'createdAt' | 'updatedAt'>[]>(() => {
     return staff ? fabricPurchaseConfirms.filter((r) => r.createUser === staff) : fabricPurchaseConfirms;
   }, [fabricPurchaseConfirms, staff]);
 

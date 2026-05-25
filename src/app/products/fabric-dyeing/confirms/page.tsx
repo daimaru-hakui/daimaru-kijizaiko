@@ -3,7 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { FabricDyeingConfirmTable } from '@/components/products/FabricDyeingConfirmTable'
-import type { History } from '../../../../../types'
+import type { SerializableHistory } from '../../../../../types'
 
 type Props = {
   searchParams: Promise<{ start?: string; end?: string }>
@@ -36,7 +36,10 @@ export default async function FabricDyeingConfirmsPage({ searchParams }: Props) 
   const isRD = Boolean(userData?.rd || userData?.admin)
 
   const confirms = confirmsSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<History, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as unknown as SerializableHistory
+    })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (

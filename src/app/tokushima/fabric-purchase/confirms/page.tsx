@@ -40,7 +40,15 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
   const isRD = Boolean(userData?.rd || userData?.admin)
 
   const confirms = confirmsSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<History, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt, updatedAt, ...data } = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: createdAt?.toDate?.() ?? null,
+        updatedAt: updatedAt?.toDate?.() ?? null,
+      } as History
+    })
     .filter((h) => h.stockPlace === HOUSE_FACTORY)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 

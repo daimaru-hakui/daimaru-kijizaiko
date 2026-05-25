@@ -24,10 +24,15 @@ export default async function GrayFabricOrdersPage() {
     usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
   )
 
-  const orders = ordersSnap.docs.map((d) => ({
-    ...(d.data() as Omit<GrayFabricHistory, 'id'>),
-    id: d.id,
-  }))
+  const orders = ordersSnap.docs.map((d) => {
+    const { createdAt, updatedAt, ...data } = d.data()
+    return {
+      ...data,
+      id: d.id,
+      createdAt: createdAt?.toDate?.() ?? null,
+      updatedAt: updatedAt?.toDate?.() ?? null,
+    } as GrayFabricHistory
+  })
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">

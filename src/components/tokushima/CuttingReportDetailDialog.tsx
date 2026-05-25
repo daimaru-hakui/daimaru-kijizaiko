@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table'
 import { CuttingReportForm } from './CuttingReportForm'
 import { deleteCuttingReportAction } from '@/app/tokushima/cutting-reports/actions'
-import type { CuttingReportType, Product } from '../../../types'
+import type { CuttingReportType, SerializableProduct } from '../../../types'
 
 type UserOption = { id: string; name: string }
 
@@ -30,7 +30,7 @@ type Props = {
   usersMap: Record<string, string>
   isTokushima: boolean
   isRD: boolean
-  products: Product[]
+  products: SerializableProduct[]
   salesUsers: UserOption[]
   productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
 }

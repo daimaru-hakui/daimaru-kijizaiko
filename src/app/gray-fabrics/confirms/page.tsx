@@ -41,10 +41,15 @@ export default async function GrayFabricConfirmsPage({
   )
 
   const confirms = confirmsSnap.docs
-    .map((d) => ({
-      ...(d.data() as Omit<GrayFabricHistory, 'id'>),
-      id: d.id,
-    }))
+    .map((d) => {
+      const { createdAt, updatedAt, ...data } = d.data()
+      return {
+        ...data,
+        id: d.id,
+        createdAt: createdAt?.toDate?.() ?? null,
+        updatedAt: updatedAt?.toDate?.() ?? null,
+      } as GrayFabricHistory
+    })
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 
   return (

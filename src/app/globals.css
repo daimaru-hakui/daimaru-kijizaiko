@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  --font-sans: var(--font-noto-sans-jp), "Hiragino Kaku Gothic ProN", sans-serif;
 
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(0 0% 3.9%);
@@ -24,4 +24,19 @@
   --color-ring: hsl(0 0% 3.9%);
   --color-ring-offset-background: hsl(0 0% 100%);
   --radius: 0.5rem;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
 }

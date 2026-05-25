@@ -16,10 +16,10 @@ import { Button } from '@/components/ui/button'
 import { TokushimaOrderToConfirmDialog } from './TokushimaOrderToConfirmDialog'
 import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEditDialog'
 import { deleteFabricPurchaseOrderAction } from '@/app/tokushima/fabric-purchase/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  orders: History[]
+  orders: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
   isTokushima: boolean
@@ -40,10 +40,10 @@ export function TokushimaFabricPurchaseOrderTable({
   isAdmin,
 }: Props) {
   const router = useRouter()
-  const [confirmOrder, setConfirmOrder] = useState<History | null>(null)
-  const [editOrder, setEditOrder] = useState<History | null>(null)
+  const [confirmOrder, setConfirmOrder] = useState<SerializableHistory | null>(null)
+  const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
 
-  const handleDelete = async (order: History) => {
+  const handleDelete = async (order: SerializableHistory) => {
     if (!window.confirm('削除してよろしいでしょうか')) return
     const result = await deleteFabricPurchaseOrderAction({
       historyId: order.id,
@@ -58,10 +58,10 @@ export function TokushimaFabricPurchaseOrderTable({
     }
   }
 
-  const canConfirmOrEdit = (order: History) =>
+  const canConfirmOrEdit = (order: SerializableHistory) =>
     isTokushima || isRD || order.createUser === userId
 
-  const canDelete = (order: History) =>
+  const canDelete = (order: SerializableHistory) =>
     isAdmin && (isRD || order.createUser === userId)
 
   return (

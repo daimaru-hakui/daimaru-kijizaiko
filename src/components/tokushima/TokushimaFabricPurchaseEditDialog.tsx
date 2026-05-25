@@ -17,10 +17,10 @@ import {
   updateFabricPurchaseOrderAction,
   updateFabricPurchaseConfirmAction,
 } from '@/app/tokushima/fabric-purchase/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  history: History
+  history: SerializableHistory
   type: 'order' | 'confirm'
   open: boolean
   onCloseAction: () => void

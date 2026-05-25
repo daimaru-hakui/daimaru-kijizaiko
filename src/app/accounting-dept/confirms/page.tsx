@@ -3,7 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { AccountingConfirmTable } from '@/components/accounting/AccountingConfirmTable'
-import type { History } from '../../../../types'
+import type { SerializableHistory } from '../../../../types'
 
 type Props = {
   searchParams: Promise<{ start?: string; end?: string }>
@@ -33,7 +33,10 @@ export default async function AccountingConfirmsPage({ searchParams }: Props) {
   )
 
   const histories = historiesSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<History, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as unknown as SerializableHistory
+    })
     .filter((h) => h.quantity > 0 && h.accounting === true)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 

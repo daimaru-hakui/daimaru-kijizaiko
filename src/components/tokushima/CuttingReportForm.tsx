@@ -11,12 +11,12 @@ import { NumberInput } from '@/components/ui/number-input'
 import { CuttingReportFabricRow } from './CuttingReportFabricRow'
 import { addCuttingReportAction, updateCuttingReportAction } from '@/app/tokushima/cutting-reports/actions'
 import { getTodayDate } from '@/lib/dates'
-import type { Product, CuttingReportType, CuttingProductType } from '../../../types'
+import type { SerializableProduct, CuttingReportType, CuttingProductType } from '../../../types'
 
 type UserOption = { id: string; name: string }
 
 type Props = {
-  products: Product[]
+  products: SerializableProduct[]
   salesUsers: UserOption[]
   initData?: CuttingReportType
   onCloseAction?: () => void

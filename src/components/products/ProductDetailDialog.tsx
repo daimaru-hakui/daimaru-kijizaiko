@@ -12,7 +12,7 @@ import { getMixed, getFabricStd } from '@/lib/utils'
 import type { Product } from '../../../types'
 
 type Props = {
-  product: Product
+  product: Omit<Product, 'createdAt' | 'updatedAt'>
   open: boolean
   onCloseAction: () => void
   suppliersMap: Record<string, string>

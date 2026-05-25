@@ -3,7 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { CuttingReportListTable } from '@/components/tokushima/CuttingReportListTable'
-import type { CuttingReportType, Product } from '../../../../types'
+import type { CuttingReportType, SerializableProduct } from '../../../../types'
 
 type Props = {
   searchParams: Promise<{ start?: string; end?: string }>
@@ -37,10 +37,10 @@ export default async function CuttingReportsPage({ searchParams }: Props) {
     .filter((d) => d.data().sales === true)
     .map((d) => ({ id: d.id, name: (d.data().name ?? d.id) as string }))
 
-  const products = productsSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Product, 'id'>),
-    id: d.id,
-  }))
+  const products = productsSnap.docs.map((d) => {
+    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    return { ...data, id: d.id } as unknown as SerializableProduct
+  })
 
   const productMap: Record<string, { productNumber: string; colorName: string; productName: string }> =
     Object.fromEntries(
@@ -55,7 +55,10 @@ export default async function CuttingReportsPage({ searchParams }: Props) {
     )
 
   const reports = reportsSnap.docs
-    .map((d) => ({ ...(d.data() as Omit<CuttingReportType, 'id'>), id: d.id }))
+    .map((d) => {
+      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      return { ...data, id: d.id } as CuttingReportType
+    })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (

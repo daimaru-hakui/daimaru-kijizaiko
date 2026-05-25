@@ -14,11 +14,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { confirmFabricPurchaseAction } from '@/app/tokushima/fabric-purchase/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 import { getTodayDate } from '@/lib/dates'
 
 type Props = {
-  order: History
+  order: SerializableHistory
   open: boolean
   onCloseAction: () => void
 }

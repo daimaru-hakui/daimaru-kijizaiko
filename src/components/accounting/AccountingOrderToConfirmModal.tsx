@@ -13,10 +13,10 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { confirmProcessingAccountingAction } from '@/app/accounting-dept/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  history: History
+  history: SerializableHistory
 }
 
 type Inputs = {

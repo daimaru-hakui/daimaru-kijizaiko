@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/tokushima/cutting-reports/actions'
-import type { CuttingReportType, Product } from '../../../types'
+import type { CuttingReportType, SerializableProduct } from '../../../types'
 
 type UserOption = { id: string; name: string }
 
@@ -25,7 +25,7 @@ type Props = {
   userId: string
   isTokushima: boolean
   isRD: boolean
-  products: Product[]
+  products: SerializableProduct[]
   salesUsers: UserOption[]
   productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
   startDay: string

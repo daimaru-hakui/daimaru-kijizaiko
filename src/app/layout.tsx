@@ -1,5 +1,13 @@
 import type { Metadata } from 'next'
+import { Noto_Sans_JP } from 'next/font/google'
 import './globals.css'
+
+const notoSansJp = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-noto-sans-jp',
+  display: 'swap',
+})
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { AppShell, type UserRoles } from '@/components/app-shell'
@@ -18,7 +26,7 @@ export default async function RootLayout({
 
   if (!token) {
     return (
-      <html lang="ja">
+      <html lang="ja" className={notoSansJp.variable}>
         <body className="min-h-screen bg-background font-sans antialiased">
           {children}
         </body>

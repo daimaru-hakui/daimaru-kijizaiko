@@ -47,6 +47,7 @@ export async function addScheduleAction(data: AddScheduleInput): Promise<ActionR
         quantity: Number(data.quantity) || 0,
         scheduledAt: data.scheduledAt,
         createUser: auth.uid,
+        updateUser: auth.uid,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       })

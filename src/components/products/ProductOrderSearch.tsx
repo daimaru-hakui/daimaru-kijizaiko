@@ -6,17 +6,17 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { ProductOrderDialog } from './ProductOrderDialog'
 import { halfToFullChar } from '@/lib/utils'
-import type { Product, StockPlace } from '../../../types'
+import type { SerializableProduct, StockPlace } from '../../../types'
 
 type Props = {
-  products: Product[]
+  products: SerializableProduct[]
   stockPlaces: StockPlace[]
   userId: string
 }
 
 export function ProductOrderSearch({ products, stockPlaces }: Props) {
   const [search, setSearch] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<SerializableProduct | null>(null)
   const [orderOpen, setOrderOpen] = useState(false)
 
   const filtered = products.find(

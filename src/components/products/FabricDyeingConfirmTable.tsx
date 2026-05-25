@@ -23,10 +23,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricDyeingConfirmAction } from '@/app/products/fabric-dyeing/actions'
-import type { History } from '../../../types'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  confirms: History[]
+  confirms: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
   isRD: boolean
@@ -43,7 +43,7 @@ function EditConfirmDialog({
   open,
   onClose,
 }: {
-  history: History
+  history: SerializableHistory
   open: boolean
   onClose: () => void
 }) {
@@ -122,7 +122,7 @@ export function FabricDyeingConfirmTable({
   const [start, setStart] = useState(startDay)
   const [end, setEnd] = useState(endDay)
   const [staffFilter, setStaffFilter] = useState('')
-  const [editConfirm, setEditConfirm] = useState<History | null>(null)
+  const [editConfirm, setEditConfirm] = useState<SerializableHistory | null>(null)
 
   const filtered = confirms.filter(
     (h) => !staffFilter || h.createUser === staffFilter
@@ -139,7 +139,7 @@ export function FabricDyeingConfirmTable({
     router.push('/products/fabric-dyeing/confirms')
   }
 
-  const canEdit = (h: History) => isRD || h.createUser === userId
+  const canEdit = (h: SerializableHistory) => isRD || h.createUser === userId
 
   return (
     <div className="p-6 space-y-4">
