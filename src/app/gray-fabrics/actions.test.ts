@@ -165,6 +165,20 @@ describe('orderGrayFabricAction', () => {
     const result = await orderGrayFabricAction(grayFabric, items)
     expect(result).toEqual({ ok: false, error: '発注処理に失敗しました' })
   })
+
+  it('order doc に updateUser と updatedAt が設定される', async () => {
+    let capturedSetData: any = null
+    mockRunTransaction.mockImplementation(async (fn: Function) => {
+      const mockTransaction = {
+        get: vi.fn().mockResolvedValue({ exists: true, data: () => ({ serialNumber: 5, wip: 10 }) }),
+        update: vi.fn(),
+        set: vi.fn((_ref: any, data: any) => { capturedSetData = data }),
+      }
+      await fn(mockTransaction)
+    })
+    await orderGrayFabricAction(grayFabric, items)
+    expect(capturedSetData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
+  })
 })
 
 describe('deleteGrayFabricOrderAction', () => {
@@ -278,5 +292,19 @@ describe('confirmProcessingAction', () => {
     mockRunTransaction.mockRejectedValue(new Error('transaction error'))
     const result = await confirmProcessingAction(history, items)
     expect(result).toEqual({ ok: false, error: '確定処理に失敗しました' })
+  })
+
+  it('confirm doc に updateUser と updatedAt が設定される', async () => {
+    let capturedSetData: any = null
+    mockRunTransaction.mockImplementation(async (fn: Function) => {
+      const mockTransaction = {
+        get: vi.fn().mockResolvedValue({ exists: true, data: () => ({ wip: 100, stock: 0 }) }),
+        update: vi.fn(),
+        set: vi.fn((_ref: any, data: any) => { capturedSetData = data }),
+      }
+      await fn(mockTransaction)
+    })
+    await confirmProcessingAction(history, items)
+    expect(capturedSetData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
   })
 })

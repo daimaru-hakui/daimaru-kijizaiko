@@ -121,9 +121,11 @@ export async function orderGrayFabricAction(
         scheduledAt: items.scheduledAt || getTodayDate(),
         comment: items.comment || '',
         createUser: auth.uid,
+        updateUser: auth.uid,
         supplierId: grayFabric.supplierId,
         supplierName: grayFabric.supplierName,
         createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       })
     })
   } catch (e) {
@@ -294,6 +296,7 @@ export async function confirmProcessingAction(
         orderedAt: items.orderedAt || history.orderedAt,
         fixedAt: items.fixedAt || getTodayDate(),
         createUser: auth.uid,
+        updateUser: auth.uid,
         productNumber: history.productNumber,
         productName: history.productName,
         supplierId: history.supplierId,
@@ -301,6 +304,7 @@ export async function confirmProcessingAction(
         quantity: Number(items.quantity),
         comment: items.comment || '',
         createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       })
     })
   } catch (e) {

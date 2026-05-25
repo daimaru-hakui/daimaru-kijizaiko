@@ -46,6 +46,9 @@ export async function addScheduleAction(data: AddScheduleInput): Promise<ActionR
         itemName: data.itemName,
         quantity: Number(data.quantity) || 0,
         scheduledAt: data.scheduledAt,
+        createUser: auth.uid,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       })
     })
   } catch (e) {
@@ -77,6 +80,8 @@ export async function updateScheduleAction(data: UpdateScheduleInput): Promise<A
     itemName: data.itemName,
     quantity: Number(data.quantity) || 0,
     scheduledAt: data.scheduledAt,
+    updateUser: auth.uid,
+    updatedAt: FieldValue.serverTimestamp(),
   })
 
   revalidatePath('/schedules')

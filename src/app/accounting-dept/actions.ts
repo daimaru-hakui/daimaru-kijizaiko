@@ -54,6 +54,7 @@ export async function updateHistoryAccountingOrderAction(
         fixedAt: data.fixedAt,
         comment: data.comment,
         updateUser: auth.uid,
+        updatedAt: FieldValue.serverTimestamp(),
       })
     })
   } catch (e) {

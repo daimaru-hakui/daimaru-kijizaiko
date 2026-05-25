@@ -105,6 +105,13 @@ describe('updateHistoryAccountingOrderAction', () => {
     )
     expect(result).toEqual({ ok: false, error: '商品が見つかりません' })
   })
+
+  it('historyRef 更新に updatedAt が含まれる', async () => {
+    mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ tokushimaStock: 200 }) })
+    await updateHistoryAccountingOrderAction('hist1', 'prod1', '倉庫A', 80, baseInput)
+    const [, updateData] = mockTransactionUpdate.mock.calls[0]
+    expect(updateData.updatedAt).toBeTruthy()
+  })
 })
 
 // ----------------------------------------------------------------

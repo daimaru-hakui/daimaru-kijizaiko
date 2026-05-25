@@ -85,6 +85,13 @@ describe('addScheduleAction', () => {
     const result = await addScheduleAction(base)
     expect(result).toEqual({ ok: false, error: '生地が登録されていません' })
   })
+
+  it('schedule doc に createUser が設定される', async () => {
+    mockTransactionGet.mockResolvedValue({ exists: true })
+    await addScheduleAction(base)
+    const [, setData] = mockTransactionSet.mock.calls[0]
+    expect(setData).toMatchObject({ createUser: 'user1' })
+  })
 })
 
 // ----------------------------------------------------------------
@@ -115,6 +122,14 @@ describe('updateScheduleAction', () => {
     const [updateData] = mockUpdate.mock.calls[0]
     expect(updateData.staff).toBe('user1')
     expect(updateData.quantity).toBe(50)
+  })
+
+  it('updateUser と updatedAt が設定される', async () => {
+    mockUpdate.mockResolvedValue(undefined)
+    await updateScheduleAction(base)
+    const [updateData] = mockUpdate.mock.calls[0]
+    expect(updateData.updateUser).toBe('user1')
+    expect(updateData.updatedAt).toBeTruthy()
   })
 })
 
