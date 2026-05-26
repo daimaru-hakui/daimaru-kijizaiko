@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Materials } from "../../types";
+import type { Materials, CuttingSchedule } from "../../types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,4 +41,11 @@ export function getFabricStd(
   const mark = width && length ? '×' : '';
   const space = weight ? ' ' : '';
   return width + mark + length + space + weight;
+}
+
+export function getCuttingScheduleTotal(
+  scheduleIds: string[],
+  schedulesMap: Record<string, CuttingSchedule>,
+): number {
+  return scheduleIds.reduce((sum, id) => sum + (schedulesMap[id]?.quantity ?? 0), 0);
 }

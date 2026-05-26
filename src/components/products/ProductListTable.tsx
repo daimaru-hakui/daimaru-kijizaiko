@@ -1,66 +1,115 @@
-'use client'
+"use client";
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { deleteProductAction } from "@/app/products/actions";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { deleteProductAction } from '@/app/products/actions'
-import { halfToFullChar, getMixed, getFabricStd } from '@/lib/utils'
-import { getTodayDate } from '@/lib/dates'
-import { ProductDetailDialog } from './ProductDetailDialog'
-import type { Product } from '../../../types'
+  halfToFullChar,
+  getMixed,
+  getFabricStd,
+  getCuttingScheduleTotal,
+} from "@/lib/utils";
+import { getTodayDate } from "@/lib/dates";
+import { ProductDetailDialog } from "./ProductDetailDialog";
+import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
+import { ProductOrderDialog } from "./ProductOrderDialog";
+import type {
+  CuttingSchedule,
+  Product,
+  SerializableProduct,
+  StockPlace,
+} from "../../../types";
 
 type Props = {
-  products: Omit<Product, 'createdAt' | 'updatedAt'>[]
-  usersMap: Record<string, string>
-  suppliersMap: Record<string, string>
-  userId: string
-  isAdmin: boolean
-  isRD: boolean
-}
+  products: Omit<Product, "createdAt" | "updatedAt">[];
+  usersMap: Record<string, string>;
+  suppliersMap: Record<string, string>;
+  cuttingSchedulesMap: Record<string, CuttingSchedule>;
+  stockPlaces: StockPlace[];
+  userId: string;
+  isAdmin: boolean;
+  isRD: boolean;
+};
 
 export function ProductListTable({
   products,
   usersMap,
   suppliersMap,
+  cuttingSchedulesMap,
+  stockPlaces,
   isAdmin,
+  isRD,
+  userId,
 }: Props) {
-  const router = useRouter()
-  const [searchNum, setSearchNum] = useState('')
-  const [searchColor, setSearchColor] = useState('')
-  const [searchName, setSearchName] = useState('')
-  const [detailProduct, setDetailProduct] = useState<Omit<Product, 'createdAt' | 'updatedAt'> | null>(null)
+  const router = useRouter();
+  const [searchNum, setSearchNum] = useState("");
+  const [searchColor, setSearchColor] = useState("");
+  const [searchName, setSearchName] = useState("");
+  const [searchStaff, setSearchStaff] = useState("");
+  const [searchMaterial, setSearchMaterial] = useState("");
+  const [detailProduct, setDetailProduct] = useState<Omit<
+    Product,
+    "createdAt" | "updatedAt"
+  > | null>(null);
+  const [orderProduct, setOrderProduct] = useState<SerializableProduct | null>(
+    null,
+  );
 
   const filtered = useMemo(() => {
-    const num = halfToFullChar(searchNum.toUpperCase())
-    return products.filter(
-      (p) =>
+    const num = halfToFullChar(searchNum.toUpperCase());
+    const staffLower = searchStaff.toLowerCase();
+    return products.filter((p) => {
+      const staffName = (usersMap[p.staff] ?? p.staff).toLowerCase();
+      return (
         p.productNumber.includes(num) &&
         p.colorName.includes(searchColor) &&
-        p.productName.includes(searchName)
-    )
-  }, [products, searchNum, searchColor, searchName])
+        p.productName.includes(searchName) &&
+        staffName.includes(staffLower) &&
+        (p.materialName ?? "").includes(searchMaterial)
+      );
+    });
+  }, [
+    products,
+    searchNum,
+    searchColor,
+    searchName,
+    searchStaff,
+    searchMaterial,
+    usersMap,
+  ]);
 
-  const handleDelete = async (product: Omit<Product, 'createdAt' | 'updatedAt'>) => {
-    if (!window.confirm(`${product.productNumber} を削除しますか？`)) return
-    const result = await deleteProductAction(product.id)
+  const handleDelete = async (
+    product: Omit<Product, "createdAt" | "updatedAt">,
+  ) => {
+    if (!window.confirm(`${product.productNumber} を削除しますか？`)) return;
+    const result = await deleteProductAction(product.id);
     if (result.ok) {
-      router.refresh()
+      router.refresh();
     } else {
-      alert(result.error)
+      alert(result.error);
     }
-  }
+  };
 
   const handleCsv = () => {
-    const headers = ['担当', '品番', '色番', '色', '品名', '単価', '生地仕掛', '外部在庫', '入荷待ち', '徳島在庫', '組織名', '混率', '規格', '機能性']
+    const headers = [
+      "担当",
+      "品番",
+      "色番",
+      "色",
+      "品名",
+      "単価",
+      "生地仕掛",
+      "外部在庫",
+      "入荷待ち",
+      "徳島在庫",
+      "組織名",
+      "混率",
+      "規格",
+      "機能性",
+    ];
     const rows = filtered.map((p) => [
       usersMap[p.staff] ?? p.staff,
       p.productNum,
@@ -73,112 +122,275 @@ export function ProductListTable({
       p.arrivingQuantity,
       p.tokushimaStock,
       p.materialName,
-      getMixed(p.materials as any).join(' '),
+      getMixed(p.materials as Parameters<typeof getMixed>[0]).join(" "),
       getFabricStd(p.fabricWidth, p.fabricLength, p.fabricWeight),
-      (p.features ?? []).join(' '),
-    ])
+      (p.features ?? []).join(" "),
+    ]);
     const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(','))
-      .join('\n')
-    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `生地一覧_${getTodayDate()}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+      .map((row) =>
+        row
+          .map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`)
+          .join(","),
+      )
+      .join("\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `生地一覧_${getTodayDate()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const canEdit = (p: Omit<Product, "createdAt" | "updatedAt">) =>
+    isAdmin || isRD || p.createUser === userId;
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">生地一覧</h2>
-        <Button size="sm" variant="outline" onClick={handleCsv}>CSV</Button>
+    <div className="space-y-4">
+      {/* ツールバー */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
+            生地一覧
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500">
+              全{products.length}件中{" "}
+              <span className="font-semibold text-slate-700">
+                {filtered.length}件
+              </span>
+              表示
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCsv}
+              className="text-xs"
+            >
+              CSV
+            </Button>
+            <Button
+              size="sm"
+              asChild
+              className="bg-indigo-700 hover:bg-indigo-800 text-white text-xs"
+            >
+              <Link href="/products/order/new">発注</Link>
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Input
+            className="w-36 h-8 text-sm"
+            placeholder="品番"
+            value={searchNum}
+            onChange={(e) => setSearchNum(e.target.value)}
+          />
+          <Input
+            className="w-24 h-8 text-sm"
+            placeholder="色"
+            value={searchColor}
+            onChange={(e) => setSearchColor(e.target.value)}
+          />
+          <Input
+            className="w-36 h-8 text-sm"
+            placeholder="品名"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
+          <Input
+            className="w-28 h-8 text-sm"
+            placeholder="担当"
+            value={searchStaff}
+            onChange={(e) => setSearchStaff(e.target.value)}
+          />
+          <Input
+            className="w-28 h-8 text-sm"
+            placeholder="組織名"
+            value={searchMaterial}
+            onChange={(e) => setSearchMaterial(e.target.value)}
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs"
+            onClick={() => {
+              setSearchNum("");
+              setSearchColor("");
+              setSearchName("");
+              setSearchStaff("");
+              setSearchMaterial("");
+            }}
+          >
+            リセット
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Input
-          className="w-40"
-          placeholder="品番"
-          value={searchNum}
-          onChange={(e) => setSearchNum(e.target.value)}
-        />
-        <Input
-          className="w-24"
-          placeholder="色"
-          value={searchColor}
-          onChange={(e) => setSearchColor(e.target.value)}
-        />
-        <Input
-          className="w-40"
-          placeholder="品名"
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-        />
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => { setSearchNum(''); setSearchColor(''); setSearchName('') }}
-        >
-          リセット
-        </Button>
-      </div>
+      {/* カードグリッド */}
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-16 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((p) => {
+            const scheduleTotal = getCuttingScheduleTotal(
+              p.cuttingSchedules ?? [],
+              cuttingSchedulesMap,
+            );
+            const isLowStock =
+              scheduleTotal > 0 && (p.tokushimaStock ?? 0) < scheduleTotal;
+            const mixed = getMixed(
+              p.materials as Parameters<typeof getMixed>[0],
+            );
+            const fabricStd = getFabricStd(
+              p.fabricWidth,
+              p.fabricLength,
+              p.fabricWeight,
+            );
+            const staffName = usersMap[p.staff] ?? p.staff;
+            const supplierName = suppliersMap[p.supplierId] ?? p.supplierId;
 
-      <div className="overflow-x-auto">
-        {filtered.length > 0 ? (
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">仕掛</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">外部</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">入荷待</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">徳島</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">詳細</TableHead>
-                {isAdmin && <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">削除</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell>{p.productNumber}</TableCell>
-                  <TableCell>{p.colorName}</TableCell>
-                  <TableCell>{p.productName}</TableCell>
-                  <TableCell>{suppliersMap[p.supplierId] ?? p.supplierId}</TableCell>
-                  <TableCell className="text-right">{p.price?.toLocaleString()}円</TableCell>
-                  <TableCell className="text-right">{(p.wip ?? 0).toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">{(p.externalStock ?? 0).toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">{(p.arrivingQuantity ?? 0).toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">{(p.tokushimaStock ?? 0).toLocaleString()}m</TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => setDetailProduct(p)}>
+            return (
+              <div
+                key={p.id}
+                className={`bg-white rounded-lg border shadow-sm overflow-hidden transition-shadow hover:shadow-md flex ${
+                  isLowStock ? "border-red-300" : "border-slate-200"
+                }`}
+              >
+                {/* 左アクセントライン */}
+                <div
+                  className={`w-1 shrink-0 ${isLowStock ? "bg-red-400" : "bg-indigo-600"}`}
+                />
+
+                {/* 4ペインボディ */}
+                <div className="flex-1 grid grid-cols-[2fr_2fr_3fr_0.5fr_auto] divide-x divide-slate-100 min-w-0">
+                  {/* ペイン1: 品番・色・品名 */}
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-bold text-slate-900 text-sm leading-none">
+                        {p.productNumber}
+                      </span>
+                      <span className="text-xs text-slate-600 bg-slate-100 rounded px-1.5 py-0.5 leading-none">
+                        {p.colorName}
+                      </span>
+                    </div>
+                    <div
+                      className="text-xs text-slate-700 truncate leading-none"
+                      title={p.productName}
+                    >
+                      {p.productName}
+                    </div>
+                  </div>
+
+                  {/* ペイン2: 担当・仕入先・スペック */}
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {supplierName && (
+                        <span className="text-xs text-slate-400 leading-none truncate">
+                          {supplierName}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {p.materialName && <Chip label={p.materialName} />}
+                      {fabricStd && <Chip label={fabricStd} />}
+                      {mixed.map((m, i) => (
+                        <Chip key={i} label={m.trim()} variant="indigo" />
+                      ))}
+                      {(p.features ?? []).map((f, i) => (
+                        <Chip key={i} label={f} variant="slate" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* ペイン3: 在庫数値 均等1行 */}
+                  <div className="px-3 py-1.5 grid grid-cols-6 bg-slate-50/60">
+                    <InlineStat
+                      label="徳島"
+                      value={p.tokushimaStock ?? 0}
+                      unit="m"
+                      danger={isLowStock}
+                    />
+                    <InlineStat label="仕掛" value={p.wip ?? 0} unit="m" />
+                    <InlineStat
+                      label="外部"
+                      value={p.externalStock ?? 0}
+                      unit="m"
+                    />
+                    <InlineStat
+                      label="入荷待"
+                      value={p.arrivingQuantity ?? 0}
+                      unit="m"
+                    />
+                    <InlineStat label="単価" value={p.price ?? 0} unit="円" />
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <span className="text-xs text-slate-600 leading-none">
+                        使用予定
+                      </span>
+                      {(p.cuttingSchedules?.length ?? 0) > 0 ? (
+                        <ProductCuttingScheduleModal
+                          scheduleIds={p.cuttingSchedules ?? []}
+                          schedulesMap={cuttingSchedulesMap}
+                          usersMap={usersMap}
+                        />
+                      ) : (
+                        <span className="text-xs text-slate-300 leading-snug">
+                          —
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ペイン4: 担当*/}
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <span className="text-xs text-slate-600 leading-none">
+                        担当
+                      </span>
+                      {staffName && (
+                        <span className="inline-flex items-center text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full px-2 py-0.5 leading-none">
+                          {staffName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ペイン5: アクション */}
+                  <div className="px-2 py-1.5 flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setDetailProduct(p)}
+                    >
                       詳細
                     </Button>
-                  </TableCell>
-                  {isAdmin && (
-                    <TableCell>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-xs border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                      onClick={() => setOrderProduct(p as SerializableProduct)}
+                    >
+                      発注
+                    </Button>
+                    {canEdit(p) && (
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-destructive"
+                        className="h-6 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
                         onClick={() => handleDelete(p)}
                       >
                         削除
                       </Button>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-center text-muted-foreground py-8">現在登録された情報はありません。</p>
-        )}
-      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {detailProduct && (
         <ProductDetailDialog
@@ -190,6 +402,57 @@ export function ProductListTable({
           grayFabricsMap={{}}
         />
       )}
+
+      {orderProduct && (
+        <ProductOrderDialog
+          product={orderProduct}
+          stockPlaces={stockPlaces}
+          open={Boolean(orderProduct)}
+          onCloseAction={() => setOrderProduct(null)}
+        />
+      )}
     </div>
-  )
+  );
+}
+
+type InlineStatProps = {
+  label: string;
+  value: number;
+  unit: string;
+  danger?: boolean;
+};
+
+function InlineStat({ label, value, unit, danger }: InlineStatProps) {
+  const isZero = value === 0;
+  return (
+    <div className="flex flex-col items-center justify-center gap-1">
+      <span className="text-xs text-slate-600 leading-none">{label}</span>
+      <span
+        className={`text-sm font-semibold leading-snug ${
+          danger ? "text-red-600" : isZero ? "text-slate-300" : "text-slate-800"
+        }`}
+      >
+        {value.toLocaleString()}
+        {unit}
+      </span>
+    </div>
+  );
+}
+
+type ChipProps = {
+  label: string;
+  variant?: "default" | "indigo" | "slate";
+};
+
+function Chip({ label, variant = "default" }: ChipProps) {
+  const styles = {
+    default: "bg-slate-100 text-slate-600",
+    indigo: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    slate: "bg-slate-100 text-slate-600 border border-slate-200",
+  };
+  return (
+    <span className={`rounded px-1.5 py-0.5 text-xs ${styles[variant]}`}>
+      {label}
+    </span>
+  );
 }

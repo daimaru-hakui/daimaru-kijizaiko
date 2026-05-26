@@ -40,10 +40,10 @@ export function AppShell({ userName, roles, children }: Props) {
       {/* Fixed header */}
       <header className="fixed top-0 left-0 right-0 h-12 bg-white border-b border-slate-200 z-10 flex items-center">
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-5">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="2xl:hidden px-1">
+                <Button variant="ghost" size="sm" className="2xl:hidden px-1 aspect-square">
                   <Menu size={20} />
                 </Button>
               </SheetTrigger>
