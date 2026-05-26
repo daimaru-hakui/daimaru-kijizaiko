@@ -83,16 +83,13 @@ export function AppShell({ userName, roles, children }: Props) {
         </div>
       </header>
 
-      {/* Body */}
-      <div className="flex">
-        {/* Desktop sidebar */}
-        <aside className="hidden 2xl:block w-60 min-h-screen bg-white border-r border-slate-200 sticky top-0 flex-shrink-0 pl-4 pt-12">
-          <NavLinks roles={roles} pathname={pathname} />
-        </aside>
+      {/* Fixed desktop sidebar */}
+      <aside className="hidden 2xl:block fixed top-12 left-0 bottom-0 w-60 bg-white border-r border-slate-200 overflow-y-auto z-10 pl-4">
+        <NavLinks roles={roles} pathname={pathname} />
+      </aside>
 
-        {/* Main content */}
-        <main className="flex-1 min-w-0">{children}</main>
-      </div>
+      {/* Main content */}
+      <main className="pt-12 2xl:pl-60">{children}</main>
     </div>
   )
 }

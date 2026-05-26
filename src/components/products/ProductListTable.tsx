@@ -264,7 +264,7 @@ export function ProductListTable({
                 />
 
                 {/* 4ペインボディ */}
-                <div className="flex-1 grid grid-cols-[2fr_2fr_3fr_0.5fr_auto] divide-x divide-slate-100 min-w-0">
+                <div className="flex-1 grid grid-cols-[1.5fr_2.5fr_3fr_0.5fr_auto] divide-x divide-slate-100 min-w-0">
                   {/* ペイン1: 品番・色・品名 */}
                   <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -287,13 +287,13 @@ export function ProductListTable({
                   <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {supplierName && (
-                        <span className="text-xs text-slate-400 leading-none truncate">
+                        <span className="text-xs text-slate-700 leading-none truncate">
                           {supplierName}
                         </span>
                       )}
+                      {p.materialName && <Chip label={p.materialName} />}
                     </div>
                     <div className="flex items-center gap-1 flex-wrap">
-                      {p.materialName && <Chip label={p.materialName} />}
                       {fabricStd && <Chip label={fabricStd} />}
                       {mixed.map((m, i) => (
                         <Chip key={i} label={m.trim()} variant="indigo" />
