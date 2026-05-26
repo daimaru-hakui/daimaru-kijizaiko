@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { GrayFabricListTable } from '@/components/grayFabrics/GrayFabricListTable'
 import type { GrayFabric } from '../../../types'
 
@@ -26,7 +27,8 @@ export default async function GrayFabricsPage() {
   const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s.name]))
 
   const grayFabrics = fabricsSnap.docs.map((d) => {
-    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    const raw = toPlainData(d.data()) as Record<string, unknown>
+    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
     return {
       ...data,
       id: d.id,

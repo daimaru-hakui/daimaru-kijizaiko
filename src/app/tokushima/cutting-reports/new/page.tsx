@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { CuttingReportForm } from '@/components/tokushima/CuttingReportForm'
 import type { SerializableProduct } from '../../../../../types'
 
@@ -15,7 +16,8 @@ export default async function CuttingReportNewPage() {
   ])
 
   const products = productsSnap.docs.map((d) => {
-    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    const raw = toPlainData(d.data()) as Record<string, unknown>
+    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
     return { ...data, id: d.id } as unknown as SerializableProduct
   })
 

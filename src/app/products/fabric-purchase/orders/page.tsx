@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { ProductsFabricPurchaseOrderTable } from '@/components/products/ProductsFabricPurchaseOrderTable'
 import type { History } from '../../../../../types'
 
@@ -26,13 +27,9 @@ export default async function ProductsFabricPurchaseOrdersPage() {
 
   const orders = ordersSnap.docs
     .map((d) => {
-      const { createdAt, updatedAt, ...data } = d.data()
-      return {
-        ...data,
-        id: d.id,
-        createdAt: createdAt?.toDate?.() ?? null,
-        updatedAt: updatedAt?.toDate?.() ?? null,
-      } as History
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as History
     })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 

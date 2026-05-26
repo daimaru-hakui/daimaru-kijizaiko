@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { Button } from '@/components/ui/button'
 import { GrayFabricConfirmTable } from '@/components/grayFabrics/GrayFabricConfirmTable'
 import { getTodayDate, get3monthsAgo } from '@/lib/gray-fabrics/dates'
@@ -42,13 +43,9 @@ export default async function GrayFabricConfirmsPage({
 
   const confirms = confirmsSnap.docs
     .map((d) => {
-      const { createdAt, updatedAt, ...data } = d.data()
-      return {
-        ...data,
-        id: d.id,
-        createdAt: createdAt?.toDate?.() ?? null,
-        updatedAt: updatedAt?.toDate?.() ?? null,
-      } as GrayFabricHistory
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as GrayFabricHistory
     })
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 

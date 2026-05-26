@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { CuttingReportHistoryTable } from '@/components/tokushima/CuttingReportHistoryTable'
 import type { CuttingReportType } from '../../../../../types'
@@ -42,7 +43,8 @@ export default async function CuttingReportHistoryPage({ searchParams }: Props) 
 
   const reports = reportsSnap.docs
     .map((d) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
       return { ...data, id: d.id } as CuttingReportType
     })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))

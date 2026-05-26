@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { FabricDyeingOrderTable } from '@/components/products/FabricDyeingOrderTable'
 import type { SerializableHistory } from '../../../../../types'
 
@@ -25,7 +26,8 @@ export default async function FabricDyeingOrdersPage() {
 
   const orders = ordersSnap.docs
     .map((d) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
       return { ...data, id: d.id } as unknown as SerializableHistory
     })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))

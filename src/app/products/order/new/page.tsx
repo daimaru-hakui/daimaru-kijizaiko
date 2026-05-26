@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { ProductOrderSearch } from '@/components/products/ProductOrderSearch'
 import type { SerializableProduct, StockPlace } from '../../../../../types'
 
@@ -17,12 +18,13 @@ export default async function ProductOrderNewPage() {
   const products = productsSnap.docs
     .filter((d) => !d.data().deletedAt)
     .map((d) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
       return { ...data, id: d.id } as unknown as SerializableProduct
     })
 
   const stockPlaces = stockPlacesSnap.docs.map((d) => ({
-    ...(d.data() as Omit<StockPlace, 'id'>),
+    ...(toPlainData(d.data()) as Omit<StockPlace, 'id'>),
     id: d.id,
   }))
 

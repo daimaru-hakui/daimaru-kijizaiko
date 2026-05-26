@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { SchedulesTable } from '@/components/schedules/SchedulesTable'
 import type { CuttingSchedule } from '../../../types'
 
@@ -44,7 +45,8 @@ export default async function SchedulesPage() {
   }))
 
   const schedules = schedulesSnap.docs.map((d) => {
-    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    const raw = toPlainData(d.data()) as Record<string, unknown>
+    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
     return { ...data, id: d.id } as CuttingSchedule
   })
 

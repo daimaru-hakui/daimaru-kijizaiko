@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { AccountingConfirmTable } from '@/components/accounting/AccountingConfirmTable'
 import type { SerializableHistory } from '../../../../types'
@@ -34,7 +35,8 @@ export default async function AccountingConfirmsPage({ searchParams }: Props) {
 
   const histories = historiesSnap.docs
     .map((d) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
       return { ...data, id: d.id } as unknown as SerializableHistory
     })
     .filter((h) => h.quantity > 0 && h.accounting === true)

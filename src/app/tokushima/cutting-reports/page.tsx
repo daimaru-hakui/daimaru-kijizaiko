@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { CuttingReportListTable } from '@/components/tokushima/CuttingReportListTable'
 import type { CuttingReportType, SerializableProduct } from '../../../../types'
@@ -38,7 +39,8 @@ export default async function CuttingReportsPage({ searchParams }: Props) {
     .map((d) => ({ id: d.id, name: (d.data().name ?? d.id) as string }))
 
   const products = productsSnap.docs.map((d) => {
-    const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+    const raw = toPlainData(d.data()) as Record<string, unknown>
+    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
     return { ...data, id: d.id } as unknown as SerializableProduct
   })
 
@@ -56,7 +58,8 @@ export default async function CuttingReportsPage({ searchParams }: Props) {
 
   const reports = reportsSnap.docs
     .map((d) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = d.data()
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
       return { ...data, id: d.id } as CuttingReportType
     })
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))

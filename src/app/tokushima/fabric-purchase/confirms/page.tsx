@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
 import { TokushimaFabricPurchaseConfirmTable } from '@/components/tokushima/TokushimaFabricPurchaseConfirmTable'
 import type { History } from '../../../../../types'
@@ -41,13 +42,9 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
 
   const confirms = confirmsSnap.docs
     .map((d) => {
-      const { createdAt, updatedAt, ...data } = d.data()
-      return {
-        ...data,
-        id: d.id,
-        createdAt: createdAt?.toDate?.() ?? null,
-        updatedAt: updatedAt?.toDate?.() ?? null,
-      } as History
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as History
     })
     .filter((h) => h.stockPlace === HOUSE_FACTORY)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
