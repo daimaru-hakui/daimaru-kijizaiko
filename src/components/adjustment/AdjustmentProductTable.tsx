@@ -5,7 +5,7 @@ import { Table, TableBody } from '@/components/ui/table'
 import { AdjustmentProductHeader } from './AdjustmentProductHeader'
 import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
 import { AdjustmentProductSearchBar } from './AdjustmentProductSearchBar'
-import { halfToFullChar } from '@/lib/utils'
+import { matchesProductNumber } from '@/lib/utils'
 import type { Product } from '../../../types'
 
 type Props = {
@@ -19,7 +19,7 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
   const [searchText, setSearchText] = useState('')
 
   const filtered = products.filter((p) =>
-    p.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
+    matchesProductNumber(p.productNumber, searchText)
   )
 
   return (

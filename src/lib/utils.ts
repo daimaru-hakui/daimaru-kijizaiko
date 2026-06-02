@@ -16,6 +16,12 @@ export function halfToFullChar(str: string): string {
   );
 }
 
+/** 品番の部分一致検索。半角/全角・大文字/小文字を区別せずにマッチする。 */
+export function matchesProductNumber(productNumber: string, keyword: string): boolean {
+  const normalize = (s: string) => halfToFullChar(s.toUpperCase());
+  return normalize(productNumber).includes(normalize(keyword));
+}
+
 export function getMixed(materials: Materials | Record<string, unknown>): string[] {
   if (!materials) return [];
   const m = materials as Record<string, string | number>;

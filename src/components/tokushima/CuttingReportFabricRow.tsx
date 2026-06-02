@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { FaWindowClose } from 'react-icons/fa'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockEditDialog } from './StockEditDialog'
-import { halfToFullChar } from '@/lib/utils'
+import { matchesProductNumber } from '@/lib/utils'
 import type { SerializableProduct, CuttingProductType } from '../../../types'
 
 const CATEGORIES = ['表地', '裏地', '芯地', '配色', 'その他']
@@ -33,7 +33,7 @@ export function CuttingReportFabricRow({
   const selectedProduct = products.find((p) => p.id === item.productId)
 
   const filteredProducts = products.filter((p) => {
-    const matchText = p.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
+    const matchText = matchesProductNumber(p.productNumber, searchText)
     if (item.category === '芯地') return matchText && p.interfacing === true
     if (item.category === '裏地') return matchText && p.lining === true
     return matchText

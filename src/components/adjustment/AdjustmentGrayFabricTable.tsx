@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table'
 import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
 import { AdjustmentGrayFabricSearchBar } from './AdjustmentGrayFabricSearchBar'
-import { halfToFullChar } from '@/lib/utils'
+import { matchesProductNumber } from '@/lib/utils'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -21,7 +21,7 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
   const [searchText, setSearchText] = useState('')
 
   const filtered = grayFabrics.filter((g) =>
-    g.productNumber.includes(halfToFullChar(searchText.toUpperCase()))
+    matchesProductNumber(g.productNumber, searchText)
   )
 
   return (

@@ -1,6 +1,28 @@
 import { describe, it, expect } from 'vitest'
-import { getMixed, getFabricStd, getCuttingScheduleTotal } from './utils'
+import { getMixed, getFabricStd, getCuttingScheduleTotal, matchesProductNumber } from './utils'
 import type { CuttingSchedule } from '../../types'
+
+describe('matchesProductNumber', () => {
+  it('半角入力で半角保存品番にマッチする', () => {
+    expect(matchesProductNumber('DM-001', 'DM')).toBe(true)
+  })
+
+  it('小文字入力で大文字品番にマッチする', () => {
+    expect(matchesProductNumber('DM-001', 'dm')).toBe(true)
+  })
+
+  it('全角入力で半角保存品番にマッチする', () => {
+    expect(matchesProductNumber('DM-001', 'ＤＭ')).toBe(true)
+  })
+
+  it('マッチしない品番で false', () => {
+    expect(matchesProductNumber('DM-001', 'XX')).toBe(false)
+  })
+
+  it('空キーワードで true（全件通過）', () => {
+    expect(matchesProductNumber('DM-001', '')).toBe(true)
+  })
+})
 
 describe('getMixed', () => {
   it('ポリエステル100%のみ返す', () => {
