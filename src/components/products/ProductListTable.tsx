@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { deleteProductAction } from "@/app/products/actions";
 import {
-  halfToFullChar,
+  matchesProductNumber,
   getMixed,
   getFabricStd,
   getCuttingScheduleTotal,
@@ -15,7 +15,7 @@ import {
 import { getTodayDate } from "@/lib/dates";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
-import { ProductOrderDialog } from "./ProductOrderDialog";
+import { ProductOrderDialog } from "./order-dialog/ProductOrderDialog";
 import type {
   CuttingSchedule,
   Product,
@@ -58,28 +58,17 @@ export function ProductListTable({
     null,
   );
 
-  const filtered = useMemo(() => {
-    const num = halfToFullChar(searchNum.toUpperCase());
-    const staffLower = searchStaff.toLowerCase();
-    return products.filter((p) => {
-      const staffName = (usersMap[p.staff] ?? p.staff).toLowerCase();
-      return (
-        p.productNumber.includes(num) &&
-        p.colorName.includes(searchColor) &&
-        p.productName.includes(searchName) &&
-        staffName.includes(staffLower) &&
-        (p.materialName ?? "").includes(searchMaterial)
-      );
-    });
-  }, [
-    products,
-    searchNum,
-    searchColor,
-    searchName,
-    searchStaff,
-    searchMaterial,
-    usersMap,
-  ]);
+  const staffLower = searchStaff.toLowerCase();
+  const filtered = products.filter((p) => {
+    const staffName = (usersMap[p.staff] ?? p.staff).toLowerCase();
+    return (
+      matchesProductNumber(p.productNumber, searchNum) &&
+      p.colorName.includes(searchColor) &&
+      p.productName.includes(searchName) &&
+      staffName.includes(staffLower) &&
+      (p.materialName ?? "").includes(searchMaterial)
+    );
+  });
 
   const handleDelete = async (
     product: Omit<Product, "createdAt" | "updatedAt">,
@@ -415,14 +404,14 @@ export function ProductListTable({
   );
 }
 
-type InlineStatProps = {
+export type InlineStatProps = {
   label: string;
   value: number;
   unit: string;
   danger?: boolean;
 };
 
-function InlineStat({ label, value, unit, danger }: InlineStatProps) {
+export function InlineStat({ label, value, unit, danger }: InlineStatProps) {
   const isZero = value === 0;
   return (
     <div className="flex flex-col items-center justify-center gap-1">
@@ -439,12 +428,12 @@ function InlineStat({ label, value, unit, danger }: InlineStatProps) {
   );
 }
 
-type ChipProps = {
+export type ChipProps = {
   label: string;
   variant?: "default" | "indigo" | "slate";
 };
 
-function Chip({ label, variant = "default" }: ChipProps) {
+export function Chip({ label, variant = "default" }: ChipProps) {
   const styles = {
     default: "bg-slate-100 text-slate-600",
     indigo: "bg-indigo-50 text-indigo-700 border border-indigo-200",

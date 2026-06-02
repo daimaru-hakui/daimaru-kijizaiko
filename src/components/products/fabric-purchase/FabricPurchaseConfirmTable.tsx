@@ -22,13 +22,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { updateFabricDyeingConfirmAction } from '@/app/products/fabric-dyeing/actions'
-import type { SerializableHistory } from '../../../types'
+import { updateFabricPurchaseConfirmAction } from '@/app/products/fabric-purchase/actions'
+import type { SerializableHistory } from '../../../../types'
 
 type Props = {
   confirms: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
+  isTokushima: boolean
   isRD: boolean
   startDay: string
   endDay: string
@@ -55,9 +56,10 @@ function EditConfirmDialog({
 
   const handleSave = async () => {
     if (!window.confirm('更新してよろしいでしょうか')) return
-    const result = await updateFabricDyeingConfirmAction({
+    const result = await updateFabricPurchaseConfirmAction({
       historyId: history.id,
       productId: history.productId,
+      stockPlace: history.stockPlace ?? '',
       currentQuantity: history.quantity,
       quantity: Number(quantity),
       price: Number(price),
@@ -110,10 +112,11 @@ function EditConfirmDialog({
   )
 }
 
-export function FabricDyeingConfirmTable({
+export function FabricPurchaseConfirmTable({
   confirms,
   usersMap,
   userId,
+  isTokushima,
   isRD,
   startDay,
   endDay,
@@ -133,20 +136,21 @@ export function FabricDyeingConfirmTable({
   )
 
   const handleSearch = () => {
-    router.push(`/products/fabric-dyeing/confirms?start=${start}&end=${end}`)
+    router.push(`/products/fabric-purchase/confirms?start=${start}&end=${end}`)
   }
   const handleReset = () => {
-    router.push('/products/fabric-dyeing/confirms')
+    router.push('/products/fabric-purchase/confirms')
   }
 
-  const canEdit = (h: SerializableHistory) => isRD || h.createUser === userId
+  const canEdit = (h: SerializableHistory) =>
+    (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">染色入荷履歴</h2>
-        <Link href="/products/fabric-dyeing/orders">
-          <Button size="sm" variant="outline">発注一覧</Button>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷履歴</h2>
+        <Link href="/products/fabric-purchase/orders">
+          <Button size="sm" variant="outline">入荷予定</Button>
         </Link>
       </div>
 
@@ -185,12 +189,13 @@ export function FabricDyeingConfirmTable({
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷日</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
                 <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
                 <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
                 <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">金額</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
               </TableRow>
@@ -210,13 +215,16 @@ export function FabricDyeingConfirmTable({
                   <TableCell className="text-right">
                     {h.price ? `${(h.quantity * h.price).toLocaleString()}円` : ''}
                   </TableCell>
+                  <TableCell>{h.stockPlace}</TableCell>
                   <TableCell className="max-w-[200px] truncate">{h.comment}</TableCell>
                   <TableCell>
-                    {canEdit(h) && (
+                    {canEdit(h) ? (
                       <Button size="sm" variant="outline" onClick={() => setEditConfirm(h)}>
                         編集
                       </Button>
-                    )}
+                    ) : h.accounting ? (
+                      <span className="text-xs text-muted-foreground">金額確認済</span>
+                    ) : null}
                   </TableCell>
                 </TableRow>
               ))}

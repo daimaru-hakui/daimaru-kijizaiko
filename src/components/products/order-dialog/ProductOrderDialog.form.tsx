@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { Textarea } from '@/components/ui/textarea'
-import type { SerializableProduct, StockPlace } from '../../../types'
+import type { SerializableProduct, StockPlace } from '../../../../types'
 import {
   DYEING_BASE_CHIPS,
   DYEING_STOCK_CHIP,

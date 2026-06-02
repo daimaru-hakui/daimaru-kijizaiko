@@ -3,14 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,14 +14,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { updateFabricPurchaseConfirmAction } from '@/app/products/fabric-purchase/actions'
-import type { SerializableHistory } from '../../../types'
+import { updateFabricDyeingConfirmAction } from '@/app/products/fabric-dyeing/actions'
+import { InlineStat, Chip } from '../ProductListTable'
+import type { SerializableHistory } from '../../../../types'
 
 type Props = {
   confirms: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
-  isTokushima: boolean
   isRD: boolean
   startDay: string
   endDay: string
@@ -56,10 +48,9 @@ function EditConfirmDialog({
 
   const handleSave = async () => {
     if (!window.confirm('更新してよろしいでしょうか')) return
-    const result = await updateFabricPurchaseConfirmAction({
+    const result = await updateFabricDyeingConfirmAction({
       historyId: history.id,
       productId: history.productId,
-      stockPlace: history.stockPlace ?? '',
       currentQuantity: history.quantity,
       quantity: Number(quantity),
       price: Number(price),
@@ -112,11 +103,10 @@ function EditConfirmDialog({
   )
 }
 
-export function ProductsFabricPurchaseConfirmTable({
+export function FabricDyeingConfirmTable({
   confirms,
   usersMap,
   userId,
-  isTokushima,
   isRD,
   startDay,
   endDay,
@@ -136,21 +126,20 @@ export function ProductsFabricPurchaseConfirmTable({
   )
 
   const handleSearch = () => {
-    router.push(`/products/fabric-purchase/confirms?start=${start}&end=${end}`)
+    router.push(`/products/fabric-dyeing/confirms?start=${start}&end=${end}`)
   }
   const handleReset = () => {
-    router.push('/products/fabric-purchase/confirms')
+    router.push('/products/fabric-dyeing/confirms')
   }
 
-  const canEdit = (h: SerializableHistory) =>
-    (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
+  const canEdit = (h: SerializableHistory) => isRD || h.createUser === userId
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷履歴</h2>
-        <Link href="/products/fabric-purchase/orders">
-          <Button size="sm" variant="outline">入荷予定</Button>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">染色入荷履歴</h2>
+        <Link href="/products/fabric-dyeing/orders">
+          <Button size="sm" variant="outline">発注一覧</Button>
         </Link>
       </div>
 
@@ -180,60 +169,97 @@ export function ProductsFabricPurchaseConfirmTable({
         <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
       </div>
 
-      <div className="overflow-x-auto">
-        {filtered.length > 0 ? (
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">金額</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((h) => (
-                <TableRow key={h.id}>
-                  <TableCell>{formatSerial(h.serialNumber)}</TableCell>
-                  <TableCell>{h.orderedAt}</TableCell>
-                  <TableCell>{h.fixedAt}</TableCell>
-                  <TableCell>{usersMap[h.createUser] ?? h.createUser}</TableCell>
-                  <TableCell>{h.productNumber}</TableCell>
-                  <TableCell>{h.colorName}</TableCell>
-                  <TableCell>{h.productName}</TableCell>
-                  <TableCell className="text-right">{h.quantity.toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">{h.price?.toLocaleString()}円</TableCell>
-                  <TableCell className="text-right">
-                    {h.price ? `${(h.quantity * h.price).toLocaleString()}円` : ''}
-                  </TableCell>
-                  <TableCell>{h.stockPlace}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{h.comment}</TableCell>
-                  <TableCell>
-                    {canEdit(h) ? (
-                      <Button size="sm" variant="outline" onClick={() => setEditConfirm(h)}>
-                        編集
-                      </Button>
-                    ) : h.accounting ? (
-                      <span className="text-xs text-muted-foreground">金額確認済</span>
-                    ) : null}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-center text-muted-foreground py-8">現在登録された情報はありません。</p>
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((h) => (
+            <div
+              key={h.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・色・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {h.productNumber}
+                    </span>
+                    {h.colorName && <Chip label={h.colorName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={h.productName}
+                  >
+                    {h.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerial(h.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={usersMap[h.createUser] ?? h.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {h.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    入荷: {h.fixedAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値 */}
+                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                  <InlineStat label="数量" value={h.quantity} unit="m" />
+                  <InlineStat label="単価" value={h.price ?? 0} unit="円" />
+                  <InlineStat
+                    label="金額"
+                    value={h.price ? h.quantity * h.price : 0}
+                    unit="円"
+                  />
+                </div>
+
+                {/* ペイン4: コメント */}
+                <div className="px-3 py-2 flex flex-col justify-center min-w-0">
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={h.comment ?? ''}
+                  >
+                    {h.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  {canEdit(h) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => setEditConfirm(h)}
+                    >
+                      編集
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {editConfirm && (
         <EditConfirmDialog

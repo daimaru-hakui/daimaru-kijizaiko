@@ -3,7 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
-import { ProductsFabricPurchaseConfirmTable } from '@/components/products/ProductsFabricPurchaseConfirmTable'
+import { FabricPurchaseConfirmTable } from '@/components/products/fabric-purchase/FabricPurchaseConfirmTable'
 import type { SerializableHistory } from '../../../../../types'
 
 type Props = {
@@ -49,7 +49,7 @@ export default async function ProductsFabricPurchaseConfirmsPage({ searchParams 
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
       <div className="max-w-7xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <ProductsFabricPurchaseConfirmTable
+          <FabricPurchaseConfirmTable
             confirms={confirms}
             usersMap={usersMap}
             userId={user.uid}

@@ -18,7 +18,7 @@ import {
   updateFabricPurchaseOrderAction,
   deleteFabricPurchaseOrderAction,
 } from '@/app/products/fabric-purchase/actions'
-import type { History } from '../../../types'
+import type { History } from '../../../../types'
 import { getTodayDate } from '@/lib/dates'
 import {
   Dialog,
@@ -230,7 +230,7 @@ function EditOrderDialog({
   )
 }
 
-export function ProductsFabricPurchaseOrderTable({
+export function FabricPurchaseOrderTable({
   orders,
   usersMap,
   userId,

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { ProductOrderDialog } from './ProductOrderDialog'
+import { ProductOrderDialog } from './order-dialog/ProductOrderDialog'
 import { halfToFullChar } from '@/lib/utils'
 import type { SerializableProduct, StockPlace } from '../../../types'
 

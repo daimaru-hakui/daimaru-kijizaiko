@@ -3,7 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
-import { FabricDyeingConfirmTable } from '@/components/products/FabricDyeingConfirmTable'
+import { FabricDyeingConfirmTable } from '@/components/products/fabric-dyeing/FabricDyeingConfirmTable'
 import type { SerializableHistory } from '../../../../../types'
 
 type Props = {

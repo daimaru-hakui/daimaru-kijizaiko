@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
-import { ProductsFabricPurchaseOrderTable } from '@/components/products/ProductsFabricPurchaseOrderTable'
+import { FabricPurchaseOrderTable } from '@/components/products/fabric-purchase/FabricPurchaseOrderTable'
 import type { History } from '../../../../../types'
 
 export default async function ProductsFabricPurchaseOrdersPage() {
@@ -37,7 +37,7 @@ export default async function ProductsFabricPurchaseOrdersPage() {
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
       <div className="max-w-7xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <ProductsFabricPurchaseOrderTable
+          <FabricPurchaseOrderTable
             orders={orders}
             usersMap={usersMap}
             userId={user.uid}

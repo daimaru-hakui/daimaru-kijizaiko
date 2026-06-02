@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, type MockInstance } from "vitest";
 import { ProductOrderDialog } from "./ProductOrderDialog";
-import type { SerializableProduct, StockPlace } from "../../../types";
+import type { SerializableProduct, StockPlace } from "../../../../types";
 
 /* ── 外部依存モック ── */
 vi.mock("next/navigation", () => ({

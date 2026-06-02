@@ -3,15 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { FaTrashAlt } from 'react-icons/fa'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,14 +20,14 @@ import {
   deleteFabricDyeingOrderAction,
 } from '@/app/products/fabric-dyeing/actions'
 import { getTodayDate } from '@/lib/dates'
-import type { SerializableHistory } from '../../../types'
+import { InlineStat, Chip } from '../ProductListTable'
+import type { SerializableHistory } from '../../../../types'
 
 type Props = {
   orders: SerializableHistory[]
   usersMap: Record<string, string>
   userId: string
   isRD: boolean
-  isAdmin: boolean
 }
 
 function formatSerial(n: number) {
@@ -228,7 +219,6 @@ export function FabricDyeingOrderTable({
   usersMap,
   userId,
   isRD,
-  isAdmin,
 }: Props) {
   const router = useRouter()
   const [confirmOrder, setConfirmOrder] = useState<SerializableHistory | null>(null)
@@ -258,75 +248,121 @@ export function FabricDyeingOrderTable({
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        {orders.length > 0 ? (
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">確定</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕上予定日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">金額</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集/削除</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>
-                    {canEdit(order) ? (
-                      <Button size="sm" variant="outline" onClick={() => setConfirmOrder(order)}>
-                        確定
-                      </Button>
-                    ) : (
-                      <Button size="sm" disabled>確定</Button>
-                    )}
-                  </TableCell>
-                  <TableCell>{formatSerial(order.serialNumber)}</TableCell>
-                  <TableCell>{order.orderedAt}</TableCell>
-                  <TableCell>{order.scheduledAt}</TableCell>
-                  <TableCell>{usersMap[order.createUser] ?? order.createUser}</TableCell>
-                  <TableCell>{order.productNumber}</TableCell>
-                  <TableCell>{order.colorName}</TableCell>
-                  <TableCell>{order.productName}</TableCell>
-                  <TableCell className="text-right">{order.quantity.toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">
-                    {order.price ? `${order.price.toLocaleString()}円` : ''}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {order.price ? `${(order.quantity * order.price).toLocaleString()}円` : ''}
-                  </TableCell>
-                  <TableCell className="max-w-[200px] truncate">{order.comment}</TableCell>
-                  <TableCell>
-                    {canEdit(order) && order.orderType === 'dyeing' && (
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={() => setEditOrder(order)}>
-                          編集
-                        </Button>
-                        {isAdmin && (
-                          <button onClick={() => handleDelete(order)} className="text-destructive">
-                            <FaTrashAlt />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-center text-muted-foreground py-8">現在登録された情報はありません。</p>
-        )}
-      </div>
+      {orders.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・色・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {order.productNumber}
+                    </span>
+                    {order.colorName && <Chip label={order.colorName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={order.productName}
+                  >
+                    {order.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerial(order.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={usersMap[order.createUser] ?? order.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {order.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    仕上: {order.scheduledAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値 */}
+                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                  <InlineStat label="数量" value={order.quantity} unit="m" />
+                  <InlineStat label="単価" value={order.price ?? 0} unit="円" />
+                  <InlineStat
+                    label="金額"
+                    value={order.price ? order.quantity * order.price : 0}
+                    unit="円"
+                  />
+                </div>
+
+                {/* ペイン4: コメント */}
+                <div className="px-3 py-2 flex flex-col justify-center min-w-0">
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={order.comment ?? ''}
+                  >
+                    {order.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  {canEdit(order) ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => setConfirmOrder(order)}
+                    >
+                      確定
+                    </Button>
+                  ) : (
+                    <Button size="sm" className="h-7 px-2 text-xs" disabled>
+                      確定
+                    </Button>
+                  )}
+                  {canEdit(order) && order.orderType === 'dyeing' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => setEditOrder(order)}
+                    >
+                      編集
+                    </Button>
+                  )}
+                  {canEdit(order) && order.orderType === 'dyeing' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDelete(order)}
+                    >
+                      削除
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {confirmOrder && (
         <ConfirmDialog
@@ -335,6 +371,7 @@ export function FabricDyeingOrderTable({
           onClose={() => setConfirmOrder(null)}
         />
       )}
+
       {editOrder && (
         <EditDialog
           order={editOrder}

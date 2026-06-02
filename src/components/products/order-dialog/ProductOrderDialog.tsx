@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import type { SerializableProduct, StockPlace } from '../../../types'
+import type { SerializableProduct, StockPlace } from '../../../../types'
 import { type OrderTab } from './ProductOrderDialog.types'
 import { ProductOrderForm } from './ProductOrderDialog.form'
 

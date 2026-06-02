@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
-import { FabricDyeingOrderTable } from '@/components/products/FabricDyeingOrderTable'
+import { FabricDyeingOrderTable } from '@/components/products/fabric-dyeing/FabricDyeingOrderTable'
 import type { SerializableHistory } from '../../../../../types'
 
 export default async function FabricDyeingOrdersPage() {
@@ -22,7 +22,6 @@ export default async function FabricDyeingOrdersPage() {
 
   const userData = userDocSnap.data()
   const isRD = Boolean(userData?.rd || userData?.admin)
-  const isAdmin = Boolean(userData?.admin)
 
   const orders = ordersSnap.docs
     .map((d) => {
@@ -41,7 +40,6 @@ export default async function FabricDyeingOrdersPage() {
             usersMap={usersMap}
             userId={user.uid}
             isRD={isRD}
-            isAdmin={isAdmin}
           />
         </div>
       </div>
