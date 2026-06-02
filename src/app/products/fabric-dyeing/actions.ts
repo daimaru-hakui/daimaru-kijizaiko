@@ -367,3 +367,5 @@ export async function updateFabricDyeingConfirmAction(
   revalidatePath('/products/fabric-dyeing/confirms')
   return { ok: true }
 }
+
+export { orderFabricDyeingFromRanningAction as orderFabricDyeingFromRunningAction }
