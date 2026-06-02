@@ -22,6 +22,58 @@ type Props = {
   onCloseAction?: () => void
 }
 
+type FormState = {
+  productType: string
+  staff: string
+  supplierId: string
+  grayFabricId: string
+  interfacing: boolean
+  lining: boolean
+  productNum: string
+  colorNum: string
+  colorName: string
+  productName: string
+  price: number
+  materialName: string
+  fabricWidth: number
+  fabricWeight: number
+  fabricLength: number
+  selectedFeatures: string[]
+  selectedLocations: string[]
+  noteProduct: string
+  noteFabric: string
+  noteEtc: string
+  externalStock: number
+  tokushimaStock: number
+}
+
+function initForm(product?: Product): FormState {
+  return {
+    productType: String(product?.productType ?? '1'),
+    staff: product?.staff ?? '',
+    supplierId: product?.supplierId ?? '',
+    grayFabricId: product?.grayFabricId ?? '',
+    interfacing: product?.interfacing ?? false,
+    lining: product?.lining ?? false,
+    productNum: product?.productNum ?? '',
+    colorNum: product?.colorNum ?? '',
+    colorName: product?.colorName ?? '',
+    productName: product?.productName ?? '',
+    price: product?.price ?? 0,
+    materialName: product?.materialName ?? '',
+    fabricWidth: product?.fabricWidth ?? 0,
+    fabricWeight: product?.fabricWeight ?? 0,
+    fabricLength: product?.fabricLength ?? 0,
+    selectedFeatures: product?.features ?? [],
+    selectedLocations: product?.locations ?? [],
+    noteProduct: product?.noteProduct ?? '',
+    noteFabric: product?.noteFabric ?? '',
+    noteEtc: product?.noteEtc ?? '',
+    externalStock: product?.externalStock ?? 0,
+    tokushimaStock: product?.tokushimaStock ?? 0,
+  }
+}
+
 export function ProductForm({
   suppliers,
   grayFabrics,
@@ -35,70 +87,48 @@ export function ProductForm({
 }: Props) {
   const router = useRouter()
   const isEdit = Boolean(product)
+  const [form, setForm] = useState<FormState>(() => initForm(product))
 
-  const [productType, setProductType] = useState(String(product?.productType ?? '1'))
-  const [staff, setStaff] = useState(product?.staff ?? '')
-  const [supplierId, setSupplierId] = useState(product?.supplierId ?? '')
-  const [grayFabricId, setGrayFabricId] = useState(product?.grayFabricId ?? '')
-  const [interfacing, setInterfacing] = useState(product?.interfacing ?? false)
-  const [lining, setLining] = useState(product?.lining ?? false)
-  const [productNum, setProductNum] = useState(product?.productNum ?? '')
-  const [colorNum, setColorNum] = useState(product?.colorNum ?? '')
-  const [colorName, setColorName] = useState(product?.colorName ?? '')
-  const [productName, setProductName] = useState(product?.productName ?? '')
-  const [price, setPrice] = useState(product?.price ?? 0)
-  const [materialName, setMaterialName] = useState(product?.materialName ?? '')
-  const [fabricWidth, setFabricWidth] = useState(product?.fabricWidth ?? 0)
-  const [fabricWeight, setFabricWeight] = useState(product?.fabricWeight ?? 0)
-  const [fabricLength, setFabricLength] = useState(product?.fabricLength ?? 0)
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(product?.features ?? [])
-  const [selectedLocations, setSelectedLocations] = useState<string[]>(product?.locations ?? [])
-  const [noteProduct, setNoteProduct] = useState(product?.noteProduct ?? '')
-  const [noteFabric, setNoteFabric] = useState(product?.noteFabric ?? '')
-  const [noteEtc, setNoteEtc] = useState(product?.noteEtc ?? '')
-  const [externalStock, setExternalStock] = useState(product?.externalStock ?? 0)
-  const [tokushimaStock, setTokushimaStock] = useState(product?.tokushimaStock ?? 0)
+  const setField = <K extends keyof FormState>(key: K, value: FormState[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }))
 
-  const toggleFeature = (f: string) => {
-    setSelectedFeatures((prev) =>
-      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
-    )
-  }
-
-  const toggleLocation = (id: string) => {
-    setSelectedLocations((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    )
-  }
+  const toggleList = (key: 'selectedFeatures' | 'selectedLocations', item: string) =>
+    setForm((prev) => {
+      const list = prev[key]
+      return {
+        ...prev,
+        [key]: list.includes(item) ? list.filter((x) => x !== item) : [...list, item],
+      }
+    })
 
   const handleSubmit = async () => {
-    if (!supplierId) { alert('仕入先を選択してください'); return }
-    if (!colorName) { alert('色を選択してください'); return }
+    if (!form.supplierId) { alert('仕入先を選択してください'); return }
+    if (!form.colorName) { alert('色を選択してください'); return }
 
     const data = {
-      productType,
-      staff: productType === '2' ? staff : 'R&D',
-      supplierId,
-      grayFabricId,
-      interfacing,
-      lining,
-      productNum,
-      colorNum,
-      colorName,
-      productName,
-      price: Number(price),
-      materialName,
+      productType: form.productType,
+      staff: form.productType === '2' ? form.staff : 'R&D',
+      supplierId: form.supplierId,
+      grayFabricId: form.grayFabricId,
+      interfacing: form.interfacing,
+      lining: form.lining,
+      productNum: form.productNum,
+      colorNum: form.colorNum,
+      colorName: form.colorName,
+      productName: form.productName,
+      price: Number(form.price),
+      materialName: form.materialName,
       materials: product?.materials ?? {},
-      fabricWidth: Number(fabricWidth),
-      fabricWeight: Number(fabricWeight),
-      fabricLength: Number(fabricLength),
-      features: selectedFeatures,
-      noteProduct,
-      noteFabric,
-      noteEtc,
-      externalStock: Number(externalStock),
-      tokushimaStock: Number(tokushimaStock),
-      locations: selectedLocations,
+      fabricWidth: Number(form.fabricWidth),
+      fabricWeight: Number(form.fabricWeight),
+      fabricLength: Number(form.fabricLength),
+      features: form.selectedFeatures,
+      noteProduct: form.noteProduct,
+      noteFabric: form.noteFabric,
+      noteEtc: form.noteEtc,
+      externalStock: Number(form.externalStock),
+      tokushimaStock: Number(form.tokushimaStock),
+      locations: form.selectedLocations,
     }
 
     let result
@@ -136,8 +166,8 @@ export function ProductForm({
             <input
               type="radio"
               value="1"
-              checked={productType === '1'}
-              onChange={(e) => setProductType(e.target.value)}
+              checked={form.productType === '1'}
+              onChange={(e) => setField('productType', e.target.value)}
             />
             既製品
           </label>
@@ -145,21 +175,21 @@ export function ProductForm({
             <input
               type="radio"
               value="2"
-              checked={productType === '2'}
-              onChange={(e) => setProductType(e.target.value)}
+              checked={form.productType === '2'}
+              onChange={(e) => setField('productType', e.target.value)}
             />
             別注品
           </label>
         </div>
       </div>
 
-      {productType === '2' && (
+      {form.productType === '2' && (
         <div>
           <Label>担当者 <span className="text-destructive">※</span></Label>
           <select
             className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-            value={staff}
-            onChange={(e) => setStaff(e.target.value)}
+            value={form.staff}
+            onChange={(e) => setField('staff', e.target.value)}
           >
             <option value="">担当者名を選択</option>
             {salesUsers.map((u) => (
@@ -173,8 +203,8 @@ export function ProductForm({
         <Label>仕入先 <span className="text-destructive">※</span></Label>
         <select
           className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-          value={supplierId}
-          onChange={(e) => setSupplierId(e.target.value)}
+          value={form.supplierId}
+          onChange={(e) => setField('supplierId', e.target.value)}
         >
           <option value="">メーカーを選択してください</option>
           {suppliers.map((s) => (
@@ -187,16 +217,16 @@ export function ProductForm({
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            checked={interfacing}
-            onChange={(e) => setInterfacing(e.target.checked)}
+            checked={form.interfacing}
+            onChange={(e) => setField('interfacing', e.target.checked)}
           />
           芯地
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            checked={lining}
-            onChange={(e) => setLining(e.target.checked)}
+            checked={form.lining}
+            onChange={(e) => setField('lining', e.target.checked)}
           />
           裏地
         </label>
@@ -208,8 +238,8 @@ export function ProductForm({
           <Input
             className="mt-1"
             placeholder="例）M2000"
-            value={productNum}
-            onChange={(e) => setProductNum(e.target.value)}
+            value={form.productNum}
+            onChange={(e) => setField('productNum', e.target.value)}
           />
         </div>
         <div>
@@ -217,16 +247,16 @@ export function ProductForm({
           <Input
             className="mt-1"
             placeholder="例）G1"
-            value={colorNum}
-            onChange={(e) => setColorNum(e.target.value)}
+            value={form.colorNum}
+            onChange={(e) => setField('colorNum', e.target.value)}
           />
         </div>
         <div>
           <Label>色 <span className="text-destructive">※</span></Label>
           <select
             className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-            value={colorName}
-            onChange={(e) => setColorName(e.target.value)}
+            value={form.colorName}
+            onChange={(e) => setField('colorName', e.target.value)}
           >
             <option value="">色を選択</option>
             {colors.map((c) => (
@@ -242,8 +272,8 @@ export function ProductForm({
           <Input
             className="mt-1"
             placeholder="例）アーバンツイル"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
+            value={form.productName}
+            onChange={(e) => setField('productName', e.target.value)}
           />
         </div>
         <div>
@@ -252,8 +282,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={100000}
-            value={price}
-            onChange={(_, v) => setPrice(isNaN(v) ? 0 : v)}
+            value={form.price}
+            onChange={(_, v) => setField('price', isNaN(v) ? 0 : v)}
           />
         </div>
       </div>
@@ -265,8 +295,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={100000}
-            value={externalStock}
-            onChange={(_, v) => setExternalStock(isNaN(v) ? 0 : v)}
+            value={form.externalStock}
+            onChange={(_, v) => setField('externalStock', isNaN(v) ? 0 : v)}
           />
         </div>
         <div>
@@ -275,8 +305,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={100000}
-            value={tokushimaStock}
-            onChange={(_, v) => setTokushimaStock(isNaN(v) ? 0 : v)}
+            value={form.tokushimaStock}
+            onChange={(_, v) => setField('tokushimaStock', isNaN(v) ? 0 : v)}
           />
         </div>
       </div>
@@ -288,8 +318,8 @@ export function ProductForm({
             <label key={loc.id} className="flex items-center gap-1 cursor-pointer text-sm">
               <input
                 type="checkbox"
-                checked={selectedLocations.includes(loc.id)}
-                onChange={() => toggleLocation(loc.id)}
+                checked={form.selectedLocations.includes(loc.id)}
+                onChange={() => toggleList('selectedLocations', loc.id)}
               />
               {loc.name}
             </label>
@@ -301,8 +331,8 @@ export function ProductForm({
         <Label>キバタ登録</Label>
         <select
           className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-          value={grayFabricId}
-          onChange={(e) => setGrayFabricId(e.target.value)}
+          value={form.grayFabricId}
+          onChange={(e) => setField('grayFabricId', e.target.value)}
         >
           <option value="">キバタを選択してください</option>
           {grayFabrics.map((g) => (
@@ -317,8 +347,8 @@ export function ProductForm({
         <Label>備考（使用製品品番）</Label>
         <Textarea
           className="mt-1"
-          value={noteProduct}
-          onChange={(e) => setNoteProduct(e.target.value)}
+          value={form.noteProduct}
+          onChange={(e) => setField('noteProduct', e.target.value)}
         />
       </div>
 
@@ -328,8 +358,8 @@ export function ProductForm({
         <Label>組織名</Label>
         <select
           className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-          value={materialName}
-          onChange={(e) => setMaterialName(e.target.value)}
+          value={form.materialName}
+          onChange={(e) => setField('materialName', e.target.value)}
         >
           <option value="">組織を選択してください</option>
           {[...materialNames].sort().map((m) => (
@@ -345,8 +375,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={200}
-            value={fabricWidth}
-            onChange={(_, v) => setFabricWidth(isNaN(v) ? 0 : v)}
+            value={form.fabricWidth}
+            onChange={(_, v) => setField('fabricWidth', isNaN(v) ? 0 : v)}
           />
         </div>
         <div>
@@ -355,8 +385,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={200}
-            value={fabricLength}
-            onChange={(_, v) => setFabricLength(isNaN(v) ? 0 : v)}
+            value={form.fabricLength}
+            onChange={(_, v) => setField('fabricLength', isNaN(v) ? 0 : v)}
           />
         </div>
         <div>
@@ -365,8 +395,8 @@ export function ProductForm({
             className="mt-1"
             min={0}
             max={200}
-            value={fabricWeight}
-            onChange={(_, v) => setFabricWeight(isNaN(v) ? 0 : v)}
+            value={form.fabricWeight}
+            onChange={(_, v) => setField('fabricWeight', isNaN(v) ? 0 : v)}
           />
         </div>
       </div>
@@ -378,8 +408,8 @@ export function ProductForm({
             <label key={f} className="flex items-center gap-1 cursor-pointer text-sm">
               <input
                 type="checkbox"
-                checked={selectedFeatures.includes(f)}
-                onChange={() => toggleFeature(f)}
+                checked={form.selectedFeatures.includes(f)}
+                onChange={() => toggleList('selectedFeatures', f)}
               />
               {f}
             </label>
@@ -391,8 +421,8 @@ export function ProductForm({
         <Label>備考（生地の性質など）</Label>
         <Textarea
           className="mt-1"
-          value={noteFabric}
-          onChange={(e) => setNoteFabric(e.target.value)}
+          value={form.noteFabric}
+          onChange={(e) => setField('noteFabric', e.target.value)}
         />
       </div>
 
@@ -402,8 +432,8 @@ export function ProductForm({
         <Label>備考（その他）</Label>
         <Textarea
           className="mt-1"
-          value={noteEtc}
-          onChange={(e) => setNoteEtc(e.target.value)}
+          value={form.noteEtc}
+          onChange={(e) => setField('noteEtc', e.target.value)}
         />
       </div>
 
