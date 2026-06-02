@@ -21,6 +21,8 @@ import {
 } from '@/app/products/fabric-dyeing/actions'
 import { getTodayDate } from '@/lib/dates'
 import { InlineStat, Chip } from '../ProductListTable'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { canEditRecord } from '@/lib/permissions'
 import type { SerializableHistory } from '../../../../types'
 
 type Props = {
@@ -28,10 +30,6 @@ type Props = {
   usersMap: Record<string, string>
   userId: string
   isRD: boolean
-}
-
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
 }
 
 function ConfirmDialog({
@@ -224,7 +222,7 @@ export function FabricDyeingOrderTable({
   const [confirmOrder, setConfirmOrder] = useState<SerializableHistory | null>(null)
   const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
 
-  const canEdit = (o: SerializableHistory) => isRD || o.createUser === userId
+  const canEdit = (o: SerializableHistory) => canEditRecord(o, userId, isRD)
 
   const handleDelete = async (order: SerializableHistory) => {
     if (!window.confirm('削除してよろしいでしょうか')) return
@@ -279,7 +277,7 @@ export function FabricDyeingOrderTable({
                     {order.productName}
                   </div>
                   <div className="text-xs text-slate-400 leading-none">
-                    NO.{formatSerial(order.serialNumber)}
+                    NO.{formatSerialNumber(order.serialNumber)}
                   </div>
                 </div>
 

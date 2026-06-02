@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/dialog'
 import { updateFabricDyeingConfirmAction } from '@/app/products/fabric-dyeing/actions'
 import { InlineStat, Chip } from '../ProductListTable'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { canEditRecord } from '@/lib/permissions'
 import type { SerializableHistory } from '../../../../types'
 
 type Props = {
@@ -25,10 +27,6 @@ type Props = {
   isRD: boolean
   startDay: string
   endDay: string
-}
-
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
 }
 
 function EditConfirmDialog({
@@ -132,7 +130,7 @@ export function FabricDyeingConfirmTable({
     router.push('/products/fabric-dyeing/confirms')
   }
 
-  const canEdit = (h: SerializableHistory) => isRD || h.createUser === userId
+  const canEdit = (h: SerializableHistory) => canEditRecord(h, userId, isRD)
 
   return (
     <div className="p-6 space-y-4">
@@ -200,7 +198,7 @@ export function FabricDyeingConfirmTable({
                     {h.productName}
                   </div>
                   <div className="text-xs text-slate-400 leading-none">
-                    NO.{formatSerial(h.serialNumber)}
+                    NO.{formatSerialNumber(h.serialNumber)}
                   </div>
                 </div>
 

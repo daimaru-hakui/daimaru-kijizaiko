@@ -30,6 +30,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { canEditRecord } from '@/lib/permissions'
 
 type Props = {
   orders: History[]
@@ -38,10 +40,6 @@ type Props = {
   isTokushima: boolean
   isRD: boolean
   isAdmin: boolean
-}
-
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
 }
 
 function ConfirmDialog({
@@ -243,7 +241,7 @@ export function FabricPurchaseOrderTable({
   const [editOrder, setEditOrder] = useState<History | null>(null)
 
   const canConfirmOrEdit = (order: History) =>
-    isTokushima || isRD || order.createUser === userId
+    canEditRecord(order, userId, isTokushima || isRD)
 
   const handleDelete = async (order: History) => {
     if (!window.confirm('削除してよろしいでしょうか')) return
@@ -299,7 +297,7 @@ export function FabricPurchaseOrderTable({
                       <Button size="sm" disabled>入荷確定</Button>
                     )}
                   </TableCell>
-                  <TableCell>{formatSerial(order.serialNumber)}</TableCell>
+                  <TableCell>{formatSerialNumber(order.serialNumber)}</TableCell>
                   <TableCell>{order.orderedAt}</TableCell>
                   <TableCell>{order.scheduledAt}</TableCell>
                   <TableCell>{usersMap[order.createUser] ?? order.createUser}</TableCell>

@@ -23,6 +23,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricPurchaseConfirmAction } from '@/app/products/fabric-purchase/actions'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { canEditAccountingRecord } from '@/lib/permissions'
 import type { SerializableHistory } from '../../../../types'
 
 type Props = {
@@ -33,10 +35,6 @@ type Props = {
   isRD: boolean
   startDay: string
   endDay: string
-}
-
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
 }
 
 function EditConfirmDialog({
@@ -143,7 +141,7 @@ export function FabricPurchaseConfirmTable({
   }
 
   const canEdit = (h: SerializableHistory) =>
-    (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
+    canEditAccountingRecord(h, userId, isTokushima || isRD)
 
   return (
     <div className="p-6 space-y-4">
@@ -203,7 +201,7 @@ export function FabricPurchaseConfirmTable({
             <TableBody>
               {filtered.map((h) => (
                 <TableRow key={h.id}>
-                  <TableCell>{formatSerial(h.serialNumber)}</TableCell>
+                  <TableCell>{formatSerialNumber(h.serialNumber)}</TableCell>
                   <TableCell>{h.orderedAt}</TableCell>
                   <TableCell>{h.fixedAt}</TableCell>
                   <TableCell>{usersMap[h.createUser] ?? h.createUser}</TableCell>

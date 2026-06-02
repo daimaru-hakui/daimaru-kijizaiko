@@ -13,6 +13,9 @@ import {
   getCuttingScheduleTotal,
 } from "@/lib/utils";
 import { getTodayDate } from "@/lib/dates";
+import { buildProductCsv } from "@/lib/products/csv";
+import { downloadCsv } from "@/lib/download";
+import { canEditRecord } from "@/lib/permissions";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
 import { ProductOrderDialog } from "./order-dialog/ProductOrderDialog";
@@ -83,56 +86,14 @@ export function ProductListTable({
   };
 
   const handleCsv = () => {
-    const headers = [
-      "担当",
-      "品番",
-      "色番",
-      "色",
-      "品名",
-      "単価",
-      "生地仕掛",
-      "外部在庫",
-      "入荷待ち",
-      "徳島在庫",
-      "組織名",
-      "混率",
-      "規格",
-      "機能性",
-    ];
-    const rows = filtered.map((p) => [
-      usersMap[p.staff] ?? p.staff,
-      p.productNum,
-      p.colorNum,
-      p.colorName,
-      p.productName,
-      p.price,
-      p.wip,
-      p.externalStock,
-      p.arrivingQuantity,
-      p.tokushimaStock,
-      p.materialName,
-      getMixed(p.materials as Parameters<typeof getMixed>[0]).join(" "),
-      getFabricStd(p.fabricWidth, p.fabricLength, p.fabricWeight),
-      (p.features ?? []).join(" "),
-    ]);
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row
-          .map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`)
-          .join(","),
-      )
-      .join("\n");
-    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `生地一覧_${getTodayDate()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(
+      buildProductCsv(filtered, usersMap),
+      `生地一覧_${getTodayDate()}.csv`,
+    );
   };
 
   const canEdit = (p: Omit<Product, "createdAt" | "updatedAt">) =>
-    isAdmin || isRD || p.createUser === userId;
+    canEditRecord(p, userId, isAdmin || isRD);
 
   return (
     <div className="space-y-4">
