@@ -20,7 +20,7 @@ import {
   deleteFabricDyeingOrderAction,
 } from '@/app/products/fabric-dyeing/actions'
 import { getTodayDate } from '@/lib/dates'
-import { InlineStat, Chip } from '../ProductListTable'
+import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { canEditRecord } from '@/lib/permissions'
 import type { SerializableHistory } from '../../../../types'
