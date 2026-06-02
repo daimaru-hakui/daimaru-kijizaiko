@@ -3,12 +3,12 @@ export type User = {
   uid: string;
   name: string;
   rank: number;
+  admin: boolean;
   rd: boolean;
   sales: boolean;
   accounting: boolean;
   tokushima: boolean;
   order: boolean;
-  admin?: boolean;
 };
 
 export type Product = {
