@@ -82,3 +82,12 @@ describe('GrayFabricConfirmTable 期間検索', () => {
     expect(screen.queryByRole('button', { name: '検索' })).toBeNull()
   })
 })
+
+describe('GrayFabricConfirmTable 数値', () => {
+  it('キバタの履歴は単価を持たないため単価・金額は表示しない', () => {
+    render(<GrayFabricConfirmTable {...defaultProps} />)
+    expect(screen.queryByText('単価')).toBeNull()
+    expect(screen.queryByText('金額')).toBeNull()
+    expect(screen.getByText('数量')).toBeInTheDocument()
+  })
+})

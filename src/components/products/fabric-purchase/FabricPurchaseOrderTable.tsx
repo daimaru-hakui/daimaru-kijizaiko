@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { deleteFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { calcAmount } from '@/lib/numbers'
 import { ListFilterBar } from '@/components/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
@@ -130,10 +131,10 @@ export function FabricPurchaseOrderTable({
                 {/* ペイン3: 数値 */}
                 <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
                   <InlineStat label="数量" value={order.quantity} unit="m" />
-                  <InlineStat label="単価" value={order.price ?? 0} unit="円" />
+                  <InlineStat label="単価" value={order.price} unit="円" />
                   <InlineStat
                     label="金額"
-                    value={order.price ? order.quantity * order.price : 0}
+                    value={calcAmount(order.quantity, order.price)}
                     unit="円"
                   />
                 </div>

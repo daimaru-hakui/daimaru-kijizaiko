@@ -148,3 +148,19 @@ describe('GrayFabricOrderTable フィルター', () => {
     expect(screen.getByText('XX-002')).toBeInTheDocument()
   })
 })
+
+describe('GrayFabricOrderTable 数値', () => {
+  it('キバタの発注は単価を持たないため単価・金額は表示しない', () => {
+    render(
+      <GrayFabricOrderTable
+        orders={[baseOrder]}
+        currentUserId="user-1"
+        isRD={false}
+        users={users}
+      />
+    )
+    expect(screen.queryByText('単価')).toBeNull()
+    expect(screen.queryByText('金額')).toBeNull()
+    expect(screen.getByText('数量')).toBeInTheDocument()
+  })
+})

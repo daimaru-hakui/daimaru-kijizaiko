@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEditDialog'
 import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { calcAmount } from '@/lib/numbers'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import type { History } from '../../../types'
 import { buildStaffOptions } from '@/lib/filters/staff-options'
@@ -145,7 +146,7 @@ export function TokushimaFabricPurchaseConfirmTable({
                   <InlineStat label="単価" value={h.price} unit="円" />
                   <InlineStat
                     label="金額"
-                    value={h.quantity * h.price}
+                    value={calcAmount(h.quantity, h.price)}
                     unit="円"
                   />
                 </div>

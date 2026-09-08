@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { calcAmount } from '@/lib/numbers'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { AccountingEditModal } from './AccountingEditModal'
 import type { SerializableHistory } from '../../../types'
@@ -136,10 +137,10 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
                 {/* ペイン3: 数値 */}
                 <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
                   <InlineStat label="数量" value={h.quantity} unit="m" />
-                  <InlineStat label="単価" value={h.price ?? 0} unit="円" />
+                  <InlineStat label="単価" value={h.price} unit="円" />
                   <InlineStat
                     label="金額"
-                    value={h.price ? h.quantity * h.price : 0}
+                    value={calcAmount(h.quantity, h.price)}
                     unit="円"
                   />
                 </div>

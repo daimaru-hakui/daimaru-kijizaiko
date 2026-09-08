@@ -75,7 +75,7 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
               <div className="w-1 shrink-0 bg-indigo-600" />
 
               {/* ペインボディ */}
-              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_1fr_2.5fr_auto] divide-x divide-slate-100 min-w-0">
                 {/* ペイン1: 品番・仕入先・品名 */}
                 <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -112,15 +112,9 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
                   </div>
                 </div>
 
-                {/* ペイン3: 数値 */}
-                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                {/* ペイン3: 数値。キバタの発注は単価を持たないため数量のみ */}
+                <div className="px-3 py-2 grid grid-cols-1 bg-slate-50/60">
                   <InlineStat label="数量" value={order.quantity} unit="m" />
-                  <InlineStat label="単価" value={order.price ?? 0} unit="円" />
-                  <InlineStat
-                    label="金額"
-                    value={order.price ? order.quantity * order.price : 0}
-                    unit="円"
-                  />
                 </div>
 
                 {/* ペイン4: コメント */}

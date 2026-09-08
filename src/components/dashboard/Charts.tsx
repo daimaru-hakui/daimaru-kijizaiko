@@ -155,7 +155,7 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
                 max={100}
                 value={limitNum}
                 onChange={(_str, num) => setLimitNum(num)}
-                className="w-46"
+                className="w-32"
               />
             </div>
           </div>

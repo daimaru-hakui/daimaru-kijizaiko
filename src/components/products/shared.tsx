@@ -1,22 +1,25 @@
+import { toFiniteNumber } from "@/lib/numbers";
+
 export type InlineStatProps = {
   label: string;
-  value: number;
+  /** 旧データには NaN や未入力が混ざるため、数値以外も受け取って "-" で表示する */
+  value: number | string | null | undefined;
   unit: string;
   danger?: boolean;
 };
 
 export function InlineStat({ label, value, unit, danger }: InlineStatProps) {
-  const isZero = value === 0;
+  const numeric = toFiniteNumber(value);
+  const isMuted = numeric === null || numeric === 0;
   return (
     <div className="flex flex-col items-center justify-center gap-1">
       <span className="text-xs text-slate-600 leading-none">{label}</span>
       <span
         className={`text-sm font-semibold leading-snug ${
-          danger ? "text-red-600" : isZero ? "text-slate-300" : "text-slate-800"
+          danger ? "text-red-600" : isMuted ? "text-slate-300" : "text-slate-800"
         }`}
       >
-        {value.toLocaleString()}
-        {unit}
+        {numeric === null ? "-" : `${numeric.toLocaleString()}${unit}`}
       </span>
     </div>
   );
