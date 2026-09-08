@@ -31,3 +31,18 @@ describe('DialogContent', () => {
     expect(dialog.querySelector('[data-slot="dialog-body"]')!.contains(closeButton)).toBe(false)
   })
 })
+
+describe('DialogContent の表示アニメーション', () => {
+  it('斜めに動くスライドではなくフェード + わずかな拡大で表示する', () => {
+    const className = renderDialog().className
+    expect(className).toContain('data-[state=open]:fade-in-0')
+    expect(className).toContain('data-[state=open]:zoom-in-95')
+    expect(className).not.toContain('slide-in-from-left')
+  })
+
+  it('中央寄せに transform を使わない (アニメーションの移動と打ち消し合うため)', () => {
+    const className = renderDialog().className
+    expect(className).not.toContain('translate-x-[-50%]')
+    expect(className).not.toContain('translate-y-[-50%]')
+  })
+})
