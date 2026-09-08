@@ -6,6 +6,7 @@ import { AdjustmentProductHeader } from './AdjustmentProductHeader'
 import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
 import { AdjustmentProductSearchBar } from './AdjustmentProductSearchBar'
 import { matchesProductNumber } from '@/lib/utils'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import type { Product } from '../../../types'
 
 type Props = {
@@ -18,8 +19,11 @@ type Props = {
 export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }: Props) {
   const [searchText, setSearchText] = useState('')
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const search = useDebounce(searchText, SEARCH_DEBOUNCE_MS)
+
   const filtered = products.filter((p) =>
-    matchesProductNumber(p.productNumber, searchText)
+    matchesProductNumber(p.productNumber, search)
   )
 
   return (

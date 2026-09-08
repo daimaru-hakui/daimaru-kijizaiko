@@ -5,6 +5,7 @@ import { FaWindowClose } from 'react-icons/fa'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockEditDialog } from './StockEditDialog'
 import { matchesProductNumber } from '@/lib/utils'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import type { SerializableProduct, CuttingProductType } from '../../../types'
 
 const CATEGORIES = ['表地', '裏地', '芯地', '配色', 'その他']
@@ -32,8 +33,11 @@ export function CuttingReportFabricRow({
 
   const selectedProduct = products.find((p) => p.id === item.productId)
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const search = useDebounce(searchText, SEARCH_DEBOUNCE_MS)
+
   const filteredProducts = products.filter((p) => {
-    const matchText = matchesProductNumber(p.productNumber, searchText)
+    const matchText = matchesProductNumber(p.productNumber, search)
     if (item.category === '芯地') return matchText && p.interfacing === true
     if (item.category === '裏地') return matchText && p.lining === true
     return matchText

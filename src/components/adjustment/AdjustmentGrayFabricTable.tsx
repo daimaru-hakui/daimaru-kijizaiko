@@ -11,6 +11,7 @@ import {
 import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
 import { AdjustmentGrayFabricSearchBar } from './AdjustmentGrayFabricSearchBar'
 import { matchesProductNumber } from '@/lib/utils'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -20,8 +21,11 @@ type Props = {
 export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
   const [searchText, setSearchText] = useState('')
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const search = useDebounce(searchText, SEARCH_DEBOUNCE_MS)
+
   const filtered = grayFabrics.filter((g) =>
-    matchesProductNumber(g.productNumber, searchText)
+    matchesProductNumber(g.productNumber, search)
   )
 
   return (

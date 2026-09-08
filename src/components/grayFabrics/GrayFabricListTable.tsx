@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineStat } from '@/components/products/shared'
 import { matchesProductNumber } from '@/lib/utils'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricEditModal } from './GrayFabricEditModal'
 import { GrayFabricOrderAreaModal } from './GrayFabricOrderAreaModal'
@@ -27,11 +28,16 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
   const [searchName, setSearchName] = useState('')
   const [searchSupplier, setSearchSupplier] = useState('')
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const num = useDebounce(searchNum, SEARCH_DEBOUNCE_MS)
+  const name = useDebounce(searchName, SEARCH_DEBOUNCE_MS)
+  const supplier = useDebounce(searchSupplier, SEARCH_DEBOUNCE_MS)
+
   const filtered = grayFabrics.filter(
     (f) =>
-      matchesProductNumber(f.productNumber, searchNum) &&
-      f.productName.includes(searchName) &&
-      f.supplierName.includes(searchSupplier)
+      matchesProductNumber(f.productNumber, num) &&
+      f.productName.includes(name) &&
+      f.supplierName.includes(supplier)
   )
 
   const handleDelete = (id: string) => {

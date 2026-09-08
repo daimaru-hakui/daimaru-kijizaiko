@@ -10,6 +10,7 @@ import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type UserOption = { id: string; name: string }
 
@@ -91,9 +92,12 @@ export function CuttingReportListTable({
   const [clientFilter, setClientFilter] = useState('')
   const [detailReport, setDetailReport] = useState<CuttingReportType | null>(null)
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const client = useDebounce(clientFilter, SEARCH_DEBOUNCE_MS)
+
   const filtered = reports.filter((r) => {
     const staffMatch = !staffFilter || r.staff === staffFilter
-    const clientMatch = !clientFilter || r.client.includes(clientFilter)
+    const clientMatch = !client || r.client.includes(client)
     return staffMatch && clientMatch
   })
 

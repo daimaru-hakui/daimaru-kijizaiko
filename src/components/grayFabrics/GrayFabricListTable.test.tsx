@@ -15,6 +15,12 @@ vi.mock('@/app/(app)/gray-fabrics/actions', () => ({
   orderGrayFabricAction: vi.fn().mockResolvedValue({ ok: true }),
 }))
 
+// デバウンスをバイパス。タイミング動作は GrayFabricListTable.debounce.test.tsx でカバー済み
+vi.mock('@/hooks/useDebounce', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useDebounce')>()),
+  useDebounce: <T,>(value: T) => value,
+}))
+
 const makeFabric = (
   overrides: Partial<GrayFabric & { supplierName: string }> = {}
 ): GrayFabric & { supplierName: string } => ({

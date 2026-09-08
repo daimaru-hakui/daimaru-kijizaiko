@@ -16,7 +16,7 @@ import { getTodayDate } from "@/lib/dates";
 import { buildProductCsv } from "@/lib/products/csv";
 import { downloadCsv } from "@/lib/download";
 import { canEditRecord } from "@/lib/permissions";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
 import { InlineStat, Chip } from "./shared";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
@@ -28,8 +28,6 @@ import type {
   SerializableProduct,
   StockPlace,
 } from "../../../types";
-
-const SEARCH_DELAY_MS = 300;
 
 type Props = {
   products: Omit<Product, "createdAt" | "updatedAt">[];
@@ -75,11 +73,11 @@ export function ProductListTable({
   } | null>(null);
 
   // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
-  const num = useDebounce(searchNum, SEARCH_DELAY_MS);
-  const color = useDebounce(searchColor, SEARCH_DELAY_MS);
-  const name = useDebounce(searchName, SEARCH_DELAY_MS);
-  const staff = useDebounce(searchStaff, SEARCH_DELAY_MS);
-  const material = useDebounce(searchMaterial, SEARCH_DELAY_MS);
+  const num = useDebounce(searchNum, SEARCH_DEBOUNCE_MS);
+  const color = useDebounce(searchColor, SEARCH_DEBOUNCE_MS);
+  const name = useDebounce(searchName, SEARCH_DEBOUNCE_MS);
+  const staff = useDebounce(searchStaff, SEARCH_DEBOUNCE_MS);
+  const material = useDebounce(searchMaterial, SEARCH_DEBOUNCE_MS);
 
   const staffLower = staff.toLowerCase();
   const filtered = products.filter((p) => {

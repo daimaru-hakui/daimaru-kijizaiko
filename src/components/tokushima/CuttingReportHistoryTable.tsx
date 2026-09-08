@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type Props = {
   reports: CuttingReportType[]
@@ -59,9 +60,12 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
     }))
   )
 
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const client = useDebounce(clientFilter, SEARCH_DEBOUNCE_MS)
+
   const filtered = rows.filter((r) => {
     const staffMatch = !staffFilter || r.staff === staffFilter
-    const clientMatch = !clientFilter || r.client.includes(clientFilter)
+    const clientMatch = !client || r.client.includes(client)
     return staffMatch && clientMatch
   })
 

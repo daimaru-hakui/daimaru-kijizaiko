@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { ProductOrderDialog } from './order-dialog/ProductOrderDialog'
 import { halfToFullChar } from '@/lib/utils'
+import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import type { SerializableProduct, StockPlace } from '../../../types'
 
 type Props = {
@@ -19,10 +20,13 @@ export function ProductOrderSearch({ products, stockPlaces }: Props) {
   const [selectedProduct, setSelectedProduct] = useState<SerializableProduct | null>(null)
   const [orderOpen, setOrderOpen] = useState(false)
 
+  // 入力のたびに全件を走査すると件数が多いときに引っかかるため、入力が落ち着いてから照合する
+  const productNumber = useDebounce(search, SEARCH_DEBOUNCE_MS)
+
   const filtered = products.find(
     (p) =>
-      p.productNumber === search ||
-      p.productNumber === halfToFullChar(search.toUpperCase())
+      p.productNumber === productNumber ||
+      p.productNumber === halfToFullChar(productNumber.toUpperCase())
   )
 
   return (

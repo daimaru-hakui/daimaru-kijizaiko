@@ -16,7 +16,8 @@ vi.mock("@/app/(app)/products/history-actions", () => ({
 }));
 
 // デバウンスをバイパス。タイミング動作は useDebounce.test.ts でカバー済み
-vi.mock("@/hooks/useDebounce", () => ({
+vi.mock("@/hooks/useDebounce", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/hooks/useDebounce")>()),
   useDebounce: <T,>(value: T) => value,
 }));
 
