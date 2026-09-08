@@ -65,6 +65,21 @@ describe('ProductForm', () => {
     await user.click(checkbox)
     expect(checkbox).toBeChecked()
   })
+
+  it('保管場所は列を揃えて並べる', () => {
+    const locations = ['棚A', '棚B', '棚C', '棚D', '棚E'].map((name, i) => ({
+      id: `l${i}`,
+      name,
+      order: i,
+      comment: '',
+    }))
+    render(<ProductForm {...baseProps} locations={locations} />)
+
+    const list = screen.getByLabelText('棚A').closest('label')?.parentElement
+
+    expect(list?.className).toContain('grid')
+    expect(list?.className).toContain('grid-cols-2')
+  })
 })
 
 describe('ProductForm 混率', () => {

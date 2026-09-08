@@ -383,16 +383,27 @@ export function ProductForm({
       </div>
 
       <div>
-        <Label>徳島保管場所</Label>
-        <div className="mt-1 flex flex-wrap gap-2 border rounded-md p-2">
+        <div className="flex items-baseline gap-2">
+          <Label>徳島保管場所</Label>
+          <span className="text-xs text-slate-400">
+            {form.selectedLocations.length > 0
+              ? `${form.selectedLocations.length}件選択中`
+              : '未選択'}
+          </span>
+        </div>
+        {/* 場所名は長さがまちまちなので、折り返しではなく列を固定して端を揃える */}
+        <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-2 rounded-md border p-3 sm:grid-cols-4">
           {locations.map((loc) => (
-            <label key={loc.id} className="flex items-center gap-1 cursor-pointer text-sm">
+            <label
+              key={loc.id}
+              className="flex cursor-pointer items-center gap-2 text-sm text-slate-700"
+            >
               <input
                 type="checkbox"
                 checked={form.selectedLocations.includes(loc.id)}
                 onChange={() => toggleList('selectedLocations', loc.id)}
               />
-              {loc.name}
+              <span className="break-words leading-tight">{loc.name}</span>
             </label>
           ))}
         </div>
