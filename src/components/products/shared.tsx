@@ -6,17 +6,37 @@ export type InlineStatProps = {
   value: number | string | null | undefined;
   unit: string;
   danger?: boolean;
+  /** スマホ幅で文字を一段小さくする */
+  compact?: boolean;
 };
 
-export function InlineStat({ label, value, unit, danger }: InlineStatProps) {
+export function InlineStat({
+  label,
+  value,
+  unit,
+  danger,
+  compact,
+}: InlineStatProps) {
   const numeric = toFiniteNumber(value);
   const isMuted = numeric === null || numeric === 0;
   return (
     <div className="flex flex-col items-center justify-center gap-1">
-      <span className="text-xs text-slate-600 leading-none">{label}</span>
       <span
-        className={`text-sm font-semibold leading-snug ${
-          danger ? "text-red-600" : isMuted ? "text-slate-300" : "text-slate-800"
+        className={`text-slate-600 leading-none ${
+          compact ? "text-[10px] sm:text-xs" : "text-xs"
+        }`}
+      >
+        {label}
+      </span>
+      <span
+        className={`font-semibold leading-snug ${
+          compact ? "text-[11px] sm:text-sm" : "text-sm"
+        } ${
+          danger
+            ? "text-red-600"
+            : isMuted
+              ? "text-slate-300"
+              : "text-slate-800"
         }`}
       >
         {numeric === null ? "-" : `${numeric.toLocaleString()}${unit}`}

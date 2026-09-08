@@ -242,10 +242,12 @@ export function ProductListTable({
                   className={`w-1 shrink-0 ${isLowStock ? "bg-red-400" : "bg-indigo-600"}`}
                 />
 
-                {/* 4ペインボディ */}
-                <div className="flex-1 grid grid-cols-[1.5fr_2.5fr_3fr_0.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* 5ペインボディ: md 未満では品番/在庫/スペック/担当・操作の 4 段に折り返す */}
+                {/* 操作列は固定幅。auto にすると削除ボタンの有無で fr の配分が変わり、
+                    カードごとにペイン1の幅がズレる */}
+                <div className="flex-1 grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[1.4fr_3.2fr_2.4fr_0.5fr_10rem] min-w-0">
                   {/* ペイン1: 品番・色・品名 */}
-                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0 col-span-2 border-b border-slate-100 md:col-auto md:border-b-0 md:border-r">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span
                         className="font-bold text-slate-900 text-sm leading-none hover:underline cursor-pointer"
@@ -265,9 +267,9 @@ export function ProductListTable({
                     </div>
                   </div>
                   {/* ペイン2: 在庫数値 均等1行 */}
-                  <div className="px-3 py-1.5 grid grid-cols-6 bg-slate-50/60">
+                  <div className="px-3 py-1.5 grid grid-cols-6 gap-x-1.5 bg-slate-50/60 col-span-2 border-b border-slate-100 md:col-auto md:border-b-0 md:border-r">
                     <div className="flex flex-col items-center justify-center gap-1">
-                      <span className="text-xs text-slate-600 leading-none">
+                      <span className="text-[10px] sm:text-xs text-slate-600 leading-none">
                         使用予定
                       </span>
                       {(p.cuttingSchedules?.length ?? 0) > 0 ? (
@@ -277,7 +279,7 @@ export function ProductListTable({
                           usersMap={usersMap}
                         />
                       ) : (
-                        <span className="text-xs text-slate-300 leading-snug">
+                        <span className="text-[11px] sm:text-sm text-slate-300 leading-snug">
                           —
                         </span>
                       )}
@@ -287,23 +289,36 @@ export function ProductListTable({
                       value={p.tokushimaStock ?? 0}
                       unit="m"
                       danger={isLowStock}
+                      compact
                     />
-                    <InlineStat label="仕掛" value={p.wip ?? 0} unit="m" />
+                    <InlineStat
+                      label="仕掛"
+                      value={p.wip ?? 0}
+                      unit="m"
+                      compact
+                    />
                     <InlineStat
                       label="外部"
                       value={p.externalStock ?? 0}
                       unit="m"
+                      compact
                     />
                     <InlineStat
                       label="入荷待"
                       value={p.arrivingQuantity ?? 0}
                       unit="m"
+                      compact
                     />
-                    <InlineStat label="単価" value={p.price ?? 0} unit="円" />
+                    <InlineStat
+                      label="単価"
+                      value={p.price ?? 0}
+                      unit="円"
+                      compact
+                    />
                   </div>
 
                   {/* ペイン3: 担当・仕入先・スペック */}
-                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0 col-span-2 border-b border-slate-100 md:col-auto md:border-b-0 md:border-r">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {supplierName && (
                         <span className="text-xs text-slate-700 leading-none truncate">
@@ -324,8 +339,8 @@ export function ProductListTable({
                   </div>
 
                   {/* ペイン4: 担当*/}
-                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
-                    <div className="flex flex-col items-center justify-center gap-1">
+                  <div className="px-3 py-1.5 flex flex-col items-start justify-center gap-1 min-w-0 border-r border-slate-100">
+                    <div className="flex flex-col items-center justify-center gap-1 text-center">
                       <span className="text-xs text-slate-600 leading-none">
                         担当
                       </span>
