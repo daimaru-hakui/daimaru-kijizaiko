@@ -1,6 +1,23 @@
 import { describe, it, expect } from 'vitest'
-import { getMixed, getFabricStd, getCuttingScheduleTotal, matchesProductNumber } from './utils'
+import { getMixed, getFabricStd, getCuttingScheduleTotal, matchesProductNumber, mathRound2nd } from './utils'
 import type { CuttingSchedule } from '../../types'
+
+describe('mathRound2nd', () => {
+  it('二進小数の誤差を落として小数第2位までにする', () => {
+    expect(mathRound2nd(100.2 - 33.4)).toBe(66.8)
+    expect(mathRound2nd(0.1 + 0.2)).toBe(0.3)
+  })
+
+  it('小数第3位は四捨五入する', () => {
+    expect(mathRound2nd(10.005)).toBe(10.01)
+    expect(mathRound2nd(10.004)).toBe(10)
+  })
+
+  it('整数はそのまま返す', () => {
+    expect(mathRound2nd(50)).toBe(50)
+    expect(mathRound2nd(0)).toBe(0)
+  })
+})
 
 describe('matchesProductNumber', () => {
   it('半角入力で半角保存品番にマッチする', () => {
