@@ -23,11 +23,15 @@ export default async function GrayFabricOrdersPage() {
     usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
   )
 
-  const orders = ordersSnap.docs.map((d) => {
-    const raw = toPlainData(d.data()) as Record<string, unknown>
-    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-    return { ...data, id: d.id } as unknown as GrayFabricHistory
-  })
+  const orders = ordersSnap.docs
+    .map((d) => {
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as GrayFabricHistory
+    })
+    // 確定処理で残数0になった発注は仕掛から外れる。createdAt の orderBy と
+    // 不等号を併用すると複合インデックスが要るためメモリ上で除外する
+    .filter((o) => o.quantity > 0)
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
