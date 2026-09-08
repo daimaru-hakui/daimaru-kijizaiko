@@ -25,10 +25,33 @@ describe('DialogContent', () => {
     expect(scrollArea!.className).toContain('overflow-y-auto')
   })
 
+  it('スクロール領域の左にフォーカスリング分の余白がある', () => {
+    // overflow-y:auto は overflow-x も auto に計算されるため、余白がないと
+    // 端に接した input のフォーカスリングが左右で切れる
+    const scrollArea = renderDialog().querySelector('[data-slot="dialog-body"]')!
+    expect(scrollArea.className).toContain('-ml-2')
+    expect(scrollArea.className).toContain('pl-2')
+  })
+
+  it('スクロールバーが閉じるボタンと重ならないよう右端まで広げる', () => {
+    // スクロールバーはスクロール領域の右端に出る。領域を閉じるボタンより
+    // 内側で止めるとボタンの下に潜り込むため、パディングを打ち消して
+    // ダイアログの縁まで広げ、内側の pr-6 で本文との間隔を保つ
+    const scrollArea = renderDialog().querySelector('[data-slot="dialog-body"]')!
+    expect(scrollArea.className).toContain('-mr-6')
+    expect(scrollArea.className).toContain('pr-6')
+  })
+
   it('閉じるボタンはスクロール領域の外にあり常に表示される', () => {
     const dialog = renderDialog()
     const closeButton = screen.getByRole('button', { name: 'Close' })
     expect(dialog.querySelector('[data-slot="dialog-body"]')!.contains(closeButton)).toBe(false)
+  })
+
+  it('閉じるボタンはスクロールバーの幅を避けた位置にある', () => {
+    renderDialog()
+    const closeButton = screen.getByRole('button', { name: 'Close' })
+    expect(closeButton.className).toContain('right-4')
   })
 })
 

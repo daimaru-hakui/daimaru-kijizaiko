@@ -48,11 +48,20 @@ const DialogContent = React.forwardRef<
         {...props}
       >
         {/* 内容がビューポートに収まらない場合はここだけスクロールさせる。
-            閉じるボタンをこの外に置くことで常に押せる状態を保つ */}
-        <div data-slot="dialog-body" className="grid gap-4 overflow-y-auto">
+            閉じるボタンをこの外に置くことで常に押せる状態を保つ。
+            overflow-y:auto は overflow-x も auto に計算されるので、左の余白
+            (-ml-2 pl-2) がないと端に接した input のフォーカスリングが切れる。
+            右はスクロールバーが出る側。領域をパディングの内側で止めると
+            スクロールバーが閉じるボタンの下に潜り込むため、-mr-6 で縁まで
+            広げてボタン (right-4) の左に逃がし、内側の pr-6 で本文との
+            間隔を保つ */}
+        <div
+          data-slot="dialog-body"
+          className="-ml-2 -mr-6 grid gap-4 overflow-y-auto pl-2 pr-6 [scrollbar-width:thin]"
+        >
           {children}
         </div>
-        <DialogPrimitive.Close className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:pointer-events-none">
+        <DialogPrimitive.Close className="absolute right-4 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:pointer-events-none">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

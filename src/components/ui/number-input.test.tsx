@@ -15,6 +15,17 @@ describe("NumberInput", () => {
     expect(screen.getByRole("spinbutton")).toBeInTheDocument();
   });
 
+  it("+/- ボタンは高さを固定せず入力欄に合わせて伸びる", () => {
+    render(<NumberInput value="5" onChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "+" }).className).toContain("h-auto");
+  });
+
+  it("入力欄とボタンの高さを揃えるため行を stretch する", () => {
+    render(<NumberInput value="5" onChange={vi.fn()} />);
+    const row = screen.getByRole("spinbutton").parentElement;
+    expect(row?.className).toContain("items-stretch");
+  });
+
   it("増加ボタン (+) が存在する", () => {
     render(<NumberInput value="5" onChange={vi.fn()} />);
     expect(screen.getByRole("button", { name: "+" })).toBeInTheDocument();

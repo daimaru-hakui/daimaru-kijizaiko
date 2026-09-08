@@ -5,6 +5,7 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { cn } from "@/lib/utils";
 import { isNumericDraft } from "@/lib/numbers";
+import { Minus, Plus } from "lucide-react";
 
 export interface NumberInputProps {
   id?: string;
@@ -37,7 +38,10 @@ function toNumber(value: number | string | undefined): number {
  * そのまま String(value) を表示すると小数点や消したはずの値が復活するので、
  * 入力中の文字列が外部の値と矛盾しない限りは入力中の文字列を優先する。
  */
-function keepsDraft(draft: string, value: number | string | undefined): boolean {
+function keepsDraft(
+  draft: string,
+  value: number | string | undefined,
+): boolean {
   const draftNum = parseFloat(draft);
   const valueNum = toNumber(value);
   // "" や "." など数値になりきっていない入力途中
@@ -60,7 +64,7 @@ export function NumberInput({
 }: NumberInputProps) {
   const controlled = value !== undefined;
   const [draft, setDraft] = React.useState<string>(
-    String(defaultValue ?? value ?? "")
+    String(defaultValue ?? value ?? ""),
   );
 
   const displayValue =
@@ -87,7 +91,7 @@ export function NumberInput({
 
   return (
     <div
-      className={cn("flex items-center gap-1", className)}
+      className={cn("flex items-stretch gap-1", className)}
       style={width ? { width } : undefined}
     >
       <Button
@@ -97,9 +101,10 @@ export function NumberInput({
         aria-label="-"
         onClick={() => stepBy(-step)}
         disabled={disabled}
-        className="h-8 w-8 shrink-0"
+        // 高さは入力欄に合わせて伸ばす (行を items-stretch にしている)
+        className="h-auto w-8 shrink-0 cursor-pointer"
       >
-        -
+        <Minus />
       </Button>
       <Input
         id={id}
@@ -122,9 +127,10 @@ export function NumberInput({
         aria-label="+"
         onClick={() => stepBy(step)}
         disabled={disabled}
-        className="h-8 w-8 shrink-0"
+        // 高さは入力欄に合わせて伸ばす (行を items-stretch にしている)
+        className="h-auto w-8 shrink-0 cursor-pointer"
       >
-        +
+        <Plus />
       </Button>
     </div>
   );
