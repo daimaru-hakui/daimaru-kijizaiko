@@ -92,7 +92,14 @@ export function CuttingReportFabricRow({
           >
             解除
           </button>
-          <FaWindowClose className="cursor-pointer text-destructive" onClick={deleteRow} />
+          <button
+            type="button"
+            aria-label={`使用生地 ${rowIndex + 1} を削除`}
+            className="text-destructive transition-opacity hover:opacity-70"
+            onClick={deleteRow}
+          >
+            <FaWindowClose />
+          </button>
         </div>
       </div>
 

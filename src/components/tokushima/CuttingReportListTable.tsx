@@ -2,20 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { InlineStat, Chip } from '@/components/products/shared'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
-import { alreadyReadAction } from '@/app/tokushima/cutting-reports/actions'
+import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
 
 type UserOption = { id: string; name: string }
 
@@ -30,10 +24,6 @@ type Props = {
   productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
   startDay: string
   endDay: string
-}
-
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
 }
 
 function buildCsvData(
@@ -182,34 +172,66 @@ export function CuttingReportListTable({
         <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 
-      <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 280px)', overflowY: 'auto' }}>
-        <Table className="text-sm">
-          <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow className="bg-slate-50">
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">詳細</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">既読</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断報告書NO.</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">裁断日</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">加工指示書NO.</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">受注先名</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者名</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((report) => {
-              const staffName = report.staff === 'R&D' ? 'R&D' : (usersMap[report.staff] ?? report.staff)
-              const unread = isUnread(report)
-              const mine = isMyReport(report)
-              return (
-                <TableRow key={report.serialNumber}>
-                  <TableCell>
-                    <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => setDetailReport(report)}>
-                      詳細
-                    </Button>
-                  </TableCell>
-                  <TableCell className="text-center">
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((report) => {
+            const staffName = report.staff === 'R&D' ? 'R&D' : (usersMap[report.staff] ?? report.staff)
+            const unread = isUnread(report)
+            const mine = isMyReport(report)
+            return (
+              <div
+                key={report.serialNumber}
+                className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+              >
+                {/* 左アクセントライン */}
+                <div className={`w-1 shrink-0 ${unread ? 'bg-amber-400' : 'bg-indigo-600'}`} />
+
+                {/* ペインボディ */}
+                <div className="flex-1 grid grid-cols-[2.5fr_2fr_1.5fr_1fr_auto] divide-x divide-slate-100 min-w-0">
+                  {/* ペイン1: 品名・受注先・NO. */}
+                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-bold text-slate-900 text-sm leading-none">
+                        {report.itemName}
+                      </span>
+                      <Chip label={report.itemType === '1' ? '既製品' : '別注品'} />
+                    </div>
+                    <div
+                      className="text-xs text-slate-700 truncate leading-none"
+                      title={report.client}
+                    >
+                      {report.client}
+                    </div>
+                    <div className="text-xs text-slate-400 leading-none">
+                      NO.{formatSerialNumber(report.serialNumber)}
+                    </div>
+                  </div>
+
+                  {/* ペイン2: 担当・日付・指示書 */}
+                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                      <Chip label={staffName} variant="indigo" />
+                    </div>
+                    <div className="text-xs text-slate-600 leading-none">
+                      裁断日: {report.cuttingDate}
+                    </div>
+                    <div className="text-xs text-slate-600 leading-none">
+                      指示書NO.{report.processNumber}
+                    </div>
+                  </div>
+
+                  {/* ペイン3: 数値 */}
+                  <div className="px-3 py-2 grid grid-cols-1 bg-slate-50/60">
+                    <InlineStat label="数量" value={report.totalQuantity} unit="" />
+                  </div>
+
+                  {/* ペイン4: 既読ステータス */}
+                  <div className="px-3 py-2 flex items-center justify-center">
                     {!unread ? (
                       <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800">
                         既読
@@ -218,26 +240,33 @@ export function CuttingReportListTable({
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-muted-foreground"
+                        className="h-7 px-2 text-xs text-muted-foreground"
                         onClick={() => handleAlreadyRead(report)}
                       >
                         未読
                       </Button>
-                    ) : null}
-                  </TableCell>
-                  <TableCell>{formatSerial(report.serialNumber)}</TableCell>
-                  <TableCell>{report.cuttingDate}</TableCell>
-                  <TableCell>{report.processNumber}</TableCell>
-                  <TableCell>{report.itemName}</TableCell>
-                  <TableCell>{report.client}</TableCell>
-                  <TableCell className="text-right">{report.totalQuantity.toLocaleString()}</TableCell>
-                  <TableCell>{staffName}</TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </div>
+                    ) : (
+                      <span className="text-xs text-slate-300">未読</span>
+                    )}
+                  </div>
+
+                  {/* ペイン5: アクション */}
+                  <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => setDetailReport(report)}
+                    >
+                      詳細
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {detailReport && (
         <CuttingReportDetailDialog

@@ -8,8 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { NumberInput } from '@/components/ui/number-input'
+import { SectionHeading } from '@/components/ui/section-heading'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { CuttingReportFabricRow } from './CuttingReportFabricRow'
-import { addCuttingReportAction, updateCuttingReportAction } from '@/app/tokushima/cutting-reports/actions'
+import { addCuttingReportAction, updateCuttingReportAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import { getTodayDate } from '@/lib/dates'
 import type { SerializableProduct, CuttingReportType, CuttingProductType } from '../../../types'
 
@@ -21,6 +23,11 @@ type Props = {
   initData?: CuttingReportType
   onCloseAction?: () => void
 }
+
+const ITEM_TYPES = [
+  { value: '1', label: '既製品' },
+  { value: '2', label: '別注品' },
+]
 
 export function CuttingReportForm({ products, salesUsers, initData, onCloseAction }: Props) {
   const router = useRouter()
@@ -102,121 +109,155 @@ export function CuttingReportForm({ products, salesUsers, initData, onCloseActio
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-900 tracking-tight mb-6">{isEdit ? '裁断報告書 編集' : '裁断報告書作成'}</h1>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-slate-200 pb-4">
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight">{isEdit ? '裁断報告書 編集' : '裁断報告書作成'}</h1>
+        {isEdit && initData?.serialNumber !== undefined && (
+          <span className="font-mono text-sm text-slate-400">No.{formatSerialNumber(initData.serialNumber)}</span>
+        )}
+      </header>
 
-      <div className="flex gap-4">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            name="itemType"
-            value="1"
-            checked={itemType === '1'}
-            onChange={() => setItemType('1')}
-          />
-          既製品
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            name="itemType"
-            value="2"
-            checked={itemType === '2'}
-            onChange={() => setItemType('2')}
-          />
-          別注品
-        </label>
-        <span className="text-red-500 text-sm">※</span>
-      </div>
+      <section>
+        <SectionHeading>基本情報</SectionHeading>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <Label>裁断日</Label>
-          <Input
-            type="date"
-            className="mt-1"
-            value={cuttingDate}
-            onChange={(e) => setCuttingDate(e.target.value)}
-          />
+        <div className="space-y-5">
+          <div>
+            <Label className="mb-1.5 block">
+              種別 <span className="text-destructive">※</span>
+            </Label>
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+              {ITEM_TYPES.map((t) => (
+                <label key={t.value} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="itemType"
+                    value={t.value}
+                    checked={itemType === t.value}
+                    onChange={() => setItemType(t.value)}
+                    className="peer sr-only"
+                  />
+                  <span className="block rounded-md px-6 py-1.5 text-sm font-medium text-slate-500 transition-colors peer-checked:bg-white peer-checked:text-blue-900 peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-blue-800">
+                    {t.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <Label htmlFor="cuttingDate" className="mb-1.5 block">裁断日</Label>
+              <Input
+                id="cuttingDate"
+                type="date"
+                value={cuttingDate}
+                onChange={(e) => setCuttingDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="processNumber" className="mb-1.5 block">加工指示書NO.</Label>
+              <Input
+                id="processNumber"
+                value={processNumber}
+                onChange={(e) => setProcessNumber(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="staff" className="mb-1.5 block">担当者</Label>
+              <select
+                id="staff"
+                className="h-9 w-full rounded-md border border-input px-3 text-sm"
+                value={staff}
+                onChange={(e) => setStaff(e.target.value)}
+              >
+                <option value="">担当者を選択</option>
+                <option value="R&D">R&amp;D</option>
+                {salesUsers.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="client" className="mb-1.5 block">受注先名</Label>
+              <Input id="client" value={client} onChange={(e) => setClient(e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="itemName" className="mb-1.5 block">製品名</Label>
+              <Input id="itemName" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+            </div>
+          </div>
         </div>
-        <div>
-          <Label>加工指示書NO.</Label>
-          <Input
-            className="mt-1"
-            value={processNumber}
-            onChange={(e) => setProcessNumber(e.target.value)}
-          />
+      </section>
+
+      <section>
+        <SectionHeading>使用生地</SectionHeading>
+
+        <div className="mb-4 flex flex-wrap items-end gap-x-4 gap-y-1">
+          <div>
+            <Label htmlFor="totalQuantity" className="mb-1.5 block">
+              総枚数 <span className="text-destructive">※</span>
+            </Label>
+            <NumberInput
+              id="totalQuantity"
+              className="w-40"
+              min={0}
+              max={100000}
+              value={totalQuantity}
+              onChange={(_, v) => setTotalQuantity(isNaN(v) ? 0 : v)}
+            />
+          </div>
+          <p className="pb-2 text-xs text-slate-400">各生地の 1 枚あたり使用量の計算に使われます</p>
         </div>
-        <div>
-          <Label>担当者</Label>
-          <select
-            className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
-            value={staff}
-            onChange={(e) => setStaff(e.target.value)}
+
+        <div className="space-y-4">
+          {items.length === 0 && (
+            <p className="rounded-xl border border-dashed border-slate-300 py-6 text-center text-sm text-slate-400">
+              使用生地を1つ以上追加してください
+            </p>
+          )}
+          {items.map((item, index) => (
+            <CuttingReportFabricRow
+              key={index}
+              item={item}
+              rowIndex={index}
+              setItemsAction={setItems}
+              products={products}
+              totalQuantity={totalQuantity}
+              isEdit={isEdit}
+            />
+          ))}
+          <button
+            type="button"
+            onClick={addRow}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-medium text-slate-500 transition-colors hover:border-blue-800 hover:text-blue-800"
           >
-            <option value="">担当者を選択</option>
-            <option value="R&D">R&amp;D</option>
-            {salesUsers.map((u) => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
+            <FaPlus /> 生地を追加
+          </button>
         </div>
-      </div>
+      </section>
 
-      <div>
-        <Label>受注先名</Label>
-        <Input className="mt-1" value={client} onChange={(e) => setClient(e.target.value)} />
-      </div>
-
-      <div>
-        <Label>製品名</Label>
-        <Input className="mt-1" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-      </div>
-
-      <div>
-        <Label>明細・備考</Label>
-        <Textarea className="mt-1" value={comment} onChange={(e) => setComment(e.target.value)} />
-      </div>
-
-      <div>
-        <Label>
-          総枚数 <span className="text-red-500">※</span>
-        </Label>
-        <NumberInput
-          className="mt-1 w-36"
-          min={0}
-          max={100000}
-          value={totalQuantity}
-          onChange={(_, v) => setTotalQuantity(isNaN(v) ? 0 : v)}
+      <section>
+        <SectionHeading>明細・備考</SectionHeading>
+        <Textarea
+          id="comment"
+          rows={4}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
         />
-      </div>
+      </section>
 
-      <div className="space-y-4">
-        {items.map((item, index) => (
-          <CuttingReportFabricRow
-            key={index}
-            item={item}
-            rowIndex={index}
-            setItemsAction={setItems}
-            products={products}
-            totalQuantity={totalQuantity}
-            isEdit={isEdit}
-          />
-        ))}
-        <div className="flex justify-center">
-          <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={addRow}>
-            <FaPlus className="mr-2" /> 追加
-          </Button>
-        </div>
+      <div className="sticky bottom-0 z-10 border-t border-slate-200 bg-white pt-4">
+        <Button
+          type="submit"
+          className="w-full bg-blue-800 hover:bg-blue-900 text-white"
+          disabled={isInvalid}
+        >
+          {isEdit ? '更新する' : '登録する'}
+        </Button>
       </div>
-
-      <Button
-        type="submit"
-        className="w-full bg-blue-800 hover:bg-blue-900 text-white"
-        disabled={isInvalid}
-      >
-        {isEdit ? '更新する' : '登録する'}
-      </Button>
     </form>
   )
 }

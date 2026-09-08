@@ -6,6 +6,7 @@ import { Input } from "./input";
 import { cn } from "@/lib/utils";
 
 export interface NumberInputProps {
+  id?: string;
   value?: number | string;
   defaultValue?: number | string;
   min?: number;
@@ -31,6 +32,7 @@ function clampValue(
 }
 
 export function NumberInput({
+  id,
   value,
   defaultValue,
   min,
@@ -88,6 +90,7 @@ export function NumberInput({
         -
       </Button>
       <Input
+        id={id}
         type="number"
         role="spinbutton"
         value={displayValue}
