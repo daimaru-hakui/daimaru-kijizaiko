@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
-import { updateUserProfileAction } from "@/app/settings/actions";
+import { updateUserProfileAction } from "@/app/(app)/settings/actions";
 
 type Props = {
   uid: string;

@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { confirmFabricPurchaseAction } from '@/app/products/fabric-purchase/actions'
+import { confirmFabricPurchaseAction } from '@/app/(app)/products/fabric-purchase/actions'
 import { getTodayDate } from '@/lib/dates'
 import type { History } from '../../../../types'
 

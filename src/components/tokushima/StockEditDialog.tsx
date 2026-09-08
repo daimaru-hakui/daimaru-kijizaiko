@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
-import { updateTokushimaStockAction } from '@/app/tokushima/cutting-reports/actions'
+import { updateTokushimaStockAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 
 type Props = {
   productId: string

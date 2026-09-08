@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEdit } from 'react-icons/fa'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +17,7 @@ import {
 import {
   updateOrderHistoryAction,
   updateConfirmHistoryAction,
-} from '@/app/gray-fabrics/actions'
+} from '@/app/(app)/gray-fabrics/actions'
 import type { GrayFabricHistory } from '../../../types'
 
 type Props = {
@@ -62,7 +61,14 @@ export function GrayFabricHistoryEditModal({ history, type }: Props) {
 
   return (
     <>
-      <FaEdit cursor="pointer" onClick={() => setOpen(true)} />
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-7 px-2 text-xs"
+        onClick={() => setOpen(true)}
+      >
+        編集
+      </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>

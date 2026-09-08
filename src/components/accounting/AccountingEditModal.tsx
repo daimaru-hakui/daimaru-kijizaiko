@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEdit } from 'react-icons/fa'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import {
   Dialog,
@@ -15,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { NumberInput } from '@/components/ui/number-input'
-import { updateHistoryAccountingOrderAction } from '@/app/accounting-dept/actions'
+import { updateHistoryAccountingOrderAction } from '@/app/(app)/accounting-dept/actions'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {
@@ -60,7 +59,14 @@ export function AccountingEditModal({ history }: Props) {
 
   return (
     <>
-      <FaEdit className="cursor-pointer" onClick={() => setOpen(true)} />
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-7 px-2 text-xs"
+        onClick={() => setOpen(true)}
+      >
+        編集
+      </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>

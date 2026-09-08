@@ -32,6 +32,7 @@ export function AppShell({ userName, roles, children }: Props) {
   const signOut = async () => {
     await auth.signOut()
     await fetch('/api/session', { method: 'DELETE' })
+    router.refresh()
     router.push('/login')
   }
 
@@ -68,7 +69,7 @@ export function AppShell({ userName, roles, children }: Props) {
             <span className="text-sm text-slate-500 hidden 2xl:block">{userName}</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="border-slate-200">
+                <Button variant="outline" size="sm" className="border-slate-200" aria-label="設定">
                   <Settings size={18} />
                 </Button>
               </DropdownMenuTrigger>

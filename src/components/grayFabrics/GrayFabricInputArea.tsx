@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import type { GrayFabric } from '../../../types'
-import { addGrayFabricAction, updateGrayFabricAction } from '@/app/gray-fabrics/actions'
+import { addGrayFabricAction, updateGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
 
 type Supplier = { id: string; name: string }
 

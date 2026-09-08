@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEdit } from 'react-icons/fa'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,14 @@ export function GrayFabricEditModal({ grayFabric, suppliers }: Props) {
 
   return (
     <>
-      <FaEdit color="#444" cursor="pointer" onClick={() => setOpen(true)} />
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-6 px-2 text-xs"
+        onClick={() => setOpen(true)}
+      >
+        編集
+      </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>

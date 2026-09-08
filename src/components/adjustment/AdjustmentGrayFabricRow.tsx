@@ -5,7 +5,7 @@ import { GiCancel } from 'react-icons/gi'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
-import { updateGrayFabricAdjustmentAction } from '@/app/adjustment/actions'
+import { updateGrayFabricAdjustmentAction } from '@/app/(app)/adjustment/actions'
 import { mathRound2nd } from '@/lib/utils'
 import type { GrayFabric } from '../../../types'
 
@@ -19,12 +19,20 @@ type Props = {
   grayFabric: GrayFabric
 }
 
+// Firestore の既存データには数値フィールドが未定義・文字列のドキュメントがある
+const toNumber = (v: unknown): number => {
+  const n = Number(v)
+  return isNaN(n) ? 0 : n
+}
+
+const toEditableFields = (grayFabric: GrayFabric): EditableFields => ({
+  price: toNumber(grayFabric.price),
+  wip: toNumber(grayFabric.wip),
+  stock: toNumber(grayFabric.stock),
+})
+
 export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
-  const [items, setItems] = useState<EditableFields>({
-    price: grayFabric.price,
-    wip: grayFabric.wip,
-    stock: grayFabric.stock,
-  })
+  const [items, setItems] = useState<EditableFields>(() => toEditableFields(grayFabric))
   const [saving, setSaving] = useState(false)
 
   const handleChange = (field: keyof EditableFields, v: number) => {
@@ -38,7 +46,7 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
   }
 
   const handleReset = () => {
-    setItems({ price: grayFabric.price, wip: grayFabric.wip, stock: grayFabric.stock })
+    setItems(toEditableFields(grayFabric))
   }
 
   return (
@@ -46,7 +54,7 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       <TableCell>{grayFabric.productNumber}</TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24"
+          className="w-40"
           min={0}
           max={100000}
           value={items.price}
@@ -55,7 +63,7 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       </TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24"
+          className="w-40"
           min={0}
           max={100000}
           value={mathRound2nd(items.wip)}
@@ -64,7 +72,7 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       </TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24"
+          className="w-40"
           min={0}
           max={100000}
           value={mathRound2nd(items.stock)}

@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { updateFabricPurchaseOrderAction } from '@/app/products/fabric-purchase/actions'
+import { updateFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
 import type { History } from '../../../../types'
 
 type Props = {

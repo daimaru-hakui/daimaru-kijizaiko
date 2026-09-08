@@ -25,6 +25,11 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
   return (
     <div className="w-full">
       <AdjustmentProductSearchBar searchText={searchText} setSearchText={setSearchText} />
+      {!isRD && !isTokushima && (
+        <p className="mt-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+          在庫の編集には R&D・徳島・管理者のいずれかの権限が必要です。
+        </p>
+      )}
       <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
         <Table className="w-full">
           <AdjustmentProductHeader isRD={isRD} isTokushima={isTokushima} />

@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
-import { confirmProcessingAccountingAction } from '@/app/accounting-dept/actions'
+import { confirmProcessingAccountingAction } from '@/app/(app)/accounting-dept/actions'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {
@@ -52,7 +52,7 @@ export function AccountingOrderToConfirmModal({ history }: Props) {
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}>
+      <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setOpen(true)}>
         金額確定
       </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>

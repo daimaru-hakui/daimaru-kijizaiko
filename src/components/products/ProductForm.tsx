@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { Textarea } from '@/components/ui/textarea'
-import { addProductAction, updateProductAction } from '@/app/products/actions'
+import { addProductAction, updateProductAction } from '@/app/(app)/products/actions'
 import type { GrayFabric, Location, Product, Supplier } from '../../../types'
 
 type Props = {

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
-import { confirmFabricPurchaseAction } from '@/app/tokushima/fabric-purchase/actions'
+import { confirmFabricPurchaseAction } from '@/app/(app)/tokushima/fabric-purchase/actions'
 import type { SerializableHistory } from '../../../types'
 import { getTodayDate } from '@/lib/dates'
 

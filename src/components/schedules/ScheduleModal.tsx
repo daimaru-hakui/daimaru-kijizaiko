@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { FaEdit } from 'react-icons/fa'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
-import { addScheduleAction, updateScheduleAction } from '@/app/schedules/actions'
+import { addScheduleAction, updateScheduleAction } from '@/app/(app)/schedules/actions'
 import type { CuttingSchedule } from '../../../types'
 
 type UserOption = { id: string; name: string }
@@ -66,9 +65,9 @@ export function ScheduleModal({ mode, salesUsers, products, initData = {} }: Pro
   return (
     <>
       {mode === 'new' ? (
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={() => setOpen(true)}>新規</Button>
+        <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800 text-white text-xs" onClick={() => setOpen(true)}>新規</Button>
       ) : (
-        <FaEdit className="cursor-pointer" onClick={() => setOpen(true)} />
+        <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setOpen(true)}>編集</Button>
       )}
 
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>

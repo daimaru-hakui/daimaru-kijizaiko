@@ -7,7 +7,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }))
 
-vi.mock('@/app/products/fabric-dyeing/actions', () => ({
+vi.mock('@/app/(app)/products/fabric-dyeing/actions', () => ({
   confirmFabricDyeingAction: vi.fn().mockResolvedValue({ ok: true }),
   updateFabricDyeingOrderAction: vi.fn().mockResolvedValue({ ok: true }),
   deleteFabricDyeingOrderAction: vi.fn().mockResolvedValue({ ok: true }),

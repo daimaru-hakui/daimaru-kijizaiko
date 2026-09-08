@@ -5,7 +5,7 @@ import { GiCancel } from 'react-icons/gi'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
-import { updateProductAdjustmentAction } from '@/app/adjustment/actions'
+import { updateProductAdjustmentAction } from '@/app/(app)/adjustment/actions'
 import { mathRound2nd } from '@/lib/utils'
 import type { Product } from '../../../types'
 
@@ -24,14 +24,22 @@ type Props = {
   isTokushima: boolean
 }
 
+// Firestore の既存データには数値フィールドが未定義・文字列のドキュメントがある
+const toNumber = (v: unknown): number => {
+  const n = Number(v)
+  return isNaN(n) ? 0 : n
+}
+
+const toEditableFields = (product: Product): EditableFields => ({
+  price: toNumber(product.price),
+  wip: toNumber(product.wip),
+  externalStock: toNumber(product.externalStock),
+  arrivingQuantity: toNumber(product.arrivingQuantity),
+  tokushimaStock: toNumber(product.tokushimaStock),
+})
+
 export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima }: Props) {
-  const [items, setItems] = useState<EditableFields>({
-    price: product.price,
-    wip: product.wip,
-    externalStock: product.externalStock,
-    arrivingQuantity: product.arrivingQuantity,
-    tokushimaStock: product.tokushimaStock,
-  })
+  const [items, setItems] = useState<EditableFields>(() => toEditableFields(product))
   const [saving, setSaving] = useState(false)
 
   const handleChange = (field: keyof EditableFields, v: number) => {
@@ -45,13 +53,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
   }
 
   const handleReset = () => {
-    setItems({
-      price: product.price,
-      wip: product.wip,
-      externalStock: product.externalStock,
-      arrivingQuantity: product.arrivingQuantity,
-      tokushimaStock: product.tokushimaStock,
-    })
+    setItems(toEditableFields(product))
   }
 
   const showEdit = isRD || isTokushima
@@ -67,7 +69,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
             <>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24"
+                  className="w-40"
                   min={0}
                   max={100000}
                   value={items.price}
@@ -76,7 +78,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24"
+                  className="w-40"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.wip)}
@@ -85,7 +87,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24"
+                  className="w-40"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.externalStock)}
@@ -94,7 +96,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24"
+                  className="w-40"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.arrivingQuantity)}
@@ -105,7 +107,7 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
           )}
           <TableCell className="p-1">
             <NumberInput
-              className="w-24"
+              className="w-40"
               min={0}
               max={100000}
               value={mathRound2nd(items.tokushimaStock)}

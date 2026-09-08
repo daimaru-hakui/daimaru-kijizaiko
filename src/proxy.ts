@@ -1,5 +1,5 @@
 import { matchRoute, type UserClaims } from './lib/auth/roles'
-import { getAdminAuth } from './lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from './lib/firebase/admin'
 
 export async function proxy(req: Request): Promise<Response | undefined> {
   const url = new URL(req.url)
@@ -13,7 +13,17 @@ export async function proxy(req: Request): Promise<Response | undefined> {
   if (sessionCookie) {
     try {
       const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true)
-      user = decoded as unknown as UserClaims
+      const userDoc = await getAdminDb().collection('users').doc(decoded.uid).get()
+      const data = userDoc.data() ?? {}
+      user = {
+        uid: decoded.uid,
+        admin: !!data.admin,
+        rd: !!data.rd,
+        sales: !!data.sales,
+        accounting: !!data.accounting,
+        tokushima: !!data.tokushima,
+        order: !!data.order,
+      }
     } catch {
       user = null
     }

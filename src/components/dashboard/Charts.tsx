@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, FC } from "react";
+import { useEffect, useState, FC } from "react";
 import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
 import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
 import { getTodayDate, get3monthsAgo } from "@/lib/dates";
-import { getCuttingReportsByDateAction } from "@/app/tokushima/cutting-reports/actions";
-import { getFabricPurchaseConfirmsByDateAction } from "@/app/products/fabric-purchase/actions";
+import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
+import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
 import { CuttingReportType, History } from "../../../types";
 import { NumberInput } from "@/components/ui/number-input";
 import { Input } from "@/components/ui/input";
@@ -42,13 +42,13 @@ export const Charts: FC<Props> = ({ productsMap }) => {
     return () => { cancelled = true; };
   }, [startDay, endDay]);
 
-  const filterCuttingReports = useMemo<CuttingReportType[]>(() => {
-    return staff ? cuttingReports.filter((r) => r.staff === staff) : cuttingReports;
-  }, [cuttingReports, staff]);
+  const filterCuttingReports: CuttingReportType[] = staff
+    ? cuttingReports.filter((r) => r.staff === staff)
+    : cuttingReports;
 
-  const filterPurchaseCofirms = useMemo<Omit<History, 'createdAt' | 'updatedAt'>[]>(() => {
-    return staff ? fabricPurchaseConfirms.filter((r) => r.createUser === staff) : fabricPurchaseConfirms;
-  }, [fabricPurchaseConfirms, staff]);
+  const filterPurchaseCofirms: Omit<History, "createdAt" | "updatedAt">[] = staff
+    ? fabricPurchaseConfirms.filter((r) => r.createUser === staff)
+    : fabricPurchaseConfirms;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

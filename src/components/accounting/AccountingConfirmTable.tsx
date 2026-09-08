@@ -5,14 +5,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Label } from '@/components/ui/label'
+import { InlineStat, Chip } from '@/components/products/shared'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { AccountingEditModal } from './AccountingEditModal'
 import type { SerializableHistory } from '../../../types'
 
@@ -48,39 +43,39 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
     : histories
 
   return (
-    <div>
-      <div className="flex items-center gap-3 p-6">
+    <div className="p-6 space-y-4">
+      <div className="flex items-center gap-3">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">処理済み</h2>
         <Link href="/accounting-dept/orders">
           <Button variant="outline" size="sm">未処理</Button>
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-4 px-6 pb-4">
+      <div className="flex flex-wrap gap-3 items-end">
         <div>
-          <div className="text-sm font-medium mb-1">期間を選択</div>
-          <div className="flex gap-2 items-center">
-            <Input
-              type="date"
-              value={localStart}
-              onChange={(e) => setLocalStart(e.target.value)}
-              className="w-36"
-            />
-            <span className="text-sm">〜</span>
-            <Input
-              type="date"
-              value={localEnd}
-              onChange={(e) => setLocalEnd(e.target.value)}
-              className="w-36"
-            />
-          </div>
+          <Label className="text-xs">開始日</Label>
+          <Input
+            type="date"
+            className="mt-1 w-36"
+            value={localStart}
+            onChange={(e) => setLocalStart(e.target.value)}
+          />
         </div>
         <div>
-          <div className="text-sm font-medium mb-1">担当者を選択</div>
+          <Label className="text-xs">終了日</Label>
+          <Input
+            type="date"
+            className="mt-1 w-36"
+            value={localEnd}
+            onChange={(e) => setLocalEnd(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label className="text-xs">担当者</Label>
           <select
+            className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
             value={staff}
             onChange={(e) => setStaff(e.target.value)}
-            className="h-9 rounded-md border border-input px-3 text-sm"
           >
             <option value="">全員</option>
             {Object.entries(usersMap).map(([id, name]) => (
@@ -88,64 +83,97 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
             ))}
           </select>
         </div>
-        <div className="flex items-end gap-2">
-          <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
-          <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
-        </div>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
+        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
       </div>
 
-      <div className="px-6 overflow-x-auto" style={{ maxHeight: 'calc(100vh - 310px)', overflowY: 'auto' }}>
-        {filtered.length > 0 ? (
-          <Table>
-            <TableHeader className="sticky top-0 bg-white z-10">
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">入荷日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">金額</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">出荷先</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((h) => (
-                <TableRow key={h.id}>
-                  <TableCell>{h.serialNumber}</TableCell>
-                  <TableCell>{h.orderedAt}</TableCell>
-                  <TableCell>{h.fixedAt}</TableCell>
-                  <TableCell>{usersMap[h.createUser] ?? h.createUser}</TableCell>
-                  <TableCell>{h.productNumber}</TableCell>
-                  <TableCell>{h.colorName}</TableCell>
-                  <TableCell>{h.productName}</TableCell>
-                  <TableCell className="text-right">{h.quantity.toLocaleString()}m</TableCell>
-                  <TableCell className="text-right">
-                    {h.price != null ? `${h.price.toLocaleString()}円` : ''}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {h.price != null ? `${(h.quantity * h.price).toLocaleString()}円` : ''}
-                  </TableCell>
-                  <TableCell>{h.stockPlace}</TableCell>
-                  <TableCell className="max-w-[180px] truncate">{h.comment}</TableCell>
-                  <TableCell>
-                    <AccountingEditModal history={h} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            現在登録された情報はありません。
-          </div>
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((h) => (
+            <div
+              key={h.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・色・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {h.productNumber}
+                    </span>
+                    {h.colorName && <Chip label={h.colorName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={h.productName}
+                  >
+                    {h.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(h.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={usersMap[h.createUser] ?? h.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {h.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    入荷: {h.fixedAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値 */}
+                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                  <InlineStat label="数量" value={h.quantity} unit="m" />
+                  <InlineStat label="単価" value={h.price ?? 0} unit="円" />
+                  <InlineStat
+                    label="金額"
+                    value={h.price ? h.quantity * h.price : 0}
+                    unit="円"
+                  />
+                </div>
+
+                {/* ペイン4: 出荷先・コメント */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  {h.stockPlace && (
+                    <div className="text-xs text-slate-600 truncate leading-none">
+                      出荷先: {h.stockPlace}
+                    </div>
+                  )}
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={h.comment ?? ''}
+                  >
+                    {h.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  <AccountingEditModal history={h} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

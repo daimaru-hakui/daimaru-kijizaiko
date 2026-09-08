@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
-import { addLocationAction, updateLocationAction } from "@/app/settings/actions";
+import { addLocationAction, updateLocationAction } from "@/app/(app)/settings/actions";
 
 type Props = {
   type: "new" | "edit";

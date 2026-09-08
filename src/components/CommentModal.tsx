@@ -21,12 +21,15 @@ export const CommentModal: FC<Props> = ({ comment }) => {
   return (
     <>
       {comment && (
-        <FaRegCommentDots
-          opacity={comment === "" ? "0.2" : "1"}
-          cursor="pointer"
-          fontSize="20px"
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700"
+          aria-label="コメントを表示"
           onClick={() => setOpen(true)}
-        />
+        >
+          <FaRegCommentDots fontSize="16px" />
+        </Button>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>

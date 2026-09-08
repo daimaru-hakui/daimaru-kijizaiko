@@ -9,12 +9,12 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 
-vi.mock("@/app/products/fabric-dyeing/actions", () => ({
+vi.mock("@/app/(app)/products/fabric-dyeing/actions", () => ({
   orderFabricDyeingFromStockAction: vi.fn().mockResolvedValue({ ok: true }),
   orderFabricDyeingFromRunningAction: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
-vi.mock("@/app/products/fabric-purchase/actions", () => ({
+vi.mock("@/app/(app)/products/fabric-purchase/actions", () => ({
   orderFabricPurchaseAction: vi.fn().mockResolvedValue({ ok: true }),
 }));
 

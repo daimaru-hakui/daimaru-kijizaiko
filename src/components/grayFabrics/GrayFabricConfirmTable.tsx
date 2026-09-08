@@ -1,18 +1,14 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { InlineStat, Chip } from '@/components/products/shared'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { canEditRecord } from '@/lib/permissions'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
 import type { GrayFabricHistory } from '../../../types'
@@ -26,11 +22,6 @@ type Props = {
   defaultEnd: string
 }
 
-type SearchForm = {
-  start: string
-  end: string
-}
-
 export function GrayFabricConfirmTable({
   confirms,
   currentUserId,
@@ -40,85 +31,127 @@ export function GrayFabricConfirmTable({
   defaultEnd,
 }: Props) {
   const router = useRouter()
-  const { register, handleSubmit, reset } = useForm<SearchForm>({
-    defaultValues: { start: defaultStart, end: defaultEnd },
-  })
+  const [start, setStart] = useState(defaultStart)
+  const [end, setEnd] = useState(defaultEnd)
 
-  const onSearch = (data: SearchForm) => {
-    router.push(`/gray-fabrics/confirms?start=${data.start}&end=${data.end}`)
+  const handleSearch = () => {
+    router.push(`/gray-fabrics/confirms?start=${start}&end=${end}`)
   }
-
-  const onReset = () => {
-    reset()
+  const handleReset = () => {
+    setStart(defaultStart)
+    setEnd(defaultEnd)
     router.push('/gray-fabrics/confirms')
   }
 
-  const formatSerial = (n: number) => String(n).padStart(10, '0')
+  const canEdit = (h: GrayFabricHistory) => canEditRecord(h, currentUserId, isRD)
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSearch)} className="flex flex-wrap items-end gap-4 p-6 pb-0">
-        <div>
-          <Label>開始日</Label>
-          <Input type="date" className="mt-1" {...register('start')} />
-        </div>
-        <div>
-          <Label>終了日</Label>
-          <Input type="date" className="mt-1" {...register('end')} />
-        </div>
-        <Button type="submit" className="bg-blue-800 hover:bg-blue-900 text-white">検索</Button>
-        <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={onReset}>リセット</Button>
-      </form>
-
-      <div className="p-6 pt-0 overflow-x-auto">
-        {confirms.length > 0 ? (
-          <Table className="mt-6">
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注NO.</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">発注日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕上日</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当者</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品番</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">数量</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {confirms.map((history) => (
-                <TableRow key={history.id}>
-                  <TableCell className="font-mono">{formatSerial(history.serialNumber)}</TableCell>
-                  <TableCell>{history.orderedAt}</TableCell>
-                  <TableCell>{history.fixedAt}</TableCell>
-                  <TableCell>{users[history.createUser] ?? history.createUser}</TableCell>
-                  <TableCell>{history.productNumber}</TableCell>
-                  <TableCell>{history.productName}</TableCell>
-                  <TableCell>{history.supplierName}</TableCell>
-                  <TableCell className="text-right">{history.quantity}m</TableCell>
-                  <TableCell>
-                    <div className="flex gap-3 items-center">
-                      <CommentModal comment={history.comment} />
-                      <span className="text-sm text-muted-foreground">
-                        {history.comment.length > 20 ? history.comment.slice(0, 20) + '...' : history.comment}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {(isRD || history.createUser === currentUserId) && (
-                      <GrayFabricHistoryEditModal history={history} type="confirm" />
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="mt-6 text-center text-muted-foreground">現在登録された情報はありません。</div>
-        )}
+    <div className="p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">キバタ仕掛履歴</h2>
+        <Link href="/gray-fabrics/orders">
+          <Button size="sm" variant="outline">仕掛一覧</Button>
+        </Link>
       </div>
-    </>
+
+      <div className="flex flex-wrap gap-3 items-end">
+        <div>
+          <Label className="text-xs">開始日</Label>
+          <Input type="date" className="mt-1 w-36" value={start} onChange={(e) => setStart(e.target.value)} />
+        </div>
+        <div>
+          <Label className="text-xs">終了日</Label>
+          <Input type="date" className="mt-1 w-36" value={end} onChange={(e) => setEnd(e.target.value)} />
+        </div>
+        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
+        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+      </div>
+
+      {confirms.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {confirms.map((h) => (
+            <div
+              key={h.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・仕入先・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {h.productNumber}
+                    </span>
+                    {h.supplierName && <Chip label={h.supplierName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={h.productName}
+                  >
+                    {h.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(h.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={users[h.createUser] ?? h.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {h.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    仕上: {h.fixedAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値 */}
+                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                  <InlineStat label="数量" value={h.quantity} unit="m" />
+                  <InlineStat label="単価" value={h.price ?? 0} unit="円" />
+                  <InlineStat
+                    label="金額"
+                    value={h.price ? h.quantity * h.price : 0}
+                    unit="円"
+                  />
+                </div>
+
+                {/* ペイン4: コメント */}
+                <div className="px-3 py-2 flex items-center gap-1 min-w-0">
+                  <CommentModal comment={h.comment ?? ''} />
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={h.comment ?? ''}
+                  >
+                    {h.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  {canEdit(h) && (
+                    <GrayFabricHistoryEditModal history={h} type="confirm" />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

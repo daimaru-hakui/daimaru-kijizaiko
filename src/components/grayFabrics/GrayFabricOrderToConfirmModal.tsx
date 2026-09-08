@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { confirmProcessingAction } from '@/app/gray-fabrics/actions'
+import { confirmProcessingAction } from '@/app/(app)/gray-fabrics/actions'
 import { getTodayDate } from '@/lib/gray-fabrics/dates'
 import type { GrayFabricHistory } from '../../../types'
 
@@ -65,12 +65,12 @@ export function GrayFabricOrderToConfirmModal({ history, canEdit }: Props) {
   }
 
   if (!canEdit) {
-    return <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" disabled>確定</Button>
+    return <Button size="sm" className="h-7 px-2 text-xs" disabled>確定</Button>
   }
 
   return (
     <>
-      <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleOpen}>確定</Button>
+      <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={handleOpen}>確定</Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent>
           <DialogHeader>

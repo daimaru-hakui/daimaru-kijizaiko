@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { confirmFabricDyeingAction } from '@/app/products/fabric-dyeing/actions'
+import { confirmFabricDyeingAction } from '@/app/(app)/products/fabric-dyeing/actions'
 import { getTodayDate } from '@/lib/dates'
 import type { SerializableHistory } from '../../../../types'
 

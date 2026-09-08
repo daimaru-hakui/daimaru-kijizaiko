@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { ProductForm } from './ProductForm'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }))
-vi.mock('@/app/products/actions', () => ({
+vi.mock('@/app/(app)/products/actions', () => ({
   addProductAction: vi.fn().mockResolvedValue({ ok: true }),
   updateProductAction: vi.fn().mockResolvedValue({ ok: true }),
 }))
@@ -32,7 +32,7 @@ describe('ProductForm', () => {
 
   it('仕入先未選択で登録するとアラートが出て送信されない', async () => {
     const user = userEvent.setup()
-    const { addProductAction } = await import('@/app/products/actions')
+    const { addProductAction } = await import('@/app/(app)/products/actions')
     render(<ProductForm {...baseProps} />)
     await user.click(screen.getByRole('button', { name: '登録' }))
     expect(window.alert).toHaveBeenCalledWith('仕入先を選択してください')

@@ -27,7 +27,7 @@ describe('getProductsAction', () => {
     mockGet.mockResolvedValue({
       docs: [{ data: () => ({ productNumber: 'P001', deletedAt: '', createdAt: null, updatedAt: null }), id: 'prod-1' }],
     })
-    const { getProductsAction } = await import('@/app/products/actions')
+    const { getProductsAction } = await import('@/app/(app)/products/actions')
     const result = await getProductsAction()
     expect(result).toEqual({
       ok: true,
@@ -37,7 +37,7 @@ describe('getProductsAction', () => {
 
   it('未認証のとき ok: false を返す', async () => {
     mockVerifySession.mockResolvedValue(null)
-    const { getProductsAction } = await import('@/app/products/actions')
+    const { getProductsAction } = await import('@/app/(app)/products/actions')
     const result = await getProductsAction()
     expect(result).toEqual({ ok: false, error: '認証が必要です' })
   })

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
   deleteFabricDyeingOrderAction,
-} from '@/app/products/fabric-dyeing/actions'
+} from '@/app/(app)/products/fabric-dyeing/actions'
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { canEditRecord } from '@/lib/permissions'

@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import {
   orderFabricDyeingFromStockAction,
   orderFabricDyeingFromRunningAction,
-} from '@/app/products/fabric-dyeing/actions'
-import { orderFabricPurchaseAction } from '@/app/products/fabric-purchase/actions'
+} from '@/app/(app)/products/fabric-dyeing/actions'
+import { orderFabricPurchaseAction } from '@/app/(app)/products/fabric-purchase/actions'
 import { getTodayDate } from '@/lib/dates'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

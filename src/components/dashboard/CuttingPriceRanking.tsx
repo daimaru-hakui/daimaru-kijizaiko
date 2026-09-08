@@ -12,7 +12,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Product, CuttingReportType } from "../../../types";
-import { getProductsAction } from "@/app/products/actions";
+import { getProductsAction } from "@/app/(app)/products/actions";
 
 ChartJS.register(
   CategoryScale,

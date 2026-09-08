@@ -1,17 +1,9 @@
 'use client'
 
-import { FaTrashAlt } from 'react-icons/fa'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { InlineStat, Chip } from '@/components/products/shared'
 import { ScheduleModal } from './ScheduleModal'
-import { deleteScheduleAction } from '@/app/schedules/actions'
+import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
 import type { CuttingSchedule } from '../../../types'
 
 type UserOption = { id: string; name: string }
@@ -32,61 +24,89 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">使用予定一覧</h2>
         <ScheduleModal mode="new" salesUsers={salesUsers} products={products} />
       </div>
-      <div className="w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
-        <Table className="w-full text-sm">
-          <TableHeader className="sticky top-0 bg-white z-10">
-            <TableRow className="bg-slate-50">
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">加工指示書NO.</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">アイテム名</TableHead>
-              <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">使用予定（m）</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">製品納期</TableHead>
-              <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {schedules.map((schedule) => {
-              const product = productMap[schedule.productId]
-              const staffName = usersMap[schedule.staff] ?? schedule.staff
-              return (
-                <TableRow key={schedule.id}>
-                  <TableCell>{staffName}</TableCell>
-                  <TableCell>{schedule.processNumber}</TableCell>
-                  <TableCell>
-                    {product ? `${product.productNumber} ${product.colorName}` : schedule.productId}
-                  </TableCell>
-                  <TableCell>{schedule.itemName}</TableCell>
-                  <TableCell className="text-right">{schedule.quantity}</TableCell>
-                  <TableCell>{schedule.scheduledAt}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <ScheduleModal
-                        mode="edit"
-                        salesUsers={salesUsers}
-                        products={products}
-                        initData={schedule}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(schedule.id, schedule.productId)}
-                      >
-                        <FaTrashAlt className="text-destructive" />
-                      </Button>
+
+      {schedules.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {schedules.map((schedule) => {
+            const product = productMap[schedule.productId]
+            const staffName = usersMap[schedule.staff] ?? schedule.staff
+            return (
+              <div
+                key={schedule.id}
+                className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+              >
+                {/* 左アクセントライン */}
+                <div className="w-1 shrink-0 bg-indigo-600" />
+
+                {/* ペインボディ */}
+                <div className="flex-1 grid grid-cols-[2fr_1.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                  {/* ペイン1: 生地品番・アイテム名・指示書NO. */}
+                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-bold text-slate-900 text-sm leading-none">
+                        {product ? product.productNumber : schedule.productId}
+                      </span>
+                      {product?.colorName && <Chip label={product.colorName} />}
                     </div>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </div>
+                    <div
+                      className="text-xs text-slate-700 truncate leading-none"
+                      title={schedule.itemName}
+                    >
+                      {schedule.itemName}
+                    </div>
+                    <div className="text-xs text-slate-400 leading-none">
+                      指示書NO.{schedule.processNumber}
+                    </div>
+                  </div>
+
+                  {/* ペイン2: 担当・納期 */}
+                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                      <Chip label={staffName} variant="indigo" />
+                    </div>
+                    <div className="text-xs text-slate-600 leading-none">
+                      製品納期: {schedule.scheduledAt}
+                    </div>
+                  </div>
+
+                  {/* ペイン3: 数値 */}
+                  <div className="px-3 py-2 grid grid-cols-1 bg-slate-50/60">
+                    <InlineStat label="使用予定" value={schedule.quantity} unit="m" />
+                  </div>
+
+                  {/* ペイン4: アクション */}
+                  <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                    <ScheduleModal
+                      mode="edit"
+                      salesUsers={salesUsers}
+                      products={products}
+                      initData={schedule}
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDelete(schedule.id, schedule.productId)}
+                    >
+                      削除
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

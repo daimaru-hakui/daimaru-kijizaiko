@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { orderGrayFabricAction } from '@/app/gray-fabrics/actions'
+import { orderGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -45,7 +45,14 @@ export function GrayFabricOrderAreaModal({ grayFabric }: Props) {
 
   return (
     <>
-      <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={() => setOpen(true)}>発注</Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-6 px-2 text-xs border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+        onClick={() => setOpen(true)}
+      >
+        発注
+      </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
         <DialogContent className="max-w-xl">
           <form onSubmit={handleSubmit(onSubmit)}>

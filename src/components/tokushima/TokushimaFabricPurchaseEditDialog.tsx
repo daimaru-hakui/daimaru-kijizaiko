@@ -16,7 +16,7 @@ import { NumberInput } from '@/components/ui/number-input'
 import {
   updateFabricPurchaseOrderAction,
   updateFabricPurchaseConfirmAction,
-} from '@/app/tokushima/fabric-purchase/actions'
+} from '@/app/(app)/tokushima/fabric-purchase/actions'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {

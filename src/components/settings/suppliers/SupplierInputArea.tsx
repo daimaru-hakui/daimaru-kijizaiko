@@ -7,7 +7,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { addSupplierAction, updateSupplierAction } from "@/app/settings/actions";
+import { addSupplierAction, updateSupplierAction } from "@/app/(app)/settings/actions";
 
 type Props = {
   type: "new" | "edit";

@@ -2,8 +2,15 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import type { UserClaims } from '../src/lib/auth/roles'
 
 const mockVerifySessionCookie = vi.fn()
+const mockUserDocGet = vi.fn()
+
 vi.mock('../src/lib/firebase/admin', () => ({
   getAdminAuth: vi.fn(() => ({ verifySessionCookie: mockVerifySessionCookie })),
+  getAdminDb: vi.fn(() => ({
+    collection: vi.fn(() => ({
+      doc: vi.fn(() => ({ get: mockUserDocGet })),
+    })),
+  })),
 }))
 
 function makeNextRequest(pathname: string, sessionCookie?: string) {
@@ -16,6 +23,11 @@ async function runProxy(pathname: string, sessionCookie?: string) {
   const req = makeNextRequest(pathname, sessionCookie)
   const { proxy } = await import('../src/proxy')
   return proxy(req as unknown as Parameters<typeof proxy>[0])
+}
+
+function mockUser(claims: UserClaims) {
+  mockVerifySessionCookie.mockResolvedValue({ uid: claims.uid })
+  mockUserDocGet.mockResolvedValue({ data: () => claims })
 }
 
 describe('proxy', () => {
@@ -40,37 +52,32 @@ describe('proxy', () => {
   })
 
   it('有効な __session で /products にアクセス → 通過 (undefined)', async () => {
-    const user: UserClaims = { uid: 'u1', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false }
-    mockVerifySessionCookie.mockResolvedValue(user)
+    mockUser({ uid: 'u1', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false })
     const res = await runProxy('/products', 'valid-cookie')
     expect(res).toBeUndefined()
   })
 
   it('/tokushima/* に tokushima=true ユーザーは通過', async () => {
-    const user: UserClaims = { uid: 'u2', admin: false, rd: false, sales: false, accounting: false, tokushima: true, order: false }
-    mockVerifySessionCookie.mockResolvedValue(user)
+    mockUser({ uid: 'u2', admin: false, rd: false, sales: false, accounting: false, tokushima: true, order: false })
     const res = await runProxy('/tokushima/cutting-reports', 'valid-cookie')
     expect(res).toBeUndefined()
   })
 
   it('/tokushima/* に tokushima=false ユーザーは 403', async () => {
-    const user: UserClaims = { uid: 'u3', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false }
-    mockVerifySessionCookie.mockResolvedValue(user)
+    mockUser({ uid: 'u3', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false })
     const res = await runProxy('/tokushima/cutting-reports', 'valid-cookie')
     expect(res).toBeDefined()
     expect(res!.status).toBe(403)
   })
 
   it('/settings/auth に admin=true ユーザーは通過', async () => {
-    const user: UserClaims = { uid: 'u4', admin: true, rd: false, sales: false, accounting: false, tokushima: false, order: false }
-    mockVerifySessionCookie.mockResolvedValue(user)
+    mockUser({ uid: 'u4', admin: true, rd: false, sales: false, accounting: false, tokushima: false, order: false })
     const res = await runProxy('/settings/auth', 'valid-cookie')
     expect(res).toBeUndefined()
   })
 
   it('/settings/auth に admin=false ユーザーは 403', async () => {
-    const user: UserClaims = { uid: 'u5', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false }
-    mockVerifySessionCookie.mockResolvedValue(user)
+    mockUser({ uid: 'u5', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false })
     const res = await runProxy('/settings/auth', 'valid-cookie')
     expect(res).toBeDefined()
     expect(res!.status).toBe(403)
