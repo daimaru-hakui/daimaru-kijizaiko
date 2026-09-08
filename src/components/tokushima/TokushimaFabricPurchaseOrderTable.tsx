@@ -9,6 +9,9 @@ import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEdit
 import { deleteFabricPurchaseOrderAction } from '@/app/(app)/tokushima/fabric-purchase/actions'
 import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { ListFilterBar } from '@/components/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {
@@ -31,6 +34,15 @@ export function TokushimaFabricPurchaseOrderTable({
   const router = useRouter()
   const [confirmOrder, setConfirmOrder] = useState<SerializableHistory | null>(null)
   const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = Array.from(
+    new Map(orders.map((o) => [o.createUser, usersMap[o.createUser] ?? o.createUser]))
+  )
+
+  const filtered = orders.filter((o) =>
+    matchesListFilter({ ...o, staff: o.createUser }, filter)
+  )
 
   const handleDelete = async (order: SerializableHistory) => {
     if (!window.confirm('削除してよろしいでしょうか')) return
@@ -62,13 +74,20 @@ export function TokushimaFabricPurchaseOrderTable({
         </Link>
       </div>
 
-      {orders.length === 0 ? (
+      <ListFilterBar
+        values={values}
+        onChange={setValue}
+        onReset={reset}
+        staffOptions={staffOptions}
+      />
+
+      {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
           現在登録された情報はありません。
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
-          {orders.map((order) => (
+          {filtered.map((order) => (
             <div
               key={order.id}
               className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"

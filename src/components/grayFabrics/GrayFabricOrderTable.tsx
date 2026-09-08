@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { ListFilterBar } from '@/components/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 import { canEditRecord } from '@/lib/permissions'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricOrderToConfirmModal } from './GrayFabricOrderToConfirmModal'
@@ -21,6 +24,15 @@ type Props = {
 
 export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Props) {
   const [, startTransition] = useTransition()
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = Array.from(
+    new Map(orders.map((o) => [o.createUser, users[o.createUser] ?? o.createUser]))
+  )
+
+  const filtered = orders.filter((o) =>
+    matchesListFilter({ ...o, staff: o.createUser }, filter)
+  )
 
   const canEdit = (o: GrayFabricHistory) => canEditRecord(o, currentUserId, isRD)
 
@@ -42,13 +54,20 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
         </Link>
       </div>
 
-      {orders.length === 0 ? (
+      <ListFilterBar
+        values={values}
+        onChange={setValue}
+        onReset={reset}
+        staffOptions={staffOptions}
+      />
+
+      {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
           現在登録された情報はありません。
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
-          {orders.map((order) => (
+          {filtered.map((order) => (
             <div
               key={order.id}
               className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"

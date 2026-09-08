@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { GrayFabricOrderTable } from './GrayFabricOrderTable'
+import {
+  setupSearchDebounceTimers,
+  setupUser,
+  flushSearchDebounce,
+} from '@/test-utils/search-debounce'
 import type { GrayFabricHistory } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -70,5 +75,76 @@ describe('GrayFabricOrderTable 削除ボタン', () => {
       />
     )
     expect(screen.getByRole('button', { name: '削除' })).toBeInTheDocument()
+  })
+})
+
+describe('GrayFabricOrderTable フィルター', () => {
+  setupSearchDebounceTimers()
+
+  const otherOrder = {
+    ...baseOrder,
+    id: 'order-2',
+    productNumber: 'XX-002',
+    productName: '別のキバタ',
+    supplierName: '別の商社',
+    createUser: 'user-2',
+  } as GrayFabricHistory
+
+  const renderTable = () =>
+    render(
+      <GrayFabricOrderTable
+        orders={[baseOrder, otherOrder]}
+        currentUserId="user-1"
+        isRD={false}
+        users={{ 'user-1': 'テストユーザー', 'user-2': '別ユーザー' }}
+      />
+    )
+
+  it('品番で絞り込める', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.type(screen.getByPlaceholderText('品番'), 'KB')
+    flushSearchDebounce()
+
+    expect(screen.getByText('KB-001')).toBeInTheDocument()
+    expect(screen.queryByText('XX-002')).toBeNull()
+  })
+
+  it('仕入先で絞り込める', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.type(screen.getByPlaceholderText('仕入先'), '別の')
+    flushSearchDebounce()
+
+    expect(screen.getByText('XX-002')).toBeInTheDocument()
+    expect(screen.queryByText('KB-001')).toBeNull()
+  })
+
+  it('担当者で絞り込める', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.selectOptions(screen.getByRole('combobox'), 'user-2')
+
+    expect(screen.getByText('XX-002')).toBeInTheDocument()
+    expect(screen.queryByText('KB-001')).toBeNull()
+  })
+
+  it('リセットを押すと絞り込みが解除される', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.type(screen.getByPlaceholderText('品番'), 'KB')
+    await user.selectOptions(screen.getByRole('combobox'), 'user-1')
+    flushSearchDebounce()
+    await user.click(screen.getByRole('button', { name: 'リセット' }))
+    flushSearchDebounce()
+
+    expect(screen.getByPlaceholderText('品番')).toHaveValue('')
+    expect(screen.getByRole('combobox')).toHaveValue('')
+    expect(screen.getByText('KB-001')).toBeInTheDocument()
+    expect(screen.getByText('XX-002')).toBeInTheDocument()
   })
 })

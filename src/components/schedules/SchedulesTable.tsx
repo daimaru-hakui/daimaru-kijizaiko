@@ -3,6 +3,9 @@
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ScheduleModal } from './ScheduleModal'
+import { ListFilterBar } from '@/components/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
 import type { CuttingSchedule } from '../../../types'
 
@@ -18,6 +21,18 @@ type Props = {
 }
 
 export function SchedulesTable({ schedules, usersMap, salesUsers, products, productMap }: Props) {
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = Array.from(
+    new Map(schedules.map((s) => [s.staff, usersMap[s.staff] ?? s.staff]))
+  )
+
+  const filtered = schedules.filter((s) =>
+    matchesListFilter(
+      { productNumber: productMap[s.productId]?.productNumber ?? s.productId, staff: s.staff },
+      filter
+    )
+  )
   const handleDelete = async (id: string, productId: string) => {
     if (!window.confirm('削除してもよいですか？')) return
     await deleteScheduleAction(id, productId)
@@ -30,13 +45,21 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
         <ScheduleModal mode="new" salesUsers={salesUsers} products={products} />
       </div>
 
-      {schedules.length === 0 ? (
+      <ListFilterBar
+        values={values}
+        onChange={setValue}
+        onReset={reset}
+        staffOptions={staffOptions}
+        fields={['productNumber', 'staff']}
+      />
+
+      {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
           現在登録された情報はありません。
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
-          {schedules.map((schedule) => {
+          {filtered.map((schedule) => {
             const product = productMap[schedule.productId]
             const staffName = usersMap[schedule.staff] ?? schedule.staff
             return (

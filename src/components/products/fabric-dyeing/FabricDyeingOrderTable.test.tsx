@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import { vi, describe, it, expect } from 'vitest'
 import { FabricDyeingOrderTable } from './FabricDyeingOrderTable'
+import {
+  setupSearchDebounceTimers,
+  setupUser,
+  flushSearchDebounce,
+} from '@/test-utils/search-debounce'
 import type { SerializableHistory } from '../../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -75,5 +80,52 @@ describe('FabricDyeingOrderTable 削除ボタン', () => {
       />
     )
     expect(screen.getByRole('button', { name: '削除' })).toBeInTheDocument()
+  })
+})
+
+describe('FabricDyeingOrderTable フィルター', () => {
+  setupSearchDebounceTimers()
+
+  const otherOrder: SerializableHistory = {
+    ...baseOrder,
+    id: 'order-2',
+    productNumber: 'XX-002',
+    productName: '別の生地',
+    supplierName: '別のサプライヤー',
+    createUser: 'user-2',
+  }
+
+  const renderTable = () =>
+    render(
+      <FabricDyeingOrderTable
+        orders={[baseOrder, otherOrder]}
+        usersMap={{ 'user-1': 'テストユーザー', 'user-2': '別ユーザー' }}
+        userId="user-1"
+        isRD={false}
+      />
+    )
+
+  it('品番で絞り込める', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.type(screen.getByPlaceholderText('品番'), 'TEST')
+    flushSearchDebounce()
+
+    expect(screen.getByText('TEST-001')).toBeInTheDocument()
+    expect(screen.queryByText('XX-002')).toBeNull()
+  })
+
+  it('リセットを押すと絞り込みが解除される', async () => {
+    const user = setupUser()
+    renderTable()
+
+    await user.type(screen.getByPlaceholderText('品番'), 'TEST')
+    flushSearchDebounce()
+    await user.click(screen.getByRole('button', { name: 'リセット' }))
+    flushSearchDebounce()
+
+    expect(screen.getByPlaceholderText('品番')).toHaveValue('')
+    expect(screen.getByText('XX-002')).toBeInTheDocument()
   })
 })
