@@ -1,49 +1,51 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { FC } from "react";
-import { FaEdit } from "react-icons/fa";
-import { GrayFabric } from "../../../types";
-import { GrayFabricForm } from "./GrayFabricForm";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { GrayFabricInputArea } from './GrayFabricInputArea'
+import type { GrayFabric } from '../../../types'
+
+type Supplier = { id: string; name: string }
 
 type Props = {
-  grayFabric: GrayFabric;
-};
+  grayFabric: GrayFabric
+  suppliers: Supplier[]
+}
 
-export const GrayFabricEditModal: FC<Props> = ({ grayFabric }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export function GrayFabricEditModal({ grayFabric, suppliers }: Props) {
+  const [open, setOpen] = useState(false)
 
   return (
     <>
-      <FaEdit color="#444" cursor="pointer" onClick={onOpen} />
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>キバタ詳細</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <GrayFabricForm
-              title="キバタの更新"
-              grayFabric={grayFabric}
-              toggleSwitch="edit"
-              onClose={onClose}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={onClose}>閉じる</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-6 px-2 text-xs"
+        onClick={() => setOpen(true)}
+      >
+        編集
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>キバタ詳細</DialogTitle>
+          </DialogHeader>
+          <GrayFabricInputArea
+            mode="edit"
+            grayFabric={grayFabric}
+            suppliers={suppliers}
+            onSuccessAction={() => setOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </>
-  );
-};
+  )
+}
 
-export default GrayFabricEditModal;
+export default GrayFabricEditModal

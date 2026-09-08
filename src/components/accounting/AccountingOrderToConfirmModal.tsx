@@ -1,155 +1,104 @@
+'use client'
+
+import { useState } from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import {
-  Box,
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Stack,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { FC } from "react";
-import { History } from "../../../types";
-import { useAccounting } from "../../hooks/useAccounting";
-import { useForm, SubmitHandler } from "react-hook-form";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/number-input'
+import { confirmProcessingAccountingAction } from '@/app/(app)/accounting-dept/actions'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
-  history: History;
-  startDay: string;
-  endDay: string;
-};
+  history: SerializableHistory
+}
 
 type Inputs = {
-  quantity: number,
-  price: number,
-  orderedAt: string;
-  fixedAt: string;
-  comment: string;
-};
+  quantity: number
+  price: number
+}
 
-export const AccountingOrderToConfirmModal: FC<Props> = ({ history, startDay, endDay }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { confirmProcessingAccounting } = useAccounting(startDay, endDay);
-  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<Inputs>({
+export function AccountingOrderToConfirmModal({ history }: Props) {
+  const [open, setOpen] = useState(false)
+  const { handleSubmit, reset, setValue, watch } = useForm<Inputs>({
     defaultValues: {
-      ...history
-    }
-  });
+      quantity: history.quantity,
+      price: history.price,
+    },
+  })
 
-  const onSubmit: SubmitHandler<Inputs> = data => {
-    confirmProcessingAccounting(history, data);
-    onClose();
-  };
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    if (!window.confirm('確定して宜しいでしょうか')) return
+    await confirmProcessingAccountingAction(
+      history.id,
+      history.productId,
+      history.stockPlace,
+      history.quantity,
+      data,
+    )
+    setOpen(false)
+  }
+
+  const handleClose = () => {
+    reset()
+    setOpen(false)
+  }
 
   return (
     <>
-      <Button
-        size="xs"
-        colorScheme="facebook"
-        onClick={() => {
-          onOpen();
-        }}
-      >
+      <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setOpen(true)}>
         金額確定
       </Button>
-
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          reset();
-          onClose();
-        }}
-      >
-        <ModalOverlay />
-        <ModalContent>
+      <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
+        <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>確定処理</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Stack spacing={6}>
-                <Flex gap={3}>
-                  <Box>品　　番</Box>
-                  <Flex gap={1}>
-                    <Box>{history.productNumber}</Box>
-                    <Box>{history.productName}</Box>
-                  </Flex>
-                </Flex>
-
-                <Box>
-                  <>
-                    <Box w="100%">
-                      <Text>入荷数量（ｍ）</Text>
-                      <NumberInput
-                        mt={1}
-                        name="quantity"
-                        defaultValue={0}
-                        {...register('quantity')}
-                        min={0}
-                        max={100000}
-                        onChange={getValues}
-                      >
-                        <NumberInputField textAlign="right" />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </Box>
-                    <Box w="100%" mt={3}>
-                      <Text>単価（円）</Text>
-                      <NumberInput
-                        mt={1}
-                        name="price"
-                        defaultValue={0}
-                        {...register('price')}
-                        min={0}
-                        max={100000}
-                        onChange={getValues}
-                      >
-                        <NumberInputField textAlign="right" />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </Box>
-                  </>
-                </Box>
-              </Stack>
-            </ModalBody>
-
-            <ModalFooter>
-              <>
-                <Button
-                  mr={3}
-                  onClick={() => {
-                    reset();
-                    onClose();
-                  }}
-                >
-                  閉じる
-                </Button>
-                <Button
-                  type="submit"
-                  colorScheme="facebook"
-                >
-                  確定
-                </Button>
-              </>
-            </ModalFooter>
+            <DialogHeader>
+              <DialogTitle>確定処理</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="flex gap-3 text-sm">
+                <span>品番</span>
+                <div className="flex gap-1">
+                  <span>{history.productNumber}</span>
+                  <span>{history.productName}</span>
+                </div>
+              </div>
+              <div>
+                <Label>入荷数量（m）</Label>
+                <NumberInput
+                  className="mt-1"
+                  min={0}
+                  max={100000}
+                  value={watch('quantity')}
+                  onChange={(_, v) => setValue('quantity', isNaN(v) ? 0 : v)}
+                />
+              </div>
+              <div>
+                <Label>単価（円）</Label>
+                <NumberInput
+                  className="mt-1"
+                  min={0}
+                  max={100000}
+                  value={watch('price')}
+                  onChange={(_, v) => setValue('price', isNaN(v) ? 0 : v)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={handleClose}>
+                閉じる
+              </Button>
+              <Button type="submit">確定</Button>
+            </DialogFooter>
           </form>
-        </ModalContent>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
-  );
-};
+  )
+}

@@ -1,162 +1,101 @@
+'use client'
+
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/number-input'
 import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Stack,
-  Text,
-  Textarea,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { FC } from "react";
-import { GrayFabric } from "../../../types";
-import { useGrayFabrics } from "../../hooks/useGrayFabrics";
-import { useForm, SubmitHandler } from "react-hook-form";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { orderGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
+import type { GrayFabric } from '../../../types'
 
 type Props = {
-  grayFabric: GrayFabric;
-};
+  grayFabric: GrayFabric & { supplierName: string }
+}
 
-type Inputs = {
-  quantity: number,
-  price: number,
-  orderedAt: string;
-  scheduledAt: string;
-  fixedAt: string;
-  comment: string;
-};
+type FormValues = {
+  quantity: number
+  orderedAt: string
+  scheduledAt: string
+  comment: string
+}
 
-export const GrayFabricOrderAreaModal: FC<Props> = ({ grayFabric }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { orderGrayFabric } = useGrayFabrics();
-  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<Inputs>({
-    defaultValues: {
-      orderedAt: "",
-      scheduledAt: "",
-      quantity: 0,
-      comment: "",
-    }
-  });
+export function GrayFabricOrderAreaModal({ grayFabric }: Props) {
+  const [open, setOpen] = useState(false)
+  const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<FormValues>({
+    defaultValues: { quantity: 0, orderedAt: '', scheduledAt: '', comment: '' },
+  })
 
-  const onSubmit: SubmitHandler<Inputs> = data => {
-    if (data.quantity === 0) {
-      window.alert('数量を入力してください。');
-      return;
-    };
-    orderGrayFabric(data, grayFabric);
-    reset();
-    onClose();
-  };
+  const onSubmit = async (data: FormValues) => {
+    const result = await orderGrayFabricAction(grayFabric, data)
+    if (!result.ok) { alert(result.error); return }
+    reset()
+    setOpen(false)
+  }
+
+  const handleClose = () => { reset(); setOpen(false) }
 
   return (
     <>
-      <Button colorScheme="facebook" size="xs" onClick={onOpen}>
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-6 px-2 text-xs border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+        onClick={() => setOpen(true)}
+      >
         発注
       </Button>
-      <Modal
-        size="xl"
-        isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          reset();
-        }} >
-        <ModalOverlay />
-        <ModalContent>
+      <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
+        <DialogContent className="max-w-xl">
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>キバタ発注</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Stack spacing={6}>
-                <Divider />
-                <Box mt={6} fontSize="xl">
-                  <Flex>
-                    <Text mr={1} fontWeight="bold">
-                      品番
-                    </Text>
-                    <Flex>
-                      <Text mr={3}>{grayFabric?.productNumber}</Text>
-                      {grayFabric?.productName}
-                    </Flex>
-                  </Flex>
-                </Box>
-                <Flex
-                  gap={3}
-                  w="full"
-                  direction={{ base: "column", md: "row" }}
-                >
-                  <Box w="100%">
-                    <Box>発注日</Box>
-                    <Input
-                      mt={1}
-                      type="date"
-                      {...register("orderedAt")}
-                    />
-                  </Box>
-                  <Box w="100%">
-                    <Box>予定日</Box>
-                    <Input
-                      mt={1}
-                      type="date"
-                      {...register("scheduledAt")}
-                    />
-                  </Box>
-
-                  <Box w="100%">
-                    <Text>数量（m）</Text>
-                    <NumberInput
-                      mt={1}
-                      w="100%"
-                      {...register("quantity", { required: true })}
-                      min={0}
-                      max={100000}
-                      onChange={getValues}
-                    >
-                      <NumberInputField textAlign="right" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </Box>
-                </Flex>
-                <Box w="100%">
-                  <Text>備考</Text>
-                  <Textarea
-                    mt={1}
-                    {...register("comment")}
+            <DialogHeader>
+              <DialogTitle>キバタ発注</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-6 py-4">
+              <div className="text-xl">
+                <span className="font-bold">品番: </span>
+                {grayFabric.productNumber} {grayFabric.productName}
+              </div>
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="w-full">
+                  <Label>発注日</Label>
+                  <Input type="date" className="mt-1" {...register('orderedAt')} />
+                </div>
+                <div className="w-full">
+                  <Label>予定日</Label>
+                  <Input type="date" className="mt-1" {...register('scheduledAt')} />
+                </div>
+                <div className="w-full">
+                  <Label>数量（m）</Label>
+                  <NumberInput
+                    className="mt-1"
+                    min={0}
+                    max={100000}
+                    value={watch('quantity')}
+                    onChange={(_, num) => setValue('quantity', num)}
                   />
-                </Box>
-                <Button
-                  type="submit"
-                  colorScheme="facebook"
-                >
-                  登録する
-                </Button>
-              </Stack>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button onClick={() => {
-                onClose();
-                reset();
-              }}>閉じる</Button>
-            </ModalFooter>
+                </div>
+              </div>
+              <div>
+                <Label>備考</Label>
+                <Textarea className="mt-1" {...register('comment')} />
+              </div>
+              <Button type="submit" disabled={isSubmitting} className="bg-blue-800 hover:bg-blue-900 text-white">登録する</Button>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" className="border-slate-200 text-slate-600" onClick={handleClose}>閉じる</Button>
+            </DialogFooter>
           </form>
-        </ModalContent>
-      </Modal >
+        </DialogContent>
+      </Dialog>
     </>
-  );
-};
+  )
+}

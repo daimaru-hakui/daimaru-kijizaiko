@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,8 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import { History } from "../../../types";
 
 ChartJS.register(
@@ -23,21 +23,20 @@ ChartJS.register(
 );
 
 type Props = {
-  data: History[];
+  data: Omit<History, 'createdAt' | 'updatedAt'>[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 export const PurchasePriceRanking: FC<Props> = ({
   data,
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", price: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; price: number }[]>([]);
 
   useEffect(() => {
     const getArray = async () => {
@@ -62,11 +61,7 @@ export const PurchasePriceRanking: FC<Props> = ({
         return { productId: header, price: sum };
       });
 
-      const result = newArray.sort((a, b) => {
-        if (a.price > b.price) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.price - a.price);
       setChartDataList(result);
     };
     getArray();
@@ -81,6 +76,7 @@ export const PurchasePriceRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -95,9 +91,7 @@ export const PurchasePriceRanking: FC<Props> = ({
   const labels = chartDataList
     ?.slice(0, rankingNumber)
     ?.map((ranking) =>
-      `${getProductNumber(ranking.productId)} ${getColorName(
-        ranking.productId
-      )}`
+      `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {
@@ -115,8 +109,8 @@ export const PurchasePriceRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };

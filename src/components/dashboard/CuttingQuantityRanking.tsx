@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,13 +11,11 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
 import {
   CuttingReportType,
   CuttingHistoryType,
   CuttingProductType,
 } from "../../../types";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 
 ChartJS.register(
   CategoryScale,
@@ -31,6 +31,7 @@ type Props = {
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 export const CuttingQuantityRanking: FC<Props> = ({
@@ -38,11 +39,9 @@ export const CuttingQuantityRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0, price: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; quantity: number }[]>([]);
 
   useEffect(() => {
     const getArray = () => {
@@ -80,11 +79,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
         });
         return { productId: header, quantity: sum };
       });
-      const result: any = newArray.sort((a, b) => {
-        if (a.quantity > b.quantity) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.quantity - a.quantity);
       setChartDataList(result);
     };
     getArray();
@@ -99,6 +94,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -114,9 +110,7 @@ export const CuttingQuantityRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking: { productId: string }) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {
@@ -134,8 +128,8 @@ export const CuttingQuantityRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };

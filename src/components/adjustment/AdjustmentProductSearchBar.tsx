@@ -1,30 +1,18 @@
-import React, { FC } from 'react';
-import { Flex, Input } from '@chakra-ui/react';
-import { GiCancel } from "react-icons/gi";
+'use client'
+
+import { GiCancel } from 'react-icons/gi'
+import { FilterInput } from '@/components/filters/fields'
 
 type Props = {
-  searchText: string;
-  setSearchText: (payload) => void;
-};
+  searchText: string
+  setSearchText: (v: string) => void
+}
 
-export const AdjustmentProductSearchBar: FC<Props> = ({ searchText, setSearchText }) => {
-
-  const reset = () => {
-    setSearchText("");
-  };
-
+export function AdjustmentProductSearchBar({ searchText, setSearchText }: Props) {
   return (
-    <Flex mt={6} gap={1} align="center">
-      <Input
-        type="text"
-        size="xs"
-        w="32"
-        mr={1}
-        value={searchText}
-        placeholder="品番絞り込み"
-        onChange={(e) => setSearchText(e.target.value)}
-      />
-      <GiCancel cursor="pointer" onClick={reset} />
-    </Flex>
-  );
-};
+    <div className="mt-4 flex items-end gap-1">
+      <FilterInput label="品番" value={searchText} onChange={setSearchText} />
+      <GiCancel className="mb-2 cursor-pointer" onClick={() => setSearchText('')} />
+    </div>
+  )
+}

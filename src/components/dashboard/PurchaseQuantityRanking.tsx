@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,8 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
-import { useGetDisp } from "../../hooks/UseGetDisp";
 import { History } from "../../../types";
 
 ChartJS.register(
@@ -23,10 +23,11 @@ ChartJS.register(
 );
 
 type Props = {
-  data: History[];
+  data: Omit<History, 'createdAt' | 'updatedAt'>[];
   startDay: string;
   endDay: string;
   rankingNumber: number;
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 export const PurchaseQuantityRanking: FC<Props> = ({
@@ -34,11 +35,9 @@ export const PurchaseQuantityRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0 },
-  ]);
+  const [chartDataList, setChartDataList] = useState<{ productId: string; quantity: number }[]>([]);
 
   useEffect(() => {
     const getArray = async () => {
@@ -49,7 +48,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
       const newArray = headers.map((header) => {
         const filterData = data?.filter(
           (obj) =>
-            new Date(startDay).getTime() < new Date(obj.fixedAt).getTime() &&
+            new Date(startDay).getTime() <= new Date(obj.fixedAt).getTime() &&
             new Date(obj.fixedAt).getTime() <= new Date(endDay).getTime()
         );
 
@@ -62,11 +61,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
         return { productId: header, quantity: sum };
       });
 
-      const result = newArray.sort((a, b) => {
-        if (a.quantity > b.quantity) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.quantity - a.quantity);
       setChartDataList(result);
     };
     getArray();
@@ -81,6 +76,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -96,9 +92,7 @@ export const PurchaseQuantityRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {
@@ -116,8 +110,8 @@ export const PurchaseQuantityRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} bg="white" w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };

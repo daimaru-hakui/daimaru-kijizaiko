@@ -1,137 +1,161 @@
+'use client'
 
-import {
-  Box,
-  Flex,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useState, useEffect, FC } from "react";
-import { GrayFabricHistory } from "../../../types";
-import { useUtil } from "../../hooks/UseUtil";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { CommentModal } from "../CommentModal";
-import { SearchArea } from "../SearchArea";
-import { useForm, FormProvider } from "react-hook-form";
-import { useSWRGrayFavricConfirms } from "../../hooks/swr/useSWRGrayFavricConfirms";
-import { useAuthStore } from "../../../store";
-import { GrayFabricEditModal } from "./GrayFabricEditModal";
-import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { InlineStat, Chip } from '@/components/products/shared'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
+import { canEditRecord } from '@/lib/permissions'
+import { CommentModal } from '@/components/CommentModal'
+import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
+import type { GrayFabricHistory } from '../../../types'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
+import { buildOptions } from '@/lib/filters/options'
 
-type Inputs = {
-  start: string;
-  end: string;
-  client: string;
-  staff: string;
-};
+type Props = {
+  confirms: GrayFabricHistory[]
+  currentUserId: string
+  isRD: boolean
+  users: Record<string, string>
+  defaultStart: string
+  defaultEnd: string
+}
 
-export const GrayFabricConfirmTable: FC = () => {
-  const { getSerialNumber, getUserName } = useGetDisp();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const { isAuths } = useAuthManagement();
-  const { getTodayDate, get3monthsAgo } = useUtil();
-  const [startDay, setStartDay] = useState(get3monthsAgo());
-  const [endDay, setEndDay] = useState(getTodayDate());
-  const [staff, setStaff] = useState("");
-  const [filterGrayFabrics, setFilterGrayFabrics] = useState<GrayFabricHistory[]>([]);
-  const { data } = useSWRGrayFavricConfirms(startDay, endDay);
+export function GrayFabricConfirmTable({
+  confirms,
+  currentUserId,
+  isRD,
+  users,
+  defaultStart,
+  defaultEnd,
+}: Props) {
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/gray-fabrics/confirms',
+    defaultStart,
+    defaultEnd
+  )
 
-  const methods = useForm<Inputs>({
-    defaultValues: {
-      start: startDay,
-      end: endDay,
-      staff: "",
-    },
-  });
+  const { values, filter, setValue, reset } = useListFilter()
 
-  const onSubmit = (data: Inputs) => {
-    setStartDay(data.start);
-    setEndDay(data.end);
-    setStaff(data.staff);
-  };
-  const onReset = () => {
-    setStartDay(get3monthsAgo());
-    setEndDay(getTodayDate());
-    setStaff("");
-    methods.reset();
-  };
+  const staffOptions = buildOptions(confirms.map((h) => h.createUser), users)
+  const supplierOptions = buildOptions(confirms.map((h) => h.supplierName))
 
-  useEffect(() => {
-    setFilterGrayFabrics(
-      data?.contents.filter(
-        (content) => staff === content.createUser || staff === ""));
-  }, [data, staff]);
+  const filtered = confirms.filter((h) =>
+    matchesListFilter({ ...h, staff: h.createUser }, filter)
+  )
+
+  const handleReset = () => {
+    reset()
+    resetPeriod()
+  }
+
+  const canEdit = (h: GrayFabricHistory) => canEditRecord(h, currentUserId, isRD)
 
   return (
-    <>
-      <FormProvider {...methods}>
-        <SearchArea onSubmit={onSubmit} onReset={onReset} />
-      </FormProvider>
-      <TableContainer p={6} pt={0} w="100%">
-        {filterGrayFabrics?.length > 0 ? (
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>発注NO.</Th>
-                <Th>発注日</Th>
-                <Th>仕上日</Th>
-                <Th>担当者</Th>
-                <Th>品番</Th>
-                <Th>品名</Th>
-                <Th>仕入先</Th>
-                <Th>数量</Th>
-                <Th>コメント</Th>
-                <Th>編集</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filterGrayFabrics?.map((history) => (
-                <Tr key={history.id}>
-                  <Td>{getSerialNumber(history.serialNumber)}</Td>
-                  <Td>{history.orderedAt}</Td>
-                  <Td>{history.fixedAt}</Td>
-                  <Td>{getUserName(history.createUser)}</Td>
-                  <Td>{history.productNumber}</Td>
-                  <Td>{history.productName}</Td>
-                  <Td>{history.supplierName}</Td>
-                  <Td isNumeric>{history?.quantity}m</Td>
-                  <Td w="100%">
-                    <Flex gap={3}>
-                      <CommentModal
-                        id={history.id}
-                        comment={history.comment}
-                        collectionName="historyGrayFabricConfirms"
-                      />
-                      {history?.comment.slice(0, 20) +
-                        (history.comment.length >= 1 ? "..." : "")}
-                    </Flex>
-                  </Td>
-                  <Td>
-                    {(isAuths(["rd"]) ||
-                      history.createUser === currentUser) && (
-                        <GrayFabricHistoryEditModal
-                          history={history}
-                          startDay={startDay}
-                          endDay={endDay}
-                          type="confirm"
-                        />
-                      )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        ) : (
-          <Box mt={6} textAlign="center">
-            現在登録された情報はありません。
-          </Box>
-        )}
-      </TableContainer>
-    </>
-  );
-};
+    <div className="p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">キバタ仕掛履歴</h2>
+        <Link href="/gray-fabrics/orders">
+          <Button size="sm" variant="outline">仕掛一覧</Button>
+        </Link>
+      </div>
+
+      <PeriodFilterBar
+        start={start}
+        end={end}
+        onStartChange={setStart}
+        onEndChange={setEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['productNumber', 'productName', 'supplier', 'staff'],
+          staffOptions,
+          supplierOptions,
+        }}
+      />
+
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((h) => (
+            <div
+              key={h.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_1fr_2.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・仕入先・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {h.productNumber}
+                    </span>
+                    {h.supplierName && <Chip label={h.supplierName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={h.productName}
+                  >
+                    {h.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(h.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={users[h.createUser] ?? h.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {h.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    仕上: {h.fixedAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値。キバタの履歴は単価を持たないため数量のみ */}
+                <div className="px-3 py-2 grid grid-cols-1 bg-slate-50/60">
+                  <InlineStat label="数量" value={h.quantity} unit="m" />
+                </div>
+
+                {/* ペイン4: コメント */}
+                <div className="px-3 py-2 flex items-center gap-1 min-w-0">
+                  <CommentModal comment={h.comment ?? ''} />
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={h.comment ?? ''}
+                  >
+                    {h.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  {canEdit(h) && (
+                    <GrayFabricHistoryEditModal history={h} type="confirm" />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

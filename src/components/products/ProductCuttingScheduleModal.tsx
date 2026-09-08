@@ -1,131 +1,104 @@
+"use client";
+
+import { useState } from "react";
 import {
-  Box,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  useDisclosure,
-} from "@chakra-ui/react";
-import React, { FC, useEffect, useState } from "react";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useCuttingScheduleStore } from "../../../store";
-import { useCuttingSchedules } from "../../hooks/useCuttingSchedules";
-import { FaTrashAlt } from "react-icons/fa";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { useUtil } from "../../hooks/UseUtil";
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { getCuttingScheduleTotal } from "@/lib/utils";
+import type { CuttingSchedule } from "../../../types";
 
 type Props = {
-  scheduleList: string[];
+  scheduleIds: string[];
+  schedulesMap: Record<string, CuttingSchedule>;
+  usersMap: Record<string, string>;
 };
 
-export const ProductCuttingScheduleModal: FC<Props> = ({ scheduleList }) => {
-  const { getUserName, getProductNumber, getColorName } = useGetDisp();
-  const {mathRound2nd} =useUtil()
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [data, setData] = useState([]);
-  const [sum, setSum] = useState(0);
-  const cuttingSchedules = useCuttingScheduleStore(
-    (state) => state.cuttingSchedules
+export function ProductCuttingScheduleModal({
+  scheduleIds,
+  schedulesMap,
+  usersMap,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const total = getCuttingScheduleTotal(scheduleIds, schedulesMap);
+  const schedules = scheduleIds.flatMap((id) =>
+    schedulesMap[id] ? [schedulesMap[id]] : [],
   );
-  const { deleteSchedule } = useCuttingSchedules();
-  const {isAuths} = useAuthManagement()
-
-  useEffect(() => {
-    const getSchedules = (array: string[]) => {
-      const filterSchedules = cuttingSchedules.filter((schedule) =>
-        array?.includes(schedule.id)
-      );
-      setData(filterSchedules);
-    };
-    getSchedules(scheduleList);
-  }, [scheduleList, cuttingSchedules]);
-
-  useEffect(() => {
-    let total = 0;
-    data.forEach((data) => (total += data.quantity));
-    setSum(mathRound2nd(total));
-  }, [data,mathRound2nd]);
-
-  // console.log(sum)
 
   return (
     <>
-      <Button colorScheme="facebook" size="xs" onClick={onOpen}>
-        あり
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-6 px-2 text-xs bg-indigo-50 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
+        onClick={() => setOpen(true)}
+      >
+        あり {total.toLocaleString()}m
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>使用予定</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box fontSize="lg" textAlign="right" mr={6}>
-              使用予定合計 {sum} m
-            </Box>
-            <TableContainer mt={6}>
-              <Table variant="simple" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>担当</Th>
-                    <Th>加工指示書NO.</Th>
-                    <Th>生地品番</Th>
-                    <Th>アイテム名</Th>
-                    <Th isNumeric>使用予定（m）</Th>
-                    <Th>製品納期</Th>
-                    <Th>削除</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {data.map(
-                    ({
-                      id,
-                      staff,
-                      processNumber,
-                      itemName,
-                      productId,
-                      quantity,
-                      scheduledAt,
-                    }) => (
-                      <Tr key={id}>
-                        <Td>{getUserName(staff)}</Td>
-                        <Td>{processNumber}</Td>
-                        <Td>
-                          {getProductNumber(productId)}{" "}
-                          {getColorName(productId)}
-                        </Td>
-                        <Td>{itemName}</Td>
-                        <Td isNumeric>{quantity}</Td>
-                        <Td>{scheduledAt}</Td>
-                        <Td>
-                          {isAuths(["tokushima"]) && (
-                            <FaTrashAlt
-                              cursor="pointer"
-                              onClick={() => deleteSchedule(id, productId)}
-                            />
-                          )}
-                        </Td>
-                      </Tr>
-                    )
-                  )}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </ModalBody>
-          <ModalFooter></ModalFooter>
-        </ModalContent>
-      </Modal>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>使用予定一覧</DialogTitle>
+          </DialogHeader>
+          <div className="text-right text-sm font-semibold text-slate-700 pr-1">
+            合計 {total.toLocaleString()}m
+          </div>
+          <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
+            <Table className="text-sm">
+              <TableHeader>
+                <TableRow className="bg-slate-50">
+                  <TableHead className="text-xs font-semibold text-slate-500">
+                    担当
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500">
+                    加工指示書NO.
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500">
+                    アイテム名
+                  </TableHead>
+                  <TableHead className="text-right text-xs font-semibold text-slate-500">
+                    使用予定(m)
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500">
+                    製品納期
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schedules.map((s) => (
+                  <TableRow key={s.id}>
+                    <TableCell>{usersMap[s.staff] ?? s.staff}</TableCell>
+                    <TableCell>{s.processNumber}</TableCell>
+                    <TableCell>{s.itemName}</TableCell>
+                    <TableCell className="text-right">
+                      {s.quantity.toLocaleString()}m
+                    </TableCell>
+                    <TableCell>{s.scheduledAt}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              閉じる
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
-};
+}

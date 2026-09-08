@@ -1,116 +1,160 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useState, FC } from "react";
-import { FaTrashAlt } from "react-icons/fa";
-import { useAuthStore, useGrayFabricStore } from "../../../store";
-import { History } from "../../../types";
-import { OrderToConfirmModal } from "../history/OrderToConfirmModal";
-import { CommentModal } from "../CommentModal";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { GrayFabricHistoryEditModal } from "./GrayFabriHistoryEditModal";
-import { useGrayFabrics } from "../../hooks/useGrayFabrics";
+'use client'
 
-export const GrayFabricOrderTable: FC = () => {
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const [items, setItems] = useState<History>();
-  const { isAuths } = useAuthManagement();
-  const { getSerialNumber, getUserName } = useGetDisp();
-  const grayFabricOrders = useGrayFabricStore((state) => state.grayFabricOrders);
-  const { confirmProcessing, deleteGrayFabricOrder } = useGrayFabrics();
+import { useTransition } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { InlineStat, Chip } from '@/components/products/shared'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
+import { canEditRecord } from '@/lib/permissions'
+import { CommentModal } from '@/components/CommentModal'
+import { GrayFabricOrderToConfirmModal } from './GrayFabricOrderToConfirmModal'
+import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
+import { deleteGrayFabricOrderAction } from '@/app/(app)/gray-fabrics/actions'
+import type { GrayFabricHistory } from '../../../types'
+import { buildOptions } from '@/lib/filters/options'
 
+type Props = {
+  orders: GrayFabricHistory[]
+  currentUserId: string
+  isRD: boolean
+  users: Record<string, string>
+}
+
+export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Props) {
+  const [, startTransition] = useTransition()
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = buildOptions(orders.map((o) => o.createUser), users)
+  const supplierOptions = buildOptions(orders.map((o) => o.supplierName))
+
+  const filtered = orders.filter((o) =>
+    matchesListFilter({ ...o, staff: o.createUser }, filter)
+  )
+
+  const canEdit = (o: GrayFabricHistory) => canEditRecord(o, currentUserId, isRD)
+
+  const handleDelete = (history: GrayFabricHistory) => {
+    if (!confirm('削除して宜しいでしょうか')) return
+    startTransition(() => {
+      void deleteGrayFabricOrderAction(history.id, history.grayFabricId, history.quantity).then(
+        (result) => { if (!result.ok) alert(result.error) }
+      )
+    })
+  }
 
   return (
-    <>
-      <TableContainer p={6} pt={0} w="100%">
-        {grayFabricOrders?.length > 0 ? (
-          <Table mt={6} variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th>処理</Th>
-                <Th>発注NO.</Th>
-                <Th>発注日</Th>
-                <Th>予定納期</Th>
-                <Th>担当者</Th>
-                <Th>品番</Th>
-                <Th>品名</Th>
-                <Th>仕入先</Th>
-                <Th>数量</Th>
-                <Th>コメント</Th>
-                <Th>編集/削除</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {grayFabricOrders?.map((history) => (
-                <Tr key={history.id}>
-                  <Td>
-                    {isAuths(["rd"]) || history.createUser === currentUser ? (
-                      <OrderToConfirmModal
-                        history={history}
-                        items={items}
-                        setItems={setItems}
-                        onClick={() => confirmProcessing(history, items)}
-                      />
-                    ) : (
-                      <Button size="xs" disabled={true}>
-                        確定
-                      </Button>
-                    )}
-                  </Td>
-                  <Td>{getSerialNumber(history.serialNumber)}</Td>
-                  <Td>{history.orderedAt}</Td>
-                  <Td>{history.scheduledAt}</Td>
-                  <Td>{getUserName(history.createUser)}</Td>
-                  <Td>{history.productNumber}</Td>
-                  <Td>{history.productName}</Td>
-                  <Td>{history.supplierName}</Td>
-                  <Td isNumeric>{history?.quantity}m</Td>
-                  <Td w="100%">
-                    <Flex gap={3}>
-                      <CommentModal
-                        id={history.id}
-                        comment={history.comment}
-                        collectionName="historyGrayFabricOrders"
-                      />
-                      {history?.comment.slice(0, 20) +
-                        (history.comment.length >= 1 ? "..." : "")}
-                    </Flex>
-                  </Td>
-                  <Td>
+    <div className="p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">キバタ仕掛一覧</h2>
+        <Link href="/gray-fabrics/confirms">
+          <Button size="sm" variant="outline">履歴</Button>
+        </Link>
+      </div>
 
-                    {(isAuths(["rd"]) || history.createUser === currentUser)
-                      && (
-                        <Flex alignItems="center" gap={3}>
-                          <GrayFabricHistoryEditModal
-                            history={history}
-                            type="order"
-                          />
-                          <FaTrashAlt
-                            color="#444"
-                            cursor="pointer"
-                            onClick={() => deleteGrayFabricOrder(history)}
-                          />
-                        </Flex>
-                      )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        ) : (
-          <Box textAlign="center">現在登録された情報はありません。</Box>
-        )}
-      </TableContainer>
-    </>
-  );
-};
+      <ListFilterBar
+        values={values}
+        onChange={setValue}
+        onReset={reset}
+        staffOptions={staffOptions}
+        supplierOptions={supplierOptions}
+      />
+
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((order) => (
+            <div
+              key={order.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_1fr_2.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・仕入先・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {order.productNumber}
+                    </span>
+                    {order.supplierName && <Chip label={order.supplierName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={order.productName}
+                  >
+                    {order.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(order.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={users[order.createUser] ?? order.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {order.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    納期: {order.scheduledAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値。キバタの発注は単価を持たないため数量のみ */}
+                <div className="px-3 py-2 grid grid-cols-1 bg-slate-50/60">
+                  <InlineStat label="数量" value={order.quantity} unit="m" />
+                </div>
+
+                {/* ペイン4: コメント */}
+                <div className="px-3 py-2 flex items-center gap-1 min-w-0">
+                  <CommentModal comment={order.comment ?? ''} />
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={order.comment ?? ''}
+                  >
+                    {order.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  <GrayFabricOrderToConfirmModal
+                    history={order}
+                    canEdit={canEdit(order)}
+                  />
+                  {canEdit(order) && (
+                    <>
+                      <GrayFabricHistoryEditModal history={order} type="order" />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDelete(order)}
+                      >
+                        削除
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

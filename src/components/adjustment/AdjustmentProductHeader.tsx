@@ -1,37 +1,37 @@
-import { Th, Thead, Tr } from '@chakra-ui/react';
-import React from 'react';
-import { useAuthManagement } from '../../hooks/UseAuthManagement';
+import {
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
-export const AdjustmentProductHeader = () => {
-  const { isAuths } = useAuthManagement();
-  return (
-    <Thead
-      w="100%"
-      position="sticky"
-      top={0}
-      zIndex="docked"
-      bg="white"
-    >
-      <Tr>
-        <Th>担当</Th>
-        <Th>生地品番</Th>
-        <Th>色</Th>
-        {isAuths(["rd", "tokushima"]) && (
-          <>
-            {isAuths(["rd"]) && (
-              <>
-                <Th>単価（円）</Th>
-                <Th>染め仕掛(m)</Th>
-                <Th>外部在庫(m)</Th>
-                <Th>入荷待ち(m)</Th>
-              </>
-            )}
-            <Th>徳島在庫(m)</Th>
-            <Th>処理</Th>
-          </>
-        )}
-      </Tr>
-    </Thead>
-  );
+type Props = {
+  isRD: boolean
+  isTokushima: boolean
 }
 
+export function AdjustmentProductHeader({ isRD, isTokushima }: Props) {
+  const showEdit = isRD || isTokushima
+  return (
+    <TableHeader className="sticky top-0 bg-white z-10">
+      <TableRow className="bg-slate-50">
+        <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">担当</TableHead>
+        <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
+        <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
+        {showEdit && (
+          <>
+            {isRD && (
+              <>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価（円）</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">染め仕掛(m)</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">外部在庫(m)</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">入荷待ち(m)</TableHead>
+              </>
+            )}
+            <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">徳島在庫(m)</TableHead>
+            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
+          </>
+        )}
+      </TableRow>
+    </TableHeader>
+  )
+}

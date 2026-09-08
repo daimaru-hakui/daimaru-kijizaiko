@@ -1,158 +1,161 @@
-import {
-  Box,
-  Flex,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useEffect, useState, FC } from "react";
-import { CommentModal } from "../CommentModal";
-import { History } from "../../../types";
-import { AccountingEditModal } from "./AccountingEditModal";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { AccountingOrderToConfirmModal } from "./AccountingOrderToConfirmModal";
-import { SearchArea } from "../SearchArea";
-import { useForm, FormProvider } from "react-hook-form";
-import { useUtil } from "../../hooks/UseUtil";
-import { useSWRPurchaseConfirms } from "../../hooks/swr/useSWRPurchaseConfirms";
+'use client'
 
-type Inputs = {
-  start: string;
-  end: string;
-  client: string;
-  staff: string;
-};
+import { useState } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { InlineStat, Chip } from '@/components/products/shared'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { calcAmount } from '@/lib/numbers'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
+import { AccountingEditModal } from './AccountingEditModal'
+import { AccountingOrderToConfirmModal } from './AccountingOrderToConfirmModal'
+import type { SerializableHistory } from '../../../types'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { buildOptions } from '@/lib/filters/options'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 
-export const AccountingOrderTable: FC = () => {
-  const [filterHistories, setFilterHistories] = useState<History[]>();
-  const { getUserName, getSerialNumber } = useGetDisp();
-  const { getTodayDate, get3monthsAgo } = useUtil();
-  const [staff, setStaff] = useState("");
-  const [startDay, setStartDay] = useState(get3monthsAgo());
-  const [endDay, setEndDay] = useState(getTodayDate());
-  const { data } = useSWRPurchaseConfirms(startDay, endDay);
-  const methods = useForm<Inputs>({
-    defaultValues: {
-      start: startDay,
-      end: endDay,
-      staff: "",
-    },
-  });
+type Props = {
+  histories: SerializableHistory[]
+  usersMap: Record<string, string>
+  startDay: string
+  endDay: string
+}
 
-  const onSubmit = (data: Inputs) => {
-    setStartDay(data.start);
-    setEndDay(data.end);
-    setStaff(data.staff);
-  };
-  const onReset = () => {
-    setStartDay(get3monthsAgo());
-    setEndDay(getTodayDate());
-    setStaff("");
-    methods.reset();
-  };
+export function AccountingOrderTable({ histories, usersMap, startDay, endDay }: Props) {
+  const {
+    start: localStart,
+    end: localEnd,
+    setStart: setLocalStart,
+    setEnd: setLocalEnd,
+    resetPeriod,
+  } = usePeriodSearch('/accounting-dept/orders', startDay, endDay)
+  const { values, filter, setValue, reset } = useListFilter()
 
-  useEffect(() => {
-    setFilterHistories(
-      data?.contents
-        ?.filter((history) =>
-          (staff === history.createUser && history.accounting === true) ||
-          (staff === "" && history.accounting !== true))
-    );
-  }, [data, staff]);
+  const staffOptions = buildOptions(histories.map((h) => h.createUser), usersMap)
+  const supplierOptions = buildOptions(histories.map((h) => h.supplierName))
 
-  const elementComment = (history: History, collectionName: string) => (
-    <Flex gap={3}>
-      <CommentModal
-        id={history.id}
-        comment={history.comment}
-        collectionName={collectionName}
-      />
-      {history?.comment.slice(0, 20) +
-        (history.comment.length >= 1 ? "..." : "")}
-    </Flex>
-  );
+  const handleReset = () => {
+    reset()
+    resetPeriod()
+  }
+
+  const filtered = histories.filter((h) =>
+    matchesListFilter({ ...h, staff: h.createUser }, filter)
+  )
 
   return (
-    <>
-      <FormProvider {...methods}>
-        <SearchArea onSubmit={onSubmit} onReset={onReset} />
-      </FormProvider>
-      <TableContainer px={6} pt={6} pb={0} w="100%" overflowX="unset" overflowY="unset">
-        <Box
-          mt={3}
-          w="full"
-          overflowX="auto"
-          position="relative"
-          h={{
-            base: "calc(100vh - 405px)",
-            md: "calc(100vh - 360px)",
-            lg: "calc(100vh - 310px)",
-          }}
-        >
-          {filterHistories?.length > 0 ? (
-            <Table variant="simple" size="sm">
-              <Thead position="sticky" top={0} zIndex="docked" bg="white">
-                <Tr>
-                  <Th>確定</Th>
-                  <Th>発注NO.</Th>
-                  <Th>発注日</Th>
-                  <Th>仕上日</Th>
-                  <Th>担当者</Th>
-                  <Th>品番</Th>
-                  <Th>色</Th>
-                  <Th>品名</Th>
-                  <Th>数量</Th>
-                  <Th>単価</Th>
-                  <Th>金額</Th>
-                  <Th>出荷先</Th>
-                  <Th>コメント</Th>
-                  <Th>編集</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filterHistories?.map((history) => (
-                  <Tr key={history.id}>
-                    <Td>
-                      <AccountingOrderToConfirmModal history={history} startDay={startDay} endDay={endDay} />
-                    </Td>
-                    <Td>{getSerialNumber(history?.serialNumber)}</Td>
-                    <Td>{history?.orderedAt}</Td>
-                    <Td>{history?.fixedAt}</Td>
-                    <Td>{getUserName(history.createUser)}</Td>
-                    <Td>{history.productNumber}</Td>
-                    {history.colorName && <Td>{history.colorName}</Td>}
-                    <Td>{history.productName}</Td>
-                    <Td isNumeric>{history?.quantity.toLocaleString()}m</Td>
-                    {history.price && (
-                      <>
-                        <Td isNumeric>{history?.price.toLocaleString()}円</Td>
-                        <Td isNumeric>
-                          {(history?.quantity * history?.price).toLocaleString()}円
-                        </Td>
-                      </>
-                    )}
-                    <Td>{history?.stockPlace}</Td>
-                    <Td w="100%" textAlign="center">
-                      {elementComment(history, "fabricPurchaseConfirms")}
-                    </Td>
-                    <Td>
-                      <Flex gap={3}>
-                        <AccountingEditModal history={history} startDay={startDay} endDay={endDay} />
-                      </Flex>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          ) : (
-            <Box textAlign="center">現在登録された情報はありません。</Box>
-          )}
-        </Box>
-      </TableContainer>
-    </>
-  );
-};
+    <div className="p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">未処理</h2>
+        <Link href="/accounting-dept/confirms">
+          <Button variant="outline" size="sm">処理済み</Button>
+        </Link>
+      </div>
+
+      <PeriodFilterBar
+        start={localStart}
+        end={localEnd}
+        onStartChange={setLocalStart}
+        onEndChange={setLocalEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['productNumber', 'productName', 'supplier', 'staff'],
+          staffOptions,
+          supplierOptions,
+        }}
+      />
+
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filtered.map((h) => (
+            <div
+              key={h.id}
+              className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
+            >
+              {/* 左アクセントライン */}
+              <div className="w-1 shrink-0 bg-indigo-600" />
+
+              {/* ペインボディ */}
+              <div className="flex-1 grid grid-cols-[2fr_1.5fr_2.5fr_1.5fr_auto] divide-x divide-slate-100 min-w-0">
+                {/* ペイン1: 品番・色・品名 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {h.productNumber}
+                    </span>
+                    {h.colorName && <Chip label={h.colorName} />}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={h.productName}
+                  >
+                    {h.productName}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(h.serialNumber)}
+                  </div>
+                </div>
+
+                {/* ペイン2: 担当・日付 */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip
+                      label={usersMap[h.createUser] ?? h.createUser}
+                      variant="indigo"
+                    />
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    発注: {h.orderedAt}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    入荷: {h.fixedAt}
+                  </div>
+                </div>
+
+                {/* ペイン3: 数値 */}
+                <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
+                  <InlineStat label="数量" value={h.quantity} unit="m" />
+                  <InlineStat label="単価" value={h.price} unit="円" />
+                  <InlineStat
+                    label="金額"
+                    value={calcAmount(h.quantity, h.price)}
+                    unit="円"
+                  />
+                </div>
+
+                {/* ペイン4: 出荷先・コメント */}
+                <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
+                  {h.stockPlace && (
+                    <div className="text-xs text-slate-600 truncate leading-none">
+                      出荷先: {h.stockPlace}
+                    </div>
+                  )}
+                  <div
+                    className="text-xs text-slate-600 truncate"
+                    title={h.comment ?? ''}
+                  >
+                    {h.comment}
+                  </div>
+                </div>
+
+                {/* ペイン5: アクション */}
+                <div className="px-2 py-2 flex flex-col justify-center gap-1">
+                  <AccountingOrderToConfirmModal history={h} />
+                  <AccountingEditModal history={h} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

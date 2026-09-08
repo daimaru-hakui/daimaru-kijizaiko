@@ -1,144 +1,73 @@
+"use client";
+
+import { useState, FC } from "react";
 import {
-  Box,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Stack,
-  Text,
-  useDisclosure,
-  Input,
-} from "@chakra-ui/react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useEffect, useState, FC } from "react";
-import { db } from "../../../../firebase";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
+import { updateUserProfileAction } from "@/app/(app)/settings/actions";
 
 type Props = {
   uid: string;
+  initialRank: number;
+  initialName: string;
 };
 
-export const AuthEditModal: FC<Props> = ({ uid }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [user, setUser] = useState<any>();
+export const AuthEditModal: FC<Props> = ({ uid, initialRank, initialName }) => {
+  const [open, setOpen] = useState(false);
+  const [rank, setRank] = useState(initialRank);
+  const [name, setName] = useState(initialName);
 
-  // usersデータ 取得
-  useEffect(() => {
-    const docRef = doc(db, "users", `${uid}`);
-    const getUser = async () => {
-      const docSnap = await getDoc(docRef);
-      setUser({ ...docSnap.data() });
-    };
-    getUser();
-  }, [uid]);
-
-  // リセット
-  const reset = () => {
-    const docRef = doc(db, "users", `${uid}`);
-    const getUsers = async () => {
-      const docSnap = await getDoc(docRef);
-      setUser({ ...docSnap.data() });
-    };
-    getUsers();
+  const handleOpen = () => {
+    setRank(initialRank);
+    setName(initialName);
+    setOpen(true);
   };
 
-  const updateName = async () => {
-    const docRef = doc(db, "users", `${uid}`);
-    await updateDoc(docRef, {
-      rank: Number(user.rank),
-      name: user.name,
-    });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setUser({ ...user, [name]: value });
-  };
-
-  const handleIncrementChange = (e: any) => {
-    const value = e;
-    setUser({ ...user, rank: value });
+  const handleSave = async () => {
+    const result = await updateUserProfileAction(uid, rank, name);
+    if (!result.ok) { alert(result.error); return; }
+    setOpen(false);
   };
 
   return (
     <>
-      <Button onClick={onOpen} size="sm">
-        編集
-      </Button>
+      <Button size="sm" onClick={handleOpen}>編集</Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>名前編集</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={3}>
-              <Box>
-                <Text>id</Text>
-                <NumberInput
-                  name="rank"
-                  onChange={handleIncrementChange}
-                  value={user?.rank}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </Box>
-              <Box>
-                <Text>名前</Text>
-                <Input
-                  name="name"
-                  value={user?.name}
-                  onChange={handleInputChange}
-                />
-              </Box>
-              <Box>
-                <Box>
-                  <Box as="span" mr={2}>
-                    email:
-                  </Box>
-                  {user?.email}
-                </Box>
-              </Box>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button
-              mr={2}
-              variant="outline"
-              onClick={() => {
-                reset();
-                onClose();
-              }}
-            >
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>名前編集</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 py-2">
+            <div>
+              <p className="text-sm mb-1">id</p>
+              <NumberInput
+                value={rank}
+                min={0}
+                max={999}
+                onChange={(_str, num) => setRank(isNaN(num) ? rank : num)}
+              />
+            </div>
+            <div>
+              <p className="text-sm mb-1">名前</p>
+              <Input value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="border-slate-200 text-slate-600" onClick={() => { setRank(initialRank); setName(initialName); setOpen(false); }}>
               キャンセル
             </Button>
-            <Button
-              colorScheme="blue"
-              onClick={() => {
-                updateName();
-                onClose();
-              }}
-              mr={3}
-            >
-              OK
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <Button className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSave}>OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

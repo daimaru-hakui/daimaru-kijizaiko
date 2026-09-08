@@ -1,107 +1,92 @@
-/* eslint-disable react/display-name */
-import {
-  Button,
-  Flex,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Td,
-  Tr,
-} from "@chakra-ui/react";
-import { GiCancel } from "react-icons/gi";
-import { useEffect, useState, FC, memo } from "react";
-import { useUtil } from "../../hooks/UseUtil";
-import { GrayFabric } from "../../../types";
-import { useGrayFabrics } from "../../hooks/useGrayFabrics";
+'use client'
+
+import { useState } from 'react'
+import { GiCancel } from 'react-icons/gi'
+import { TableCell, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { NumberInput } from '@/components/ui/number-input'
+import { updateGrayFabricAdjustmentAction } from '@/app/(app)/adjustment/actions'
+import { mathRound2nd } from '@/lib/utils'
+import type { GrayFabric } from '../../../types'
+
+type EditableFields = {
+  price: number
+  wip: number
+  stock: number
+}
 
 type Props = {
-  grayFabric: GrayFabric;
-};
+  grayFabric: GrayFabric
+}
 
-export const AdjustmentGrayFabricRow: FC<Props> = memo(({ grayFabric }) => {
-  const { updateAjustmentGrayFabric } = useGrayFabrics();
-  const [items, setItems] = useState<GrayFabric>();
+// Firestore の既存データには数値フィールドが未定義・文字列のドキュメントがある
+const toNumber = (v: unknown): number => {
+  const n = Number(v)
+  return isNaN(n) ? 0 : n
+}
 
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: value });
-  };
+const toEditableFields = (grayFabric: GrayFabric): EditableFields => ({
+  price: toNumber(grayFabric.price),
+  wip: toNumber(grayFabric.wip),
+  stock: toNumber(grayFabric.stock),
+})
 
-  useEffect(() => {
-    setItems({ ...grayFabric } as GrayFabric);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grayFabric.price, grayFabric.stock]);
+export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
+  const [items, setItems] = useState<EditableFields>(() => toEditableFields(grayFabric))
+  const [saving, setSaving] = useState(false)
 
-  const onReset = (grayFabric: GrayFabric) => {
-    setItems({ ...grayFabric });
-  };
+  const handleChange = (field: keyof EditableFields, v: number) => {
+    setItems((prev) => ({ ...prev, [field]: isNaN(v) ? 0 : v }))
+  }
+
+  const handleUpdate = async () => {
+    setSaving(true)
+    await updateGrayFabricAdjustmentAction(grayFabric.id, items)
+    setSaving(false)
+  }
+
+  const handleReset = () => {
+    setItems(toEditableFields(grayFabric))
+  }
 
   return (
-    <Tr height="50px">
-      <Td>{grayFabric.productNumber}</Td>
-      <Td p={1} isNumeric>
+    <TableRow className="h-[50px]">
+      <TableCell>{grayFabric.productNumber}</TableCell>
+      <TableCell className="p-1">
         <NumberInput
-          mt={1}
-          w="90px"
-          value={items?.price}
+          className="w-40"
           min={0}
           max={100000}
-          onChange={(e) => handleNumberChange(e, "price")}
-        >
-          <NumberInputField textAlign="right" />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      </Td>
-      <Td p={1}>
+          value={items.price}
+          onChange={(_, v) => handleChange('price', v)}
+        />
+      </TableCell>
+      <TableCell className="p-1">
         <NumberInput
-          mt={1}
-          w="90px"
+          className="w-40"
           min={0}
           max={100000}
-          value={items?.wip}
-          onChange={(e) => handleNumberChange(e, "wip")}
-        >
-          <NumberInputField textAlign="right" />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      </Td>
-      <Td p={1}>
+          value={mathRound2nd(items.wip)}
+          onChange={(_, v) => handleChange('wip', v)}
+        />
+      </TableCell>
+      <TableCell className="p-1">
         <NumberInput
-          mt={1}
-          w="90px"
+          className="w-40"
           min={0}
           max={100000}
-          value={items?.stock}
-          onChange={(e) => handleNumberChange(e, "stock")}
-        >
-          <NumberInputField textAlign="right" />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      </Td>
-
-      <Td flex="1">
-        <Flex alignItems="center" gap={3}>
-          <Button
-            size="xs"
-            colorScheme="facebook"
-            onClick={() => updateAjustmentGrayFabric(items, grayFabric.id)}
-          >
+          value={mathRound2nd(items.stock)}
+          onChange={(_, v) => handleChange('stock', v)}
+        />
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Button size="sm" disabled={saving} onClick={handleUpdate}>
             更新
           </Button>
-          <GiCancel cursor="pointer" onClick={() => onReset(grayFabric)} />
-        </Flex>
-      </Td>
-    </Tr>
-  );
-});
+          <GiCancel className="cursor-pointer" onClick={handleReset} />
+        </div>
+      </TableCell>
+    </TableRow>
+  )
+}

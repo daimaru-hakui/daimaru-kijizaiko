@@ -3,6 +3,7 @@ export type User = {
   uid: string;
   name: string;
   rank: number;
+  admin: boolean;
   rd: boolean;
   sales: boolean;
   accounting: boolean;
@@ -198,6 +199,9 @@ export type Location = {
   order: number;
   comment: string;
 };
+
+export type SerializableHistory = Omit<History, 'createdAt' | 'updatedAt'>
+export type SerializableProduct = Omit<Product, 'createdAt' | 'updatedAt'>
 
 export type CuttingSchedule = {
   id:string;

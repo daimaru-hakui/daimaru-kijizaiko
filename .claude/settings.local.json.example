@@ -1,0 +1,6 @@
+{
+  "_comment": "このファイルを settings.local.json にコピーして使う。.gitignore 済みなので個人設定を自由に書いてよい。",
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  }
+}

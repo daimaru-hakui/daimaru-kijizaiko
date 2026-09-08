@@ -1,131 +1,78 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Stack,
-  Text,
-  Textarea,
-} from "@chakra-ui/react";
-import React, { useState, useEffect, FC } from "react";
+"use client";
+
+import { useId, FC } from "react";
+import { useRouter } from "next/navigation";
 import { Location } from "../../../../types";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { NumberInput } from "@/components/ui/number-input";
+import { addLocationAction, updateLocationAction } from "@/app/(app)/settings/actions";
+import { isDuplicateName } from "@/lib/validation/duplicate";
+import { Label } from "@/components/ui/label";
 
 type Props = {
-  type: string;
+  type: "new" | "edit";
   location: Location;
-  addLocation?: Function;
-  updateLocation?: Function;
+  /** 新規登録時の重複チェックに使う登録済みの保管場所名 */
+  existingNames?: string[];
+  onSuccess?: () => void;
 };
 
-type Inputs = Location;
+type Inputs = Omit<Location, "id">;
 
-export const LocationInputArea: FC<Props> = ({
-  type,
-  location,
-  addLocation,
-  updateLocation,
-}: Props) => {
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [flag, setFlag] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    getValues,
-    formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      ...location,
-    },
+export const LocationInputArea: FC<Props> = ({ type, location, existingNames = [], onSuccess }) => {
+  const router = useRouter();
+  const nameId = useId();
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<Inputs>({
+    defaultValues: { name: location.name, order: location.order, comment: location.comment },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    switch (type) {
-      case "new":
-        addLocation(data);
-        return;
-      case "edit":
-        updateLocation(data);
-        return;
-      default:
-        return;
+  // 編集時は自分自身と衝突するため重複チェックしない (旧実装と同じ)
+  const flag = type === "new" && isDuplicateName(watch("name") ?? "", existingNames);
+
+  const handleFormSubmit: SubmitHandler<Inputs> = async (data) => {
+    if (type === "new") {
+      const result = window.confirm("登録して宜しいでしょうか");
+      if (!result) return;
+      const addResult = await addLocationAction(data);
+      if (!addResult.ok) { alert(addResult.error); return; }
+      router.push("/settings/locations");
+    } else {
+      const result = window.confirm("変更して宜しいでしょうか");
+      if (!result) return;
+      const updateResult = await updateLocationAction(location.id, data);
+      if (!updateResult.ok) { alert(updateResult.error); return; }
+      router.refresh();
+      onSuccess?.();
     }
   };
 
-  // 登録しているかのチェック
-  useEffect(() => {
-    if (type === "edit") return;
-    let item = watch("name");
-    if (!item) item = "noValue";
-    const base = locations?.map((a: { name: string }) => a.name);
-    const result = base?.includes(item);
-    if (!result) {
-      setFlag(false);
-    } else {
-      setFlag(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("name")]);
-
-  useEffect(() => {
-    const getData = async () => {
-      const collectionRef = collection(db, "locations");
-      const docSnap = await getDocs(collectionRef);
-      setLocations(docSnap.docs.map((doc) => ({ ...doc.data() } as Location)));
-    };
-    getData();
-  }, []);
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={6} mt={6}>
-        <Flex gap={6} flexDirection={{ base: "column" }}>
-          <Box w="100%" flex={2}>
-            <Text>保管場所名</Text>
-            <Input mt={1} {...register("name", { required: true })} />
-            {errors.name && (
-              <Box color="red" fontWeight="bold">
-                ※保管場所を入力してください
-              </Box>
-            )}
-            {flag && (
-              <Box color="red" fontWeight="bold">
-                ※すでに登録されています。
-              </Box>
-            )}
-          </Box>
-          <Box>
-            <Text>順番</Text>
-            <NumberInput
-              {...register("order")}
-              onChange={() => getValues}
-              min={0}
-              max={1000}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Box>
-          <Box w="100%" flex={1}>
-            <Text>備考</Text>
-            <Textarea mt={1} {...register("comment")} />
-          </Box>
-        </Flex>
-        <Button type="submit" disabled={flag} colorScheme="facebook">
-          {type === "new" ? "登録" : "更新"}
-        </Button>
-      </Stack>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <div className="flex flex-col gap-6 mt-6">
+        <div>
+          <Label htmlFor={nameId} className="block text-sm mb-1">保管場所名</Label>
+          <Input id={nameId} {...register("name", { required: true })} />
+          {errors.name && <p className="text-red-600 font-bold text-sm mt-1">※保管場所を入力してください</p>}
+          {flag && <p className="text-red-600 font-bold text-sm mt-1">※すでに登録されています。</p>}
+        </div>
+        <div>
+          <p className="text-sm mb-1">順番</p>
+          <NumberInput
+            value={watch("order")}
+            min={0}
+            max={1000}
+            onChange={(_str, num) => setValue("order", isNaN(num) ? 0 : num)}
+          />
+        </div>
+        <div>
+          <p className="text-sm mb-1">備考</p>
+          <Textarea {...register("comment")} />
+        </div>
+        <Button type="submit" disabled={flag} className="bg-blue-800 hover:bg-blue-900 text-white">{type === "new" ? "登録" : "更新"}</Button>
+      </div>
     </form>
   );
 };

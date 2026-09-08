@@ -1,184 +1,129 @@
-/* eslint-disable react/display-name */
-import {
-  Button,
-  Flex,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Td,
-  Tr,
-} from "@chakra-ui/react";
-import { GiCancel } from "react-icons/gi";
-import { useEffect, useState, FC, memo } from "react";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import { useUtil } from "../../hooks/UseUtil";
-import { useAuthManagement } from "../../hooks/UseAuthManagement";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
-import { useAuthStore, useLoadingStore } from "../../../store";
-import { Product } from "../../../types";
+'use client'
+
+import { useState } from 'react'
+import { GiCancel } from 'react-icons/gi'
+import { TableCell, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { NumberInput } from '@/components/ui/number-input'
+import { updateProductAdjustmentAction } from '@/app/(app)/adjustment/actions'
+import { mathRound2nd } from '@/lib/utils'
+import type { Product } from '../../../types'
+
+type EditableFields = {
+  price: number
+  wip: number
+  externalStock: number
+  arrivingQuantity: number
+  tokushimaStock: number
+}
 
 type Props = {
-  product: Product;
-};
+  product: Product
+  usersMap: Record<string, string>
+  isRD: boolean
+  isTokushima: boolean
+}
 
-export const AdjustmentProductTableRow: FC<Props> = memo(({ product }) => {
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
-  const { getUserName } = useGetDisp();
-  const { isAuths } = useAuthManagement();
-  const [items, setItems] = useState<Product>();
-  const { mathRound2nd } = useUtil();
+// Firestore の既存データには数値フィールドが未定義・文字列のドキュメントがある
+const toNumber = (v: unknown): number => {
+  const n = Number(v)
+  return isNaN(n) ? 0 : n
+}
 
-  const handleNumberChange = (e: string, name: string) => {
-    const value = e;
-    setItems({ ...items, [name]: value });
-  };
+const toEditableFields = (product: Product): EditableFields => ({
+  price: toNumber(product.price),
+  wip: toNumber(product.wip),
+  externalStock: toNumber(product.externalStock),
+  arrivingQuantity: toNumber(product.arrivingQuantity),
+  tokushimaStock: toNumber(product.tokushimaStock),
+})
 
-  useEffect(() => {
-    setItems({ ...product });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.price, product.tokushimaStock]);
+export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima }: Props) {
+  const [items, setItems] = useState<EditableFields>(() => toEditableFields(product))
+  const [saving, setSaving] = useState(false)
 
-  const updateAjustmentProduct = async (productId: string) => {
-    setIsLoading(true);
-    try {
-      const docRef = doc(db, "products", productId);
-      await updateDoc(docRef, {
-        price: Number(items.price),
-        wip: mathRound2nd(Number(items.wip)),
-        externalStock: mathRound2nd(Number(items.externalStock)),
-        arrivingQuantity: mathRound2nd(Number(items.arrivingQuantity)),
-        tokushimaStock: mathRound2nd(Number(items.tokushimaStock)),
-        updatedAt: serverTimestamp(),
-        updateUser: currentUser,
-      });
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleChange = (field: keyof EditableFields, v: number) => {
+    setItems((prev) => ({ ...prev, [field]: isNaN(v) ? 0 : v }))
+  }
 
-  const onReset = (product: Product) => {
-    setItems({ ...product });
-  };
+  const handleUpdate = async () => {
+    setSaving(true)
+    await updateProductAdjustmentAction(product.id, items)
+    setSaving(false)
+  }
 
-  if (product === null) return;
+  const handleReset = () => {
+    setItems(toEditableFields(product))
+  }
+
+  const showEdit = isRD || isTokushima
 
   return (
-    <Tr key={product.id}>
-      <Td>{getUserName(product.staff)}</Td>
-      <Td>{product.productNumber}</Td>
-      <Td>{product?.colorName}</Td>
-      {isAuths(["rd"]) && (
+    <TableRow>
+      <TableCell>{usersMap[product.staff] ?? product.staff}</TableCell>
+      <TableCell>{product.productNumber}</TableCell>
+      <TableCell>{product.colorName}</TableCell>
+      {showEdit && (
         <>
-          <Td p={1}>
+          {isRD && (
+            <>
+              <TableCell className="p-1">
+                <NumberInput
+                  className="w-40"
+                  min={0}
+                  max={100000}
+                  value={items.price}
+                  onChange={(_, v) => handleChange('price', v)}
+                />
+              </TableCell>
+              <TableCell className="p-1">
+                <NumberInput
+                  className="w-40"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.wip)}
+                  onChange={(_, v) => handleChange('wip', v)}
+                />
+              </TableCell>
+              <TableCell className="p-1">
+                <NumberInput
+                  className="w-40"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.externalStock)}
+                  onChange={(_, v) => handleChange('externalStock', v)}
+                />
+              </TableCell>
+              <TableCell className="p-1">
+                <NumberInput
+                  className="w-40"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.arrivingQuantity)}
+                  onChange={(_, v) => handleChange('arrivingQuantity', v)}
+                />
+              </TableCell>
+            </>
+          )}
+          <TableCell className="p-1">
             <NumberInput
-              mt={1}
-              w="90px"
-              name="price"
-              defaultValue={0}
+              className="w-40"
               min={0}
               max={100000}
-              value={items?.price}
-              onChange={(e) => handleNumberChange(e, "price")}
-            >
-              <NumberInputField textAlign="right" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Td>
-          <Td p={1} >
-            <NumberInput
-              mt={1}
-              w="100px"
-              name="wip"
-              defaultValue={0}
-              min={0}
-              max={100000}
-              value={mathRound2nd(items?.wip)}
-              onChange={(e) => handleNumberChange(e, "wip")}
-            >
-              <NumberInputField textAlign="right" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Td>
-          <Td p={1}>
-            <NumberInput
-              mt={1}
-              w="100px"
-              name="externalStock"
-              defaultValue={0}
-              min={0}
-              max={100000}
-              value={mathRound2nd(items?.externalStock)}
-              onChange={(e) => handleNumberChange(e, "externalStock")}
-            >
-              <NumberInputField textAlign="right" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Td>
-          <Td p={1}>
-            <NumberInput
-              mt={1}
-              w="100px"
-              name="arrivingQuantity"
-              defaultValue={0}
-              min={0}
-              max={100000}
-              value={mathRound2nd(items?.arrivingQuantity)}
-              onChange={(e) => handleNumberChange(e, "arrivingQuantity")}
-            >
-              <NumberInputField textAlign="right" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Td>
+              value={mathRound2nd(items.tokushimaStock)}
+              onChange={(_, v) => handleChange('tokushimaStock', v)}
+            />
+          </TableCell>
+          <TableCell>
+            <div className="flex items-center gap-2">
+              <Button size="sm" disabled={saving} onClick={handleUpdate}>
+                更新
+              </Button>
+              <GiCancel className="cursor-pointer" onClick={handleReset} />
+            </div>
+          </TableCell>
         </>
       )}
-      <Td p={1} >
-        <NumberInput
-          mt={1}
-          w="100px"
-          name="tokushimaStock"
-          defaultValue={0}
-          min={0}
-          max={100000}
-          value={mathRound2nd(items?.tokushimaStock)}
-          onChange={(e) => handleNumberChange(e, "tokushimaStock")}
-        >
-          <NumberInputField textAlign="right" />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      </Td>
-      <Td flex="1">
-        <Flex align="center" gap={3}>
-          <Button
-            size="xs"
-            colorScheme="facebook"
-            onClick={() => updateAjustmentProduct(product.id)}
-          >
-            更新
-          </Button>
-          <GiCancel cursor="pointer" onClick={() => onReset(product)} />
-        </Flex>
-      </Td>
-    </Tr>
-  );
-});
+    </TableRow>
+  )
+}

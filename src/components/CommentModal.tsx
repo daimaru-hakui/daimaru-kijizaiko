@@ -1,71 +1,50 @@
-import {
-  Box,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useState, useEffect, FC } from "react";
+"use client";
+
+import { useState, FC } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type Props = {
-  id: string;
   comment: string;
-  collectionName: string;
-  mutate?: Function;
 };
 
 export const CommentModal: FC<Props> = ({ comment }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newComment, setNewComment] = useState(comment);
-
-  useEffect(() => {
-    setNewComment(comment);
-  }, [comment]);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
       {comment && (
-        <FaRegCommentDots
-          opacity={comment === "" ? "0.2" : "1"}
-          cursor="pointer"
-          fontSize="20px"
-          onClick={onOpen}
-        />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700"
+          aria-label="コメントを表示"
+          onClick={() => setOpen(true)}
+        >
+          <FaRegCommentDots fontSize="16px" />
+        </Button>
       )}
 
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          setNewComment(comment);
-          onClose();
-        }}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>コメント</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box whiteSpace="pre-wrap">{newComment}</Box>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              mr={3}
-              onClick={() => {
-                setNewComment(comment);
-                onClose();
-              }}
-            >
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>コメント</DialogTitle>
+          </DialogHeader>
+          <div className="whitespace-pre-wrap">{comment}</div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
               閉じる
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

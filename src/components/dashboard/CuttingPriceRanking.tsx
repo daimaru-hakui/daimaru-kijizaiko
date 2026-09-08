@@ -1,4 +1,6 @@
-import React, { useEffect, useState, FC } from "react";
+"use client";
+
+import { useEffect, useState, FC } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,10 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Box } from "@chakra-ui/react";
 import { Product, CuttingReportType } from "../../../types";
-import { useGetDisp } from "../../hooks/UseGetDisp";
-import useSWRImmutable from "swr/immutable";
+import { getProductsAction } from "@/app/(app)/products/actions";
 
 ChartJS.register(
   CategoryScale,
@@ -28,10 +28,7 @@ type Props = {
   startDay: string;
   endDay: string;
   rankingNumber: number;
-};
-
-type Data = {
-  contents: Product[];
+  productsMap: Record<string, { productNumber: string; colorName: string }>;
 };
 
 export const CuttingPriceRanking: FC<Props> = ({
@@ -39,18 +36,20 @@ export const CuttingPriceRanking: FC<Props> = ({
   startDay,
   endDay,
   rankingNumber,
+  productsMap,
 }) => {
-  const { getProductNumber, getColorName } = useGetDisp();
-  const [chartDataList, setChartDataList] = useState([
-    { productId: "", quantity: 0, price: 0 },
-  ]);
-  const { data: products } = useSWRImmutable<Data>("/api/products");
+  const [chartDataList, setChartDataList] = useState<{ productId: string; price: number }[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProductsAction().then((result) => {
+      if (result.ok) setProducts(result.contents);
+    });
+  }, []);
 
   useEffect(() => {
     const getPrice = (productId: string) => {
-      const product = products?.contents.find(
-        (product) => product.id === productId
-      );
+      const product = products.find((p) => p.id === productId);
       return product?.price || 0;
     };
 
@@ -86,11 +85,7 @@ export const CuttingPriceRanking: FC<Props> = ({
         return { productId: header, price: sum };
       });
 
-      const result: any = newArray.sort((a, b) => {
-        if (a.price > b.price) {
-          return -1;
-        }
-      });
+      const result = [...newArray].sort((a, b) => b.price - a.price);
       setChartDataList(result);
     };
     getArray();
@@ -105,6 +100,7 @@ export const CuttingPriceRanking: FC<Props> = ({
       },
     },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -120,9 +116,7 @@ export const CuttingPriceRanking: FC<Props> = ({
     ?.slice(0, rankingNumber)
     ?.map(
       (ranking) =>
-        `${getProductNumber(ranking.productId)} ${getColorName(
-          ranking.productId
-        )}`
+        `${productsMap[ranking.productId]?.productNumber ?? ranking.productId} ${productsMap[ranking.productId]?.colorName ?? ''}`
     );
 
   const dataList = {
@@ -140,8 +134,8 @@ export const CuttingPriceRanking: FC<Props> = ({
   };
 
   return (
-    <Box p={3} w="100%" h="100%" rounded="md">
+    <div className="p-3 w-full rounded-md relative h-96">
       <Bar options={options} data={dataList} />
-    </Box>
+    </div>
   );
 };
