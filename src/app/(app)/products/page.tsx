@@ -17,6 +17,8 @@ export default async function ProductsPage() {
     userDocSnap,
     schedulesSnap,
     stockPlacesSnap,
+    locationsSnap,
+    grayFabricsSnap,
   ] = await Promise.all([
     db.collection("products").get(),
     db.collection("users").get(),
@@ -24,6 +26,8 @@ export default async function ProductsPage() {
     db.collection("users").doc(user.uid).get(),
     db.collection("cuttingSchedules").get(),
     db.collection("stockPlaces").orderBy("kana").get(),
+    db.collection("locations").get(),
+    db.collection("grayFabrics").get(),
   ]);
 
   const usersMap: Record<string, string> = Object.fromEntries(
@@ -32,6 +36,23 @@ export default async function ProductsPage() {
 
   const suppliersMap: Record<string, string> = Object.fromEntries(
     suppliersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string]),
+  );
+
+  const locationsMap: Record<string, string> = Object.fromEntries(
+    locationsSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string]),
+  );
+
+  const grayFabricsMap: Record<
+    string,
+    { productNumber: string; productName: string }
+  > = Object.fromEntries(
+    grayFabricsSnap.docs.map((d) => [
+      d.id,
+      {
+        productNumber: (d.data().productNumber ?? "") as string,
+        productName: (d.data().productName ?? "") as string,
+      },
+    ]),
   );
 
   const cuttingSchedulesMap: Record<string, CuttingSchedule> =
@@ -70,6 +91,8 @@ export default async function ProductsPage() {
           products={products}
           usersMap={usersMap}
           suppliersMap={suppliersMap}
+          locationsMap={locationsMap}
+          grayFabricsMap={grayFabricsMap}
           cuttingSchedulesMap={cuttingSchedulesMap}
           stockPlaces={stockPlaces}
           userId={user.uid}

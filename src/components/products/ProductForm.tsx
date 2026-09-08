@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { Textarea } from '@/components/ui/textarea'
 import { addProductAction, updateProductAction } from '@/app/(app)/products/actions'
+import { MATERIAL_ENTRIES } from '@/lib/utils'
 import type { GrayFabric, Location, Product, Supplier } from '../../../types'
 
 type Props = {
@@ -23,6 +24,8 @@ type Props = {
 }
 
 type FormState = {
+  /** 混率。キーは MATERIAL_ENTRIES のもの、値は % */
+  materials: Record<string, number>
   productType: string
   staff: string
   supplierId: string
@@ -47,8 +50,20 @@ type FormState = {
   tokushimaStock: number
 }
 
+/** Firestore には数値・文字列が混在しているため数値に寄せ、0 と空は落とす */
+function initMaterials(materials: unknown): Record<string, number> {
+  const source = (materials ?? {}) as Record<string, unknown>
+  const result: Record<string, number> = {}
+  for (const [key] of MATERIAL_ENTRIES) {
+    const value = Number(source[key])
+    if (Number.isFinite(value) && value > 0) result[key] = value
+  }
+  return result
+}
+
 function initForm(product?: Product): FormState {
   return {
+    materials: initMaterials(product?.materials),
     productType: String(product?.productType ?? '1'),
     staff: product?.staff ?? '',
     supplierId: product?.supplierId ?? '',
@@ -89,6 +104,17 @@ export function ProductForm({
   const isEdit = Boolean(product)
   const [form, setForm] = useState<FormState>(() => initForm(product))
 
+  const setMaterial = (key: string, raw: string) =>
+    setForm((prev) => {
+      const materials = { ...prev.materials }
+      const value = Number(raw)
+      if (!raw || !Number.isFinite(value) || value <= 0) delete materials[key]
+      else materials[key] = value
+      return { ...prev, materials }
+    })
+
+  const materialTotal = Object.values(form.materials).reduce((sum, v) => sum + v, 0)
+
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
@@ -118,7 +144,7 @@ export function ProductForm({
       productName: form.productName,
       price: Number(form.price),
       materialName: form.materialName,
-      materials: product?.materials ?? {},
+      materials: form.materials,
       fabricWidth: Number(form.fabricWidth),
       fabricWeight: Number(form.fabricWeight),
       fabricLength: Number(form.fabricLength),
@@ -200,8 +226,9 @@ export function ProductForm({
       )}
 
       <div>
-        <Label>仕入先 <span className="text-destructive">※</span></Label>
+        <Label htmlFor="supplierId">仕入先 <span className="text-destructive">※</span></Label>
         <select
+          id="supplierId"
           className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
           value={form.supplierId}
           onChange={(e) => setField('supplierId', e.target.value)}
@@ -232,6 +259,36 @@ export function ProductForm({
         </label>
       </div>
 
+      <div>
+        <Label className="mb-2 block">混率</Label>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+          {MATERIAL_ENTRIES.map(([key, label]) => (
+            <div key={key} className="flex items-center gap-2">
+              <Label htmlFor={`material-${key}`} className="w-24 shrink-0 text-xs text-slate-600">
+                {label}
+              </Label>
+              <Input
+                id={`material-${key}`}
+                type="number"
+                min={0}
+                max={100}
+                step="any"
+                className="h-8 text-right"
+                value={form.materials[key] ?? ''}
+                onChange={(e) => setMaterial(key, e.target.value)}
+              />
+              <span className="text-xs text-slate-400">%</span>
+            </div>
+          ))}
+        </div>
+        <p
+          className={`mt-2 text-xs ${materialTotal === 100 ? 'text-slate-400' : 'text-destructive'}`}
+        >
+          合計 {materialTotal}%
+          {materialTotal !== 100 && '（100% になっていません）'}
+        </p>
+      </div>
+
       <div className="grid grid-cols-3 gap-3">
         <div>
           <Label>品番 <span className="text-destructive">※</span></Label>
@@ -252,8 +309,9 @@ export function ProductForm({
           />
         </div>
         <div>
-          <Label>色 <span className="text-destructive">※</span></Label>
+          <Label htmlFor="colorName">色 <span className="text-destructive">※</span></Label>
           <select
+            id="colorName"
             className="mt-1 h-9 w-full rounded-md border border-input px-3 text-sm"
             value={form.colorName}
             onChange={(e) => setField('colorName', e.target.value)}

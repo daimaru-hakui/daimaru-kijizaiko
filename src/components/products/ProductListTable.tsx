@@ -31,6 +31,8 @@ type Props = {
   products: Omit<Product, "createdAt" | "updatedAt">[];
   usersMap: Record<string, string>;
   suppliersMap: Record<string, string>;
+  locationsMap: Record<string, string>;
+  grayFabricsMap: Record<string, { productNumber: string; productName: string }>;
   cuttingSchedulesMap: Record<string, CuttingSchedule>;
   stockPlaces: StockPlace[];
   userId: string;
@@ -42,6 +44,8 @@ export function ProductListTable({
   products,
   usersMap,
   suppliersMap,
+  locationsMap,
+  grayFabricsMap,
   cuttingSchedulesMap,
   stockPlaces,
   isAdmin,
@@ -349,8 +353,13 @@ export function ProductListTable({
           open={Boolean(detailProduct)}
           onCloseAction={() => setDetailProduct(null)}
           suppliersMap={suppliersMap}
-          locationsMap={{}}
-          grayFabricsMap={{}}
+          locationsMap={locationsMap}
+          grayFabricsMap={grayFabricsMap}
+          onEditAction={
+            canEdit(detailProduct)
+              ? () => router.push(`/products/${detailProduct.id}/edit`)
+              : undefined
+          }
         />
       )}
 

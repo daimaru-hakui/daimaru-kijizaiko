@@ -66,3 +66,43 @@ describe('ProductForm', () => {
     expect(checkbox).toBeChecked()
   })
 })
+
+describe('ProductForm 混率', () => {
+  it('各素材の入力欄が表示される', () => {
+    render(<ProductForm {...baseProps} />)
+    expect(screen.getByLabelText('ポリエステル')).toBeInTheDocument()
+    expect(screen.getByLabelText('綿')).toBeInTheDocument()
+    expect(screen.getByLabelText('複合繊維')).toBeInTheDocument()
+  })
+
+  it('編集時は既存の混率が入力欄に入る', () => {
+    const product = { id: 'p1', materials: { t: 65, c: 35 } } as never
+    render(<ProductForm {...baseProps} product={product} />)
+    expect(screen.getByLabelText('ポリエステル')).toHaveValue(65)
+    expect(screen.getByLabelText('綿')).toHaveValue(35)
+  })
+
+  it('合計が100%でないとき警告を表示する', async () => {
+    const user = userEvent.setup()
+    render(<ProductForm {...baseProps} />)
+
+    await user.type(screen.getByLabelText('ポリエステル'), '60')
+
+    expect(screen.getByText(/合計 60%/)).toBeInTheDocument()
+  })
+
+  it('入力した混率を登録内容に含める', async () => {
+    const user = userEvent.setup()
+    const { addProductAction } = await import('@/app/(app)/products/actions')
+    render(<ProductForm {...baseProps} />)
+
+    await user.selectOptions(screen.getByLabelText(/仕入先/), 's1')
+    await user.selectOptions(screen.getByLabelText(/^色 /), 'ブラック')
+    await user.type(screen.getByLabelText('ポリエステル'), '100')
+    await user.click(screen.getByRole('button', { name: '登録' }))
+
+    expect(addProductAction).toHaveBeenCalledWith(
+      expect.objectContaining({ materials: { t: 100 } })
+    )
+  })
+})

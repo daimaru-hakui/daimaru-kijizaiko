@@ -4,8 +4,9 @@ import { describe, it, expect, vi } from "vitest";
 import { ProductListTable } from "./ProductListTable";
 import type { Product, StockPlace } from "../../../types";
 
+const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: vi.fn() }),
+  useRouter: () => ({ refresh: vi.fn(), push: mockPush }),
 }));
 
 // デバウンスをバイパス。タイミング動作は useDebounce.test.ts でカバー済み
@@ -54,6 +55,8 @@ const defaultProps = {
   products: [makeProduct()],
   usersMap: { user1: "山田太郎" },
   suppliersMap: { sup1: "テスト商社" },
+  locationsMap: {},
+  grayFabricsMap: {},
   cuttingSchedulesMap: {},
   stockPlaces: [] as StockPlace[],
   userId: "user1",
@@ -84,5 +87,31 @@ describe("ProductListTable 品番検索", () => {
     const input = screen.getByPlaceholderText("品番");
     await userEvent.type(input, "dm");
     expect(screen.queryByText("現在登録された情報はありません。")).toBeNull();
+  });
+});
+
+describe("ProductListTable 生地の編集", () => {
+  it("詳細ダイアログの編集ボタンから編集画面へ遷移する", async () => {
+    render(<ProductListTable {...defaultProps} isRD />);
+
+    await userEvent.click(screen.getByRole("button", { name: "詳細" }));
+    await userEvent.click(screen.getByRole("button", { name: "編集" }));
+
+    expect(mockPush).toHaveBeenCalledWith("/products/p1/edit");
+  });
+
+  it("編集権限がないときは編集ボタンを表示しない", async () => {
+    render(
+      <ProductListTable
+        {...defaultProps}
+        isRD={false}
+        isAdmin={false}
+        userId="other-user"
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "詳細" }));
+
+    expect(screen.queryByRole("button", { name: "編集" })).toBeNull();
   });
 });

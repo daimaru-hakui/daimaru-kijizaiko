@@ -22,15 +22,18 @@ export function matchesProductNumber(productNumber: string, keyword: string): bo
   return normalize(productNumber).includes(normalize(keyword));
 }
 
+/** 混率 (materials) のキーと表示名。入力フォームと表示の双方で使う */
+export const MATERIAL_ENTRIES: readonly [keyof Materials, string][] = [
+  ['t', 'ポリエステル'], ['c', '綿'], ['n', 'ナイロン'], ['r', 'レーヨン'],
+  ['h', '麻'], ['pu', 'ポリウレタン'], ['w', 'ウール'], ['ac', 'アクリル'],
+  ['cu', 'キュプラ'], ['si', 'シルク'], ['as', 'アセテート'],
+  ['z', '指定外繊維'], ['f', '複合繊維'],
+];
+
 export function getMixed(materials: Materials | Record<string, unknown>): string[] {
   if (!materials) return [];
   const m = materials as Record<string, string | number>;
-  const entries: [string, string][] = [
-    ['t', 'ポリエステル'], ['c', '綿'], ['n', 'ナイロン'], ['r', 'レーヨン'],
-    ['h', '麻'], ['pu', 'ポリウレタン'], ['w', 'ウール'], ['ac', 'アクリル'],
-    ['cu', 'キュプラ'], ['si', 'シルク'], ['as', 'アセテート'],
-    ['z', '指定外繊維'], ['f', '複合繊維'],
-  ];
+  const entries = MATERIAL_ENTRIES;
   return entries
     .filter(([key]) => m[key])
     .map(([key, label]) => `${label}${m[key]}% `);
