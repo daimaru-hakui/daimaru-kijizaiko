@@ -5,7 +5,7 @@ import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
 import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
-import { getTodayDate, get3monthsAgo } from "@/lib/dates";
+import { getTodayDate, get3monthsAgo, getDefaultPeriod } from "@/lib/dates";
 import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
 import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
 import { CuttingReportType, History } from "../../../types";
@@ -57,12 +57,11 @@ export const Charts: FC<Props> = ({ productsMap }) => {
   };
 
   const handleReset = () => {
-    const s = get3monthsAgo();
-    const e = getTodayDate();
-    setStartDay(s);
-    setEndDay(e);
-    setInputStart(s);
-    setInputEnd(e);
+    const { start, end } = getDefaultPeriod();
+    setStartDay(start);
+    setEndDay(end);
+    setInputStart(start);
+    setInputEnd(end);
     setStaff('');
   };
 

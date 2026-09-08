@@ -10,6 +10,7 @@ import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type UserOption = { id: string; name: string }
@@ -105,6 +106,11 @@ export function CuttingReportListTable({
     router.push(`/tokushima/cutting-reports?start=${start}&end=${end}`)
   }
   const handleReset = () => {
+    const period = getDefaultPeriod()
+    setStart(period.start)
+    setEnd(period.end)
+    setStaffFilter('')
+    setClientFilter('')
     router.push('/tokushima/cutting-reports')
   }
 

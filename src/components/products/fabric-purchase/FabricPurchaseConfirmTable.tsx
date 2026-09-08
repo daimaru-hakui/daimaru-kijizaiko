@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import { canEditAccountingRecord } from '@/lib/permissions'
 import { FabricPurchaseEditConfirmDialog } from './FabricPurchaseEditConfirmDialog'
 import type { SerializableHistory } from '../../../../types'
@@ -49,6 +50,10 @@ export function FabricPurchaseConfirmTable({
     router.push(`/products/fabric-purchase/confirms?start=${start}&end=${end}`)
   }
   const handleReset = () => {
+    const period = getDefaultPeriod()
+    setStart(period.start)
+    setEnd(period.end)
+    setStaffFilter('')
     router.push('/products/fabric-purchase/confirms')
   }
 

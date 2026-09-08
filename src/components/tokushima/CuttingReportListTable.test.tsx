@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { CuttingReportListTable } from './CuttingReportListTable'
+import { getDefaultPeriod } from '@/lib/dates'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -104,5 +105,24 @@ describe('CuttingReportListTable', () => {
       expect(screen.queryByRole('heading', { level: 1, name: '裁断報告書 編集' })).not.toBeInTheDocument()
     })
     expect(screen.queryByRole('button', { name: '閉じる' })).not.toBeInTheDocument()
+  })
+})
+
+describe('CuttingReportListTable リセット', () => {
+  it('リセットを押すと検索条件が既定値に戻る', async () => {
+    const user = userEvent.setup()
+    render(<CuttingReportListTable {...defaultProps} />)
+    const startInput = screen.getByDisplayValue('2024-01-01')
+    const endInput = screen.getByDisplayValue('2024-03-01')
+
+    await user.selectOptions(screen.getByRole('combobox'), 'user-1')
+    await user.type(screen.getByPlaceholderText('受注先名'), 'テスト')
+    await user.click(screen.getByRole('button', { name: 'リセット' }))
+
+    const { start, end } = getDefaultPeriod()
+    expect(startInput).toHaveValue(start)
+    expect(endInput).toHaveValue(end)
+    expect(screen.getByRole('combobox')).toHaveValue('')
+    expect(screen.getByPlaceholderText('受注先名')).toHaveValue('')
   })
 })

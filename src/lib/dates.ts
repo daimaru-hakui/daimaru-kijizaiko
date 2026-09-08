@@ -14,6 +14,11 @@ export function get3monthsAgo(): string {
   return `${y}-${m}-01`
 }
 
+/** 一覧の期間検索の既定値 (3ヶ月前の月初〜今日) */
+export function getDefaultPeriod(): { start: string; end: string } {
+  return { start: get3monthsAgo(), end: getTodayDate() }
+}
+
 /**
  * 発注書など帳票に載せる発行日時。
  * 本番はサーバーが UTC で動くため、日本時間で固定して整形する。

@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEditDialog'
 import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import type { History } from '../../../types'
 
 type Props = {
@@ -44,6 +45,10 @@ export function TokushimaFabricPurchaseConfirmTable({
     router.push(`/tokushima/fabric-purchase/confirms?start=${start}&end=${end}`)
   }
   const handleReset = () => {
+    const period = getDefaultPeriod()
+    setStart(period.start)
+    setEnd(period.end)
+    setStaffFilter('')
     router.push('/tokushima/fabric-purchase/confirms')
   }
 

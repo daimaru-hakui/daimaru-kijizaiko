@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { AccountingConfirmTable } from './AccountingConfirmTable'
+import { getDefaultPeriod } from '@/lib/dates'
 import type { SerializableHistory } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -73,5 +74,29 @@ describe('AccountingConfirmTable', () => {
     await userEvent.selectOptions(screen.getByRole('combobox'), 'user-2')
     expect(screen.getByText('DM-002')).toBeInTheDocument()
     expect(screen.queryByText('DM-001')).toBeNull()
+  })
+})
+
+describe('AccountingConfirmTable リセット', () => {
+  it('リセットを押すと検索条件が既定値に戻る', async () => {
+    const user = userEvent.setup()
+    render(
+      <AccountingConfirmTable
+        histories={[makeHistory()]}
+        usersMap={usersMap}
+        startDay="2024-01-01"
+        endDay="2024-03-01"
+      />
+    )
+    const startInput = screen.getByDisplayValue('2024-01-01')
+    const endInput = screen.getByDisplayValue('2024-03-01')
+
+    await user.selectOptions(screen.getByRole('combobox'), 'user-1')
+    await user.click(screen.getByRole('button', { name: 'リセット' }))
+
+    const { start, end } = getDefaultPeriod()
+    expect(startInput).toHaveValue(start)
+    expect(endInput).toHaveValue(end)
+    expect(screen.getByRole('combobox')).toHaveValue('')
   })
 })

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import { AccountingEditModal } from './AccountingEditModal'
 import type { SerializableHistory } from '../../../types'
 
@@ -32,9 +33,10 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
   }
 
   const handleReset = () => {
+    const period = getDefaultPeriod()
     setStaff('')
-    setLocalStart(startDay)
-    setLocalEnd(endDay)
+    setLocalStart(period.start)
+    setLocalEnd(period.end)
     startTransition(() => router.push(pathname ?? '/accounting-dept/confirms'))
   }
 

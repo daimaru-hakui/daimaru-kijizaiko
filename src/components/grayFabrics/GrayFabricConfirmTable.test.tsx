@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { GrayFabricConfirmTable } from './GrayFabricConfirmTable'
+import { getDefaultPeriod } from '@/lib/dates'
 import type { GrayFabricHistory } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -56,5 +58,20 @@ describe('GrayFabricConfirmTable 編集ボタン', () => {
       <GrayFabricConfirmTable {...defaultProps} currentUserId="other-user" isRD={true} />
     )
     expect(screen.getByRole('button', { name: '編集' })).toBeInTheDocument()
+  })
+})
+
+describe('GrayFabricConfirmTable リセット', () => {
+  it('リセットを押すと期間が既定値に戻る', async () => {
+    const user = userEvent.setup()
+    render(<GrayFabricConfirmTable {...defaultProps} />)
+    const startInput = screen.getByDisplayValue('2024-01-01')
+    const endInput = screen.getByDisplayValue('2024-03-01')
+
+    await user.click(screen.getByRole('button', { name: 'リセット' }))
+
+    const { start, end } = getDefaultPeriod()
+    expect(startInput).toHaveValue(start)
+    expect(endInput).toHaveValue(end)
   })
 })

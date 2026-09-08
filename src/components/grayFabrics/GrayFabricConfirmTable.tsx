@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import { canEditRecord } from '@/lib/permissions'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
@@ -38,8 +39,9 @@ export function GrayFabricConfirmTable({
     router.push(`/gray-fabrics/confirms?start=${start}&end=${end}`)
   }
   const handleReset = () => {
-    setStart(defaultStart)
-    setEnd(defaultEnd)
+    const period = getDefaultPeriod()
+    setStart(period.start)
+    setEnd(period.end)
     router.push('/gray-fabrics/confirms')
   }
 

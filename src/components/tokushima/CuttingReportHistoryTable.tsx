@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
+import { getDefaultPeriod } from '@/lib/dates'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type Props = {
@@ -73,6 +74,11 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
     router.push(`/tokushima/cutting-reports/history?start=${start}&end=${end}`)
   }
   const handleReset = () => {
+    const period = getDefaultPeriod()
+    setStart(period.start)
+    setEnd(period.end)
+    setStaffFilter('')
+    setClientFilter('')
     router.push('/tokushima/cutting-reports/history')
   }
 
