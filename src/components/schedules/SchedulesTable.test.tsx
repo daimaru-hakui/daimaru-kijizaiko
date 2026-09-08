@@ -80,7 +80,7 @@ describe('SchedulesTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'DM')
+    await user.type(screen.getByLabelText('品番'), 'DM')
     flushSearchDebounce()
 
     expect(screen.getByText(/DM-001/)).toBeInTheDocument()
@@ -91,12 +91,12 @@ describe('SchedulesTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'DM')
+    await user.type(screen.getByLabelText('品番'), 'DM')
     flushSearchDebounce()
     await user.click(screen.getByRole('button', { name: 'リセット' }))
     flushSearchDebounce()
 
-    expect(screen.getByPlaceholderText('品番')).toHaveValue('')
+    expect(screen.getByLabelText('品番')).toHaveValue('')
     expect(screen.getByText(/XX-002/)).toBeInTheDocument()
   })
 })

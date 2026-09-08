@@ -1,7 +1,9 @@
 'use client'
 
+import { useId } from 'react'
 import { GiCancel } from 'react-icons/gi'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 type Props = {
   searchText: string
@@ -9,16 +11,23 @@ type Props = {
 }
 
 export function AdjustmentGrayFabricSearchBar({ searchText, setSearchText }: Props) {
+  const filterId = useId()
+
   return (
-    <div className="flex items-center gap-1 mt-4">
-      <Input
-        type="text"
-        className="w-32 h-7 text-xs"
-        value={searchText}
-        placeholder="品番絞り込み"
-        onChange={(e) => setSearchText(e.target.value)}
-      />
-      <GiCancel className="cursor-pointer" onClick={() => setSearchText('')} />
+    <div className="flex items-end gap-1 mt-4">
+      <div>
+        <Label htmlFor={filterId} className="text-xs">
+          品番
+        </Label>
+        <Input
+          id={filterId}
+          type="text"
+          className="mt-1 w-36"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </div>
+      <GiCancel className="mb-2 cursor-pointer" onClick={() => setSearchText('')} />
     </div>
   )
 }

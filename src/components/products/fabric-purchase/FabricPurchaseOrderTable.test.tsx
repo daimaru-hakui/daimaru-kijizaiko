@@ -71,7 +71,7 @@ describe('FabricPurchaseOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'TEST')
+    await user.type(screen.getByLabelText('品番'), 'TEST')
     flushSearchDebounce()
 
     expect(screen.getByText('TEST-001')).toBeInTheDocument()
@@ -82,12 +82,12 @@ describe('FabricPurchaseOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'TEST')
+    await user.type(screen.getByLabelText('品番'), 'TEST')
     flushSearchDebounce()
     await user.click(screen.getByRole('button', { name: 'リセット' }))
     flushSearchDebounce()
 
-    expect(screen.getByPlaceholderText('品番')).toHaveValue('')
+    expect(screen.getByLabelText('品番')).toHaveValue('')
     expect(screen.getByText('XX-002')).toBeInTheDocument()
   })
 })

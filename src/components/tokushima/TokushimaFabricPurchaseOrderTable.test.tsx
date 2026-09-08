@@ -131,7 +131,7 @@ describe('TokushimaFabricPurchaseOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品名'), '別の')
+    await user.type(screen.getByLabelText('品名'), '別の')
     flushSearchDebounce()
 
     expect(screen.getByText('XX-002')).toBeInTheDocument()
@@ -142,12 +142,12 @@ describe('TokushimaFabricPurchaseOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品名'), '別の')
+    await user.type(screen.getByLabelText('品名'), '別の')
     flushSearchDebounce()
     await user.click(screen.getByRole('button', { name: 'リセット' }))
     flushSearchDebounce()
 
-    expect(screen.getByPlaceholderText('品名')).toHaveValue('')
+    expect(screen.getByLabelText('品名')).toHaveValue('')
     expect(screen.getByText('TEST-001')).toBeInTheDocument()
   })
 })

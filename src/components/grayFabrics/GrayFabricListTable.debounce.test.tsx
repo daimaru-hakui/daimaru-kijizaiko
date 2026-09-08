@@ -52,9 +52,9 @@ describe('GrayFabricListTable 検索のデバウンス', () => {
     const user = setupUser()
     render(<GrayFabricListTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('品番'), 'KB')
+    await user.type(screen.getByLabelText('品番'), 'KB')
 
-    expect(screen.getByPlaceholderText('品番')).toHaveValue('KB')
+    expect(screen.getByLabelText('品番')).toHaveValue('KB')
     expect(screen.getByText('XX-002')).toBeInTheDocument()
 
     flushSearchDebounce()

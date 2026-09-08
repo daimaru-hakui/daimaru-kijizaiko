@@ -40,7 +40,7 @@ describe('AdjustmentProductTable 検索のデバウンス', () => {
     const user = setupUser()
     render(<AdjustmentProductTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('品番絞り込み'), 'DM')
+    await user.type(screen.getByLabelText('品番'), 'DM')
 
     expect(screen.getByText('XX-002')).toBeInTheDocument()
 

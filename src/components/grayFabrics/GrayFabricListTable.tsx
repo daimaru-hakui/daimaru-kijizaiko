@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { InlineStat } from '@/components/products/shared'
 import { matchesProductNumber } from '@/lib/utils'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
@@ -24,6 +25,7 @@ type Props = {
 
 export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isRD }: Props) {
   const [, startTransition] = useTransition()
+  const filterId = useId()
   const [searchNum, setSearchNum] = useState('')
   const [searchName, setSearchName] = useState('')
   const [searchSupplier, setSearchSupplier] = useState('')
@@ -74,29 +76,43 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Input
-              className="w-36 h-8 text-sm"
-              placeholder="品番"
-              value={searchNum}
-              onChange={(e) => setSearchNum(e.target.value)}
-            />
-            <Input
-              className="w-36 h-8 text-sm"
-              placeholder="品名"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-            />
-            <Input
-              className="w-36 h-8 text-sm"
-              placeholder="仕入先"
-              value={searchSupplier}
-              onChange={(e) => setSearchSupplier(e.target.value)}
-            />
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <Label htmlFor={`${filterId}-num`} className="text-xs">
+                品番
+              </Label>
+              <Input
+                id={`${filterId}-num`}
+                className="mt-1 w-36"
+                value={searchNum}
+                onChange={(e) => setSearchNum(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor={`${filterId}-name`} className="text-xs">
+                品名
+              </Label>
+              <Input
+                id={`${filterId}-name`}
+                className="mt-1 w-36"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor={`${filterId}-supplier`} className="text-xs">
+                仕入先
+              </Label>
+              <Input
+                id={`${filterId}-supplier`}
+                className="mt-1 w-36"
+                value={searchSupplier}
+                onChange={(e) => setSearchSupplier(e.target.value)}
+              />
+            </div>
             <Button
               size="sm"
               variant="outline"
-              className="h-8 text-xs"
               onClick={() => {
                 setSearchNum('')
                 setSearchName('')

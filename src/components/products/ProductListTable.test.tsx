@@ -37,7 +37,7 @@ const defaultProps = {
 describe("ProductListTable 品番検索", () => {
   it("半角で品番の一部を入力するとマッチする品番が表示される", async () => {
     render(<ProductListTable {...defaultProps} />);
-    const input = screen.getByPlaceholderText("品番");
+    const input = screen.getByLabelText("品番");
     await userEvent.type(input, "DM");
     expect(screen.queryByText("現在登録された情報はありません。")).toBeNull();
     expect(screen.getByText("DM-001")).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe("ProductListTable 品番検索", () => {
 
   it("マッチしない品番を入力すると空状態が表示される", async () => {
     render(<ProductListTable {...defaultProps} />);
-    const input = screen.getByPlaceholderText("品番");
+    const input = screen.getByLabelText("品番");
     await userEvent.type(input, "XX");
     expect(
       screen.getByText("現在登録された情報はありません。"),
@@ -54,7 +54,7 @@ describe("ProductListTable 品番検索", () => {
 
   it("小文字で入力しても大文字品番にマッチする", async () => {
     render(<ProductListTable {...defaultProps} />);
-    const input = screen.getByPlaceholderText("品番");
+    const input = screen.getByLabelText("品番");
     await userEvent.type(input, "dm");
     expect(screen.queryByText("現在登録された情報はありません。")).toBeNull();
   });

@@ -104,7 +104,7 @@ describe('GrayFabricOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'KB')
+    await user.type(screen.getByLabelText('品番'), 'KB')
     flushSearchDebounce()
 
     expect(screen.getByText('KB-001')).toBeInTheDocument()
@@ -115,7 +115,7 @@ describe('GrayFabricOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('仕入先'), '別の')
+    await user.type(screen.getByLabelText('仕入先'), '別の')
     flushSearchDebounce()
 
     expect(screen.getByText('XX-002')).toBeInTheDocument()
@@ -136,13 +136,13 @@ describe('GrayFabricOrderTable フィルター', () => {
     const user = setupUser()
     renderTable()
 
-    await user.type(screen.getByPlaceholderText('品番'), 'KB')
+    await user.type(screen.getByLabelText('品番'), 'KB')
     await user.selectOptions(screen.getByRole('combobox'), 'user-1')
     flushSearchDebounce()
     await user.click(screen.getByRole('button', { name: 'リセット' }))
     flushSearchDebounce()
 
-    expect(screen.getByPlaceholderText('品番')).toHaveValue('')
+    expect(screen.getByLabelText('品番')).toHaveValue('')
     expect(screen.getByRole('combobox')).toHaveValue('')
     expect(screen.getByText('KB-001')).toBeInTheDocument()
     expect(screen.getByText('XX-002')).toBeInTheDocument()

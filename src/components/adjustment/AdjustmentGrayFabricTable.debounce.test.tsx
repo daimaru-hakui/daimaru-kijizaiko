@@ -37,7 +37,7 @@ describe('AdjustmentGrayFabricTable 検索のデバウンス', () => {
     const user = setupUser()
     render(<AdjustmentGrayFabricTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('品番絞り込み'), 'KB')
+    await user.type(screen.getByLabelText('品番'), 'KB')
 
     expect(screen.getByText('XX-002')).toBeInTheDocument()
 

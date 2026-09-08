@@ -47,7 +47,7 @@ const defaultProps = {
 describe('GrayFabricListTable 品番検索', () => {
   it('品番の一部を入力するとマッチする品番が表示される', async () => {
     render(<GrayFabricListTable {...defaultProps} />)
-    const input = screen.getByPlaceholderText('品番')
+    const input = screen.getByLabelText('品番')
     await userEvent.type(input, 'KB')
     expect(screen.getByText('KB-001')).toBeInTheDocument()
     expect(screen.queryByText('現在登録された情報はありません。')).toBeNull()
@@ -55,7 +55,7 @@ describe('GrayFabricListTable 品番検索', () => {
 
   it('マッチしない品番を入力すると空状態が表示される', async () => {
     render(<GrayFabricListTable {...defaultProps} />)
-    const input = screen.getByPlaceholderText('品番')
+    const input = screen.getByLabelText('品番')
     await userEvent.type(input, 'XX')
     expect(screen.getByText('現在登録された情報はありません。')).toBeInTheDocument()
   })

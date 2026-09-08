@@ -44,10 +44,10 @@ describe('ProductListTable 検索のデバウンス', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     render(<ProductListTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('品番'), 'DM')
+    await user.type(screen.getByLabelText('品番'), 'DM')
 
     // 入力値そのものは即座に反映される
-    expect(screen.getByPlaceholderText('品番')).toHaveValue('DM')
+    expect(screen.getByLabelText('品番')).toHaveValue('DM')
     // まだ絞り込みは走っていない
     expect(screen.getByText('XX-002')).toBeInTheDocument()
 

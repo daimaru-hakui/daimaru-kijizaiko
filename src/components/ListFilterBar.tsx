@@ -1,7 +1,9 @@
 'use client'
 
+import { useId } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import type { ListFilterValues } from '@/lib/filters/list-filter'
 
 type Props = {
@@ -21,10 +23,13 @@ const DEFAULT_FIELDS: (keyof ListFilterValues)[] = [
   'staff',
 ]
 
-const PLACEHOLDERS: Record<'productNumber' | 'productName' | 'supplier', string> = {
+const TEXT_FIELDS = ['productNumber', 'productName', 'supplier'] as const
+
+const LABELS: Record<keyof ListFilterValues, string> = {
   productNumber: '品番',
   productName: '品名',
   supplier: '仕入先',
+  staff: '担当者',
 }
 
 export function ListFilterBar({
@@ -34,35 +39,44 @@ export function ListFilterBar({
   staffOptions = [],
   fields = DEFAULT_FIELDS,
 }: Props) {
+  const id = useId()
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {(['productNumber', 'productName', 'supplier'] as const)
-        .filter((field) => fields.includes(field))
-        .map((field) => (
+    <div className="flex flex-wrap gap-3 items-end">
+      {TEXT_FIELDS.filter((field) => fields.includes(field)).map((field) => (
+        <div key={field}>
+          <Label htmlFor={`${id}-${field}`} className="text-xs">
+            {LABELS[field]}
+          </Label>
           <Input
-            key={field}
-            className="w-36 h-8 text-sm"
-            placeholder={PLACEHOLDERS[field]}
+            id={`${id}-${field}`}
+            className="mt-1 w-36"
             value={values[field]}
             onChange={(e) => onChange(field, e.target.value)}
           />
-        ))}
+        </div>
+      ))}
       {fields.includes('staff') && (
-        <select
-          aria-label="担当者"
-          className="h-8 rounded-md border border-input px-2 text-sm"
-          value={values.staff}
-          onChange={(e) => onChange('staff', e.target.value)}
-        >
-          <option value="">全員</option>
-          {staffOptions.map(([id, name]) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <Label htmlFor={`${id}-staff`} className="text-xs">
+            {LABELS.staff}
+          </Label>
+          <select
+            id={`${id}-staff`}
+            className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
+            value={values.staff}
+            onChange={(e) => onChange('staff', e.target.value)}
+          >
+            <option value="">全員</option>
+            {staffOptions.map(([optionId, name]) => (
+              <option key={optionId} value={optionId}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
-      <Button size="sm" variant="outline" className="h-8 text-xs" onClick={onReset}>
+      <Button size="sm" variant="outline" onClick={onReset}>
         リセット
       </Button>
     </div>
