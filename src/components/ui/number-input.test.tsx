@@ -24,6 +24,21 @@ describe("NumberInput", () => {
     expect(screen.getByRole("button", { name: "-" })).toBeInTheDocument();
   });
 
+  it("小数を入力できる（生地の長さは m 単位で小数を扱う）", () => {
+    render(<NumberInput value="2.7" onChange={vi.fn()} />);
+    expect(screen.getByRole("spinbutton")).toHaveAttribute("step", "any");
+  });
+
+  it("小数値に + ボタンを押しても浮動小数の誤差が出ない", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<NumberInput value={2.7} onChange={onChange} />);
+
+    await user.click(screen.getByRole("button", { name: "+" }));
+
+    expect(onChange).toHaveBeenCalledWith("3.7", 3.7);
+  });
+
   it("onChange が入力変更時に (文字列, 数値) を渡す（Chakra 互換シグネチャ）", async () => {
     const onChange = vi.fn();
     render(<NumberInput value="" onChange={onChange} />);

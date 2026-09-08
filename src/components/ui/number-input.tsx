@@ -11,6 +11,7 @@ export interface NumberInputProps {
   defaultValue?: number | string;
   min?: number;
   max?: number;
+  /** +/- ボタンの増減幅。入力欄そのものは小数を受け付ける (step="any") */
   step?: number;
   /** Chakra UI NumberInput 互換: 第2引数は valueAsNumber (NaN の場合あり) */
   onChange?: (valueAsString: string, valueAsNumber: number) => void;
@@ -18,6 +19,11 @@ export interface NumberInputProps {
   className?: string;
   inputClassName?: string;
   width?: string;
+}
+
+/** 浮動小数の誤差 (0.1 + 0.2 = 0.30000000000000004) を丸める */
+function roundValue(value: number): number {
+  return Math.round(value * 1e6) / 1e6;
 }
 
 function clampValue(
@@ -59,7 +65,7 @@ export function NumberInput({
 
   const increment = () => {
     const current = parseFloat(displayValue) || 0;
-    const next = clampValue(current + step, min, max);
+    const next = roundValue(clampValue(current + step, min, max));
     const nextStr = String(next);
     if (!controlled) setInternalValue(nextStr);
     onChange?.(nextStr, next);
@@ -67,7 +73,7 @@ export function NumberInput({
 
   const decrement = () => {
     const current = parseFloat(displayValue) || 0;
-    const next = clampValue(current - step, min, max);
+    const next = roundValue(clampValue(current - step, min, max));
     const nextStr = String(next);
     if (!controlled) setInternalValue(nextStr);
     onChange?.(nextStr, next);
@@ -98,7 +104,8 @@ export function NumberInput({
         disabled={disabled}
         min={min}
         max={max}
-        step={step}
+        // 生地の長さは m 単位で小数を扱うため、ブラウザの step 検証は無効にする
+        step="any"
         className={cn("text-center", inputClassName)}
       />
       <Button
