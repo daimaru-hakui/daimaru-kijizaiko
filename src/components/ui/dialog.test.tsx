@@ -1,0 +1,33 @@
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { Dialog, DialogContent, DialogTitle } from './dialog'
+
+function renderDialog() {
+  render(
+    <Dialog open>
+      <DialogContent>
+        <DialogTitle>テストダイアログ</DialogTitle>
+        <p>本文</p>
+      </DialogContent>
+    </Dialog>
+  )
+  return screen.getByRole('dialog')
+}
+
+describe('DialogContent', () => {
+  it('ビューポート高さを超えないよう最大高さが設定されている', () => {
+    expect(renderDialog().className).toContain('max-h-[90dvh]')
+  })
+
+  it('本文が収まらない場合にスクロールする領域を持つ', () => {
+    const scrollArea = renderDialog().querySelector('[data-slot="dialog-body"]')
+    expect(scrollArea).not.toBeNull()
+    expect(scrollArea!.className).toContain('overflow-y-auto')
+  })
+
+  it('閉じるボタンはスクロール領域の外にあり常に表示される', () => {
+    const dialog = renderDialog()
+    const closeButton = screen.getByRole('button', { name: 'Close' })
+    expect(dialog.querySelector('[data-slot="dialog-body"]')!.contains(closeButton)).toBe(false)
+  })
+})

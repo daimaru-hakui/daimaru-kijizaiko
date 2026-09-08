@@ -35,7 +35,7 @@ export function ProductDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             生地詳細
