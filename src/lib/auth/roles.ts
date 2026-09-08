@@ -16,6 +16,8 @@ type RouteRule =
 const pathRoleMatrix: Array<{ pattern: RegExp; rule: RouteRule }> = [
   { pattern: /^\/_next\//, rule: { public: true } },
   { pattern: /^\/api\/session/, rule: { public: true } },
+  // 外部システム (daimaru-portal) 向け。認可は各ルートの API_KEY チェックで行う
+  { pattern: /^\/api\/cutting-reports/, rule: { public: true } },
   { pattern: /^\/favicon\.ico$/, rule: { public: true } },
   { pattern: /^\/$/, rule: { public: true } },
   { pattern: /^\/login$/, rule: { public: true } },

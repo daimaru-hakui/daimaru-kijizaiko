@@ -47,4 +47,18 @@ describe('matchRoute', () => {
   it('/accounting-dept は accounting=false のユーザーに 403', () => {
     expect(matchRoute('/accounting-dept', noRole)).toBe(false)
   })
+
+  // 外部システム (daimaru-portal) はセッションクッキーを持てず API_KEY で認可するため、
+  // proxy 側では素通しさせる必要がある
+  it('/api/cutting-reports は未ログインでも通過する', () => {
+    expect(matchRoute('/api/cutting-reports', null)).toBe(true)
+  })
+
+  it('/api/cutting-reports の配下も未ログインで通過する', () => {
+    expect(matchRoute('/api/cutting-reports/', null)).toBe(true)
+  })
+
+  it('定義のない /api/* は未ログインで通過しない', () => {
+    expect(matchRoute('/api/products/abc', null)).toBe(false)
+  })
 })
