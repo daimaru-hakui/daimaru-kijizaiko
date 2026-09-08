@@ -109,7 +109,7 @@ export function CuttingReportFabricRow({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div>
-          <label className="text-xs font-semibold">
+          <label className="flex h-5 items-center gap-1 text-xs font-semibold">
             選択 <span className="text-red-500">※</span>
           </label>
           <select
@@ -125,7 +125,7 @@ export function CuttingReportFabricRow({
         </div>
 
         <div className="sm:col-span-2">
-          <div className="text-xs font-semibold flex items-center gap-1">
+          <div className="flex h-5 items-center gap-1 text-xs font-semibold">
             品名 <span className="text-red-500">※</span>
             {selectedProduct && (
               <>
@@ -157,7 +157,7 @@ export function CuttingReportFabricRow({
         </div>
 
         <div>
-          <label className="text-xs font-semibold">
+          <label className="flex h-5 items-center gap-1 text-xs font-semibold">
             数量(m) <span className="text-red-500">※</span>
           </label>
           <NumberInput
