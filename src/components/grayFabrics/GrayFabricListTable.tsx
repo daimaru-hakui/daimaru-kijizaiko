@@ -45,7 +45,7 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
   }
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-7xl mx-auto pt-6 space-y-4">
         {/* ツールバー */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">

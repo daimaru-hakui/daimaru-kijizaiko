@@ -17,7 +17,7 @@ export default async function SettingsPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-4xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex flex-col md:flex-row gap-1 items-center justify-start">

@@ -34,7 +34,7 @@ export default async function ProductsFabricPurchaseOrdersPage() {
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-7xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <FabricPurchaseOrderTable

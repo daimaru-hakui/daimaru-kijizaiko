@@ -37,7 +37,7 @@ export default async function ProductEditPage({ params }: Props) {
   if (!canEditRecord(product, user.uid, isPrivileged)) redirect('/products')
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-3xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight mb-6">生地の編集</h1>

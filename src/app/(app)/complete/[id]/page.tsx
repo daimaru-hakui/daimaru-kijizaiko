@@ -39,7 +39,7 @@ export default async function CompletePage({ params, searchParams }: Props) {
   )
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-3xl mx-auto pt-6">
         <OrderSheet
           serialNumber={Number(query.serialNumber ?? 0)}

@@ -11,7 +11,7 @@ export default async function MaterialNamesPage() {
   const names: string[] = snap.data()?.data ?? [];
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-xl mx-auto pt-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <MaterialNamesClient initialNames={names} />
