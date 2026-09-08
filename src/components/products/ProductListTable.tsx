@@ -1,11 +1,10 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FilterInput, FilterSelect } from "@/components/filters/fields";
 import { deleteProductAction } from "@/app/(app)/products/actions";
 import {
   matchesProductNumber,
@@ -57,7 +56,6 @@ export function ProductListTable({
   userId,
 }: Props) {
   const router = useRouter();
-  const filterId = useId();
   const [searchNum, setSearchNum] = useState("");
   const [searchColor, setSearchColor] = useState("");
   const [searchName, setSearchName] = useState("");
@@ -151,68 +149,27 @@ export function ProductListTable({
           </div>
         </div>
         <div className="flex flex-wrap gap-3 items-end">
-          <div>
-            <Label htmlFor={`${filterId}-num`} className="text-xs">
-              品番
-            </Label>
-            <Input
-              id={`${filterId}-num`}
-              className="mt-1 w-36"
-              value={searchNum}
-              onChange={(e) => setSearchNum(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${filterId}-color`} className="text-xs">
-              色
-            </Label>
-            <Input
-              id={`${filterId}-color`}
-              className="mt-1 w-24"
-              value={searchColor}
-              onChange={(e) => setSearchColor(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${filterId}-name`} className="text-xs">
-              品名
-            </Label>
-            <Input
-              id={`${filterId}-name`}
-              className="mt-1 w-36"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${filterId}-staff`} className="text-xs">
-              担当
-            </Label>
-            <select
-              id={`${filterId}-staff`}
-              className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
-              value={searchStaff}
-              onChange={(e) => setSearchStaff(e.target.value)}
-            >
-              <option value="">全員</option>
-              {staffOptions.map(([id, staffName]) => (
-                <option key={id} value={id}>
-                  {staffName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <Label htmlFor={`${filterId}-material`} className="text-xs">
-              組織名
-            </Label>
-            <Input
-              id={`${filterId}-material`}
-              className="mt-1 w-28"
-              value={searchMaterial}
-              onChange={(e) => setSearchMaterial(e.target.value)}
-            />
-          </div>
+          <FilterInput label="品番" value={searchNum} onChange={setSearchNum} />
+          <FilterInput
+            label="色"
+            value={searchColor}
+            onChange={setSearchColor}
+            className="w-24"
+          />
+          <FilterInput label="品名" value={searchName} onChange={setSearchName} />
+          <FilterSelect
+            label="担当"
+            value={searchStaff}
+            onChange={setSearchStaff}
+            options={staffOptions}
+            emptyLabel="全員"
+          />
+          <FilterInput
+            label="組織名"
+            value={searchMaterial}
+            onChange={setSearchMaterial}
+            className="w-28"
+          />
           <Button
             size="sm"
             variant="outline"

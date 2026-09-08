@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
@@ -11,6 +9,10 @@ import { canEditRecord } from '@/lib/permissions'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
 import type { GrayFabricHistory } from '../../../types'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   confirms: GrayFabricHistory[]
@@ -35,6 +37,20 @@ export function GrayFabricConfirmTable({
     defaultEnd
   )
 
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = buildOptions(confirms.map((h) => h.createUser), users)
+  const supplierOptions = buildOptions(confirms.map((h) => h.supplierName))
+
+  const filtered = confirms.filter((h) =>
+    matchesListFilter({ ...h, staff: h.createUser }, filter)
+  )
+
+  const handleReset = () => {
+    reset()
+    resetPeriod()
+  }
+
   const canEdit = (h: GrayFabricHistory) => canEditRecord(h, currentUserId, isRD)
 
   return (
@@ -46,25 +62,28 @@ export function GrayFabricConfirmTable({
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-end">
-        <div>
-          <Label className="text-xs">開始日</Label>
-          <Input type="date" className="mt-1 w-36" value={start} onChange={(e) => setStart(e.target.value)} />
-        </div>
-        <div>
-          <Label className="text-xs">終了日</Label>
-          <Input type="date" className="mt-1 w-36" value={end} onChange={(e) => setEnd(e.target.value)} />
-        </div>
-        <Button size="sm" variant="outline" onClick={resetPeriod}>リセット</Button>
-      </div>
+      <PeriodFilterBar
+        start={start}
+        end={end}
+        onStartChange={setStart}
+        onEndChange={setEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['productNumber', 'productName', 'supplier', 'staff'],
+          staffOptions,
+          supplierOptions,
+        }}
+      />
 
-      {confirms.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
           現在登録された情報はありません。
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
-          {confirms.map((h) => (
+          {filtered.map((h) => (
             <div
               key={h.id}
               className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"

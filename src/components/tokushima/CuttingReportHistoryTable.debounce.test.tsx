@@ -55,7 +55,7 @@ describe('CuttingReportHistoryTable 受注先検索のデバウンス', () => {
     const user = setupUser()
     render(<CuttingReportHistoryTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('受注先名'), '大阪')
+    await user.type(screen.getByLabelText('受注先'), '大阪')
 
     expect(screen.getByText('XX-002')).toBeInTheDocument()
 

@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
@@ -13,6 +11,9 @@ import { canEditAccountingRecord } from '@/lib/permissions'
 import { FabricPurchaseEditConfirmDialog } from './FabricPurchaseEditConfirmDialog'
 import type { SerializableHistory } from '../../../../types'
 import { buildOptions } from '@/lib/filters/options'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 
 type Props = {
   confirms: SerializableHistory[]
@@ -38,17 +39,18 @@ export function FabricPurchaseConfirmTable({
     startDay,
     endDay
   )
-  const [staffFilter, setStaffFilter] = useState('')
+  const { values, filter, setValue, reset } = useListFilter()
   const [editConfirm, setEditConfirm] = useState<SerializableHistory | null>(null)
 
-  const filtered = confirms.filter(
-    (h) => !staffFilter || h.createUser === staffFilter
+  const filtered = confirms.filter((h) =>
+    matchesListFilter({ ...h, staff: h.createUser }, filter)
   )
 
   const staffOptions = buildOptions(confirms.map((h) => h.createUser), usersMap)
+  const supplierOptions = buildOptions(confirms.map((h) => h.supplierName))
 
   const handleReset = () => {
-    setStaffFilter('')
+    reset()
     resetPeriod()
   }
 
@@ -64,30 +66,20 @@ export function FabricPurchaseConfirmTable({
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-end">
-        <div>
-          <Label className="text-xs">開始日</Label>
-          <Input type="date" className="mt-1 w-36" value={start} onChange={(e) => setStart(e.target.value)} />
-        </div>
-        <div>
-          <Label className="text-xs">終了日</Label>
-          <Input type="date" className="mt-1 w-36" value={end} onChange={(e) => setEnd(e.target.value)} />
-        </div>
-        <div>
-          <Label className="text-xs">担当者</Label>
-          <select
-            className="mt-1 h-9 rounded-md border border-input px-3 text-sm"
-            value={staffFilter}
-            onChange={(e) => setStaffFilter(e.target.value)}
-          >
-            <option value="">全員</option>
-            {staffOptions.map(([id, name]) => (
-              <option key={id} value={id}>{name}</option>
-            ))}
-          </select>
-        </div>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
-      </div>
+      <PeriodFilterBar
+        start={start}
+        end={end}
+        onStartChange={setStart}
+        onEndChange={setEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['productNumber', 'productName', 'supplier', 'staff'],
+          staffOptions,
+          supplierOptions,
+        }}
+      />
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">

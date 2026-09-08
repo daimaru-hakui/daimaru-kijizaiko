@@ -3,16 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
-import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import { buildOptions } from '@/lib/filters/options'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 
 type UserOption = { id: string; name: string }
 
@@ -93,22 +93,13 @@ export function CuttingReportListTable({
     startDay,
     endDay
   )
-  const [staffFilter, setStaffFilter] = useState('')
-  const [clientFilter, setClientFilter] = useState('')
+  const { values, filter, setValue, reset } = useListFilter()
   const [detailReport, setDetailReport] = useState<CuttingReportType | null>(null)
 
-  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
-  const client = useDebounce(clientFilter, SEARCH_DEBOUNCE_MS)
-
-  const filtered = reports.filter((r) => {
-    const staffMatch = !staffFilter || r.staff === staffFilter
-    const clientMatch = !client || r.client.includes(client)
-    return staffMatch && clientMatch
-  })
+  const filtered = reports.filter((r) => matchesListFilter(r, filter))
 
   const handleReset = () => {
-    setStaffFilter('')
-    setClientFilter('')
+    reset()
     resetPeriod()
   }
 
@@ -141,39 +132,19 @@ export function CuttingReportListTable({
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-end">
-        <div>
-          <Label className="text-xs">開始日</Label>
-          <Input type="date" className="mt-1 w-36" value={start} onChange={(e) => setStart(e.target.value)} />
-        </div>
-        <div>
-          <Label className="text-xs">終了日</Label>
-          <Input type="date" className="mt-1 w-36" value={end} onChange={(e) => setEnd(e.target.value)} />
-        </div>
-        <div>
-          <Label className="text-xs">担当者</Label>
-          <select
-            className="mt-1 h-9 rounded-md border border-input px-3 text-sm"
-            value={staffFilter}
-            onChange={(e) => setStaffFilter(e.target.value)}
-          >
-            <option value="">全員</option>
-            {staffOptions.map(([id, name]) => (
-              <option key={id} value={id}>{name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <Label className="text-xs">受注先</Label>
-          <Input
-            className="mt-1 w-32"
-            placeholder="受注先名"
-            value={clientFilter}
-            onChange={(e) => setClientFilter(e.target.value)}
-          />
-        </div>
-        <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
-      </div>
+      <PeriodFilterBar
+        start={start}
+        end={end}
+        onStartChange={setStart}
+        onEndChange={setEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['staff', 'client'],
+          staffOptions,
+        }}
+      />
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">

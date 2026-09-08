@@ -3,14 +3,16 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { AccountingEditModal } from './AccountingEditModal'
 import type { SerializableHistory } from '../../../types'
+import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
+import { buildOptions } from '@/lib/filters/options'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
 
 type Props = {
   histories: SerializableHistory[]
@@ -27,16 +29,19 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
     setEnd: setLocalEnd,
     resetPeriod,
   } = usePeriodSearch('/accounting-dept/confirms', startDay, endDay)
-  const [staff, setStaff] = useState('')
+  const { values, filter, setValue, reset } = useListFilter()
+
+  const staffOptions = buildOptions(histories.map((h) => h.createUser), usersMap)
+  const supplierOptions = buildOptions(histories.map((h) => h.supplierName))
 
   const handleReset = () => {
-    setStaff('')
+    reset()
     resetPeriod()
   }
 
-  const filtered = staff
-    ? histories.filter((h) => h.createUser === staff)
-    : histories
+  const filtered = histories.filter((h) =>
+    matchesListFilter({ ...h, staff: h.createUser }, filter)
+  )
 
   return (
     <div className="p-6 space-y-4">
@@ -47,40 +52,20 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-end">
-        <div>
-          <Label className="text-xs">開始日</Label>
-          <Input
-            type="date"
-            className="mt-1 w-36"
-            value={localStart}
-            onChange={(e) => setLocalStart(e.target.value)}
-          />
-        </div>
-        <div>
-          <Label className="text-xs">終了日</Label>
-          <Input
-            type="date"
-            className="mt-1 w-36"
-            value={localEnd}
-            onChange={(e) => setLocalEnd(e.target.value)}
-          />
-        </div>
-        <div>
-          <Label className="text-xs">担当者</Label>
-          <select
-            className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
-            value={staff}
-            onChange={(e) => setStaff(e.target.value)}
-          >
-            <option value="">全員</option>
-            {Object.entries(usersMap).map(([id, name]) => (
-              <option key={id} value={id}>{name}</option>
-            ))}
-          </select>
-        </div>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
-      </div>
+      <PeriodFilterBar
+        start={localStart}
+        end={localEnd}
+        onStartChange={setLocalStart}
+        onEndChange={setLocalEnd}
+        onReset={handleReset}
+        list={{
+          values,
+          onChange: setValue,
+          fields: ['productNumber', 'productName', 'supplier', 'staff'],
+          staffOptions,
+          supplierOptions,
+        }}
+      />
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">

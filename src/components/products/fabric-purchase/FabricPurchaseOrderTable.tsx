@@ -8,7 +8,7 @@ import { deleteFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-pur
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
-import { ListFilterBar } from '@/components/ListFilterBar'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { canEditRecord } from '@/lib/permissions'

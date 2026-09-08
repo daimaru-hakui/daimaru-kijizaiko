@@ -115,15 +115,15 @@ describe('CuttingReportListTable リセット', () => {
     const startInput = screen.getByDisplayValue('2024-01-01')
     const endInput = screen.getByDisplayValue('2024-03-01')
 
-    await user.selectOptions(screen.getByRole('combobox'), 'user-1')
-    await user.type(screen.getByPlaceholderText('受注先名'), 'テスト')
+    await user.selectOptions(screen.getByLabelText('担当者'), 'user-1')
+    await user.type(screen.getByLabelText('受注先'), 'テスト')
     await user.click(screen.getByRole('button', { name: 'リセット' }))
 
     const { start, end } = getDefaultPeriod()
     expect(startInput).toHaveValue(start)
     expect(endInput).toHaveValue(end)
-    expect(screen.getByRole('combobox')).toHaveValue('')
-    expect(screen.getByPlaceholderText('受注先名')).toHaveValue('')
+    expect(screen.getByLabelText('担当者')).toHaveValue('')
+    expect(screen.getByLabelText('受注先')).toHaveValue('')
   })
 })
 

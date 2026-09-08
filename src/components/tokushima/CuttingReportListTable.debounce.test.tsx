@@ -59,7 +59,7 @@ describe('CuttingReportListTable 受注先検索のデバウンス', () => {
     const user = setupUser()
     render(<CuttingReportListTable {...defaultProps} />)
 
-    await user.type(screen.getByPlaceholderText('受注先名'), '大阪')
+    await user.type(screen.getByLabelText('受注先'), '大阪')
 
     expect(screen.getByText('東京商店')).toBeInTheDocument()
 

@@ -9,6 +9,7 @@ export function useListFilter() {
   // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
   const productNumber = useDebounce(values.productNumber, SEARCH_DEBOUNCE_MS)
   const productName = useDebounce(values.productName, SEARCH_DEBOUNCE_MS)
+  const client = useDebounce(values.client, SEARCH_DEBOUNCE_MS)
 
   return {
     /** 入力欄に表示する値 */
@@ -17,6 +18,7 @@ export function useListFilter() {
     filter: {
       productNumber,
       productName,
+      client,
       supplier: values.supplier,
       staff: values.staff,
     },

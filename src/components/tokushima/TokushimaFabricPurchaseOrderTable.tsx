@@ -10,7 +10,7 @@ import { deleteFabricPurchaseOrderAction } from '@/app/(app)/tokushima/fabric-pu
 import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
-import { ListFilterBar } from '@/components/ListFilterBar'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import type { SerializableHistory } from '../../../types'

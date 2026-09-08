@@ -41,6 +41,18 @@ describe('matchesListFilter', () => {
     expect(matchesListFilter(schedule, { ...EMPTY_LIST_FILTER, supplier: 'テスト商社' })).toBe(false)
   })
 
+  it('受注先は部分一致する', () => {
+    const report = { client: '大阪商店', staff: 'user-1' }
+    expect(matchesListFilter(report, { ...EMPTY_LIST_FILTER, client: '大阪' })).toBe(true)
+    expect(matchesListFilter(report, { ...EMPTY_LIST_FILTER, client: '東京' })).toBe(false)
+  })
+
+  it('品番を持たないレコードでも他の条件だけで絞り込める', () => {
+    const report = { client: '大阪商店', staff: 'user-1' }
+    expect(matchesListFilter(report, EMPTY_LIST_FILTER)).toBe(true)
+    expect(matchesListFilter(report, { ...EMPTY_LIST_FILTER, productNumber: 'DM' })).toBe(false)
+  })
+
   it('複数条件は AND で効く', () => {
     expect(
       matchesListFilter(record, {
@@ -48,6 +60,7 @@ describe('matchesListFilter', () => {
         productName: 'テスト',
         supplier: 'テスト商社',
         staff: 'user-1',
+        client: '',
       })
     ).toBe(true)
     expect(

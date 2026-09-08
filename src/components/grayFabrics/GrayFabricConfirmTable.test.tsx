@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { GrayFabricConfirmTable } from './GrayFabricConfirmTable'
 import { getDefaultPeriod } from '@/lib/dates'
+import {
+  setupSearchDebounceTimers,
+  setupUser,
+  flushSearchDebounce,
+} from '@/test-utils/search-debounce'
 import type { GrayFabricHistory } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -89,5 +94,28 @@ describe('GrayFabricConfirmTable 数値', () => {
     expect(screen.queryByText('単価')).toBeNull()
     expect(screen.queryByText('金額')).toBeNull()
     expect(screen.getByText('数量')).toBeInTheDocument()
+  })
+})
+
+describe('GrayFabricConfirmTable 品番の絞り込み', () => {
+  setupSearchDebounceTimers()
+
+  it('品番で絞り込める', async () => {
+    const user = setupUser()
+    render(
+      <GrayFabricConfirmTable
+        {...defaultProps}
+        confirms={[
+          baseConfirm,
+          { ...baseConfirm, id: 'confirm-2', productNumber: 'XX-002' } as GrayFabricHistory,
+        ]}
+      />
+    )
+
+    await user.type(screen.getByLabelText('品番'), 'KB')
+    flushSearchDebounce()
+
+    expect(screen.getByText('KB-001')).toBeInTheDocument()
+    expect(screen.queryByText('XX-002')).toBeNull()
   })
 })

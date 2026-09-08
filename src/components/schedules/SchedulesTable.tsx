@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ScheduleModal } from './ScheduleModal'
-import { ListFilterBar } from '@/components/ListFilterBar'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
