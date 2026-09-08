@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
+import { StockPlaceSelect } from '@/components/StockPlaceSelect'
 import {
   Dialog,
   DialogContent,
@@ -14,20 +15,22 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
-import type { History } from '../../../../types'
+import type { History, StockPlace } from '../../../../types'
 
 type Props = {
   order: History
+  stockPlaces: StockPlace[]
   open: boolean
   onClose: () => void
 }
 
-export function FabricPurchaseEditOrderDialog({ order, open, onClose }: Props) {
+export function FabricPurchaseEditOrderDialog({ order, stockPlaces, open, onClose }: Props) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(order.quantity)
   const [price, setPrice] = useState(order.price ?? 0)
   const [orderedAt, setOrderedAt] = useState(order.orderedAt ?? '')
   const [scheduledAt, setScheduledAt] = useState(order.scheduledAt ?? '')
+  const stockPlaceId = useId()
   const [stockPlace, setStockPlace] = useState(order.stockPlace ?? '')
   const [comment, setComment] = useState(order.comment ?? '')
 
@@ -84,9 +87,13 @@ export function FabricPurchaseEditOrderDialog({ order, open, onClose }: Props) {
             </div>
           </div>
           <div>
-            <Label>出荷先</Label>
-            <Input className="mt-1" value={stockPlace}
-              onChange={(e) => setStockPlace(e.target.value)} />
+            <StockPlaceSelect
+              id={stockPlaceId}
+              label="出荷先"
+              value={stockPlace}
+              stockPlaces={stockPlaces}
+              onChange={setStockPlace}
+            />
           </div>
           <div>
             <Label>コメント</Label>

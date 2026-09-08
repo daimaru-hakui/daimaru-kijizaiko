@@ -2,8 +2,9 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
+import { sortByKana } from '@/lib/sort'
 import { TokushimaFabricPurchaseOrderTable } from '@/components/tokushima/TokushimaFabricPurchaseOrderTable'
-import type { SerializableHistory } from '../../../../../../types'
+import type { SerializableHistory, StockPlace } from '../../../../../../types'
 
 const HOUSE_FACTORY = '徳島工場'
 
@@ -12,14 +13,23 @@ export default async function TokushimaFabricPurchaseOrdersPage() {
   if (!user) redirect('/login')
 
   const db = getAdminDb()
-  const [ordersSnap, usersSnap, userDocSnap] = await Promise.all([
+  const [ordersSnap, usersSnap, userDocSnap, stockPlacesSnap] = await Promise.all([
     db.collection('fabricPurchaseOrders').where('stockPlace', '==', HOUSE_FACTORY).get(),
     db.collection('users').get(),
     db.collection('users').doc(user.uid).get(),
+    db.collection('stockPlaces').get(),
   ])
 
   const usersMap: Record<string, string> = Object.fromEntries(
     usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
+  )
+
+  // 入荷確定・編集の出荷先セレクト用。旧実装と同じくフリガナ順で出す
+  const stockPlaces: StockPlace[] = sortByKana(
+    stockPlacesSnap.docs.map((d) => ({
+      ...(toPlainData(d.data()) as Omit<StockPlace, 'id'>),
+      id: d.id,
+    })),
   )
 
   const userData = userDocSnap.data()
@@ -44,6 +54,7 @@ export default async function TokushimaFabricPurchaseOrdersPage() {
         <TokushimaFabricPurchaseOrderTable
           orders={orders}
           usersMap={usersMap}
+          stockPlaces={stockPlaces}
           userId={user.uid}
           isTokushima={isTokushima}
           isRD={isRD}

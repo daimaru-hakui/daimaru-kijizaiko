@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
@@ -13,26 +13,30 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
+import { StockPlaceSelect } from '@/components/StockPlaceSelect'
 import {
   updateFabricPurchaseOrderAction,
   updateFabricPurchaseConfirmAction,
 } from '@/app/(app)/tokushima/fabric-purchase/actions'
-import type { SerializableHistory } from '../../../types'
+import type { SerializableHistory, StockPlace } from '../../../types'
 
 type Props = {
   history: SerializableHistory
   type: 'order' | 'confirm'
+  /** type='order' のとき出荷先セレクトに出す送り先マスタ */
+  stockPlaces?: StockPlace[]
   open: boolean
   onCloseAction: () => void
 }
 
-export function TokushimaFabricPurchaseEditDialog({ history, type, open, onCloseAction }: Props) {
+export function TokushimaFabricPurchaseEditDialog({ history, type, stockPlaces = [], open, onCloseAction }: Props) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(history.quantity)
   const [price, setPrice] = useState(history.price ?? 0)
   const [orderedAt, setOrderedAt] = useState(history.orderedAt ?? '')
   const [scheduledAt, setScheduledAt] = useState(history.scheduledAt ?? '')
   const [fixedAt, setFixedAt] = useState(history.fixedAt ?? '')
+  const stockPlaceId = useId()
   const [stockPlace, setStockPlace] = useState(history.stockPlace ?? '')
   const [comment, setComment] = useState(history.comment ?? '')
 
@@ -124,8 +128,13 @@ export function TokushimaFabricPurchaseEditDialog({ history, type, open, onClose
           )}
           {type === 'order' && (
             <div>
-              <Label>出荷先</Label>
-              <Input className="mt-1" value={stockPlace} onChange={(e) => setStockPlace(e.target.value)} />
+              <StockPlaceSelect
+                id={stockPlaceId}
+                label="出荷先"
+                value={stockPlace}
+                stockPlaces={stockPlaces}
+                onChange={setStockPlace}
+              />
             </div>
           )}
           <div>

@@ -14,12 +14,13 @@ import { matchesListFilter } from '@/lib/filters/list-filter'
 import { canEditRecord } from '@/lib/permissions'
 import { FabricPurchaseConfirmOrderDialog } from './FabricPurchaseConfirmOrderDialog'
 import { FabricPurchaseEditOrderDialog } from './FabricPurchaseEditOrderDialog'
-import type { History } from '../../../../types'
+import type { History, StockPlace } from '../../../../types'
 import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   orders: History[]
   usersMap: Record<string, string>
+  stockPlaces: StockPlace[]
   userId: string
   isTokushima: boolean
   isRD: boolean
@@ -29,6 +30,7 @@ type Props = {
 export function FabricPurchaseOrderTable({
   orders,
   usersMap,
+  stockPlaces,
   userId,
   isTokushima,
   isRD,
@@ -202,6 +204,7 @@ export function FabricPurchaseOrderTable({
       {confirmOrder && (
         <FabricPurchaseConfirmOrderDialog
           order={confirmOrder}
+          stockPlaces={stockPlaces}
           open={Boolean(confirmOrder)}
           onClose={() => setConfirmOrder(null)}
         />
@@ -209,6 +212,7 @@ export function FabricPurchaseOrderTable({
       {editOrder && (
         <FabricPurchaseEditOrderDialog
           order={editOrder}
+          stockPlaces={stockPlaces}
           open={Boolean(editOrder)}
           onClose={() => setEditOrder(null)}
         />

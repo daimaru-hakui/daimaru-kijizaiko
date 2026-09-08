@@ -51,6 +51,7 @@ describe('TokushimaFabricPurchaseOrderTable 削除ボタン', () => {
       <TokushimaFabricPurchaseOrderTable
         orders={[baseOrder]}
         usersMap={usersMap}
+        stockPlaces={[]}
         userId="user-1"
         isTokushima={false}
         isRD={false}
@@ -65,6 +66,7 @@ describe('TokushimaFabricPurchaseOrderTable 削除ボタン', () => {
       <TokushimaFabricPurchaseOrderTable
         orders={[baseOrder]}
         usersMap={usersMap}
+        stockPlaces={[]}
         userId="other-user"
         isTokushima={false}
         isRD={false}
@@ -79,6 +81,7 @@ describe('TokushimaFabricPurchaseOrderTable 削除ボタン', () => {
       <TokushimaFabricPurchaseOrderTable
         orders={[baseOrder]}
         usersMap={usersMap}
+        stockPlaces={[]}
         userId="other-user"
         isTokushima={false}
         isRD={true}
@@ -93,6 +96,7 @@ describe('TokushimaFabricPurchaseOrderTable 削除ボタン', () => {
       <TokushimaFabricPurchaseOrderTable
         orders={[baseOrder]}
         usersMap={usersMap}
+        stockPlaces={[]}
         userId="other-user"
         isTokushima={false}
         isRD={false}
@@ -120,6 +124,7 @@ describe('TokushimaFabricPurchaseOrderTable フィルター', () => {
       <TokushimaFabricPurchaseOrderTable
         orders={[baseOrder, otherOrder]}
         usersMap={{ 'user-1': 'テストユーザー', 'user-2': '別ユーザー' }}
+      stockPlaces={[]}
         userId="user-1"
         isTokushima={false}
         isRD={false}

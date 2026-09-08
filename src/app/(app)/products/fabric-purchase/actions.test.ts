@@ -127,6 +127,7 @@ describe('confirmFabricPurchaseAction', () => {
     stockPlace: '徳島工場',
     comment: '',
     orderedAt: '2026-05-01',
+    scheduledAt: '2026-06-01',
     fixedAt: '2026-05-20',
   }
 
@@ -312,5 +313,52 @@ describe("getFabricPurchaseConfirmsByDateAction", () => {
     if (!result.ok) return
     expect(() => JSON.stringify(result.contents)).not.toThrow()
     expect(typeof result.contents[0].productId).toBe("string")
+  })
+})
+
+// ----------------------------------------------------------------
+// confirmFabricPurchaseAction — 旧 Pages Router 仕様との互換
+// ----------------------------------------------------------------
+describe('confirmFabricPurchaseAction の履歴書き込み', () => {
+  const base = {
+    historyId: 'order1',
+    productId: 'prod1',
+    serialNumber: 5,
+    orderType: 'normal',
+    grayFabricId: 'gray1',
+    productNumber: 'P-100',
+    productName: '生地A',
+    colorName: '白',
+    supplierId: 'sup1',
+    supplierName: '仕入先A',
+    price: 1000,
+    quantity: 30,
+    remainingOrder: 20,
+    stockPlace: '徳島工場',
+    comment: '',
+    orderedAt: '2026-05-01',
+    scheduledAt: '2026-07-01',
+    fixedAt: '2026-05-20',
+  }
+
+  const mockSnapshots = () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 100, tokushimaStock: 50 }) })
+      .mockResolvedValueOnce({ data: () => ({ quantity: 50, createUser: 'orderer1' }) })
+  }
+
+  it('入荷履歴の担当者は確定者ではなく発注者になる', async () => {
+    mockSnapshots()
+    await confirmFabricPurchaseAction(base)
+    const [, confirmData] = mockTransactionSet.mock.calls[0]
+    expect(confirmData.createUser).toBe('orderer1')
+    expect(confirmData.updateUser).toBe('user1')
+  })
+
+  it('残発注の予定納期は入荷日ではなく入力された予定納期になる', async () => {
+    mockSnapshots()
+    await confirmFabricPurchaseAction(base)
+    const orderUpdateCall = mockTransactionUpdate.mock.calls[1]
+    expect(orderUpdateCall[1].scheduledAt).toBe('2026-07-01')
   })
 })

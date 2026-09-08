@@ -57,6 +57,7 @@ const renderTable = () =>
     <FabricPurchaseOrderTable
       orders={[baseOrder, otherOrder]}
       usersMap={{ 'user-1': 'テストユーザー', 'user-2': '別ユーザー' }}
+      stockPlaces={[]}
       userId="user-1"
       isTokushima={false}
       isRD={false}

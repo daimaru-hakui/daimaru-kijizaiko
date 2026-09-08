@@ -129,6 +129,8 @@ export type ConfirmFabricPurchaseInput = {
   stockPlace: string
   comment: string
   orderedAt: string
+  /** 残注文が発生したときの、残数分の予定納期 */
+  scheduledAt: string
   fixedAt: string
 }
 
@@ -148,6 +150,8 @@ export async function confirmFabricPurchaseAction(
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
       const currentOrderQuantity: number = orderSnap.data()?.quantity ?? 0
+      // 入荷履歴の担当者は確定操作をした人ではなく発注した人。経理の担当者絞り込みがこれを見る
+      const orderedBy: string = orderSnap.data()?.createUser ?? uid
 
       const newArrivingQuantity = mathRound2nd(
         arrivingQuantity - currentOrderQuantity + data.remainingOrder,
@@ -165,7 +169,7 @@ export async function confirmFabricPurchaseAction(
       tx.update(orderRef, {
         quantity: data.remainingOrder,
         orderedAt: data.orderedAt,
-        scheduledAt: data.fixedAt,
+        scheduledAt: data.scheduledAt,
         comment: data.comment,
         updateUser: uid,
         updatedAt: FieldValue.serverTimestamp(),
@@ -187,7 +191,7 @@ export async function confirmFabricPurchaseAction(
         comment: data.comment,
         orderedAt: data.orderedAt,
         fixedAt: data.fixedAt,
-        createUser: uid,
+        createUser: orderedBy,
         updateUser: uid,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),

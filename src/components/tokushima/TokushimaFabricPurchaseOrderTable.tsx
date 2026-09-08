@@ -13,12 +13,13 @@ import { calcAmount } from '@/lib/numbers'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
-import type { SerializableHistory } from '../../../types'
+import type { SerializableHistory, StockPlace } from '../../../types'
 import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   orders: SerializableHistory[]
   usersMap: Record<string, string>
+  stockPlaces: StockPlace[]
   userId: string
   isTokushima: boolean
   isRD: boolean
@@ -28,6 +29,7 @@ type Props = {
 export function TokushimaFabricPurchaseOrderTable({
   orders,
   usersMap,
+  stockPlaces,
   userId,
   isTokushima,
   isRD,
@@ -206,6 +208,7 @@ export function TokushimaFabricPurchaseOrderTable({
       {confirmOrder && (
         <TokushimaOrderToConfirmDialog
           order={confirmOrder}
+          stockPlaces={stockPlaces}
           open={Boolean(confirmOrder)}
           onCloseAction={() => setConfirmOrder(null)}
         />
@@ -214,6 +217,7 @@ export function TokushimaFabricPurchaseOrderTable({
         <TokushimaFabricPurchaseEditDialog
           history={editOrder}
           type="order"
+          stockPlaces={stockPlaces}
           open={Boolean(editOrder)}
           onCloseAction={() => setEditOrder(null)}
         />
