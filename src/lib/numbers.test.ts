@@ -59,4 +59,10 @@ describe('isNumericDraft', () => {
     expect(isNumericDraft('1.2.3')).toBe(false)
     expect(isNumericDraft('１')).toBe(false)
   })
+
+  it('小数第2位までしか受け付けない', () => {
+    expect(isNumericDraft('10.05')).toBe(true)
+    expect(isNumericDraft('10.005')).toBe(false)
+    expect(isNumericDraft('-10.005')).toBe(false)
+  })
 })

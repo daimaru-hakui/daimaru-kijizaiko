@@ -1,4 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore'
+import { mathRound2nd } from '@/lib/utils'
 import type { AddProductInput } from '@/app/(app)/products/actions'
 
 export function buildProductCommonPayload(args: {
@@ -35,8 +36,8 @@ export function buildProductCommonPayload(args: {
     noteProduct: data.noteProduct ?? '',
     noteFabric: data.noteFabric ?? '',
     noteEtc: data.noteEtc ?? '',
-    externalStock: Number(data.externalStock) || 0,
-    tokushimaStock: Number(data.tokushimaStock) || 0,
+    externalStock: mathRound2nd(Number(data.externalStock) || 0),
+    tokushimaStock: mathRound2nd(Number(data.tokushimaStock) || 0),
     locations: data.locations ?? [],
     updateUser: uid,
     updatedAt: FieldValue.serverTimestamp(),

@@ -4,7 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FilterInput, FilterSelect, FilterCheckbox } from "@/components/filters/fields";
+import {
+  FilterInput,
+  FilterSelect,
+  FilterCheckbox,
+} from "@/components/filters/fields";
 import { deleteProductAction } from "@/app/(app)/products/actions";
 import {
   matchesProductNumber,
@@ -243,7 +247,10 @@ export function ProductListTable({
                   {/* ペイン1: 品番・色・品名 */}
                   <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-bold text-slate-900 text-sm leading-none">
+                      <span
+                        className="font-bold text-slate-900 text-sm leading-none hover:underline cursor-pointer"
+                        onClick={() => setDetailProduct(p)}
+                      >
                         {p.productNumber}
                       </span>
                       <span className="text-xs text-slate-600 bg-slate-100 rounded px-1.5 py-0.5 leading-none">
@@ -257,30 +264,24 @@ export function ProductListTable({
                       {p.productName}
                     </div>
                   </div>
-
-                  {/* ペイン2: 担当・仕入先・スペック */}
-                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {supplierName && (
-                        <span className="text-xs text-slate-700 leading-none truncate">
-                          {supplierName}
+                  {/* ペイン2: 在庫数値 均等1行 */}
+                  <div className="px-3 py-1.5 grid grid-cols-6 bg-slate-50/60">
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <span className="text-xs text-slate-600 leading-none">
+                        使用予定
+                      </span>
+                      {(p.cuttingSchedules?.length ?? 0) > 0 ? (
+                        <ProductCuttingScheduleModal
+                          scheduleIds={p.cuttingSchedules ?? []}
+                          schedulesMap={cuttingSchedulesMap}
+                          usersMap={usersMap}
+                        />
+                      ) : (
+                        <span className="text-xs text-slate-300 leading-snug">
+                          —
                         </span>
                       )}
-                      {p.materialName && <Chip label={p.materialName} />}
                     </div>
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {fabricStd && <Chip label={fabricStd} />}
-                      {mixed.map((m, i) => (
-                        <Chip key={i} label={m.trim()} variant="indigo" />
-                      ))}
-                      {(p.features ?? []).map((f, i) => (
-                        <Chip key={i} label={f} variant="slate" />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ペイン3: 在庫数値 均等1行 */}
-                  <div className="px-3 py-1.5 grid grid-cols-6 bg-slate-50/60">
                     <InlineStat
                       label="徳島"
                       value={p.tokushimaStock ?? 0}
@@ -299,21 +300,26 @@ export function ProductListTable({
                       unit="m"
                     />
                     <InlineStat label="単価" value={p.price ?? 0} unit="円" />
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <span className="text-xs text-slate-600 leading-none">
-                        使用予定
-                      </span>
-                      {(p.cuttingSchedules?.length ?? 0) > 0 ? (
-                        <ProductCuttingScheduleModal
-                          scheduleIds={p.cuttingSchedules ?? []}
-                          schedulesMap={cuttingSchedulesMap}
-                          usersMap={usersMap}
-                        />
-                      ) : (
-                        <span className="text-xs text-slate-300 leading-snug">
-                          —
+                  </div>
+
+                  {/* ペイン3: 担当・仕入先・スペック */}
+                  <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {supplierName && (
+                        <span className="text-xs text-slate-700 leading-none truncate">
+                          {supplierName}
                         </span>
                       )}
+                      {p.materialName && <Chip label={p.materialName} />}
+                    </div>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {fabricStd && <Chip label={fabricStd} />}
+                      {mixed.map((m, i) => (
+                        <Chip key={i} label={m.trim()} variant="indigo" />
+                      ))}
+                      {(p.features ?? []).map((f, i) => (
+                        <Chip key={i} label={f} variant="slate" />
+                      ))}
                     </div>
                   </div>
 

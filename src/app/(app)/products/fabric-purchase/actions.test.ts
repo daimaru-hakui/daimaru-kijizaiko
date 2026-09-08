@@ -104,6 +104,24 @@ describe('orderFabricPurchaseAction', () => {
     expect(productUpdate[1].arrivingQuantity).toBe(70) // 20 + 50
     expect(productUpdate[1].externalStock).toBeUndefined()
   })
+
+  it('履歴に書く数量も小数第2位に丸める (在庫と履歴をずらさない)', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 0, externalStock: 0 }) })
+    await orderFabricPurchaseAction({ ...base, quantity: 10.005 })
+    expect(mockTransactionSet.mock.calls[0][1].quantity).toBe(10.01)
+  })
+
+  it('小数の在庫は二進小数の誤差を残さず小数第2位に丸める', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 0.1, externalStock: 100.2 }) })
+    await orderFabricPurchaseAction({ ...base, stockType: 'stock', quantity: 33.4 })
+    const productUpdate = mockTransactionUpdate.mock.calls[1]
+    expect(productUpdate[1].externalStock).toBe(66.8) // 100.2 - 33.4
+    expect(productUpdate[1].arrivingQuantity).toBe(33.5) // 0.1 + 33.4
+  })
 })
 
 // ----------------------------------------------------------------

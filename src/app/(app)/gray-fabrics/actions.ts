@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getTodayDate } from '@/lib/gray-fabrics/dates'
+import { mathRound2nd } from '@/lib/utils'
 import type { GrayFabric, GrayFabricHistory } from '../../../../types'
 import { FieldValue } from 'firebase-admin/firestore'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
@@ -103,7 +104,7 @@ export async function orderGrayFabricAction(
       if (!grayFabricSnap.exists) throw new Error('grayFabric does not exist')
 
       commitSerial()
-      const newWip = Number(grayFabricSnap.data()!.wip) + Number(items.quantity)
+      const newWip = mathRound2nd(Number(grayFabricSnap.data()!.wip) + Number(items.quantity))
       transaction.update(grayFabricRef, { wip: newWip })
 
       const orderRef = db.collection('grayFabricOrders').doc()
@@ -113,7 +114,7 @@ export async function orderGrayFabricAction(
         productNumber: grayFabric.productNumber,
         productName: grayFabric.productName,
         price: Number(grayFabric.price) || 0,
-        quantity: Number(items.quantity),
+        quantity: mathRound2nd(Number(items.quantity)),
         orderedAt: items.orderedAt || getTodayDate(),
         scheduledAt: items.scheduledAt || getTodayDate(),
         comment: items.comment || '',
@@ -150,7 +151,7 @@ export async function deleteGrayFabricOrderAction(
       const snap = await transaction.get(grayFabricRef)
       if (!snap.exists) throw new Error('grayFabric does not exist')
 
-      const newWip = Number(snap.data()!.wip) - Number(quantity)
+      const newWip = mathRound2nd(Number(snap.data()!.wip) - Number(quantity))
       transaction.update(grayFabricRef, { wip: newWip })
       transaction.delete(orderRef)
     })
@@ -190,10 +191,12 @@ export async function updateOrderHistoryAction(
       const historySnap = await transaction.get(historyRef)
       if (!historySnap.exists) throw new Error('history does not exist')
 
-      const newWip = Number(fabricSnap.data()!.wip) - Number(oldQuantity) + Number(items.quantity)
+      const newWip = mathRound2nd(
+        Number(fabricSnap.data()!.wip) - Number(oldQuantity) + Number(items.quantity),
+      )
       transaction.update(grayFabricRef, { wip: newWip })
       transaction.update(historyRef, {
-        quantity: Number(items.quantity),
+        quantity: mathRound2nd(Number(items.quantity)),
         orderedAt: items.orderedAt,
         scheduledAt: items.scheduledAt,
         comment: items.comment || '',
@@ -229,10 +232,12 @@ export async function updateConfirmHistoryAction(
       const historySnap = await transaction.get(historyRef)
       if (!historySnap.exists) throw new Error('history does not exist')
 
-      const newStock = Number(fabricSnap.data()!.stock) - Number(oldQuantity) + Number(items.quantity)
+      const newStock = mathRound2nd(
+        Number(fabricSnap.data()!.stock) - Number(oldQuantity) + Number(items.quantity),
+      )
       transaction.update(grayFabricRef, { stock: newStock })
       transaction.update(historyRef, {
-        quantity: Number(items.quantity),
+        quantity: mathRound2nd(Number(items.quantity)),
         orderedAt: items.orderedAt,
         fixedAt: items.fixedAt,
         comment: items.comment || '',
@@ -273,13 +278,14 @@ export async function confirmProcessingAction(
       const fabricSnap = await transaction.get(grayFabricRef)
       if (!fabricSnap.exists) throw new Error('grayFabric does not exist')
 
-      const newWip =
-        Number(fabricSnap.data()!.wip) - Number(history.quantity) + Number(items.remainingOrder)
-      const newStock = Number(fabricSnap.data()!.stock) + Number(items.quantity)
+      const newWip = mathRound2nd(
+        Number(fabricSnap.data()!.wip) - Number(history.quantity) + Number(items.remainingOrder),
+      )
+      const newStock = mathRound2nd(Number(fabricSnap.data()!.stock) + Number(items.quantity))
       transaction.update(grayFabricRef, { wip: newWip, stock: newStock })
 
       transaction.update(orderRef, {
-        quantity: Number(items.remainingOrder),
+        quantity: mathRound2nd(Number(items.remainingOrder)),
         orderedAt: items.orderedAt || getTodayDate(),
         scheduledAt: items.scheduledAt || getTodayDate(),
         comment: items.comment || '',
@@ -298,7 +304,7 @@ export async function confirmProcessingAction(
         productName: history.productName,
         supplierId: history.supplierId,
         supplierName: history.supplierName,
-        quantity: Number(items.quantity),
+        quantity: mathRound2nd(Number(items.quantity)),
         comment: items.comment || '',
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),

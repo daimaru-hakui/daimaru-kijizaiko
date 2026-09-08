@@ -49,6 +49,20 @@ beforeEach(() => {
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
 })
 
+/** トランザクション内の update payload を集めて返す */
+function captureUpdates(data: Record<string, unknown>): Record<string, unknown>[] {
+  const updates: Record<string, unknown>[] = []
+  mockRunTransaction.mockImplementation(async (fn: Function) => {
+    await fn({
+      get: vi.fn().mockResolvedValue({ exists: true, data: () => data }),
+      update: vi.fn((_ref: any, payload: any) => { updates.push(payload) }),
+      set: vi.fn(),
+      delete: vi.fn(),
+    })
+  })
+  return updates
+}
+
 describe('addGrayFabricAction', () => {
   it('未認証の場合は { ok: false } を返す', async () => {
     vi.mocked(verifyServerSession).mockResolvedValue(null)
@@ -166,6 +180,25 @@ describe('orderGrayFabricAction', () => {
     expect(result).toEqual({ ok: false, error: '発注処理に失敗しました' })
   })
 
+  it('履歴に書く数量も小数第2位に丸める (在庫と履歴をずらさない)', async () => {
+    let captured: any = null
+    mockRunTransaction.mockImplementation(async (fn: Function) => {
+      await fn({
+        get: vi.fn().mockResolvedValue({ exists: true, data: () => ({ serialNumber: 5, wip: 0 }) }),
+        update: vi.fn(),
+        set: vi.fn((_ref: any, payload: any) => { captured = payload }),
+      })
+    })
+    await orderGrayFabricAction(grayFabric, { ...items, quantity: 10.005 })
+    expect(captured.quantity).toBe(10.01)
+  })
+
+  it('浮動小数点の丸め: wip が小数第2位まで丸められる', async () => {
+    const updates = captureUpdates({ serialNumber: 5, wip: 0.1 })
+    await orderGrayFabricAction(grayFabric, { ...items, quantity: 0.2 })
+    expect(updates.at(-1)).toEqual({ wip: 0.3 })
+  })
+
   it('order doc に updateUser と updatedAt が設定される', async () => {
     let capturedSetData: any = null
     mockRunTransaction.mockImplementation(async (fn: Function) => {
@@ -201,6 +234,12 @@ describe('deleteGrayFabricOrderAction', () => {
     expect(mockRunTransaction).toHaveBeenCalledOnce()
     expect(result).toEqual({ ok: true })
   })
+
+  it('浮動小数点の丸め: wip が小数第2位まで丸められる', async () => {
+    const updates = captureUpdates({ wip: 100.2 })
+    await deleteGrayFabricOrderAction('h1', 'gf1', 33.4)
+    expect(updates[0]).toEqual({ wip: 66.8 })
+  })
 })
 
 describe('updateOrderHistoryAction', () => {
@@ -223,6 +262,12 @@ describe('updateOrderHistoryAction', () => {
     const result = await updateOrderHistoryAction('h1', 'gf1', 100, items)
     expect(result).toEqual({ ok: true })
   })
+
+  it('浮動小数点の丸め: wip が小数第2位まで丸められる', async () => {
+    const updates = captureUpdates({ wip: 100.2 })
+    await updateOrderHistoryAction('h1', 'gf1', 33.4, { ...items, quantity: 0 })
+    expect(updates[0]).toEqual({ wip: 66.8 })
+  })
 })
 
 describe('updateConfirmHistoryAction', () => {
@@ -244,6 +289,12 @@ describe('updateConfirmHistoryAction', () => {
     })
     const result = await updateConfirmHistoryAction('h1', 'gf1', 100, items)
     expect(result).toEqual({ ok: true })
+  })
+
+  it('浮動小数点の丸め: stock が小数第2位まで丸められる', async () => {
+    const updates = captureUpdates({ stock: 100.2 })
+    await updateConfirmHistoryAction('h1', 'gf1', 33.4, { ...items, quantity: 0 })
+    expect(updates[0]).toEqual({ stock: 66.8 })
   })
 })
 
@@ -292,6 +343,15 @@ describe('confirmProcessingAction', () => {
     mockRunTransaction.mockRejectedValue(new Error('transaction error'))
     const result = await confirmProcessingAction(history, items)
     expect(result).toEqual({ ok: false, error: '確定処理に失敗しました' })
+  })
+
+  it('浮動小数点の丸め: wip と stock が小数第2位まで丸められる', async () => {
+    const updates = captureUpdates({ wip: 100.2, stock: 0.1 })
+    await confirmProcessingAction(
+      { ...history, quantity: 33.4 },
+      { ...items, quantity: 0.2, remainingOrder: 0 },
+    )
+    expect(updates[0]).toEqual({ wip: 66.8, stock: 0.3 })
   })
 
   it('confirm doc に updateUser と updatedAt が設定される', async () => {
