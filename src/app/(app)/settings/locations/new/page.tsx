@@ -12,6 +12,8 @@ export default async function LocationNewPage() {
 
   const snap = await getAdminDb().collection("locations").get();
   const nextOrder = snap.size + 1;
+  // 同名の保管場所を二重登録しないよう、登録済みの名前を渡す
+  const existingNames = snap.docs.map((d) => (d.data().name ?? "") as string);
 
   const emptyLocation: Location = { id: "", name: "", order: nextOrder, comment: "" };
 
@@ -25,7 +27,7 @@ export default async function LocationNewPage() {
               <Button size="sm" variant="outline" className="border-slate-200 text-slate-600">戻る</Button>
             </Link>
           </div>
-          <LocationInputArea type="new" location={emptyLocation} />
+          <LocationInputArea type="new" location={emptyLocation} existingNames={existingNames} />
         </div>
       </div>
     </div>

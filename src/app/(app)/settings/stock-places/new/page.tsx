@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { StockPlaceInputArea } from "@/components/settings/stock-places/StockPlaceInputArea";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,10 @@ export default async function StockPlaceNewPage() {
   const user = await verifyServerSession();
   if (!user) redirect("/login");
 
+  // 同名の送り先を二重登録しないよう、登録済みの名前を渡す
+  const snap = await getAdminDb().collection("stockPlaces").get();
+  const existingNames = snap.docs.map((d) => (d.data().name ?? "") as string);
+
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-xl mx-auto pt-6">
@@ -23,7 +28,7 @@ export default async function StockPlaceNewPage() {
               <Button size="sm" variant="outline" className="border-slate-200 text-slate-600">戻る</Button>
             </Link>
           </div>
-          <StockPlaceInputArea type="new" stockPlace={EMPTY_STOCK_PLACE} />
+          <StockPlaceInputArea type="new" stockPlace={EMPTY_STOCK_PLACE} existingNames={existingNames} />
         </div>
       </div>
     </div>
