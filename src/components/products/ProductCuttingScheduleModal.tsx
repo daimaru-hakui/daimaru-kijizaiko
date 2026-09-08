@@ -42,10 +42,10 @@ export function ProductCuttingScheduleModal({
       <Button
         size="sm"
         variant="outline"
-        className="h-6 px-2 text-xs bg-indigo-50 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
+        className="h-6 px-1.5 sm:px-2 text-[11px] sm:text-xs bg-indigo-50 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
         onClick={() => setOpen(true)}
       >
-        あり {total.toLocaleString()}m
+        {total.toLocaleString()}m
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
