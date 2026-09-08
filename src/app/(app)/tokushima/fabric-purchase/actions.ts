@@ -72,7 +72,7 @@ export async function confirmFabricPurchaseAction(
       })
 
       tx.update(orderRef, {
-        quantity: data.remainingOrder,
+        quantity: mathRound2nd(data.remainingOrder),
         orderedAt: data.orderedAt,
         scheduledAt: data.scheduledAt,
         comment: data.comment,
@@ -91,7 +91,7 @@ export async function confirmFabricPurchaseAction(
         supplierId: data.supplierId,
         supplierName: data.supplierName,
         price: data.price,
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         stockPlace: data.stockPlace,
         comment: data.comment,
         orderedAt: data.orderedAt,
@@ -155,7 +155,7 @@ export async function updateFabricPurchaseOrderAction(
       }
 
       tx.update(orderRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         orderedAt: data.orderedAt,
         scheduledAt: data.scheduledAt,
@@ -252,7 +252,7 @@ export async function updateFabricPurchaseConfirmAction(
       }
 
       tx.update(confirmRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         fixedAt: data.fixedAt,
         comment: data.comment,

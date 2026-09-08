@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
+import { mathRound2nd } from '@/lib/utils'
 import { ensureAuth, runAuthedAction } from '@/lib/actions'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { buildProductCommonPayload } from '@/lib/products/payload'
@@ -98,8 +99,8 @@ export async function updateProductAction(data: UpdateProductInput): Promise<Act
 
     await db.collection('products').doc(data.productId).update({
       ...buildProductCommonPayload({ data, supplierName, uid }),
-      wip: Number(data.wip) || 0,
-      arrivingQuantity: Number(data.arrivingQuantity) || 0,
+      wip: mathRound2nd(Number(data.wip) || 0),
+      arrivingQuantity: mathRound2nd(Number(data.arrivingQuantity) || 0),
     })
   }, '更新に失敗しました')
 

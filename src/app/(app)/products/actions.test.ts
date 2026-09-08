@@ -218,6 +218,23 @@ describe('updateProductAction', () => {
     expect(updateData.wip).toBe(3)
     expect(updateData.externalStock).toBe(10)
   })
+
+  it('在庫は小数第2位まで丸めて保存する', async () => {
+    mockGet.mockResolvedValueOnce({ exists: true, data: () => ({ name: '仕入先B' }) })
+    mockUpdate.mockResolvedValueOnce(undefined)
+    await updateProductAction({
+      ...base,
+      wip: 3.005,
+      arrivingQuantity: 2.004,
+      externalStock: 10.005,
+      tokushimaStock: 5.004,
+    })
+    const updateData = mockUpdate.mock.calls[0][0]
+    expect(updateData.wip).toBe(3.01)
+    expect(updateData.arrivingQuantity).toBe(2)
+    expect(updateData.externalStock).toBe(10.01)
+    expect(updateData.tokushimaStock).toBe(5)
+  })
 })
 
 // ----------------------------------------------------------------

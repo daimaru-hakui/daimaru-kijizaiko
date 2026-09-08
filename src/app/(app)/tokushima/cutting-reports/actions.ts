@@ -97,7 +97,7 @@ export async function addCuttingReportAction(
         products: data.products.map((p) => ({
           category: p.category,
           productId: p.productId,
-          quantity: Number(p.quantity),
+          quantity: mathRound2nd(Number(p.quantity)),
         })),
         serialNumber: newSerial,
         createUser: auth.uid,
@@ -177,7 +177,7 @@ export async function updateCuttingReportAction(
         products: data.products.map((p) => ({
           category: p.category,
           productId: p.productId,
-          quantity: Number(p.quantity),
+          quantity: mathRound2nd(Number(p.quantity)),
         })),
         updateUser: auth.uid,
         updatedAt: FieldValue.serverTimestamp(),
@@ -265,7 +265,7 @@ export async function updateTokushimaStockAction(
 
   const db = getAdminDb()
   await db.collection('products').doc(productId).update({
-    tokushimaStock: Number(stock),
+    tokushimaStock: mathRound2nd(Number(stock)),
   })
 
   revalidatePath('/tokushima/cutting-reports')

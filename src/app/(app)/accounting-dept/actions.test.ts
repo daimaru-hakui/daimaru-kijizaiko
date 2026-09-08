@@ -94,6 +94,30 @@ describe('updateHistoryAccountingOrderAction', () => {
     expect(productUpdate.tokushimaStock).toBe(220)
   })
 
+  it('履歴に書く数量も小数第2位に丸める (在庫と履歴をずらさない)', async () => {
+    mockTransactionGet.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ tokushimaStock: 0 }),
+    })
+    await updateHistoryAccountingOrderAction(
+      'hist1', 'prod1', '徳島工場', 0, { ...baseInput, quantity: 10.005 }
+    )
+    const [, historyUpdate] = mockTransactionUpdate.mock.calls[1]
+    expect(historyUpdate.quantity).toBe(10.01)
+  })
+
+  it('浮動小数点の丸め: tokushimaStock が小数第2位まで丸められる', async () => {
+    mockTransactionGet.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ tokushimaStock: 100.2 }),
+    })
+    await updateHistoryAccountingOrderAction(
+      'hist1', 'prod1', '徳島工場', 33.4, { ...baseInput, quantity: 0 }
+    )
+    const [, productUpdate] = mockTransactionUpdate.mock.calls[0]
+    expect(productUpdate.tokushimaStock).toBe(66.8)
+  })
+
   it('product が存在しない場合はエラーを返す', async () => {
     mockTransactionGet.mockResolvedValue({ exists: false, data: () => null })
     mockRunTransaction.mockImplementation(async (fn: any) => {
@@ -162,5 +186,17 @@ describe('confirmProcessingAccountingAction', () => {
     const [, productUpdate] = mockTransactionUpdate.mock.calls[0]
     // 300 - 100 + 120 = 320
     expect(productUpdate.tokushimaStock).toBe(320)
+  })
+
+  it('浮動小数点の丸め: tokushimaStock が小数第2位まで丸められる', async () => {
+    mockTransactionGet.mockResolvedValue({
+      exists: true,
+      data: () => ({ tokushimaStock: 100.2 }),
+    })
+    await confirmProcessingAccountingAction(
+      'hist1', 'prod1', '徳島工場', 33.4, { ...baseInput, quantity: 0 }
+    )
+    const [, productUpdate] = mockTransactionUpdate.mock.calls[0]
+    expect(productUpdate.tokushimaStock).toBe(66.8)
   })
 })

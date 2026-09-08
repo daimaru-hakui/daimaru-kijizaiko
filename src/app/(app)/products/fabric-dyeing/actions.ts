@@ -42,10 +42,10 @@ export async function orderFabricDyeingFromStockAction(
 
       commitSerial()
       const grayStock: number = grayFabricSnap.data()?.stock ?? 0
-      tx.update(grayFabricRef, { stock: grayStock - data.quantity })
+      tx.update(grayFabricRef, { stock: mathRound2nd(grayStock - data.quantity) })
 
       const wip: number = productSnap.data()?.wip ?? 0
-      tx.update(productRef, { wip: wip + data.quantity })
+      tx.update(productRef, { wip: mathRound2nd(wip + data.quantity) })
 
       tx.set(historyRef, {
         serialNumber: newSerial,
@@ -56,7 +56,7 @@ export async function orderFabricDyeingFromStockAction(
         productName: data.productName,
         colorName: data.colorName,
         grayFabricId: data.grayFabricId,
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         price: data.price || data.productPrice,
         comment: data.comment ?? '',
         supplierId: data.supplierId,
@@ -89,7 +89,7 @@ export async function orderFabricDyeingFromRunningAction(
 
       commitSerial()
       const wip: number = productSnap.data()?.wip ?? 0
-      tx.update(productRef, { wip: wip + data.quantity })
+      tx.update(productRef, { wip: mathRound2nd(wip + data.quantity) })
 
       tx.set(historyRef, {
         serialNumber: newSerial,
@@ -100,7 +100,7 @@ export async function orderFabricDyeingFromRunningAction(
         productName: data.productName,
         colorName: data.colorName,
         grayFabricId: '',
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         price: data.price || data.productPrice,
         comment: data.comment ?? '',
         supplierId: data.supplierId,
@@ -160,7 +160,7 @@ export async function confirmFabricDyeingAction(
       })
 
       tx.update(orderRef, {
-        quantity: data.remainingOrder,
+        quantity: mathRound2nd(data.remainingOrder),
         orderedAt: data.orderedAt || getTodayDate(),
         scheduledAt: data.scheduledAt || getTodayDate(),
         comment: data.comment,
@@ -179,7 +179,7 @@ export async function confirmFabricDyeingAction(
         supplierId: data.supplierId,
         supplierName: data.supplierName,
         price: Number(data.price),
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         comment: data.comment,
         orderedAt: data.orderedAt || getTodayDate(),
         fixedAt: data.fixedAt || getTodayDate(),
@@ -228,13 +228,13 @@ export async function updateFabricDyeingOrderAction(
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
-        tx.update(grayFabricRef, { stock: stock + diff })
+        tx.update(grayFabricRef, { stock: mathRound2nd(stock + diff) })
       }
 
-      tx.update(productRef, { wip: wip - diff })
+      tx.update(productRef, { wip: mathRound2nd(wip - diff) })
 
       tx.update(orderRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         orderedAt: data.orderedAt,
         scheduledAt: data.scheduledAt,
@@ -273,10 +273,10 @@ export async function deleteFabricDyeingOrderAction(
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
-        tx.update(grayFabricRef, { stock: stock + data.quantity })
+        tx.update(grayFabricRef, { stock: mathRound2nd(stock + data.quantity) })
       }
 
-      tx.update(productRef, { wip: wip - data.quantity })
+      tx.update(productRef, { wip: mathRound2nd(wip - data.quantity) })
       tx.delete(orderRef)
     })
   }, '削除に失敗しました')
@@ -307,11 +307,11 @@ export async function updateFabricDyeingConfirmAction(
       const productSnap = await tx.get(productRef)
       const externalStock: number = productSnap.data()?.externalStock ?? 0
       tx.update(productRef, {
-        externalStock: externalStock - (data.currentQuantity - data.quantity),
+        externalStock: mathRound2nd(externalStock - (data.currentQuantity - data.quantity)),
       })
 
       tx.update(confirmRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         fixedAt: data.fixedAt,
         comment: data.comment,

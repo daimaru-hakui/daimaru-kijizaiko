@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
+import { mathRound2nd } from '@/lib/utils'
 
 type ActionResult = { ok: true } | { ok: false; error: string }
 
@@ -44,11 +45,11 @@ export async function updateHistoryAccountingOrderAction(
         if (!productSnap.exists) throw new Error('商品が見つかりません')
         const currentStock: number = (productSnap.data()?.tokushimaStock as number) ?? 0
         tx.update(productRef, {
-          tokushimaStock: currentStock - currentQuantity + Number(data.quantity),
+          tokushimaStock: mathRound2nd(currentStock - currentQuantity + Number(data.quantity)),
         })
       }
       tx.update(historyRef, {
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         price: Number(data.price),
         orderedAt: data.orderedAt,
         fixedAt: data.fixedAt,
@@ -93,11 +94,11 @@ export async function confirmProcessingAccountingAction(
         if (!productSnap.exists) throw new Error('商品が見つかりません')
         const currentStock: number = (productSnap.data()?.tokushimaStock as number) ?? 0
         tx.update(productRef, {
-          tokushimaStock: currentStock - currentQuantity + Number(data.quantity),
+          tokushimaStock: mathRound2nd(currentStock - currentQuantity + Number(data.quantity)),
         })
       }
       tx.update(historyRef, {
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         price: Number(data.price),
         updateUser: auth.uid,
         updatedAt: FieldValue.serverTimestamp(),

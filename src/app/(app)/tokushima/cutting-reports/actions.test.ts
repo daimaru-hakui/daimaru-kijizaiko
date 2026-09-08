@@ -398,4 +398,11 @@ describe('updateTokushimaStockAction', () => {
     const [updateData] = mockUpdate.mock.calls[0]
     expect(updateData.tokushimaStock).toBe(100)
   })
+
+  it('在庫は小数第2位まで丸めて保存する', async () => {
+    mockUpdate.mockResolvedValue(undefined)
+    await updateTokushimaStockAction('prod1', 100.005)
+    const [updateData] = mockUpdate.mock.calls[0]
+    expect(updateData.tokushimaStock).toBe(100.01)
+  })
 })

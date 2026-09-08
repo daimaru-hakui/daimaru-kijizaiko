@@ -124,6 +124,25 @@ describe('orderFabricDyeingFromStockAction', () => {
     const productUpdate = mockTransactionUpdate.mock.calls[2]
     expect(productUpdate[1]).toEqual({ wip: 70 })
   })
+
+  it('履歴に書く数量も小数第2位に丸める (在庫と履歴をずらさない)', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ stock: 0 }) })
+      .mockResolvedValueOnce({ data: () => ({ wip: 0 }) })
+    await orderFabricDyeingFromStockAction({ ...base, quantity: 10.005 })
+    expect(mockTransactionSet.mock.calls[0][1].quantity).toBe(10.01)
+  })
+
+  it('浮動小数点の丸め: stock と wip が小数第2位まで丸められる', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ stock: 100.2 }) })
+      .mockResolvedValueOnce({ data: () => ({ wip: 0.1 }) })
+    await orderFabricDyeingFromStockAction({ ...base, quantity: 33.4 })
+    expect(mockTransactionUpdate.mock.calls[1][1]).toEqual({ stock: 66.8 })
+    expect(mockTransactionUpdate.mock.calls[2][1]).toEqual({ wip: 33.5 }) // 0.1 + 33.4
+  })
 })
 
 // ----------------------------------------------------------------
@@ -170,6 +189,14 @@ describe('orderFabricDyeingFromRunningAction', () => {
     // calls[0]=serialNumber, calls[1]=product
     const productUpdate = mockTransactionUpdate.mock.calls[1]
     expect(productUpdate[1]).toEqual({ wip: 40 })
+  })
+
+  it('浮動小数点の丸め: wip が小数第2位まで丸められる', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 5 }) })
+      .mockResolvedValueOnce({ data: () => ({ wip: 0.1 }) })
+    await orderFabricDyeingFromRunningAction({ ...base, quantity: 0.2 })
+    expect(mockTransactionUpdate.mock.calls[1][1]).toEqual({ wip: 0.3 })
   })
 })
 
@@ -294,6 +321,15 @@ describe('updateFabricDyeingOrderAction', () => {
     expect(result).toEqual({ ok: true })
     expect(mockTransactionUpdate.mock.calls[0][1].wip).toBe(40)
   })
+
+  it('浮動小数点の丸め: stock と wip が小数第2位まで丸められる', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ wip: 100.2 }) })
+      .mockResolvedValueOnce({ data: () => ({ stock: 0.1 }) })
+    await updateFabricDyeingOrderAction({ ...base, currentQuantity: 33.4, quantity: 0 })
+    expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 33.5 })
+    expect(mockTransactionUpdate.mock.calls[1][1].wip).toBe(66.8)
+  })
 })
 
 // ----------------------------------------------------------------
@@ -335,6 +371,15 @@ describe('deleteFabricDyeingOrderAction', () => {
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ wip: 20 })
     expect(mockTransactionDelete).toHaveBeenCalledOnce()
   })
+
+  it('浮動小数点の丸め: stock と wip が小数第2位まで丸められる', async () => {
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ wip: 100.2 }) })
+      .mockResolvedValueOnce({ data: () => ({ stock: 0.1 }) })
+    await deleteFabricDyeingOrderAction({ ...base, quantity: 33.4 })
+    expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 33.5 })
+    expect(mockTransactionUpdate.mock.calls[1][1]).toEqual({ wip: 66.8 })
+  })
 })
 
 // ----------------------------------------------------------------
@@ -366,5 +411,11 @@ describe('updateFabricDyeingConfirmAction', () => {
     // externalStock = 100 - (30 - 20) = 90
     const productUpdate = mockTransactionUpdate.mock.calls[0]
     expect(productUpdate[1]).toEqual({ externalStock: 90 })
+  })
+
+  it('浮動小数点の丸め: externalStock が小数第2位まで丸められる', async () => {
+    mockTransactionGet.mockResolvedValueOnce({ data: () => ({ externalStock: 100.2 }) })
+    await updateFabricDyeingConfirmAction({ ...base, currentQuantity: 33.4, quantity: 0 })
+    expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ externalStock: 66.8 })
   })
 })

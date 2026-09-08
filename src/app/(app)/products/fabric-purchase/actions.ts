@@ -71,12 +71,12 @@ export async function orderFabricPurchaseAction(
       commitSerial()
       if (data.stockType === 'stock') {
         tx.update(productRef, {
-          externalStock: externalStock - data.quantity,
-          arrivingQuantity: arrivingQuantity + data.quantity,
+          externalStock: mathRound2nd(externalStock - data.quantity),
+          arrivingQuantity: mathRound2nd(arrivingQuantity + data.quantity),
         })
       } else {
         tx.update(productRef, {
-          arrivingQuantity: arrivingQuantity + data.quantity,
+          arrivingQuantity: mathRound2nd(arrivingQuantity + data.quantity),
         })
       }
 
@@ -89,7 +89,7 @@ export async function orderFabricPurchaseAction(
         productName: data.productName,
         colorName: data.colorName,
         grayFabricId: '',
-        quantity: Number(data.quantity),
+        quantity: mathRound2nd(Number(data.quantity)),
         price: data.price || data.productPrice,
         comment: data.comment ?? '',
         supplierId: data.supplierId,
@@ -167,7 +167,7 @@ export async function confirmFabricPurchaseAction(
       })
 
       tx.update(orderRef, {
-        quantity: data.remainingOrder,
+        quantity: mathRound2nd(data.remainingOrder),
         orderedAt: data.orderedAt,
         scheduledAt: data.scheduledAt,
         comment: data.comment,
@@ -186,7 +186,7 @@ export async function confirmFabricPurchaseAction(
         supplierId: data.supplierId,
         supplierName: data.supplierName,
         price: data.price,
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         stockPlace: data.stockPlace,
         comment: data.comment,
         orderedAt: data.orderedAt,
@@ -246,7 +246,7 @@ export async function updateFabricPurchaseOrderAction(
       }
 
       tx.update(orderRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         orderedAt: data.orderedAt,
         scheduledAt: data.scheduledAt,
@@ -331,7 +331,7 @@ export async function updateFabricPurchaseConfirmAction(
       }
 
       tx.update(confirmRef, {
-        quantity: data.quantity,
+        quantity: mathRound2nd(data.quantity),
         price: data.price,
         fixedAt: data.fixedAt,
         comment: data.comment,

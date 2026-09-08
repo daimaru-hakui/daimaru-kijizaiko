@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
+import { mathRound2nd } from '@/lib/utils'
 
 type ActionResult = { ok: true } | { ok: false; error: string }
 
@@ -44,7 +45,7 @@ export async function addScheduleAction(data: AddScheduleInput): Promise<ActionR
         processNumber: data.processNumber,
         productId: data.productId,
         itemName: data.itemName,
-        quantity: Number(data.quantity) || 0,
+        quantity: mathRound2nd(Number(data.quantity) || 0),
         scheduledAt: data.scheduledAt,
         createUser: auth.uid,
         updateUser: auth.uid,
@@ -79,7 +80,7 @@ export async function updateScheduleAction(data: UpdateScheduleInput): Promise<A
     staff: data.staff,
     processNumber: data.processNumber,
     itemName: data.itemName,
-    quantity: Number(data.quantity) || 0,
+    quantity: mathRound2nd(Number(data.quantity) || 0),
     scheduledAt: data.scheduledAt,
     updateUser: auth.uid,
     updatedAt: FieldValue.serverTimestamp(),
