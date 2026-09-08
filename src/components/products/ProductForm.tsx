@@ -530,9 +530,17 @@ export function ProductForm({
       </div>
 
       <div className="flex gap-3">
-        {isEdit && onCloseAction && (
+        {isEdit && onCloseAction ? (
           <Button variant="outline" className="flex-1" onClick={onCloseAction}>
             キャンセル
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="flex-1 border-slate-200 text-slate-600"
+            onClick={() => router.push('/products')}
+          >
+            戻る
           </Button>
         )}
         <Button className="flex-1 bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSubmit}>

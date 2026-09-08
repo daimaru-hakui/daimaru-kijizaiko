@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ProductForm } from './ProductForm'
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }))
+const { push } = vi.hoisted(() => ({ push: vi.fn() }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push, refresh: vi.fn() }) }))
 vi.mock('@/app/(app)/products/actions', () => ({
   addProductAction: vi.fn().mockResolvedValue({ ok: true }),
   updateProductAction: vi.fn().mockResolvedValue({ ok: true }),
@@ -25,6 +26,15 @@ beforeEach(() => {
 })
 
 describe('ProductForm', () => {
+  it('登録ボタンの横の戻るボタンで一覧へ戻る', async () => {
+    const user = userEvent.setup()
+    render(<ProductForm {...baseProps} />)
+
+    await user.click(screen.getByRole('button', { name: '戻る' }))
+
+    expect(push).toHaveBeenCalledWith('/products')
+  })
+
   it('登録ボタンが表示される', () => {
     render(<ProductForm {...baseProps} />)
     expect(screen.getByRole('button', { name: '登録' })).toBeInTheDocument()
