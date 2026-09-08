@@ -66,17 +66,22 @@ export default async function DashboardPage() {
     grayFabricOrdersSnap,
     fabricDyeingOrdersSnap,
     fabricPurchaseOrdersSnap,
+    usersSnap,
   ] = await Promise.all([
     db.collection('products').where('deletedAt', '==', '').get(),
     db.collection('grayFabrics').get(),
     db.collection('grayFabricOrders').where('quantity', '>', 0).get(),
     db.collection('fabricDyeingOrders').where('quantity', '>', 0).get(),
     db.collection('fabricPurchaseOrders').where('quantity', '>', 0).get(),
+    db.collection('users').get(),
   ])
 
   const products: Product[] = productsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
   const productsMap = Object.fromEntries(
     products.map(p => [p.id, { productNumber: p.productNumber, colorName: p.colorName }])
+  )
+  const usersMap: Record<string, string> = Object.fromEntries(
+    usersSnap.docs.map(d => [d.id, (d.data().name ?? d.id) as string])
   )
   const grayFabricCount = grayFabricsSnap.size
   const qKeys = [...QUANTITY_KEYS] as QKey[]
@@ -138,7 +143,7 @@ export default async function DashboardPage() {
 
         {/* ランキングチャート */}
         <SectionHeading>使用・購入ランキング</SectionHeading>
-        <Charts productsMap={productsMap} />
+        <Charts productsMap={productsMap} usersMap={usersMap} />
 
       </div>
     </div>

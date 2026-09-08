@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, FC } from "react";
+import { useEffect, useId, useState, FC } from "react";
 import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
 import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
 import { getTodayDate, get3monthsAgo, getDefaultPeriod, isCompleteDate } from "@/lib/dates";
 import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
+import { buildStaffOptions } from "@/lib/filters/staff-options";
 import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
 import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
 import { CuttingReportType, History } from "../../../types";
@@ -18,9 +19,11 @@ import { RotateCcw } from "lucide-react";
 
 type Props = {
   productsMap: Record<string, { productNumber: string; colorName: string }>
+  usersMap: Record<string, string>
 }
 
-export const Charts: FC<Props> = ({ productsMap }) => {
+export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
+  const staffId = useId();
   const [limitNum, setLimitNum] = useState(5);
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
@@ -45,6 +48,14 @@ export const Charts: FC<Props> = ({ productsMap }) => {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [appliedStart, appliedEnd]);
+
+  const staffOptions = buildStaffOptions(
+    [
+      ...cuttingReports.map((r) => r.staff),
+      ...fabricPurchaseConfirms.map((h) => h.createUser),
+    ],
+    usersMap
+  );
 
   const filterCuttingReports: CuttingReportType[] = staff
     ? cuttingReports.filter((r) => r.staff === staff)
@@ -83,6 +94,27 @@ export const Charts: FC<Props> = ({ productsMap }) => {
               value={endDay}
               onChange={(e) => setEndDay(e.target.value)}
             />
+          </div>
+          <div>
+            <Label
+              htmlFor={staffId}
+              className="text-[11px] font-semibold text-slate-400 tracking-[0.1em] uppercase"
+            >
+              担当者
+            </Label>
+            <select
+              id={staffId}
+              className="mt-1.5 h-9 w-36 rounded-md border border-slate-200 px-3 text-sm block"
+              value={staff}
+              onChange={(e) => setStaff(e.target.value)}
+            >
+              <option value="">全員</option>
+              {staffOptions.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex gap-2">
             <Button

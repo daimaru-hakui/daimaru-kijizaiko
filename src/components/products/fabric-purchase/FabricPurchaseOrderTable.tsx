@@ -14,6 +14,7 @@ import { canEditRecord } from '@/lib/permissions'
 import { FabricPurchaseConfirmOrderDialog } from './FabricPurchaseConfirmOrderDialog'
 import { FabricPurchaseEditOrderDialog } from './FabricPurchaseEditOrderDialog'
 import type { History } from '../../../../types'
+import { buildStaffOptions } from '@/lib/filters/staff-options'
 
 type Props = {
   orders: History[]
@@ -37,9 +38,7 @@ export function FabricPurchaseOrderTable({
   const [editOrder, setEditOrder] = useState<History | null>(null)
   const { values, filter, setValue, reset } = useListFilter()
 
-  const staffOptions = Array.from(
-    new Map(orders.map((o) => [o.createUser, usersMap[o.createUser] ?? o.createUser]))
-  )
+  const staffOptions = buildStaffOptions(orders.map((o) => o.createUser), usersMap)
 
   const filtered = orders.filter((o) =>
     matchesListFilter({ ...o, staff: o.createUser }, filter)

@@ -10,6 +10,7 @@ import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import type { History } from '../../../types'
+import { buildStaffOptions } from '@/lib/filters/staff-options'
 
 type Props = {
   confirms: History[]
@@ -50,9 +51,7 @@ export function TokushimaFabricPurchaseConfirmTable({
   const canEdit = (h: History) =>
     (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
 
-  const staffOptions = Array.from(
-    new Map(confirms.map((h) => [h.createUser, usersMap[h.createUser] ?? h.createUser]))
-  )
+  const staffOptions = buildStaffOptions(confirms.map((h) => h.createUser), usersMap)
 
   return (
     <div className="p-6 space-y-4">

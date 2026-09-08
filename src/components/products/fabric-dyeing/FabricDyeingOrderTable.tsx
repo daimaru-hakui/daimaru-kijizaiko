@@ -16,6 +16,7 @@ import { canEditRecord } from '@/lib/permissions'
 import { FabricDyeingConfirmOrderDialog } from './FabricDyeingConfirmOrderDialog'
 import { FabricDyeingEditOrderDialog } from './FabricDyeingEditOrderDialog'
 import type { SerializableHistory } from '../../../../types'
+import { buildStaffOptions } from '@/lib/filters/staff-options'
 
 type Props = {
   orders: SerializableHistory[]
@@ -35,9 +36,7 @@ export function FabricDyeingOrderTable({
   const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
   const { values, filter, setValue, reset } = useListFilter()
 
-  const staffOptions = Array.from(
-    new Map(orders.map((o) => [o.createUser, usersMap[o.createUser] ?? o.createUser]))
-  )
+  const staffOptions = buildStaffOptions(orders.map((o) => o.createUser), usersMap)
 
   const filtered = orders.filter((o) =>
     matchesListFilter({ ...o, staff: o.createUser }, filter)
