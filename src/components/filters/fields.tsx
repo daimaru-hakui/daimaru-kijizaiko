@@ -44,7 +44,8 @@ export function FilterInput({
       <Input
         id={id}
         type={type}
-        className={cn('w-36', className)}
+        // 高さ・文字サイズはバー内のセレクトとリセットボタン (h-9) に揃える
+        className={cn('h-9 w-36 py-1 text-sm', className)}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

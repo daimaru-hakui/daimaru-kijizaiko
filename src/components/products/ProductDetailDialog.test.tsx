@@ -36,4 +36,22 @@ describe('ProductDetailDialog', () => {
     render(<ProductDetailDialog {...defaultProps} />)
     expect(screen.queryByRole('button', { name: '編集' })).not.toBeInTheDocument()
   })
+
+  it('項目名を定義リストの見出しとして表示する', () => {
+    render(<ProductDetailDialog {...defaultProps} />)
+    const terms = screen.getAllByRole('term').map((t) => t.textContent)
+    expect(terms).toEqual(expect.arrayContaining(['品番', '色番', '色', '品名', '仕入先', '単価']))
+  })
+
+  it('別注品のとき担当者を表示する', () => {
+    render(
+      <ProductDetailDialog
+        {...defaultProps}
+        product={makeProduct({ productType: 2, staff: '後藤' })}
+      />,
+    )
+    const terms = screen.getAllByRole('term').map((t) => t.textContent)
+    expect(terms).toContain('担当者')
+    expect(screen.getByText('後藤')).toBeInTheDocument()
+  })
 })

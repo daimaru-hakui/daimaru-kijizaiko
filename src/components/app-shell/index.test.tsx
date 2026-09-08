@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AppShell } from './index'
 
@@ -48,5 +48,27 @@ describe('AppShell', () => {
     await vi.waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/login')
     })
+  })
+
+  it('サイドバーは横スクロールバーを出さない', () => {
+    render(
+      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    expect(screen.getByRole('complementary').className).toContain('overflow-x-hidden')
+  })
+
+  it('サイドバー内のナビゲーションも横スクロールバーを出さない', () => {
+    render(
+      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    const nav = within(screen.getByRole('complementary')).getByRole('navigation')
+
+    expect(nav.className).toContain('overflow-x-hidden')
   })
 })

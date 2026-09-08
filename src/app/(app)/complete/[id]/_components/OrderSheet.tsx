@@ -147,10 +147,10 @@ export function OrderSheet({
         <table className="mt-6 w-full border-collapse text-sm">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border border-slate-300 px-3 py-2 text-left font-semibold">品番/商品名</th>
-              <th className="border border-slate-300 px-3 py-2 text-right font-semibold">数量</th>
-              <th className="border border-slate-300 px-3 py-2 text-right font-semibold">希望納期</th>
-              <th className="border border-slate-300 px-3 py-2 text-right font-semibold">発注書NO.</th>
+              <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-left font-semibold">品番/商品名</th>
+              <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-right font-semibold">数量</th>
+              <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-right font-semibold">希望納期</th>
+              <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-right font-semibold">発注書NO.</th>
             </tr>
           </thead>
           <tbody>
@@ -169,9 +169,9 @@ export function OrderSheet({
           <table className="mt-3 w-full border-collapse text-sm">
             <thead>
               <tr className="bg-slate-50">
-                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">送り先</th>
-                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">住所</th>
-                <th className="border border-slate-300 px-3 py-2 text-right font-semibold">TEL</th>
+                <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-left font-semibold">送り先</th>
+                <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-left font-semibold">住所</th>
+                <th className="whitespace-nowrap border border-slate-300 px-3 py-2 text-right font-semibold">TEL</th>
               </tr>
             </thead>
             <tbody>

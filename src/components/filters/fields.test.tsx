@@ -51,3 +51,26 @@ describe('FilterSelect', () => {
     expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual(['すべて', '商社'])
   })
 })
+
+describe('絞り込み項目の高さ', () => {
+  const heightClass = (el: HTMLElement) =>
+    el.className.split(/\s+/).find((c) => /^h-\d/.test(c))
+
+  it('入力欄とセレクトが同じ高さになる', () => {
+    render(
+      <>
+        <FilterInput label="品番" value="" onChange={vi.fn()} />
+        <FilterSelect label="担当者" value="" onChange={vi.fn()} options={[]} />
+      </>
+    )
+
+    expect(heightClass(screen.getByLabelText('品番'))).toBe(
+      heightClass(screen.getByLabelText('担当者'))
+    )
+  })
+
+  it('リセットボタン (size="sm") と同じ h-9 に揃える', () => {
+    render(<FilterInput label="品番" value="" onChange={vi.fn()} />)
+    expect(heightClass(screen.getByLabelText('品番'))).toBe('h-9')
+  })
+})

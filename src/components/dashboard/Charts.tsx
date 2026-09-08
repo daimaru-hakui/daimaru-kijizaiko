@@ -96,7 +96,7 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
             </Label>
             <Input
               type="date"
-              className="mt-1.5 w-36 text-sm border-slate-200 focus-visible:ring-blue-700"
+              className="mt-1.5 h-9 w-36 py-1 text-sm border-slate-200 focus-visible:ring-blue-700"
               value={startDay}
               onChange={(e) => setStartDay(e.target.value)}
             />
@@ -107,7 +107,7 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
             </Label>
             <Input
               type="date"
-              className="mt-1.5 w-36 text-sm border-slate-200 focus-visible:ring-blue-700"
+              className="mt-1.5 h-9 w-36 py-1 text-sm border-slate-200 focus-visible:ring-blue-700"
               value={endDay}
               onChange={(e) => setEndDay(e.target.value)}
             />
@@ -156,6 +156,7 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
                 value={limitNum}
                 onChange={(_str, num) => setLimitNum(num)}
                 className="w-32"
+                inputClassName="h-9 py-1"
               />
             </div>
           </div>
