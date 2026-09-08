@@ -15,6 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+const HEAD = "text-xs font-semibold text-slate-500 tracking-wider";
+const HEAD_NOWRAP = `${HEAD} whitespace-nowrap`;
+
 type Props = {
   locations: Location[];
 };
@@ -35,17 +38,17 @@ export const LocationsTable: FC<Props> = ({ locations }) => {
     <Table>
       <TableHeader>
         <TableRow className="bg-slate-50">
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">順番</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">保管場所</TableHead>
-          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
+          <TableHead className={HEAD_NOWRAP}>順番</TableHead>
+          <TableHead className={HEAD_NOWRAP}>保管場所</TableHead>
+          <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
+          <TableHead className={HEAD_NOWRAP}>編集</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {locations.map((location) => (
           <TableRow key={location.id}>
-            <TableCell>{location.order}</TableCell>
-            <TableCell>{location.name}</TableCell>
+            <TableCell className="whitespace-nowrap">{location.order}</TableCell>
+            <TableCell className="whitespace-nowrap">{location.name}</TableCell>
             <TableCell>
               <div className="flex gap-3 items-center">
                 <CommentModal comment={location.comment} />

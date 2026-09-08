@@ -15,6 +15,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+const HEAD = "text-xs font-semibold text-slate-500 tracking-wider";
+// 名前・カナ・電話番号は途中で折り返すと読みにくいので折り返さない
+const HEAD_NOWRAP = `${HEAD} whitespace-nowrap`;
+
 const PROTECTED_ID = "ifk1EZX80Jecxy04fqxu";
 
 type Props = {
@@ -37,23 +41,23 @@ export const StockPlacesTable: FC<Props> = ({ stockPlaces }) => {
     <Table>
       <TableHeader>
         <TableRow className="bg-slate-50">
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">送り先名</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">フリガナ</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">住所</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">TEL</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">FAX</TableHead>
-          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集/削除</TableHead>
+          <TableHead className={HEAD_NOWRAP}>送り先名</TableHead>
+          <TableHead className={HEAD_NOWRAP}>フリガナ</TableHead>
+          <TableHead className={HEAD}>住所</TableHead>
+          <TableHead className={HEAD_NOWRAP}>TEL</TableHead>
+          <TableHead className={HEAD_NOWRAP}>FAX</TableHead>
+          <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
+          <TableHead className={HEAD_NOWRAP}>編集/削除</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {stockPlaces.map((sp) => (
           <TableRow key={sp.id}>
-            <TableCell>{sp.name}</TableCell>
-            <TableCell>{sp.kana}</TableCell>
+            <TableCell className="whitespace-nowrap">{sp.name}</TableCell>
+            <TableCell className="whitespace-nowrap">{sp.kana}</TableCell>
             <TableCell>{sp.address}</TableCell>
-            <TableCell>{sp.tel}</TableCell>
-            <TableCell>{sp.fax}</TableCell>
+            <TableCell className="whitespace-nowrap">{sp.tel}</TableCell>
+            <TableCell className="whitespace-nowrap">{sp.fax}</TableCell>
             <TableCell>
               <div className="flex gap-3 items-center">
                 <CommentModal comment={sp.comment} />

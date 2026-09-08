@@ -15,6 +15,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+const HEAD = "text-xs font-semibold text-slate-500 tracking-wider";
+// 名前・カナは途中で折り返すと読みにくいので折り返さない
+const HEAD_NOWRAP = `${HEAD} whitespace-nowrap`;
+
 type Props = {
   suppliers: Supplier[];
 };
@@ -35,17 +39,17 @@ export const SuppliersTable: FC<Props> = ({ suppliers }) => {
     <Table>
       <TableHeader>
         <TableRow className="bg-slate-50">
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">仕入先名</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">フリガナ</TableHead>
-          <TableHead className="w-full text-xs font-semibold text-slate-500 tracking-wider">コメント</TableHead>
-          <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
+          <TableHead className={HEAD_NOWRAP}>仕入先名</TableHead>
+          <TableHead className={HEAD_NOWRAP}>フリガナ</TableHead>
+          <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
+          <TableHead className={HEAD_NOWRAP}>編集</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {suppliers.map((supplier) => (
           <TableRow key={supplier.id}>
-            <TableCell>{supplier.name}</TableCell>
-            <TableCell>{supplier.kana}</TableCell>
+            <TableCell className="whitespace-nowrap">{supplier.name}</TableCell>
+            <TableCell className="whitespace-nowrap">{supplier.kana}</TableCell>
             <TableCell>
               <div className="flex gap-3 items-center">
                 <CommentModal comment={supplier.comment} />
