@@ -3,6 +3,7 @@ import { verifyServerSession } from "@/lib/auth/session";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { parseDocs } from "@/lib/firestore/parse";
 import { supplierSchema } from "@/lib/firestore/schemas";
+import { sortByKana } from "@/lib/sort";
 import { SuppliersTable } from "./_components/SuppliersTable";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,8 @@ export default async function SuppliersPage() {
   if (!user) redirect("/login");
 
   const snap = await getAdminDb().collection("suppliers").get();
-  const suppliers = parseDocs(snap.docs, supplierSchema, "suppliers");
+  // Firestore の orderBy("kana") はカナ未登録のドキュメントを取りこぼすため JS 側で並べる
+  const suppliers = sortByKana(parseDocs(snap.docs, supplierSchema, "suppliers"));
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">

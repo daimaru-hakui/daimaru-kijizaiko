@@ -3,6 +3,7 @@ import { verifyServerSession } from "@/lib/auth/session";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { parseDocs } from "@/lib/firestore/parse";
 import { stockPlaceSchema } from "@/lib/firestore/schemas";
+import { sortByKana } from "@/lib/sort";
 import { StockPlacesTable } from "./_components/StockPlacesTable";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,8 @@ export default async function StockPlacesPage() {
   if (!user) redirect("/login");
 
   const snap = await getAdminDb().collection("stockPlaces").get();
-  const stockPlaces = parseDocs(snap.docs, stockPlaceSchema, "stockPlaces");
+  // Firestore の orderBy("kana") はカナ未登録のドキュメントを取りこぼすため JS 側で並べる
+  const stockPlaces = sortByKana(parseDocs(snap.docs, stockPlaceSchema, "stockPlaces"));
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
+import { sortByKana } from '@/lib/sort'
 import { GrayFabricListTable } from '@/components/grayFabrics/GrayFabricListTable'
 import type { GrayFabric } from '../../../../types'
 
@@ -19,10 +20,14 @@ export default async function GrayFabricsPage() {
   const userData = userDoc.data()
   const isRD = Boolean(userData?.rd || userData?.admin)
 
-  const suppliers = suppliersSnap.docs.map((d) => ({
-    id: d.id,
-    name: d.data().name as string,
-  }))
+  // 仕入先セレクトはフリガナ順で出す
+  const suppliers = sortByKana(
+    suppliersSnap.docs.map((d) => ({
+      id: d.id,
+      name: d.data().name as string,
+      kana: (d.data().kana ?? '') as string,
+    })),
+  )
 
   const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s.name]))
 
