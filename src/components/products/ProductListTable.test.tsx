@@ -109,3 +109,24 @@ describe("ProductListTable 履歴", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("ProductListTable 担当者検索", () => {
+  it("担当者を選ぶとその担当の生地だけが表示される", async () => {
+    const user = userEvent.setup();
+    render(
+      <ProductListTable
+        {...defaultProps}
+        products={[
+          makeProduct(),
+          makeProduct({ id: "p2", productNumber: "XX-002", staff: "user2" }),
+        ]}
+        usersMap={{ user1: "山田太郎", user2: "佐藤花子" }}
+      />,
+    );
+
+    await user.selectOptions(screen.getByLabelText("担当"), "user2");
+
+    expect(screen.getByText("XX-002")).toBeInTheDocument();
+    expect(screen.queryByText("DM-001")).toBeNull();
+  });
+});

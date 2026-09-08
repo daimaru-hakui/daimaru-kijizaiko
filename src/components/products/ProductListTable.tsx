@@ -78,20 +78,20 @@ export function ProductListTable({
   const num = useDebounce(searchNum, SEARCH_DEBOUNCE_MS);
   const color = useDebounce(searchColor, SEARCH_DEBOUNCE_MS);
   const name = useDebounce(searchName, SEARCH_DEBOUNCE_MS);
-  const staff = useDebounce(searchStaff, SEARCH_DEBOUNCE_MS);
   const material = useDebounce(searchMaterial, SEARCH_DEBOUNCE_MS);
 
-  const staffLower = staff.toLowerCase();
-  const filtered = products.filter((p) => {
-    const staffName = (usersMap[p.staff] ?? p.staff).toLowerCase();
-    return (
+  const staffOptions = Array.from(
+    new Map(products.map((p) => [p.staff, usersMap[p.staff] ?? p.staff])),
+  );
+
+  const filtered = products.filter(
+    (p) =>
       matchesProductNumber(p.productNumber, num) &&
       p.colorName.includes(color) &&
       p.productName.includes(name) &&
-      staffName.includes(staffLower) &&
-      (p.materialName ?? "").includes(material)
-    );
-  });
+      (!searchStaff || p.staff === searchStaff) &&
+      (p.materialName ?? "").includes(material),
+  );
 
   const handleDelete = async (
     product: Omit<Product, "createdAt" | "updatedAt">,
@@ -186,12 +186,19 @@ export function ProductListTable({
             <Label htmlFor={`${filterId}-staff`} className="text-xs">
               担当
             </Label>
-            <Input
+            <select
               id={`${filterId}-staff`}
-              className="mt-1 w-28"
+              className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
               value={searchStaff}
               onChange={(e) => setSearchStaff(e.target.value)}
-            />
+            >
+              <option value="">全員</option>
+              {staffOptions.map(([id, staffName]) => (
+                <option key={id} value={id}>
+                  {staffName}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <Label htmlFor={`${filterId}-material`} className="text-xs">
