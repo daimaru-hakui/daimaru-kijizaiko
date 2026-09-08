@@ -9,6 +9,7 @@ import { NumberInput } from '@/components/ui/number-input'
 import { Textarea } from '@/components/ui/textarea'
 import { addProductAction, updateProductAction } from '@/app/(app)/products/actions'
 import { MATERIAL_ENTRIES } from '@/lib/utils'
+import { isNumericDraft, toFiniteNumber } from '@/lib/numbers'
 import type { GrayFabric, Location, Product, Supplier } from '../../../types'
 
 type Props = {
@@ -24,8 +25,8 @@ type Props = {
 }
 
 type FormState = {
-  /** 混率。キーは MATERIAL_ENTRIES のもの、値は % */
-  materials: Record<string, number>
+  /** 混率。キーは MATERIAL_ENTRIES のもの、値は入力中の % 文字列 */
+  materials: Record<string, string>
   productType: string
   staff: string
   supplierId: string
@@ -51,12 +52,22 @@ type FormState = {
 }
 
 /** Firestore には数値・文字列が混在しているため数値に寄せ、0 と空は落とす */
-function initMaterials(materials: unknown): Record<string, number> {
+function initMaterials(materials: unknown): Record<string, string> {
   const source = (materials ?? {}) as Record<string, unknown>
-  const result: Record<string, number> = {}
+  const result: Record<string, string> = {}
   for (const [key] of MATERIAL_ENTRIES) {
-    const value = Number(source[key])
-    if (Number.isFinite(value) && value > 0) result[key] = value
+    const value = toFiniteNumber(source[key])
+    if (value !== null && value > 0) result[key] = String(value)
+  }
+  return result
+}
+
+/** 保存時に数値へ戻す。未入力と 0 は持たせない */
+function toMaterialNumbers(materials: Record<string, string>): Record<string, number> {
+  const result: Record<string, number> = {}
+  for (const [key, raw] of Object.entries(materials)) {
+    const value = toFiniteNumber(raw)
+    if (value !== null && value > 0) result[key] = value
   }
   return result
 }
@@ -106,14 +117,18 @@ export function ProductForm({
 
   const setMaterial = (key: string, raw: string) =>
     setForm((prev) => {
+      // 入力途中の "33." を数値に丸めると小数点が打てなくなるため文字列で持つ
+      if (!isNumericDraft(raw)) return prev
       const materials = { ...prev.materials }
-      const value = Number(raw)
-      if (!raw || !Number.isFinite(value) || value <= 0) delete materials[key]
-      else materials[key] = value
+      if (!raw) delete materials[key]
+      else materials[key] = raw
       return { ...prev, materials }
     })
 
-  const materialTotal = Object.values(form.materials).reduce((sum, v) => sum + v, 0)
+  const materialTotal = Object.values(form.materials).reduce(
+    (sum, v) => sum + (toFiniteNumber(v) ?? 0),
+    0,
+  )
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -144,7 +159,7 @@ export function ProductForm({
       productName: form.productName,
       price: Number(form.price),
       materialName: form.materialName,
-      materials: form.materials,
+      materials: toMaterialNumbers(form.materials),
       fabricWidth: Number(form.fabricWidth),
       fabricWeight: Number(form.fabricWeight),
       fabricLength: Number(form.fabricLength),
@@ -269,10 +284,8 @@ export function ProductForm({
               </Label>
               <Input
                 id={`material-${key}`}
-                type="number"
-                min={0}
-                max={100}
-                step="any"
+                type="text"
+                inputMode="decimal"
                 className="h-8 text-right"
                 value={form.materials[key] ?? ''}
                 onChange={(e) => setMaterial(key, e.target.value)}

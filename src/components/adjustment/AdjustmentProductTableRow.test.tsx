@@ -61,11 +61,11 @@ describe('AdjustmentProductTableRow', () => {
   it('在庫数値が入力欄に表示される', () => {
     renderRow(makeProduct())
     const inputs = screen.getAllByRole('spinbutton')
-    expect(inputs[0]).toHaveValue(1000) // price
-    expect(inputs[1]).toHaveValue(10.5) // wip
-    expect(inputs[2]).toHaveValue(20) // externalStock
-    expect(inputs[3]).toHaveValue(30) // arrivingQuantity
-    expect(inputs[4]).toHaveValue(40) // tokushimaStock
+    expect(inputs[0]).toHaveValue('1000') // price
+    expect(inputs[1]).toHaveValue('10.5') // wip
+    expect(inputs[2]).toHaveValue('20') // externalStock
+    expect(inputs[3]).toHaveValue('30') // arrivingQuantity
+    expect(inputs[4]).toHaveValue('40') // tokushimaStock
   })
 
   it('フィールドが未定義のときは 0 を表示する', () => {
@@ -80,7 +80,7 @@ describe('AdjustmentProductTableRow', () => {
     )
     const inputs = screen.getAllByRole('spinbutton')
     for (const input of inputs) {
-      expect(input).toHaveValue(0)
+      expect(input).toHaveValue('0')
     }
   })
 
@@ -92,7 +92,7 @@ describe('AdjustmentProductTableRow', () => {
       }),
     )
     const inputs = screen.getAllByRole('spinbutton')
-    expect(inputs[0]).toHaveValue(1500)
-    expect(inputs[1]).toHaveValue(2.5)
+    expect(inputs[0]).toHaveValue('1500')
+    expect(inputs[1]).toHaveValue('2.5')
   })
 })

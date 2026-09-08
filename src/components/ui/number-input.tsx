@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 import { cn } from "@/lib/utils";
+import { isNumericDraft } from "@/lib/numbers";
 
 export interface NumberInputProps {
   id?: string;
@@ -11,7 +12,7 @@ export interface NumberInputProps {
   defaultValue?: number | string;
   min?: number;
   max?: number;
-  /** +/- ボタンの増減幅。入力欄そのものは小数を受け付ける (step="any") */
+  /** +/- ボタンの増減幅。入力欄そのものは小数を受け付ける */
   step?: number;
   /** Chakra UI NumberInput 互換: 第2引数は valueAsNumber (NaN の場合あり) */
   onChange?: (valueAsString: string, valueAsNumber: number) => void;
@@ -26,15 +27,22 @@ function roundValue(value: number): number {
   return Math.round(value * 1e6) / 1e6;
 }
 
-function clampValue(
-  value: number,
-  min: number | undefined,
-  max: number | undefined
-): number {
-  let result = value;
-  if (min !== undefined) result = Math.max(min, result);
-  if (max !== undefined) result = Math.min(max, result);
-  return result;
+function toNumber(value: number | string | undefined): number {
+  return typeof value === "number" ? value : parseFloat(String(value ?? ""));
+}
+
+/**
+ * 入力中の文字列を外部の値で上書きしてよいかを判定する。
+ * 呼び出し側は数値 state を持つため、"2." は 2、"" は 0 として返ってくる。
+ * そのまま String(value) を表示すると小数点や消したはずの値が復活するので、
+ * 入力中の文字列が外部の値と矛盾しない限りは入力中の文字列を優先する。
+ */
+function keepsDraft(draft: string, value: number | string | undefined): boolean {
+  const draftNum = parseFloat(draft);
+  const valueNum = toNumber(value);
+  // "" や "." など数値になりきっていない入力途中
+  if (Number.isNaN(draftNum)) return Number.isNaN(valueNum) || valueNum === 0;
+  return draftNum === valueNum;
 }
 
 export function NumberInput({
@@ -51,31 +59,29 @@ export function NumberInput({
   width,
 }: NumberInputProps) {
   const controlled = value !== undefined;
-  const [internalValue, setInternalValue] = React.useState<string>(
-    String(defaultValue ?? "")
+  const [draft, setDraft] = React.useState<string>(
+    String(defaultValue ?? value ?? "")
   );
 
-  const displayValue = controlled ? String(value) : internalValue;
+  const displayValue =
+    controlled && !keepsDraft(draft, value) ? String(value) : draft;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
-    if (!controlled) setInternalValue(newVal);
+    // 数値として読めない文字は打てないようにする (type="number" の代わり)
+    if (!isNumericDraft(newVal)) return;
+    setDraft(newVal);
     onChange?.(newVal, parseFloat(newVal));
   };
 
-  const increment = () => {
+  const stepBy = (diff: number) => {
     const current = parseFloat(displayValue) || 0;
-    const next = roundValue(clampValue(current + step, min, max));
+    let next = current + diff;
+    if (min !== undefined) next = Math.max(min, next);
+    if (max !== undefined) next = Math.min(max, next);
+    next = roundValue(next);
     const nextStr = String(next);
-    if (!controlled) setInternalValue(nextStr);
-    onChange?.(nextStr, next);
-  };
-
-  const decrement = () => {
-    const current = parseFloat(displayValue) || 0;
-    const next = roundValue(clampValue(current - step, min, max));
-    const nextStr = String(next);
-    if (!controlled) setInternalValue(nextStr);
+    setDraft(nextStr);
     onChange?.(nextStr, next);
   };
 
@@ -89,7 +95,7 @@ export function NumberInput({
         variant="outline"
         size="icon"
         aria-label="-"
-        onClick={decrement}
+        onClick={() => stepBy(-step)}
         disabled={disabled}
         className="h-8 w-8 shrink-0"
       >
@@ -97,27 +103,24 @@ export function NumberInput({
       </Button>
       <Input
         id={id}
-        type="number"
+        // 生地の長さは m 単位で小数を扱う。type="number" はブラウザが "2." を
+        // 空文字に正規化してしまい小数点が打てないため、text + inputMode で扱う
+        type="text"
+        inputMode="decimal"
         role="spinbutton"
         value={displayValue}
         onChange={handleChange}
         disabled={disabled}
         min={min}
         max={max}
-        // 生地の長さは m 単位で小数を扱うため、ブラウザの step 検証は無効にする
-        step="any"
-        // 増減は +/- ボタンで行うため、ブラウザ標準のスピナーは隠す
-        className={cn(
-          "text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-          inputClassName
-        )}
+        className={cn("text-center", inputClassName)}
       />
       <Button
         type="button"
         variant="outline"
         size="icon"
         aria-label="+"
-        onClick={increment}
+        onClick={() => stepBy(step)}
         disabled={disabled}
         className="h-8 w-8 shrink-0"
       >

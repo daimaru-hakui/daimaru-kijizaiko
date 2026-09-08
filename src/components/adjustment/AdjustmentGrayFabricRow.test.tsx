@@ -34,9 +34,9 @@ describe('AdjustmentGrayFabricRow', () => {
   it('価格・仕掛・在庫が入力欄に表示される', () => {
     renderRow(makeGrayFabric())
     const inputs = screen.getAllByRole('spinbutton')
-    expect(inputs[0]).toHaveValue(500) // price
-    expect(inputs[1]).toHaveValue(12.5) // wip
-    expect(inputs[2]).toHaveValue(100) // stock
+    expect(inputs[0]).toHaveValue('500') // price
+    expect(inputs[1]).toHaveValue('12.5') // wip
+    expect(inputs[2]).toHaveValue('100') // stock
   })
 
   it('フィールドが未定義のときは 0 を表示する', () => {
@@ -49,7 +49,7 @@ describe('AdjustmentGrayFabricRow', () => {
     )
     const inputs = screen.getAllByRole('spinbutton')
     for (const input of inputs) {
-      expect(input).toHaveValue(0)
+      expect(input).toHaveValue('0')
     }
   })
 
@@ -61,7 +61,7 @@ describe('AdjustmentGrayFabricRow', () => {
       }),
     )
     const inputs = screen.getAllByRole('spinbutton')
-    expect(inputs[0]).toHaveValue(800)
-    expect(inputs[2]).toHaveValue(3.5)
+    expect(inputs[0]).toHaveValue('800')
+    expect(inputs[2]).toHaveValue('3.5')
   })
 })

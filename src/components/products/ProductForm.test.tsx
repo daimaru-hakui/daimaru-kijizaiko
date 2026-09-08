@@ -68,6 +68,36 @@ describe('ProductForm', () => {
 })
 
 describe('ProductForm 混率', () => {
+  it('小数点を打っても入力欄から消えない', async () => {
+    const user = userEvent.setup()
+    render(<ProductForm {...baseProps} />)
+    const input = screen.getByLabelText('ポリエステル')
+
+    await user.type(input, '33.')
+
+    expect(input).toHaveValue('33.')
+  })
+
+  it('小数を含む混率の合計を表示する', async () => {
+    const user = userEvent.setup()
+    render(<ProductForm {...baseProps} />)
+
+    await user.type(screen.getByLabelText('ポリエステル'), '33.5')
+    await user.type(screen.getByLabelText('綿'), '66.5')
+
+    expect(screen.getByText(/合計 100%/)).toBeInTheDocument()
+  })
+
+  it('数値にならない文字は入力できない', async () => {
+    const user = userEvent.setup()
+    render(<ProductForm {...baseProps} />)
+    const input = screen.getByLabelText('ナイロン')
+
+    await user.type(input, '5a0')
+
+    expect(input).toHaveValue('50')
+  })
+
   it('各素材の入力欄が表示される', () => {
     render(<ProductForm {...baseProps} />)
     expect(screen.getByLabelText('ポリエステル')).toBeInTheDocument()
@@ -78,8 +108,8 @@ describe('ProductForm 混率', () => {
   it('編集時は既存の混率が入力欄に入る', () => {
     const product = { id: 'p1', materials: { t: 65, c: 35 } } as never
     render(<ProductForm {...baseProps} product={product} />)
-    expect(screen.getByLabelText('ポリエステル')).toHaveValue(65)
-    expect(screen.getByLabelText('綿')).toHaveValue(35)
+    expect(screen.getByLabelText('ポリエステル')).toHaveValue('65')
+    expect(screen.getByLabelText('綿')).toHaveValue('35')
   })
 
   it('合計が100%でないとき警告を表示する', async () => {

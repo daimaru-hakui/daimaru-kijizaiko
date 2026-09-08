@@ -19,3 +19,12 @@ export function calcAmount(quantity: unknown, price: unknown): number | null {
   if (q === null || p === null) return null
   return q * p
 }
+
+/**
+ * 数値入力欄に打てる文字列か。"2." のような入力途中の状態も許す。
+ * 生地の長さ・数量は小数を扱うため、input[type=number] ではなく
+ * text + この判定で数字だけを受け付ける。
+ */
+export function isNumericDraft(value: string): boolean {
+  return /^-?\d*\.?\d*$/.test(value)
+}

@@ -40,7 +40,7 @@ describe('CuttingReportForm', () => {
     expect(screen.getByLabelText('担当者')).toHaveValue('user-1')
     expect(screen.getByLabelText('受注先名')).toHaveValue('テスト受注先')
     expect(screen.getByLabelText('製品名')).toHaveValue('テストアイテム')
-    expect(screen.getByLabelText(/総枚数/)).toHaveValue(30)
+    expect(screen.getByLabelText(/総枚数/)).toHaveValue('30')
   })
 
   it('編集時は伝票ナンバーを表示する', () => {
