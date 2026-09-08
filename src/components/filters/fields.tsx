@@ -94,3 +94,28 @@ export function FilterSelect({
     </FilterField>
   )
 }
+
+type FilterCheckboxProps = {
+  label: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+}
+
+/** 絞り込みバーの ON/OFF 項目。他の項目と下端を揃えるため高さを h-9 にする */
+export function FilterCheckbox({ label, checked, onChange }: FilterCheckboxProps) {
+  const id = useId()
+  return (
+    <div className="flex h-9 items-center gap-2 self-end">
+      <input
+        id={id}
+        type="checkbox"
+        className="h-4 w-4 rounded border-input accent-indigo-700"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <Label htmlFor={id} className="text-xs">
+        {label}
+      </Label>
+    </div>
+  )
+}

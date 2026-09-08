@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FilterInput, FilterSelect } from "@/components/filters/fields";
+import { FilterInput, FilterSelect, FilterCheckbox } from "@/components/filters/fields";
 import { deleteProductAction } from "@/app/(app)/products/actions";
 import {
   matchesProductNumber,
@@ -35,7 +35,10 @@ type Props = {
   usersMap: Record<string, string>;
   suppliersMap: Record<string, string>;
   locationsMap: Record<string, string>;
-  grayFabricsMap: Record<string, { productNumber: string; productName: string }>;
+  grayFabricsMap: Record<
+    string,
+    { productNumber: string; productName: string }
+  >;
   cuttingSchedulesMap: Record<string, CuttingSchedule>;
   stockPlaces: StockPlace[];
   userId: string;
@@ -61,6 +64,7 @@ export function ProductListTable({
   const [searchName, setSearchName] = useState("");
   const [searchStaff, setSearchStaff] = useState("");
   const [searchMaterial, setSearchMaterial] = useState("");
+  const [onlyCuttingScheduled, setOnlyCuttingScheduled] = useState(false);
   const [detailProduct, setDetailProduct] = useState<Omit<
     Product,
     "createdAt" | "updatedAt"
@@ -90,7 +94,8 @@ export function ProductListTable({
       p.colorName.includes(color) &&
       p.productName.includes(name) &&
       (!searchStaff || p.staff === searchStaff) &&
-      (p.materialName ?? "").includes(material),
+      (p.materialName ?? "").includes(material) &&
+      (!onlyCuttingScheduled || (p.cuttingSchedules?.length ?? 0) > 0),
   );
 
   const handleDelete = async (
@@ -144,7 +149,7 @@ export function ProductListTable({
               asChild
               className="bg-indigo-700 hover:bg-indigo-800 text-white text-xs"
             >
-              <Link href="/products/order/new">発注</Link>
+              <Link href="/products/new">マスター登録</Link>
             </Button>
           </div>
         </div>
@@ -156,7 +161,11 @@ export function ProductListTable({
             onChange={setSearchColor}
             className="w-24"
           />
-          <FilterInput label="品名" value={searchName} onChange={setSearchName} />
+          <FilterInput
+            label="品名"
+            value={searchName}
+            onChange={setSearchName}
+          />
           <FilterSelect
             label="担当"
             value={searchStaff}
@@ -170,6 +179,11 @@ export function ProductListTable({
             onChange={setSearchMaterial}
             className="w-28"
           />
+          <FilterCheckbox
+            label="裁断予定あり"
+            checked={onlyCuttingScheduled}
+            onChange={setOnlyCuttingScheduled}
+          />
           <Button
             size="sm"
             variant="outline"
@@ -179,6 +193,7 @@ export function ProductListTable({
               setSearchName("");
               setSearchStaff("");
               setSearchMaterial("");
+              setOnlyCuttingScheduled(false);
             }}
           >
             リセット
@@ -365,8 +380,12 @@ export function ProductListTable({
               ? () => router.push(`/products/${detailProduct.id}/edit`)
               : undefined
           }
-          onCuttingHistoryAction={() => setHistory({ product: detailProduct, mode: "cutting" })}
-          onPurchaseHistoryAction={() => setHistory({ product: detailProduct, mode: "purchase" })}
+          onCuttingHistoryAction={() =>
+            setHistory({ product: detailProduct, mode: "cutting" })
+          }
+          onPurchaseHistoryAction={() =>
+            setHistory({ product: detailProduct, mode: "purchase" })
+          }
         />
       )}
 
@@ -392,4 +411,3 @@ export function ProductListTable({
     </div>
   );
 }
-
