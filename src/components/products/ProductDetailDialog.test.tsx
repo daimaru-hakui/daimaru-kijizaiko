@@ -1,41 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { ProductDetailDialog } from './ProductDetailDialog'
-import type { Product } from '../../../types'
+import { makeProduct } from './product.fixture'
 
-const product = {
-  id: 'p1',
-  productNumber: 'DM-001',
-  productNum: 'DM001',
-  colorName: 'ブラック',
-  colorNum: 'BK',
-  productName: 'テスト生地',
-  staff: 'user1',
-  supplierId: 'sup1',
-  supplierName: 'テスト商社',
-  grayFabricId: 'gf1',
-  price: 1000,
-  wip: 0,
-  externalStock: 0,
-  arrivingQuantity: 0,
-  tokushimaStock: 100,
-  materialName: 'ポリエステル',
-  materials: { t: 100 },
-  fabricWidth: 110,
-  fabricLength: 50,
-  fabricWeight: null as unknown as number,
-  features: [],
-  cuttingSchedules: [],
-  locations: ['loc1'],
-  noteProduct: '',
-  noteFabric: '',
-  noteEtc: '',
-  interfacing: false,
-  lining: false,
-  createUser: 'user1',
-  updateUser: 'user1',
-  productType: 1,
-} as unknown as Omit<Product, 'createdAt' | 'updatedAt'>
+const product = makeProduct({ grayFabricId: 'gf1', locations: ['loc1'] })
 
 const defaultProps = {
   product,

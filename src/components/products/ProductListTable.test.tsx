@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { ProductListTable } from "./ProductListTable";
+import { makeProduct } from "./product.fixture";
 import type { Product, StockPlace } from "../../../types";
 
 const mockPush = vi.fn();
@@ -18,43 +19,6 @@ vi.mock("@/app/(app)/products/history-actions", () => ({
 vi.mock("@/hooks/useDebounce", () => ({
   useDebounce: <T,>(value: T) => value,
 }));
-
-const makeProduct = (
-  overrides: Partial<Omit<Product, "createdAt" | "updatedAt">> = {},
-): Omit<Product, "createdAt" | "updatedAt"> => ({
-  id: "p1",
-  productNumber: "DM-001",
-  productNum: "DM001",
-  colorName: "ブラック",
-  colorNum: "BK",
-  productName: "テスト生地",
-  staff: "user1",
-  supplierId: "sup1",
-  supplierName: "テスト商社",
-  grayFabricId: "",
-  price: 1000,
-  wip: 0,
-  externalStock: 0,
-  arrivingQuantity: 0,
-  tokushimaStock: 100,
-  materialName: "ポリエステル",
-  materials: { t: 100 },
-  fabricWidth: 110,
-  fabricLength: 50,
-  fabricWeight: null as unknown as number,
-  features: [],
-  cuttingSchedules: [],
-  locations: [],
-  noteProduct: "",
-  noteFabric: "",
-  noteEtc: "",
-  interfacing: false,
-  lining: false,
-  createUser: "user1",
-  updateUser: "user1",
-  productType: 1,
-  ...overrides,
-});
 
 const defaultProps = {
   products: [makeProduct()],

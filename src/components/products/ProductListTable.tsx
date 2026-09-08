@@ -16,6 +16,7 @@ import { getTodayDate } from "@/lib/dates";
 import { buildProductCsv } from "@/lib/products/csv";
 import { downloadCsv } from "@/lib/download";
 import { canEditRecord } from "@/lib/permissions";
+import { useDebounce } from "@/hooks/useDebounce";
 import { InlineStat, Chip } from "./shared";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
@@ -27,6 +28,8 @@ import type {
   SerializableProduct,
   StockPlace,
 } from "../../../types";
+
+const SEARCH_DELAY_MS = 300;
 
 type Props = {
   products: Omit<Product, "createdAt" | "updatedAt">[];
@@ -71,15 +74,22 @@ export function ProductListTable({
     mode: "cutting" | "purchase";
   } | null>(null);
 
-  const staffLower = searchStaff.toLowerCase();
+  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
+  const num = useDebounce(searchNum, SEARCH_DELAY_MS);
+  const color = useDebounce(searchColor, SEARCH_DELAY_MS);
+  const name = useDebounce(searchName, SEARCH_DELAY_MS);
+  const staff = useDebounce(searchStaff, SEARCH_DELAY_MS);
+  const material = useDebounce(searchMaterial, SEARCH_DELAY_MS);
+
+  const staffLower = staff.toLowerCase();
   const filtered = products.filter((p) => {
     const staffName = (usersMap[p.staff] ?? p.staff).toLowerCase();
     return (
-      matchesProductNumber(p.productNumber, searchNum) &&
-      p.colorName.includes(searchColor) &&
-      p.productName.includes(searchName) &&
+      matchesProductNumber(p.productNumber, num) &&
+      p.colorName.includes(color) &&
+      p.productName.includes(name) &&
       staffName.includes(staffLower) &&
-      (p.materialName ?? "").includes(searchMaterial)
+      (p.materialName ?? "").includes(material)
     );
   });
 
