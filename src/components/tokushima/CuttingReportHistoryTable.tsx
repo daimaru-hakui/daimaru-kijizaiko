@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type Props = {
@@ -39,9 +38,11 @@ function calcScale(meter: number, total: number) {
 }
 
 export function CuttingReportHistoryTable({ reports, usersMap, productMap, startDay, endDay }: Props) {
-  const router = useRouter()
-  const [start, setStart] = useState(startDay)
-  const [end, setEnd] = useState(endDay)
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/tokushima/cutting-reports/history',
+    startDay,
+    endDay
+  )
   const [staffFilter, setStaffFilter] = useState('')
   const [clientFilter, setClientFilter] = useState('')
 
@@ -70,16 +71,10 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
     return staffMatch && clientMatch
   })
 
-  const handleSearch = () => {
-    router.push(`/tokushima/cutting-reports/history?start=${start}&end=${end}`)
-  }
   const handleReset = () => {
-    const period = getDefaultPeriod()
-    setStart(period.start)
-    setEnd(period.end)
     setStaffFilter('')
     setClientFilter('')
-    router.push('/tokushima/cutting-reports/history')
+    resetPeriod()
   }
 
   const staffOptions = Array.from(
@@ -123,7 +118,6 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
             onChange={(e) => setClientFilter(e.target.value)}
           />
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
         <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 

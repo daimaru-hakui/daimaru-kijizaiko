@@ -75,3 +75,10 @@ describe('GrayFabricConfirmTable リセット', () => {
     expect(endInput).toHaveValue(end)
   })
 })
+
+describe('GrayFabricConfirmTable 期間検索', () => {
+  it('期間は入力すると自動で反映されるため検索ボタンを持たない', () => {
+    render(<GrayFabricConfirmTable {...defaultProps} />)
+    expect(screen.queryByRole('button', { name: '検索' })).toBeNull()
+  })
+})

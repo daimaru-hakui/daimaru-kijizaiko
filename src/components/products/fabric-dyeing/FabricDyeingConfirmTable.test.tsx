@@ -63,3 +63,10 @@ describe('FabricDyeingConfirmTable リセット', () => {
     expect(screen.getByRole('combobox')).toHaveValue('')
   })
 })
+
+describe('FabricDyeingConfirmTable 期間検索', () => {
+  it('期間は入力すると自動で反映されるため検索ボタンを持たない', () => {
+    render(<FabricDyeingConfirmTable {...defaultProps} />)
+    expect(screen.queryByRole('button', { name: '検索' })).toBeNull()
+  })
+})

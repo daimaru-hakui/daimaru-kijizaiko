@@ -101,3 +101,10 @@ describe('AccountingOrderTable リセット', () => {
     expect(screen.getByRole('combobox')).toHaveValue('')
   })
 })
+
+describe('AccountingOrderTable 期間検索', () => {
+  it('期間は入力すると自動で反映されるため検索ボタンを持たない', () => {
+    render(<AccountingOrderTable histories={[makeHistory()]} usersMap={usersMap} startDay="2024-01-01" endDay="2024-03-01" />)
+    expect(screen.queryByRole('button', { name: '検索' })).toBeNull()
+  })
+})

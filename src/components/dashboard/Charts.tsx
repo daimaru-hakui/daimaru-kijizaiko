@@ -5,7 +5,8 @@ import { CuttingPriceRanking } from "./CuttingPriceRanking";
 import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
 import { PurchasePriceRanking } from "./PurchasePriceRanking";
 import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
-import { getTodayDate, get3monthsAgo, getDefaultPeriod } from "@/lib/dates";
+import { getTodayDate, get3monthsAgo, getDefaultPeriod, isCompleteDate } from "@/lib/dates";
+import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
 import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
 import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
 import { CuttingReportType, History } from "../../../types";
@@ -13,7 +14,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Search, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 type Props = {
   productsMap: Record<string, { productNumber: string; colorName: string }>
@@ -23,24 +24,27 @@ export const Charts: FC<Props> = ({ productsMap }) => {
   const [limitNum, setLimitNum] = useState(5);
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
-  const [inputStart, setInputStart] = useState(startDay);
-  const [inputEnd, setInputEnd] = useState(endDay);
   const [staff, setStaff] = useState("");
   const [cuttingReports, setCuttingReports] = useState<CuttingReportType[]>([]);
   const [fabricPurchaseConfirms, setFabricPurchaseConfirms] = useState<Omit<History, 'createdAt' | 'updatedAt'>[]>([]);
 
+  // 検索ボタンを持たないため、入力が落ち着いてから取得し直す
+  const appliedStart = useDebounce(startDay, SEARCH_DEBOUNCE_MS);
+  const appliedEnd = useDebounce(endDay, SEARCH_DEBOUNCE_MS);
+
   useEffect(() => {
+    if (!isCompleteDate(appliedStart) || !isCompleteDate(appliedEnd)) return;
     let cancelled = false;
     Promise.all([
-      getCuttingReportsByDateAction(startDay, endDay),
-      getFabricPurchaseConfirmsByDateAction(startDay, endDay),
+      getCuttingReportsByDateAction(appliedStart, appliedEnd),
+      getFabricPurchaseConfirmsByDateAction(appliedStart, appliedEnd),
     ]).then(([reportsResult, confirmsResult]) => {
       if (cancelled) return;
       if (reportsResult.ok) setCuttingReports(reportsResult.contents);
       if (confirmsResult.ok) setFabricPurchaseConfirms(confirmsResult.contents);
     }).catch(() => {});
     return () => { cancelled = true; };
-  }, [startDay, endDay]);
+  }, [appliedStart, appliedEnd]);
 
   const filterCuttingReports: CuttingReportType[] = staff
     ? cuttingReports.filter((r) => r.staff === staff)
@@ -50,18 +54,10 @@ export const Charts: FC<Props> = ({ productsMap }) => {
     ? fabricPurchaseConfirms.filter((r) => r.createUser === staff)
     : fabricPurchaseConfirms;
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStartDay(inputStart);
-    setEndDay(inputEnd);
-  };
-
   const handleReset = () => {
     const { start, end } = getDefaultPeriod();
     setStartDay(start);
     setEndDay(end);
-    setInputStart(start);
-    setInputEnd(end);
     setStaff('');
   };
 
@@ -69,14 +65,14 @@ export const Charts: FC<Props> = ({ productsMap }) => {
     <>
       {/* フィルターバー */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 py-4 mb-6">
-        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
+        <div className="flex flex-wrap gap-4 items-end">
           <div>
             <Label className="text-[11px] font-semibold text-slate-400 tracking-[0.1em] uppercase">開始日</Label>
             <Input
               type="date"
               className="mt-1.5 w-36 text-sm border-slate-200 focus-visible:ring-blue-700"
-              value={inputStart}
-              onChange={(e) => setInputStart(e.target.value)}
+              value={startDay}
+              onChange={(e) => setStartDay(e.target.value)}
             />
           </div>
           <div>
@@ -84,19 +80,11 @@ export const Charts: FC<Props> = ({ productsMap }) => {
             <Input
               type="date"
               className="mt-1.5 w-36 text-sm border-slate-200 focus-visible:ring-blue-700"
-              value={inputEnd}
-              onChange={(e) => setInputEnd(e.target.value)}
+              value={endDay}
+              onChange={(e) => setEndDay(e.target.value)}
             />
           </div>
           <div className="flex gap-2">
-            <Button
-              type="submit"
-              size="sm"
-              className="bg-blue-800 hover:bg-blue-900 text-white gap-1.5"
-            >
-              <Search className="w-3.5 h-3.5" />
-              検索
-            </Button>
             <Button
               type="button"
               size="sm"
@@ -119,7 +107,7 @@ export const Charts: FC<Props> = ({ productsMap }) => {
               />
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* 裁断ランキング */}
@@ -127,8 +115,8 @@ export const Charts: FC<Props> = ({ productsMap }) => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
           <CuttingQuantityRanking
             data={filterCuttingReports}
-            startDay={startDay}
-            endDay={endDay}
+            startDay={appliedStart}
+            endDay={appliedEnd}
             rankingNumber={limitNum}
             productsMap={productsMap}
           />
@@ -136,8 +124,8 @@ export const Charts: FC<Props> = ({ productsMap }) => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
           <CuttingPriceRanking
             data={filterCuttingReports}
-            startDay={startDay}
-            endDay={endDay}
+            startDay={appliedStart}
+            endDay={appliedEnd}
             rankingNumber={limitNum}
             productsMap={productsMap}
           />
@@ -149,8 +137,8 @@ export const Charts: FC<Props> = ({ productsMap }) => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
           <PurchaseQuantityRanking
             data={filterPurchaseCofirms}
-            startDay={startDay}
-            endDay={endDay}
+            startDay={appliedStart}
+            endDay={appliedEnd}
             rankingNumber={limitNum}
             productsMap={productsMap}
           />
@@ -158,8 +146,8 @@ export const Charts: FC<Props> = ({ productsMap }) => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
           <PurchasePriceRanking
             data={filterPurchaseCofirms}
-            startDay={startDay}
-            endDay={endDay}
+            startDay={appliedStart}
+            endDay={appliedEnd}
             rankingNumber={limitNum}
             productsMap={productsMap}
           />

@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { canEditRecord } from '@/lib/permissions'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
@@ -31,19 +29,11 @@ export function GrayFabricConfirmTable({
   defaultStart,
   defaultEnd,
 }: Props) {
-  const router = useRouter()
-  const [start, setStart] = useState(defaultStart)
-  const [end, setEnd] = useState(defaultEnd)
-
-  const handleSearch = () => {
-    router.push(`/gray-fabrics/confirms?start=${start}&end=${end}`)
-  }
-  const handleReset = () => {
-    const period = getDefaultPeriod()
-    setStart(period.start)
-    setEnd(period.end)
-    router.push('/gray-fabrics/confirms')
-  }
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/gray-fabrics/confirms',
+    defaultStart,
+    defaultEnd
+  )
 
   const canEdit = (h: GrayFabricHistory) => canEditRecord(h, currentUserId, isRD)
 
@@ -65,8 +55,7 @@ export function GrayFabricConfirmTable({
           <Label className="text-xs">終了日</Label>
           <Input type="date" className="mt-1 w-36" value={end} onChange={(e) => setEnd(e.target.value)} />
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
-        <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
+        <Button size="sm" variant="outline" onClick={resetPeriod}>リセット</Button>
       </div>
 
       {confirms.length === 0 ? (

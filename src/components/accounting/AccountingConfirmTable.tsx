@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { AccountingEditModal } from './AccountingEditModal'
 import type { SerializableHistory } from '../../../types'
 
@@ -20,24 +19,18 @@ type Props = {
 }
 
 export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [, startTransition] = useTransition()
-  const [localStart, setLocalStart] = useState(startDay)
-  const [localEnd, setLocalEnd] = useState(endDay)
+  const {
+    start: localStart,
+    end: localEnd,
+    setStart: setLocalStart,
+    setEnd: setLocalEnd,
+    resetPeriod,
+  } = usePeriodSearch('/accounting-dept/confirms', startDay, endDay)
   const [staff, setStaff] = useState('')
 
-  const handleSearch = () => {
-    const params = new URLSearchParams({ start: localStart, end: localEnd })
-    startTransition(() => router.push(`${pathname ?? '/accounting-dept/confirms'}?${params}`))
-  }
-
   const handleReset = () => {
-    const period = getDefaultPeriod()
     setStaff('')
-    setLocalStart(period.start)
-    setLocalEnd(period.end)
-    startTransition(() => router.push(pathname ?? '/accounting-dept/confirms'))
+    resetPeriod()
   }
 
   const filtered = staff
@@ -85,7 +78,6 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
             ))}
           </select>
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
         <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
       </div>
 

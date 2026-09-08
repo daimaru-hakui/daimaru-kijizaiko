@@ -126,3 +126,10 @@ describe('CuttingReportListTable リセット', () => {
     expect(screen.getByPlaceholderText('受注先名')).toHaveValue('')
   })
 })
+
+describe('CuttingReportListTable 期間検索', () => {
+  it('期間は入力すると自動で反映されるため検索ボタンを持たない', () => {
+    render(<CuttingReportListTable {...defaultProps} />)
+    expect(screen.queryByRole('button', { name: '検索' })).toBeNull()
+  })
+})

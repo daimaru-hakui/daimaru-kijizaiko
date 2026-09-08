@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InlineStat, Chip } from '../shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { canEditAccountingRecord } from '@/lib/permissions'
 import { FabricPurchaseEditConfirmDialog } from './FabricPurchaseEditConfirmDialog'
 import type { SerializableHistory } from '../../../../types'
@@ -32,9 +31,11 @@ export function FabricPurchaseConfirmTable({
   startDay,
   endDay,
 }: Props) {
-  const router = useRouter()
-  const [start, setStart] = useState(startDay)
-  const [end, setEnd] = useState(endDay)
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/products/fabric-purchase/confirms',
+    startDay,
+    endDay
+  )
   const [staffFilter, setStaffFilter] = useState('')
   const [editConfirm, setEditConfirm] = useState<SerializableHistory | null>(null)
 
@@ -46,15 +47,9 @@ export function FabricPurchaseConfirmTable({
     new Map(confirms.map((h) => [h.createUser, usersMap[h.createUser] ?? h.createUser]))
   )
 
-  const handleSearch = () => {
-    router.push(`/products/fabric-purchase/confirms?start=${start}&end=${end}`)
-  }
   const handleReset = () => {
-    const period = getDefaultPeriod()
-    setStart(period.start)
-    setEnd(period.end)
     setStaffFilter('')
-    router.push('/products/fabric-purchase/confirms')
+    resetPeriod()
   }
 
   const canEdit = (h: SerializableHistory) =>
@@ -91,7 +86,6 @@ export function FabricPurchaseConfirmTable({
             ))}
           </select>
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
         <Button size="sm" variant="outline" onClick={handleReset}>リセット</Button>
       </div>
 

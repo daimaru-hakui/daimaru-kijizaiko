@@ -10,7 +10,7 @@ import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 
 type UserOption = { id: string; name: string }
@@ -87,8 +87,11 @@ export function CuttingReportListTable({
   endDay,
 }: Props) {
   const router = useRouter()
-  const [start, setStart] = useState(startDay)
-  const [end, setEnd] = useState(endDay)
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/tokushima/cutting-reports',
+    startDay,
+    endDay
+  )
   const [staffFilter, setStaffFilter] = useState('')
   const [clientFilter, setClientFilter] = useState('')
   const [detailReport, setDetailReport] = useState<CuttingReportType | null>(null)
@@ -102,16 +105,10 @@ export function CuttingReportListTable({
     return staffMatch && clientMatch
   })
 
-  const handleSearch = () => {
-    router.push(`/tokushima/cutting-reports?start=${start}&end=${end}`)
-  }
   const handleReset = () => {
-    const period = getDefaultPeriod()
-    setStart(period.start)
-    setEnd(period.end)
     setStaffFilter('')
     setClientFilter('')
-    router.push('/tokushima/cutting-reports')
+    resetPeriod()
   }
 
   const handleAlreadyRead = async (report: CuttingReportType) => {
@@ -178,7 +175,6 @@ export function CuttingReportListTable({
             onChange={(e) => setClientFilter(e.target.value)}
           />
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
         <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 

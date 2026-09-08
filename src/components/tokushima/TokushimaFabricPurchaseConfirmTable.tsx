@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEditDialog'
 import { InlineStat, Chip } from '../products/shared'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
-import { getDefaultPeriod } from '@/lib/dates'
+import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import type { History } from '../../../types'
 
 type Props = {
@@ -31,9 +30,11 @@ export function TokushimaFabricPurchaseConfirmTable({
   startDay,
   endDay,
 }: Props) {
-  const router = useRouter()
-  const [start, setStart] = useState(startDay)
-  const [end, setEnd] = useState(endDay)
+  const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
+    '/tokushima/fabric-purchase/confirms',
+    startDay,
+    endDay
+  )
   const [staffFilter, setStaffFilter] = useState('')
   const [editConfirm, setEditConfirm] = useState<History | null>(null)
 
@@ -41,15 +42,9 @@ export function TokushimaFabricPurchaseConfirmTable({
     (h) => !staffFilter || h.createUser === staffFilter
   )
 
-  const handleSearch = () => {
-    router.push(`/tokushima/fabric-purchase/confirms?start=${start}&end=${end}`)
-  }
   const handleReset = () => {
-    const period = getDefaultPeriod()
-    setStart(period.start)
-    setEnd(period.end)
     setStaffFilter('')
-    router.push('/tokushima/fabric-purchase/confirms')
+    resetPeriod()
   }
 
   const canEdit = (h: History) =>
@@ -90,7 +85,6 @@ export function TokushimaFabricPurchaseConfirmTable({
             ))}
           </select>
         </div>
-        <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white" onClick={handleSearch}>検索</Button>
         <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={handleReset}>リセット</Button>
       </div>
 
