@@ -106,7 +106,11 @@ export function NumberInput({
         max={max}
         // 生地の長さは m 単位で小数を扱うため、ブラウザの step 検証は無効にする
         step="any"
-        className={cn("text-center", inputClassName)}
+        // 増減は +/- ボタンで行うため、ブラウザ標準のスピナーは隠す
+        className={cn(
+          "text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          inputClassName
+        )}
       />
       <Button
         type="button"

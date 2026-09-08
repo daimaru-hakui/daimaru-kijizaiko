@@ -88,3 +88,12 @@ describe("NumberInput", () => {
     expect(onChange).toHaveBeenCalledWith("100", 100);
   });
 });
+
+describe("NumberInput のスピナー", () => {
+  it("増減は +/- ボタンで行うため、ブラウザ標準の矢印は出さない", () => {
+    render(<NumberInput value="5" onChange={vi.fn()} />);
+    const className = screen.getByRole("spinbutton").className;
+    expect(className).toContain("[&::-webkit-inner-spin-button]:appearance-none");
+    expect(className).toContain("[appearance:textfield]");
+  });
+});
