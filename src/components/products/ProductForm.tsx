@@ -484,16 +484,26 @@ export function ProductForm({
       </div>
 
       <div>
-        <Label>機能性</Label>
-        <div className="mt-1 flex flex-wrap gap-3 border rounded-md p-2">
+        <div className="flex items-baseline gap-2">
+          <Label>機能性</Label>
+          <span className="text-xs text-slate-400">
+            {form.selectedFeatures.length > 0
+              ? `${form.selectedFeatures.length}件選択中`
+              : '未選択'}
+          </span>
+        </div>
+        <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-2 rounded-md border p-3 sm:grid-cols-4">
           {features.map((f) => (
-            <label key={f} className="flex items-center gap-1 cursor-pointer text-sm">
+            <label
+              key={f}
+              className="flex cursor-pointer items-center gap-2 text-sm text-slate-700"
+            >
               <input
                 type="checkbox"
                 checked={form.selectedFeatures.includes(f)}
                 onChange={() => toggleList('selectedFeatures', f)}
               />
-              {f}
+              <span className="break-words leading-tight">{f}</span>
             </label>
           ))}
         </div>

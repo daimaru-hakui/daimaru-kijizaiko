@@ -46,6 +46,15 @@ describe('ProductForm', () => {
     expect(screen.getByText('担当者')).toBeInTheDocument()
   })
 
+  it('機能性は保管場所と同じ列で揃える', () => {
+    render(<ProductForm {...baseProps} />)
+
+    const featureList = screen.getByLabelText('防水').closest('label')?.parentElement
+    const locationList = screen.getByLabelText('棚A').closest('label')?.parentElement
+
+    expect(featureList?.className).toBe(locationList?.className)
+  })
+
   it('機能性チェックボックスをトグルできる', async () => {
     const user = userEvent.setup()
     render(<ProductForm {...baseProps} />)
