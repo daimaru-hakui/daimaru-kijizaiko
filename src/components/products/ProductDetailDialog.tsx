@@ -19,6 +19,8 @@ type Props = {
   locationsMap: Record<string, string>
   grayFabricsMap: Record<string, { productNumber: string; productName: string }>
   onEditAction?: () => void
+  onCuttingHistoryAction?: () => void
+  onPurchaseHistoryAction?: () => void
 }
 
 export function ProductDetailDialog({
@@ -29,6 +31,8 @@ export function ProductDetailDialog({
   locationsMap,
   grayFabricsMap,
   onEditAction,
+  onCuttingHistoryAction,
+  onPurchaseHistoryAction,
 }: Props) {
   const mixed = getMixed(product.materials as any)
   const fabricStd = getFabricStd(product.fabricWidth, product.fabricLength, product.fabricWeight)
@@ -37,14 +41,29 @@ export function ProductDetailDialog({
     <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            生地詳細
-            {onEditAction && (
-              <Button size="sm" variant="outline" onClick={onEditAction}>
-                編集
-              </Button>
-            )}
-          </DialogTitle>
+          {/* 閉じる (×) ボタンと重ならないよう右側に余白を確保する */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 pr-8">
+            <DialogTitle className="text-lg font-bold text-slate-900 tracking-tight">
+              生地詳細
+            </DialogTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              {onCuttingHistoryAction && (
+                <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={onCuttingHistoryAction}>
+                  裁断履歴
+                </Button>
+              )}
+              {onPurchaseHistoryAction && (
+                <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={onPurchaseHistoryAction}>
+                  入荷履歴
+                </Button>
+              )}
+              {onEditAction && (
+                <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={onEditAction}>
+                  編集
+                </Button>
+              )}
+            </div>
+          </div>
         </DialogHeader>
         <div className="space-y-4 py-2 text-sm">
           <div className="text-center py-1 bg-muted rounded text-xs">

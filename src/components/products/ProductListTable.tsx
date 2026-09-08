@@ -19,6 +19,7 @@ import { canEditRecord } from "@/lib/permissions";
 import { InlineStat, Chip } from "./shared";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
+import { ProductHistoryDialog } from "./ProductHistoryDialog";
 import { ProductOrderDialog } from "./order-dialog/ProductOrderDialog";
 import type {
   CuttingSchedule,
@@ -65,6 +66,10 @@ export function ProductListTable({
   const [orderProduct, setOrderProduct] = useState<SerializableProduct | null>(
     null,
   );
+  const [history, setHistory] = useState<{
+    product: Omit<Product, "createdAt" | "updatedAt">;
+    mode: "cutting" | "purchase";
+  } | null>(null);
 
   const staffLower = searchStaff.toLowerCase();
   const filtered = products.filter((p) => {
@@ -360,6 +365,19 @@ export function ProductListTable({
               ? () => router.push(`/products/${detailProduct.id}/edit`)
               : undefined
           }
+          onCuttingHistoryAction={() => setHistory({ product: detailProduct, mode: "cutting" })}
+          onPurchaseHistoryAction={() => setHistory({ product: detailProduct, mode: "purchase" })}
+        />
+      )}
+
+      {history && (
+        <ProductHistoryDialog
+          productId={history.product.id}
+          productLabel={`${history.product.productNumber} ${history.product.productName}`}
+          mode={history.mode}
+          open={Boolean(history)}
+          onCloseAction={() => setHistory(null)}
+          usersMap={usersMap}
         />
       )}
 

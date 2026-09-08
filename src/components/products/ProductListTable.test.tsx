@@ -9,6 +9,11 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: mockPush }),
 }));
 
+vi.mock("@/app/(app)/products/history-actions", () => ({
+  getProductCuttingHistoryAction: vi.fn().mockResolvedValue({ ok: true, contents: [] }),
+  getProductPurchaseHistoryAction: vi.fn().mockResolvedValue({ ok: true, contents: [] }),
+}));
+
 // デバウンスをバイパス。タイミング動作は useDebounce.test.ts でカバー済み
 vi.mock("@/hooks/useDebounce", () => ({
   useDebounce: <T,>(value: T) => value,
@@ -113,5 +118,29 @@ describe("ProductListTable 生地の編集", () => {
     await userEvent.click(screen.getByRole("button", { name: "詳細" }));
 
     expect(screen.queryByRole("button", { name: "編集" })).toBeNull();
+  });
+});
+
+describe("ProductListTable 履歴", () => {
+  it("詳細ダイアログから裁断履歴を開ける", async () => {
+    render(<ProductListTable {...defaultProps} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "詳細" }));
+    await userEvent.click(screen.getByRole("button", { name: "裁断履歴" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "裁断履歴" }),
+    ).toBeInTheDocument();
+  });
+
+  it("詳細ダイアログから入荷履歴を開ける", async () => {
+    render(<ProductListTable {...defaultProps} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "詳細" }));
+    await userEvent.click(screen.getByRole("button", { name: "入荷履歴" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "入荷履歴" }),
+    ).toBeInTheDocument();
   });
 });
