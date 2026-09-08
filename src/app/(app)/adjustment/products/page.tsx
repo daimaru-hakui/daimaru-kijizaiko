@@ -24,11 +24,14 @@ export default async function AdjustmentProductsPage() {
     usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
   )
 
-  const products = productsSnap.docs.map((d) => {
-    const raw = toPlainData(d.data()) as Record<string, unknown>
-    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-    return { ...data, id: d.id } as unknown as Product
-  })
+  const products = productsSnap.docs
+    // 論理削除された生地は在庫調整の対象外
+    .filter((d) => !d.data().deletedAt)
+    .map((d) => {
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as Product
+    })
 
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">

@@ -38,11 +38,15 @@ export default async function SchedulesPage() {
       ])
     )
 
-  const products: ProductOption[] = productsSnap.docs.map((d) => ({
-    id: d.id,
-    productNumber: (d.data().productNumber ?? '') as string,
-    colorName: (d.data().colorName ?? '') as string,
-  }))
+  // 選択肢からは論理削除された生地を外す。表示用の productMap は
+  // 既存の予定が参照している生地を引けるよう全件のまま残す
+  const products: ProductOption[] = productsSnap.docs
+    .filter((d) => !d.data().deletedAt)
+    .map((d) => ({
+      id: d.id,
+      productNumber: (d.data().productNumber ?? '') as string,
+      colorName: (d.data().colorName ?? '') as string,
+    }))
 
   const schedules = schedulesSnap.docs.map((d) => {
     const raw = toPlainData(d.data()) as Record<string, unknown>

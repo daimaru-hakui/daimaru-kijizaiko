@@ -15,11 +15,14 @@ export default async function CuttingReportNewPage() {
     db.collection('users').get(),
   ])
 
-  const products = productsSnap.docs.map((d) => {
-    const raw = toPlainData(d.data()) as Record<string, unknown>
-    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-    return { ...data, id: d.id } as unknown as SerializableProduct
-  })
+  const products = productsSnap.docs
+    // 論理削除された生地は使用生地の選択肢に出さない
+    .filter((d) => !d.data().deletedAt)
+    .map((d) => {
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as SerializableProduct
+    })
 
   const salesUsers = usersSnap.docs
     .filter((d) => d.data().sales === true)

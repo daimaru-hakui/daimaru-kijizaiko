@@ -38,11 +38,15 @@ export default async function CuttingReportsPage({ searchParams }: Props) {
     .filter((d) => d.data().sales === true)
     .map((d) => ({ id: d.id, name: (d.data().name ?? d.id) as string }))
 
-  const products = productsSnap.docs.map((d) => {
-    const raw = toPlainData(d.data()) as Record<string, unknown>
-    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-    return { ...data, id: d.id } as unknown as SerializableProduct
-  })
+  // 編集フォームの選択肢からは論理削除された生地を外す。
+  // 表示用の productMap は過去の報告書が参照する生地を引けるよう全件のまま残す
+  const products = productsSnap.docs
+    .filter((d) => !d.data().deletedAt)
+    .map((d) => {
+      const raw = toPlainData(d.data()) as Record<string, unknown>
+      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
+      return { ...data, id: d.id } as unknown as SerializableProduct
+    })
 
   const productMap: Record<string, { productNumber: string; colorName: string; productName: string }> =
     Object.fromEntries(
