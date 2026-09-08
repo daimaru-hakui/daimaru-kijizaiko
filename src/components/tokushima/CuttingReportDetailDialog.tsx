@@ -18,8 +18,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { CuttingReportForm } from './CuttingReportForm'
-import { deleteCuttingReportAction } from '@/app/tokushima/cutting-reports/actions'
+import { deleteCuttingReportAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
+import { formatSerialNumber } from '@/lib/serialnumbers/format'
 
 type UserOption = { id: string; name: string }
 
@@ -35,8 +36,21 @@ type Props = {
   productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
 }
 
-function formatSerial(n: number) {
-  return ('0000000000' + String(n)).slice(-10)
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <dt className="text-xs font-semibold text-slate-400 tracking-wider">{label}</dt>
+      <dd className="mt-0.5 text-sm text-slate-800 break-words">{children}</dd>
+    </div>
+  )
 }
 
 function calcScale(meter: number, total: number) {
@@ -70,67 +84,55 @@ export function CuttingReportDetailDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(v) => { if (!v) onCloseAction() }}>
+      {/* 編集中は詳細を閉じる。onCloseAction() を呼ぶと親が このコンポーネントごと
+          アンマウントして editOpen が失われるため、ローカル state だけで切り替える */}
+      <Dialog open={open && !editOpen} onOpenChange={(v) => { if (!v) onCloseAction() }}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-3">
-              裁断報告書
-              {canEdit && (
-                <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => { onCloseAction(); setEditOpen(true) }}>
-                  編集
-                </Button>
-              )}
-              {canDelete && (
-                <Button size="sm" variant="outline" className="border-slate-200 text-destructive" onClick={handleDelete}>
-                  削除
-                </Button>
-              )}
-            </DialogTitle>
+            {/* 閉じる (×) ボタンと重ならないよう右側に余白を確保する */}
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-4 pr-8">
+              <div className="flex items-center gap-2">
+                <DialogTitle className="text-lg font-bold text-slate-900 tracking-tight">
+                  裁断報告書
+                </DialogTitle>
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
+                  {report.itemType === '1' ? '既製' : '別注'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {canEdit && (
+                  <Button size="sm" variant="outline" className="border-slate-200 text-slate-600" onClick={() => setEditOpen(true)}>
+                    編集
+                  </Button>
+                )}
+                {canDelete && (
+                  <Button size="sm" variant="outline" className="border-slate-200 text-destructive" onClick={handleDelete}>
+                    削除
+                  </Button>
+                )}
+              </div>
+            </div>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div className="flex flex-wrap gap-6">
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">裁断報告書</p>
-                <p>No.{formatSerial(report.serialNumber)}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">裁断日</p>
-                <p>{report.cuttingDate}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">担当者</p>
-                <p>{staffName}</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-6">
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">加工指示書</p>
-                <p>No.{report.processNumber}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">受注先名</p>
-                <p>{report.client}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">種別</p>
-                <p>{report.itemType === '1' ? '既製' : '別注'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">品名</p>
-                <p>{report.itemName}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground">枚数</p>
-                <p>{report.totalQuantity}</p>
-              </div>
-            </div>
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4 sm:grid-cols-4">
+              <Field label="伝票No.">
+                <span className="font-mono">{formatSerialNumber(report.serialNumber)}</span>
+              </Field>
+              <Field label="裁断日">{report.cuttingDate}</Field>
+              <Field label="担当者">{staffName}</Field>
+              <Field label="加工指示書NO.">
+                <span className="font-mono">{report.processNumber}</span>
+              </Field>
+              <Field label="受注先名" className="sm:col-span-2">{report.client}</Field>
+              <Field label="品名">{report.itemName}</Field>
+              <Field label="枚数">{report.totalQuantity.toLocaleString()} 枚</Field>
+            </dl>
 
             {report.comment && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">明細・備考</p>
-                <pre className="mt-1 p-3 border rounded text-sm whitespace-pre-wrap">
+                <p className="text-xs font-semibold text-slate-400 tracking-wider">明細・備考</p>
+                <pre className="mt-1 p-3 border border-slate-200 rounded-lg bg-slate-50/60 text-sm whitespace-pre-wrap">
                   {report.comment}
                 </pre>
               </div>
@@ -174,13 +176,15 @@ export function CuttingReportDetailDialog({
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={(v) => { if (!v) setEditOpen(false) }}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl">
           <DialogTitle className="sr-only">裁断報告書 編集</DialogTitle>
           <CuttingReportForm
             products={products}
             salesUsers={salesUsers}
             initData={report}
-            onCloseAction={() => setEditOpen(false)}
+            // 更新成功時のみ呼ばれる。詳細ダイアログは古い report を保持したままなので
+            // 編集後は両方閉じて一覧の再取得結果を見せる
+            onCloseAction={() => { setEditOpen(false); onCloseAction() }}
           />
         </DialogContent>
       </Dialog>
