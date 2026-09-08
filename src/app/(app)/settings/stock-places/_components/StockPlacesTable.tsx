@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 
 const HEAD = "text-xs font-semibold text-slate-500 tracking-wider";
-// 名前・カナ・電話番号は途中で折り返すと読みにくいので折り返さない
+// 名前・カナ・住所・電話番号は途中で折り返すと読みにくいので折り返さない
 const HEAD_NOWRAP = `${HEAD} whitespace-nowrap`;
 
 const PROTECTED_ID = "ifk1EZX80Jecxy04fqxu";
@@ -43,7 +43,7 @@ export const StockPlacesTable: FC<Props> = ({ stockPlaces }) => {
         <TableRow className="bg-slate-50">
           <TableHead className={HEAD_NOWRAP}>送り先名</TableHead>
           <TableHead className={HEAD_NOWRAP}>フリガナ</TableHead>
-          <TableHead className={HEAD}>住所</TableHead>
+          <TableHead className={HEAD_NOWRAP}>住所</TableHead>
           <TableHead className={HEAD_NOWRAP}>TEL</TableHead>
           <TableHead className={HEAD_NOWRAP}>FAX</TableHead>
           <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
@@ -55,7 +55,7 @@ export const StockPlacesTable: FC<Props> = ({ stockPlaces }) => {
           <TableRow key={sp.id}>
             <TableCell className="whitespace-nowrap">{sp.name}</TableCell>
             <TableCell className="whitespace-nowrap">{sp.kana}</TableCell>
-            <TableCell>{sp.address}</TableCell>
+            <TableCell className="whitespace-nowrap">{sp.address}</TableCell>
             <TableCell className="whitespace-nowrap">{sp.tel}</TableCell>
             <TableCell className="whitespace-nowrap">{sp.fax}</TableCell>
             <TableCell>
