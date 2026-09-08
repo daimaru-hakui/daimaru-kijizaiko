@@ -12,7 +12,7 @@ import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { canEditAccountingRecord } from '@/lib/permissions'
 import { FabricPurchaseEditConfirmDialog } from './FabricPurchaseEditConfirmDialog'
 import type { SerializableHistory } from '../../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   confirms: SerializableHistory[]
@@ -45,7 +45,7 @@ export function FabricPurchaseConfirmTable({
     (h) => !staffFilter || h.createUser === staffFilter
   )
 
-  const staffOptions = buildStaffOptions(confirms.map((h) => h.createUser), usersMap)
+  const staffOptions = buildOptions(confirms.map((h) => h.createUser), usersMap)
 
   const handleReset = () => {
     setStaffFilter('')

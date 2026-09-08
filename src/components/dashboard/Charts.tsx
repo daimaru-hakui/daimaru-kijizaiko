@@ -12,7 +12,7 @@ import {
   isCompleteDate,
 } from "@/lib/dates";
 import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
-import { buildStaffOptions } from "@/lib/filters/staff-options";
+import { buildOptions } from "@/lib/filters/options";
 import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
 import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
 import { CuttingReportType, History } from "../../../types";
@@ -61,7 +61,7 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
     };
   }, [appliedStart, appliedEnd]);
 
-  const staffOptions = buildStaffOptions(
+  const staffOptions = buildOptions(
     [
       ...cuttingReports.map((r) => r.staff),
       ...fabricPurchaseConfirms.map((h) => h.createUser),

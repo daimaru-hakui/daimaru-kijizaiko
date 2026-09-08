@@ -9,7 +9,7 @@ import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   reports: CuttingReportType[]
@@ -78,7 +78,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
     resetPeriod()
   }
 
-  const staffOptions = buildStaffOptions(reports.map((r) => r.staff), usersMap)
+  const staffOptions = buildOptions(reports.map((r) => r.staff), usersMap)
 
   return (
     <div className="p-6 space-y-4">

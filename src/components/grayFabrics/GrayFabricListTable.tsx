@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { InlineStat } from '@/components/products/shared'
 import { matchesProductNumber } from '@/lib/utils'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
+import { buildOptions } from '@/lib/filters/options'
 import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricEditModal } from './GrayFabricEditModal'
 import { GrayFabricOrderAreaModal } from './GrayFabricOrderAreaModal'
@@ -33,13 +34,14 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
   // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
   const num = useDebounce(searchNum, SEARCH_DEBOUNCE_MS)
   const name = useDebounce(searchName, SEARCH_DEBOUNCE_MS)
-  const supplier = useDebounce(searchSupplier, SEARCH_DEBOUNCE_MS)
+
+  const supplierOptions = buildOptions(grayFabrics.map((f) => f.supplierName))
 
   const filtered = grayFabrics.filter(
     (f) =>
       matchesProductNumber(f.productNumber, num) &&
       f.productName.includes(name) &&
-      f.supplierName.includes(supplier)
+      (!searchSupplier || f.supplierName === searchSupplier)
   )
 
   const handleDelete = (id: string) => {
@@ -103,12 +105,19 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
               <Label htmlFor={`${filterId}-supplier`} className="text-xs">
                 仕入先
               </Label>
-              <Input
+              <select
                 id={`${filterId}-supplier`}
-                className="mt-1 w-36"
+                className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
                 value={searchSupplier}
                 onChange={(e) => setSearchSupplier(e.target.value)}
-              />
+              >
+                <option value="">すべて</option>
+                {supplierOptions.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
             </div>
             <Button
               size="sm"

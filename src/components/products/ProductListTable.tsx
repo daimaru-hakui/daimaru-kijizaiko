@@ -18,7 +18,7 @@ import { buildProductCsv } from "@/lib/products/csv";
 import { downloadCsv } from "@/lib/download";
 import { canEditRecord } from "@/lib/permissions";
 import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
-import { buildStaffOptions } from "@/lib/filters/staff-options";
+import { buildOptions } from "@/lib/filters/options";
 import { InlineStat, Chip } from "./shared";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
@@ -81,7 +81,7 @@ export function ProductListTable({
   const name = useDebounce(searchName, SEARCH_DEBOUNCE_MS);
   const material = useDebounce(searchMaterial, SEARCH_DEBOUNCE_MS);
 
-  const staffOptions = buildStaffOptions(
+  const staffOptions = buildOptions(
     products.map((p) => p.staff),
     usersMap,
   );

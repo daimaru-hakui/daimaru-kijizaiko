@@ -12,7 +12,7 @@ import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import { canEditRecord } from '@/lib/permissions'
 import { FabricDyeingEditConfirmDialog } from './FabricDyeingEditConfirmDialog'
 import type { SerializableHistory } from '../../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   confirms: SerializableHistory[]
@@ -43,7 +43,7 @@ export function FabricDyeingConfirmTable({
     (h) => !staffFilter || h.createUser === staffFilter
   )
 
-  const staffOptions = buildStaffOptions(confirms.map((h) => h.createUser), usersMap)
+  const staffOptions = buildOptions(confirms.map((h) => h.createUser), usersMap)
 
   const handleReset = () => {
     setStaffFilter('')

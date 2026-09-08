@@ -4,6 +4,7 @@ import { matchesProductNumber } from '@/lib/utils'
 export type ListFilterValues = {
   productNumber: string
   productName: string
+  /** 仕入先はセレクトで選ぶため完全一致 */
   supplier: string
   /** 担当者はセレクトで選ぶため id の完全一致 */
   staff: string
@@ -31,7 +32,7 @@ export function matchesListFilter(
   return (
     matchesProductNumber(target.productNumber, filter.productNumber) &&
     (target.productName ?? '').includes(filter.productName) &&
-    (target.supplierName ?? '').includes(filter.supplier) &&
+    (!filter.supplier || target.supplierName === filter.supplier) &&
     (!filter.staff || target.staff === filter.staff)
   )
 }

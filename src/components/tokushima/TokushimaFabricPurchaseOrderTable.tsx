@@ -14,7 +14,7 @@ import { ListFilterBar } from '@/components/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import type { SerializableHistory } from '../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   orders: SerializableHistory[]
@@ -38,7 +38,8 @@ export function TokushimaFabricPurchaseOrderTable({
   const [editOrder, setEditOrder] = useState<SerializableHistory | null>(null)
   const { values, filter, setValue, reset } = useListFilter()
 
-  const staffOptions = buildStaffOptions(orders.map((o) => o.createUser), usersMap)
+  const staffOptions = buildOptions(orders.map((o) => o.createUser), usersMap)
+  const supplierOptions = buildOptions(orders.map((o) => o.supplierName))
 
   const filtered = orders.filter((o) =>
     matchesListFilter({ ...o, staff: o.createUser }, filter)
@@ -79,6 +80,7 @@ export function TokushimaFabricPurchaseOrderTable({
         onChange={setValue}
         onReset={reset}
         staffOptions={staffOptions}
+        supplierOptions={supplierOptions}
       />
 
       {filtered.length === 0 ? (

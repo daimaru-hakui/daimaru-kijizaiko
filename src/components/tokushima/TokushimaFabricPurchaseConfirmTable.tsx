@@ -11,7 +11,7 @@ import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
 import type { History } from '../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   confirms: History[]
@@ -52,7 +52,7 @@ export function TokushimaFabricPurchaseConfirmTable({
   const canEdit = (h: History) =>
     (isTokushima || isRD || h.createUser === userId) && h.accounting !== true
 
-  const staffOptions = buildStaffOptions(confirms.map((h) => h.createUser), usersMap)
+  const staffOptions = buildOptions(confirms.map((h) => h.createUser), usersMap)
 
   return (
     <div className="p-6 space-y-4">

@@ -14,7 +14,7 @@ import { GrayFabricOrderToConfirmModal } from './GrayFabricOrderToConfirmModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
 import { deleteGrayFabricOrderAction } from '@/app/(app)/gray-fabrics/actions'
 import type { GrayFabricHistory } from '../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type Props = {
   orders: GrayFabricHistory[]
@@ -27,7 +27,8 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
   const [, startTransition] = useTransition()
   const { values, filter, setValue, reset } = useListFilter()
 
-  const staffOptions = buildStaffOptions(orders.map((o) => o.createUser), users)
+  const staffOptions = buildOptions(orders.map((o) => o.createUser), users)
+  const supplierOptions = buildOptions(orders.map((o) => o.supplierName))
 
   const filtered = orders.filter((o) =>
     matchesListFilter({ ...o, staff: o.createUser }, filter)
@@ -58,6 +59,7 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
         onChange={setValue}
         onReset={reset}
         staffOptions={staffOptions}
+        supplierOptions={supplierOptions}
       />
 
       {filtered.length === 0 ? (

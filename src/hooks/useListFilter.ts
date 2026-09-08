@@ -9,13 +9,17 @@ export function useListFilter() {
   // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
   const productNumber = useDebounce(values.productNumber, SEARCH_DEBOUNCE_MS)
   const productName = useDebounce(values.productName, SEARCH_DEBOUNCE_MS)
-  const supplier = useDebounce(values.supplier, SEARCH_DEBOUNCE_MS)
 
   return {
     /** 入力欄に表示する値 */
     values,
-    /** 絞り込みに使う値。テキスト項目はデバウンス後、担当者セレクトは即時 */
-    filter: { productNumber, productName, supplier, staff: values.staff },
+    /** 絞り込みに使う値。テキスト項目はデバウンス後、セレクトは即時 */
+    filter: {
+      productNumber,
+      productName,
+      supplier: values.supplier,
+      staff: values.staff,
+    },
     setValue: (key: keyof ListFilterValues, value: string) =>
       setValues((prev) => ({ ...prev, [key]: value })),
     reset: () => setValues(EMPTY_LIST_FILTER),

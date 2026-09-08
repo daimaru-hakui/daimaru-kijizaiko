@@ -8,7 +8,7 @@ import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
 import type { CuttingSchedule } from '../../../types'
-import { buildStaffOptions } from '@/lib/filters/staff-options'
+import { buildOptions } from '@/lib/filters/options'
 
 type UserOption = { id: string; name: string }
 type ProductOption = { id: string; productNumber: string; colorName: string }
@@ -24,7 +24,7 @@ type Props = {
 export function SchedulesTable({ schedules, usersMap, salesUsers, products, productMap }: Props) {
   const { values, filter, setValue, reset } = useListFilter()
 
-  const staffOptions = buildStaffOptions(schedules.map((s) => s.staff), usersMap)
+  const staffOptions = buildOptions(schedules.map((s) => s.staff), usersMap)
 
   const filtered = schedules.filter((s) =>
     matchesListFilter(

@@ -93,3 +93,20 @@ describe('GrayFabricListTable 削除ボタン', () => {
     expect(screen.getByRole('button', { name: '削除' })).toBeInTheDocument()
   })
 })
+
+describe('GrayFabricListTable 仕入先検索', () => {
+  it('仕入先を選ぶとその仕入先のキバタだけが表示される', async () => {
+    render(
+      <GrayFabricListTable
+        {...defaultProps}
+        grayFabrics={[
+          makeFabric(),
+          makeFabric({ id: 'gf2', productNumber: 'XX-002', supplierName: '別の商社' }),
+        ]}
+      />
+    )
+    await userEvent.selectOptions(screen.getByLabelText('仕入先'), '別の商社')
+    expect(screen.getByText('XX-002')).toBeInTheDocument()
+    expect(screen.queryByText('KB-001')).toBeNull()
+  })
+})

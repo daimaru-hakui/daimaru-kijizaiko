@@ -12,6 +12,8 @@ type Props = {
   onReset: () => void
   /** 担当者セレクトの選択肢 [id, 表示名] */
   staffOptions?: [string, string][]
+  /** 仕入先セレクトの選択肢 [仕入先名, 表示名] */
+  supplierOptions?: [string, string][]
   /** 表示する項目。既定は品番・品名・仕入先・担当者 */
   fields?: (keyof ListFilterValues)[]
 }
@@ -23,7 +25,7 @@ const DEFAULT_FIELDS: (keyof ListFilterValues)[] = [
   'staff',
 ]
 
-const TEXT_FIELDS = ['productNumber', 'productName', 'supplier'] as const
+const TEXT_FIELDS = ['productNumber', 'productName'] as const
 
 const LABELS: Record<keyof ListFilterValues, string> = {
   productNumber: '品番',
@@ -37,6 +39,7 @@ export function ListFilterBar({
   onChange,
   onReset,
   staffOptions = [],
+  supplierOptions = [],
   fields = DEFAULT_FIELDS,
 }: Props) {
   const id = useId()
@@ -56,6 +59,26 @@ export function ListFilterBar({
           />
         </div>
       ))}
+      {fields.includes('supplier') && (
+        <div>
+          <Label htmlFor={`${id}-supplier`} className="text-xs">
+            {LABELS.supplier}
+          </Label>
+          <select
+            id={`${id}-supplier`}
+            className="mt-1 h-9 rounded-md border border-input px-3 text-sm block"
+            value={values.supplier}
+            onChange={(e) => onChange('supplier', e.target.value)}
+          >
+            <option value="">すべて</option>
+            {supplierOptions.map(([value, name]) => (
+              <option key={value} value={value}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       {fields.includes('staff') && (
         <div>
           <Label htmlFor={`${id}-staff`} className="text-xs">
