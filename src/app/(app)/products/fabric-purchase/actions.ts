@@ -5,10 +5,10 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
-import { ensureAuth, runAuthedAction } from '@/lib/actions'
+import { ensureAuth, runAuthedAction, runAuthedActionWith } from '@/lib/actions'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
-import type { ActionResult } from '@/lib/actions'
+import type { ActionResult, ActionResultWith } from '@/lib/actions'
 import type { History } from '../../../../../types'
 
 export async function getFabricPurchaseConfirmsByDateAction(
@@ -52,15 +52,16 @@ export type OrderFabricPurchaseInput = {
   stockPlace: string
 }
 
+/** 発注書PDF画面 (/complete/[id]) が発注No. を必要とするため data で返す */
 export async function orderFabricPurchaseAction(
   data: OrderFabricPurchaseInput,
-): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+): Promise<ActionResultWith<{ serialNumber: number }>> {
+  const result = await runAuthedActionWith(async (uid) => {
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const historyRef = db.collection('fabricPurchaseOrders').doc()
 
-    await db.runTransaction(async (tx) => {
+    return await db.runTransaction(async (tx) => {
       const { next: newSerial, commit: commitSerial } = await prepareSerialNumber(tx, 'fabricPurchaseOrderNumbers')
       const productSnap = await tx.get(productRef)
 
@@ -102,6 +103,8 @@ export async function orderFabricPurchaseAction(
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       })
+
+      return { serialNumber: newSerial }
     })
   }, '発注に失敗しました')
 

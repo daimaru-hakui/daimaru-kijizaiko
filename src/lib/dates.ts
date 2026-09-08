@@ -13,3 +13,20 @@ export function get3monthsAgo(): string {
   const m = String(d.getMonth() + 1).padStart(2, '0')
   return `${y}-${m}-01`
 }
+
+/**
+ * 発注書など帳票に載せる発行日時。
+ * 本番はサーバーが UTC で動くため、日本時間で固定して整形する。
+ */
+export function formatJstDateTime(date: Date): string {
+  // sv-SE は "YYYY-MM-DD HH:mm" 形式で返る
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date)
+}

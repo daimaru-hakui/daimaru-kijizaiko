@@ -76,23 +76,36 @@ export function ProductOrderForm({ product, stockPlaces, tab, onCloseAction: onC
       scheduledAt,
     }
 
-    let result
     if (tab === 'dyeing') {
       const data = { ...baseInput, grayFabricId: product.grayFabricId ?? '' }
-      result =
+      const result =
         stockType === 'stock'
           ? await orderFabricDyeingFromStockAction(data)
           : await orderFabricDyeingFromRunningAction(data)
-    } else {
-      result = await orderFabricPurchaseAction({ ...baseInput, stockPlace })
-    }
-
-    if (result.ok) {
+      if (!result.ok) {
+        alert(result.error)
+        return
+      }
       onClose()
       router.refresh()
-    } else {
-      alert(result.error)
+      return
     }
+
+    const result = await orderFabricPurchaseAction({ ...baseInput, stockPlace })
+    if (!result.ok) {
+      alert(result.error)
+      return
+    }
+    onClose()
+
+    // 生地購入発注のみ発注書を発行するため、発注No. を渡して作成画面へ送る
+    const query = new URLSearchParams({
+      quantity: String(baseInput.quantity),
+      scheduledAt: baseInput.scheduledAt,
+      serialNumber: String(result.data.serialNumber),
+      stockPlace,
+    })
+    router.push(`/complete/${product.id}?${query}`)
   }
 
   return (

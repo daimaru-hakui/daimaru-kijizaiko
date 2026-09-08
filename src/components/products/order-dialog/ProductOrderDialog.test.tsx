@@ -5,8 +5,9 @@ import { ProductOrderDialog } from "./ProductOrderDialog";
 import type { SerializableProduct, StockPlace } from "../../../../types";
 
 /* ── 外部依存モック ── */
+const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: vi.fn() }),
+  useRouter: () => ({ refresh: vi.fn(), push: mockPush }),
 }));
 
 vi.mock("@/app/(app)/products/fabric-dyeing/actions", () => ({
@@ -15,7 +16,9 @@ vi.mock("@/app/(app)/products/fabric-dyeing/actions", () => ({
 }));
 
 vi.mock("@/app/(app)/products/fabric-purchase/actions", () => ({
-  orderFabricPurchaseAction: vi.fn().mockResolvedValue({ ok: true }),
+  orderFabricPurchaseAction: vi
+    .fn()
+    .mockResolvedValue({ ok: true, data: { serialNumber: 1484 } }),
 }));
 
 /* ── テスト用フィクスチャ ── */
@@ -129,5 +132,35 @@ describe("ProductOrderDialog — コメント必須バリデーション", () =>
 
     expect(alertSpy).not.toHaveBeenCalledWith("コメントを入力してください");
     expect(confirmSpy).toHaveBeenCalled();
+  });
+});
+
+describe("ProductOrderDialog — 生地購入発注後の遷移", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    vi.spyOn(window, "confirm").mockImplementation(() => true);
+  });
+
+  it("発注に成功すると発注書作成画面へ遷移する", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ProductOrderDialog
+        product={mockProduct}
+        stockPlaces={mockStockPlaces}
+        open={true}
+        onCloseAction={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /生地を購入/ }));
+    await user.type(screen.getByPlaceholderText("必須"), "テストコメント");
+    await user.click(screen.getByRole("button", { name: "発注する" }));
+
+    const url = mockPush.mock.calls[0]?.[0] as string;
+    expect(url).toContain("/complete/prod-1");
+    expect(url).toContain("serialNumber=1484");
+    expect(url).toContain("quantity=");
   });
 });

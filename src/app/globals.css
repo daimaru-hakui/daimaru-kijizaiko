@@ -41,3 +41,25 @@
     font-family: var(--font-sans);
   }
 }
+
+/* 発注書 (/complete/[id]) の印刷用。.print-target だけを紙に出す */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-target,
+  .print-target * {
+    visibility: visible;
+  }
+  .print-target {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

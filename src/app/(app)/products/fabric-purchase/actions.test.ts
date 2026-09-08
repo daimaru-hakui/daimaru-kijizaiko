@@ -74,12 +74,13 @@ describe('orderFabricPurchaseAction', () => {
     expect(mockRunTransaction).not.toHaveBeenCalled()
   })
 
-  it('正常系: transaction が呼ばれ ok:true を返す', async () => {
+  it('正常系: transaction が呼ばれ採番した発注No. を返す', async () => {
     mockTransactionGet
       .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
       .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 20, externalStock: 100 }) })
     const result = await orderFabricPurchaseAction(base)
-    expect(result).toEqual({ ok: true })
+    // 発注書PDF画面が発注No. を必要とするため data で返す
+    expect(result).toEqual({ ok: true, data: { serialNumber: 11 } })
     expect(mockTransactionSet).toHaveBeenCalledOnce()
   })
 
