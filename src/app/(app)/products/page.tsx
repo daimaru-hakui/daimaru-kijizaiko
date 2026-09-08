@@ -64,7 +64,7 @@ export default async function ProductsPage() {
     .sort((a, b) => (a.productNumber < b.productNumber ? -1 : 1));
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16 mt-12">
+    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-370 mx-auto pt-6">
         <ProductListTable
           products={products}

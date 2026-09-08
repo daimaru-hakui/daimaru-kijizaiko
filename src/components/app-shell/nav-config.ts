@@ -41,19 +41,19 @@ export const NAV_SECTIONS: NavSection[] = [
       {
         title: '入荷予定一覧',
         href: '/tokushima/fabric-purchase/orders',
-        visible: (roles) => roles.tokushima || roles.admin,
+        visible: (roles) => roles.tokushima || roles.rd || roles.admin,
       },
       {
         title: '入荷履歴一覧',
         href: '/tokushima/fabric-purchase/confirms',
-        visible: (roles) => roles.tokushima || roles.admin,
+        visible: (roles) => roles.tokushima || roles.rd || roles.admin,
       },
       { title: '裁断生地一覧', href: '/tokushima/cutting-reports/history' },
       { title: '裁断報告書一覧', href: '/tokushima/cutting-reports' },
       {
         title: '裁断報告書作成',
         href: '/tokushima/cutting-reports/new',
-        visible: (roles) => roles.tokushima || roles.admin,
+        visible: (roles) => roles.tokushima || roles.rd || roles.admin,
       },
       { title: '使用予定一覧', href: '/schedules' },
     ],
@@ -76,7 +76,7 @@ export const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: '設定',
-    visible: (roles) => roles.rd,
+    visible: (roles) => roles.rd || roles.admin,
     items: [
       { title: '仕入先', href: '/settings/suppliers' },
       { title: '送り先', href: '/settings/stock-places' },

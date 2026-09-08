@@ -20,7 +20,8 @@ describe('matchRoute', () => {
   })
 
   it('/tokushima/* は tokushima=false のユーザーに 403', () => {
-    expect(matchRoute('/tokushima/cutting-reports', sales)).toBe(false)
+    // 裁断報告書の一覧は例外的に全員可なので、徳島の入荷予定で確認する
+    expect(matchRoute('/tokushima/fabric-purchase/orders', sales)).toBe(false)
   })
 
   it('/settings/auth は admin=true のユーザーが通過', () => {
@@ -60,5 +61,43 @@ describe('matchRoute', () => {
 
   it('定義のない /api/* は未ログインで通過しない', () => {
     expect(matchRoute('/api/products/abc', null)).toBe(false)
+  })
+
+  // ナビの表示条件 (nav-config.ts) と一致させる。
+  // 表示されているのに Forbidden になるのを防ぐ
+  describe('ナビの表示条件との整合', () => {
+    it('/settings/suppliers は rd のユーザーが通過する', () => {
+      const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+      expect(matchRoute('/settings/suppliers', rd)).toBe(true)
+      expect(matchRoute('/settings/stock-places', rd)).toBe(true)
+    })
+
+    it('/settings は権限のないユーザーには 403', () => {
+      expect(matchRoute('/settings/suppliers', noRole)).toBe(false)
+    })
+
+    it('/settings/auth は rd でも 403 (admin 限定)', () => {
+      const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+      expect(matchRoute('/settings/auth', rd)).toBe(false)
+      expect(matchRoute('/settings/auth', admin)).toBe(true)
+    })
+
+    it('裁断報告書一覧・裁断生地一覧は全ログインユーザーが通過する', () => {
+      expect(matchRoute('/tokushima/cutting-reports', noRole)).toBe(true)
+      expect(matchRoute('/tokushima/cutting-reports/history', noRole)).toBe(true)
+    })
+
+    it('裁断報告書作成は tokushima か rd が必要', () => {
+      const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+      expect(matchRoute('/tokushima/cutting-reports/new', rd)).toBe(true)
+      expect(matchRoute('/tokushima/cutting-reports/new', tokushima)).toBe(true)
+      expect(matchRoute('/tokushima/cutting-reports/new', noRole)).toBe(false)
+    })
+
+    it('徳島の入荷予定一覧は rd も通過する', () => {
+      const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+      expect(matchRoute('/tokushima/fabric-purchase/orders', rd)).toBe(true)
+      expect(matchRoute('/tokushima/fabric-purchase/orders', noRole)).toBe(false)
+    })
   })
 })

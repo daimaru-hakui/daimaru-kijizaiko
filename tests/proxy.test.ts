@@ -65,7 +65,8 @@ describe('proxy', () => {
 
   it('/tokushima/* に tokushima=false ユーザーは 403', async () => {
     mockUser({ uid: 'u3', admin: false, rd: false, sales: true, accounting: false, tokushima: false, order: false })
-    const res = await runProxy('/tokushima/cutting-reports', 'valid-cookie')
+    // 裁断報告書の一覧は全員可なので、徳島の入荷予定で確認する
+    const res = await runProxy('/tokushima/fabric-purchase/orders', 'valid-cookie')
     expect(res).toBeDefined()
     expect(res!.status).toBe(403)
   })
