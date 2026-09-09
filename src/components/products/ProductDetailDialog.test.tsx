@@ -10,6 +10,7 @@ const defaultProps = {
   open: true,
   onCloseAction: vi.fn(),
   suppliersMap: { sup1: 'テスト商社' },
+  usersMap: { uid1: '後藤' },
   locationsMap: { loc1: '第一倉庫' },
   grayFabricsMap: { gf1: { productNumber: 'KB-100', productName: 'テストキバタ' } },
 }
@@ -43,15 +44,26 @@ describe('ProductDetailDialog', () => {
     expect(terms).toEqual(expect.arrayContaining(['品番', '色番', '色', '品名', '仕入先', '単価']))
   })
 
-  it('別注品のとき担当者を表示する', () => {
+  it('別注品のとき担当者を UID ではなく名前で表示する', () => {
     render(
       <ProductDetailDialog
         {...defaultProps}
-        product={makeProduct({ productType: 2, staff: '後藤' })}
+        product={makeProduct({ productType: 2, staff: 'uid1' })}
       />,
     )
     const terms = screen.getAllByRole('term').map((t) => t.textContent)
     expect(terms).toContain('担当者')
     expect(screen.getByText('後藤')).toBeInTheDocument()
+    expect(screen.queryByText('uid1')).not.toBeInTheDocument()
+  })
+
+  it('usersMap に無い担当者は UID をそのまま表示する', () => {
+    render(
+      <ProductDetailDialog
+        {...defaultProps}
+        product={makeProduct({ productType: 2, staff: 'unknown-uid' })}
+      />,
+    )
+    expect(screen.getByText('unknown-uid')).toBeInTheDocument()
   })
 })

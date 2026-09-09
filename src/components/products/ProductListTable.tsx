@@ -373,6 +373,7 @@ export function ProductListTable({
           open={Boolean(detailProduct)}
           onCloseAction={() => setDetailProduct(null)}
           suppliersMap={suppliersMap}
+          usersMap={usersMap}
           locationsMap={locationsMap}
           grayFabricsMap={grayFabricsMap}
           onEditAction={

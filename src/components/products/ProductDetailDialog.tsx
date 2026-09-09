@@ -16,6 +16,7 @@ type Props = {
   open: boolean
   onCloseAction: () => void
   suppliersMap: Record<string, string>
+  usersMap: Record<string, string>
   locationsMap: Record<string, string>
   grayFabricsMap: Record<string, { productNumber: string; productName: string }>
   onEditAction?: () => void
@@ -49,6 +50,7 @@ export function ProductDetailDialog({
   open,
   onCloseAction,
   suppliersMap,
+  usersMap,
   locationsMap,
   grayFabricsMap,
   onEditAction,
@@ -116,7 +118,11 @@ export function ProductDetailDialog({
             <Field label="仕入先" className={isCustom ? undefined : 'sm:col-span-2'}>
               {suppliersMap[product.supplierId] ?? product.supplierId}
             </Field>
-            {isCustom && <Field label="担当者">{product.staff}</Field>}
+            {isCustom && (
+              <Field label="担当者">
+                {usersMap[product.staff] ?? product.staff}
+              </Field>
+            )}
           </dl>
 
           <div>
