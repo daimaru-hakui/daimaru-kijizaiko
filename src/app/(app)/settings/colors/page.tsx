@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getColorsPageData } from "@/lib/settings/queries";
 import { PageContainer } from "@/components/ui/page-container";
 import { ColorsClient } from "./_components/ColorsClient";
 
@@ -8,8 +8,7 @@ export default async function ColorsPage() {
   const user = await verifyServerSession();
   if (!user) redirect("/login");
 
-  const snap = await getAdminDb().collection("components").doc("colors").get();
-  const colors: string[] = snap.data()?.data ?? [];
+  const { colors } = await getColorsPageData();
 
   return (
     <PageContainer maxWidth="max-w-xl">

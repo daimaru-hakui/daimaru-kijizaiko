@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getMaterialNamesPageData } from "@/lib/settings/queries";
 import { PageContainer } from "@/components/ui/page-container";
 import { MaterialNamesClient } from "./_components/MaterialNamesClient";
 
@@ -8,8 +8,7 @@ export default async function MaterialNamesPage() {
   const user = await verifyServerSession();
   if (!user) redirect("/login");
 
-  const snap = await getAdminDb().collection("components").doc("materialNames").get();
-  const names: string[] = snap.data()?.data ?? [];
+  const { names } = await getMaterialNamesPageData();
 
   return (
     <PageContainer maxWidth="max-w-xl">

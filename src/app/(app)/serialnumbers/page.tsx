@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { verifyAdminSession } from "@/lib/auth/session";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getSerialNumbersPageData } from "@/lib/serialnumbers/queries";
 import { formatSerialNumber } from "@/lib/serialnumbers/format";
-import { parseDocs } from "@/lib/firestore/parse";
-import { serialNumberSchema } from "@/lib/firestore/schemas";
 import {
   Table,
   TableBody,
@@ -23,8 +21,7 @@ export default async function SerialNumbersPage() {
   const user = await verifyAdminSession();
   if (!user) redirect("/login");
 
-  const snap = await getAdminDb().collection("serialNumbers").get();
-  const serialNumbers = parseDocs(snap.docs, serialNumberSchema, "serialNumbers");
+  const { serialNumbers } = await getSerialNumbersPageData();
 
   return (
     <PageContainer maxWidth="max-w-lg">
