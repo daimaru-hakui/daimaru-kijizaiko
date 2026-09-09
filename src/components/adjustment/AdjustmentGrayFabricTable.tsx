@@ -13,7 +13,7 @@ import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
 import { buildAdjustmentGrayFabricCsv } from '@/lib/adjustment/csv'
-import { HEAD } from './table-styles'
+import { HEAD } from '@/components/ui/table-styles'
 import type { GrayFabric } from '../../../types'
 
 type Props = {

@@ -1,5 +1,5 @@
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { HEAD } from './table-styles'
+import { HEAD } from '@/components/ui/table-styles'
 
 type Props = {
   isRD: boolean
