@@ -4,6 +4,7 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { formatJstDateTime } from '@/lib/dates'
 import { parseDocs } from '@/lib/firestore/parse'
 import { stockPlaceSchema } from '@/lib/firestore/schemas'
+import { PageContainer } from '@/components/ui/page-container'
 import { OrderSheet } from './_components/OrderSheet'
 
 type Props = {
@@ -39,23 +40,21 @@ export default async function CompletePage({ params, searchParams }: Props) {
   )
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-3xl mx-auto pt-6">
-        <OrderSheet
-          serialNumber={Number(query.serialNumber ?? 0)}
-          quantity={Number(query.quantity ?? 0)}
-          scheduledAt={query.scheduledAt ?? ''}
-          stockPlace={stockPlace}
-          createUserName={(userSnap.data()?.name as string) ?? ''}
-          issuedAt={formatJstDateTime(new Date())}
-          product={{
-            productNumber: (product.productNumber as string) ?? '',
-            productName: (product.productName as string) ?? '',
-            supplierName: (product.supplierName as string) ?? '',
-          }}
-          stockPlaceInfo={stockPlaceInfo}
-        />
-      </div>
-    </div>
+    <PageContainer maxWidth="max-w-3xl">
+      <OrderSheet
+        serialNumber={Number(query.serialNumber ?? 0)}
+        quantity={Number(query.quantity ?? 0)}
+        scheduledAt={query.scheduledAt ?? ''}
+        stockPlace={stockPlace}
+        createUserName={(userSnap.data()?.name as string) ?? ''}
+        issuedAt={formatJstDateTime(new Date())}
+        product={{
+          productNumber: (product.productNumber as string) ?? '',
+          productName: (product.productName as string) ?? '',
+          supplierName: (product.supplierName as string) ?? '',
+        }}
+        stockPlaceInfo={stockPlaceInfo}
+      />
+    </PageContainer>
   )
 }

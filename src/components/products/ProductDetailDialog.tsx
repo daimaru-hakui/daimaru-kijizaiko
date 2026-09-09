@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { getMixed, getFabricStd } from '@/lib/utils'
-import type { Product } from '../../../types'
+import type { SerializableProduct } from '../../../types'
 
 type Props = {
-  product: Omit<Product, 'createdAt' | 'updatedAt'>
+  product: SerializableProduct
   open: boolean
   onCloseAction: () => void
   suppliersMap: Record<string, string>

@@ -1,11 +1,6 @@
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
+import { withId } from '@/lib/firestore/with-id'
 import type { GrayFabric, Location, Supplier } from '../../../types'
-
-function withId<T>(doc: { id: string; data: () => unknown }): T {
-  const { createdAt: _ca, updatedAt: _ua, ...data } = toPlainData(doc.data()) as Record<string, unknown>
-  return { ...data, id: doc.id } as T
-}
 
 export type ProductFormOptions = {
   suppliers: Supplier[]

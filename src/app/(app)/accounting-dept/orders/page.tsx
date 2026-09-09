@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
+import { withId } from '@/lib/firestore/with-id'
+import { buildUsersMap } from '@/lib/users/map'
 import { AccountingOrderTable } from '@/components/accounting/AccountingOrderTable'
+import { PageContainer } from '@/components/ui/page-container'
 import type { SerializableHistory } from '../../../../../types'
 
 type Props = {
@@ -29,31 +31,23 @@ export default async function AccountingOrdersPage({ searchParams }: Props) {
     db.collection('users').get(),
   ])
 
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
-  )
+  const usersMap = buildUsersMap(usersSnap.docs)
 
   const histories = historiesSnap.docs
-    .map((d) => {
-      const raw = toPlainData(d.data()) as Record<string, unknown>
-      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-      return { ...data, id: d.id } as unknown as SerializableHistory
-    })
+    .map((d) => withId<SerializableHistory>(d))
     .filter((h) => h.quantity > 0 && h.accounting !== true)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-7xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <AccountingOrderTable
-            histories={histories}
-            usersMap={usersMap}
-            startDay={startDay}
-            endDay={endDay}
-          />
-        </div>
+    <PageContainer>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <AccountingOrderTable
+          histories={histories}
+          usersMap={usersMap}
+          startDay={startDay}
+          endDay={endDay}
+        />
       </div>
-    </div>
+    </PageContainer>
   )
 }

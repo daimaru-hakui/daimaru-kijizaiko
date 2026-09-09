@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, FC } from "react";
-import { CuttingPriceRanking } from "./CuttingPriceRanking";
-import { CuttingQuantityRanking } from "./CuttingQuantityRanking";
-import { PurchasePriceRanking } from "./PurchasePriceRanking";
-import { PurchaseQuantityRanking } from "./PurchaseQuantityRanking";
+import { RankingBarChart } from "./RankingBarChart";
 import {
   getTodayDate,
   get3monthsAgo,
@@ -13,9 +10,19 @@ import {
 } from "@/lib/dates";
 import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
 import { buildOptions } from "@/lib/filters/options";
+import {
+  rankCuttingPrice,
+  rankCuttingQuantity,
+  rankPurchasePrice,
+  rankPurchaseQuantity,
+  toChartRows,
+  type ProductLabelMap,
+  type RankingRow,
+} from "@/lib/dashboard/ranking";
 import { getCuttingReportsByDateAction } from "@/app/(app)/tokushima/cutting-reports/actions";
 import { getFabricPurchaseConfirmsByDateAction } from "@/app/(app)/products/fabric-purchase/actions";
-import { CuttingReportType, History } from "../../../types";
+import { getProductsAction } from "@/app/(app)/products/actions";
+import { CuttingReportType, SerializableHistory } from "../../../types";
 import { NumberInput } from "@/components/ui/number-input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,20 +30,38 @@ import { Label } from "@/components/ui/label";
 import { RotateCcw } from "lucide-react";
 
 type Props = {
-  productsMap: Record<string, { productNumber: string; colorName: string }>;
+  productsMap: ProductLabelMap;
   usersMap: Record<string, string>;
 };
 
 export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
   const staffId = useId();
+  const limitId = useId();
   const [limitNum, setLimitNum] = useState(5);
   const [startDay, setStartDay] = useState(get3monthsAgo());
   const [endDay, setEndDay] = useState(getTodayDate());
   const [staff, setStaff] = useState("");
   const [cuttingReports, setCuttingReports] = useState<CuttingReportType[]>([]);
   const [fabricPurchaseConfirms, setFabricPurchaseConfirms] = useState<
-    Omit<History, "createdAt" | "updatedAt">[]
+    SerializableHistory[]
   >([]);
+  // 裁断報告書は単価を持たないため、使用金額の算出に生地マスタの単価を引く
+  const [priceMap, setPriceMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    getProductsAction()
+      .then((result) => {
+        if (cancelled || !result.ok) return;
+        setPriceMap(
+          Object.fromEntries(result.contents.map((p) => [p.id, p.price]))
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 検索ボタンを持たないため、入力が落ち着いてから取得し直す
   const appliedStart = useDebounce(startDay, SEARCH_DEBOUNCE_MS);
@@ -73,10 +98,12 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
     ? cuttingReports.filter((r) => r.staff === staff)
     : cuttingReports;
 
-  const filterPurchaseCofirms: Omit<History, "createdAt" | "updatedAt">[] =
-    staff
-      ? fabricPurchaseConfirms.filter((r) => r.createUser === staff)
-      : fabricPurchaseConfirms;
+  const filterPurchaseConfirms: SerializableHistory[] = staff
+    ? fabricPurchaseConfirms.filter((r) => r.createUser === staff)
+    : fabricPurchaseConfirms;
+
+  const chartRows = (ranking: RankingRow[]) =>
+    toChartRows(ranking, limitNum, productsMap);
 
   const handleReset = () => {
     const { start, end } = getDefaultPeriod();
@@ -146,11 +173,15 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
             </Button>
           </div>
           <div className="ml-auto">
-            <Label className="text-[11px] font-semibold text-slate-400 tracking-[0.1em] uppercase">
+            <Label
+              htmlFor={limitId}
+              className="text-[11px] font-semibold text-slate-400 tracking-[0.1em] uppercase"
+            >
               表示件数
             </Label>
             <div className="mt-1.5">
               <NumberInput
+                id={limitId}
                 min={1}
                 max={100}
                 value={limitNum}
@@ -166,21 +197,28 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
       {/* 裁断ランキング */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <CuttingQuantityRanking
-            data={filterCuttingReports}
-            startDay={appliedStart}
-            endDay={appliedEnd}
-            rankingNumber={limitNum}
-            productsMap={productsMap}
+          <RankingBarChart
+            title="生地使用数量ランキング"
+            label="使用数量（ｍ）"
+            color="rose"
+            rows={chartRows(
+              rankCuttingQuantity(filterCuttingReports, appliedStart, appliedEnd)
+            )}
           />
         </div>
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <CuttingPriceRanking
-            data={filterCuttingReports}
-            startDay={appliedStart}
-            endDay={appliedEnd}
-            rankingNumber={limitNum}
-            productsMap={productsMap}
+          <RankingBarChart
+            title="生地使用金額ランキング"
+            label="使用金額（円）"
+            color="blue"
+            rows={chartRows(
+              rankCuttingPrice(
+                filterCuttingReports,
+                appliedStart,
+                appliedEnd,
+                priceMap
+              )
+            )}
           />
         </div>
       </div>
@@ -188,21 +226,23 @@ export const Charts: FC<Props> = ({ productsMap, usersMap }) => {
       {/* 購入ランキング */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <PurchaseQuantityRanking
-            data={filterPurchaseCofirms}
-            startDay={appliedStart}
-            endDay={appliedEnd}
-            rankingNumber={limitNum}
-            productsMap={productsMap}
+          <RankingBarChart
+            title="生地購入数量ランキング"
+            label="購入数量（ｍ）"
+            color="teal"
+            rows={chartRows(
+              rankPurchaseQuantity(filterPurchaseConfirms, appliedStart, appliedEnd)
+            )}
           />
         </div>
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <PurchasePriceRanking
-            data={filterPurchaseCofirms}
-            startDay={appliedStart}
-            endDay={appliedEnd}
-            rankingNumber={limitNum}
-            productsMap={productsMap}
+          <RankingBarChart
+            title="生地購入金額ランキング"
+            label="購入金額（円）"
+            color="amber"
+            rows={chartRows(
+              rankPurchasePrice(filterPurchaseConfirms, appliedStart, appliedEnd)
+            )}
           />
         </div>
       </div>

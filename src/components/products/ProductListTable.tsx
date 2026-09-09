@@ -23,19 +23,20 @@ import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
 import { buildOptions } from "@/lib/filters/options";
 import { InlineStat, Chip } from "./shared";
 import { ListCard, ListCardPane } from "@/components/list/ListCard";
+import { EmptyState } from "@/components/list/EmptyState";
+import { ListTitle } from "@/components/list/ListTitle";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
 import { ProductHistoryDialog } from "./ProductHistoryDialog";
 import { ProductOrderDialog } from "./order-dialog/ProductOrderDialog";
 import type {
   CuttingSchedule,
-  Product,
   SerializableProduct,
   StockPlace,
 } from "../../../types";
 
 type Props = {
-  products: Omit<Product, "createdAt" | "updatedAt">[];
+  products: SerializableProduct[];
   usersMap: Record<string, string>;
   suppliersMap: Record<string, string>;
   locationsMap: Record<string, string>;
@@ -69,15 +70,12 @@ export function ProductListTable({
   const [searchStaff, setSearchStaff] = useState("");
   const [searchMaterial, setSearchMaterial] = useState("");
   const [onlyCuttingScheduled, setOnlyCuttingScheduled] = useState(false);
-  const [detailProduct, setDetailProduct] = useState<Omit<
-    Product,
-    "createdAt" | "updatedAt"
-  > | null>(null);
+  const [detailProduct, setDetailProduct] = useState<SerializableProduct | null>(null);
   const [orderProduct, setOrderProduct] = useState<SerializableProduct | null>(
     null,
   );
   const [history, setHistory] = useState<{
-    product: Omit<Product, "createdAt" | "updatedAt">;
+    product: SerializableProduct;
     mode: "cutting" | "purchase";
   } | null>(null);
 
@@ -103,7 +101,7 @@ export function ProductListTable({
   );
 
   const handleDelete = async (
-    product: Omit<Product, "createdAt" | "updatedAt">,
+    product: SerializableProduct,
   ) => {
     if (!window.confirm(`${product.productNumber} を削除しますか？`)) return;
     const result = await deleteProductAction(product.id);
@@ -114,7 +112,7 @@ export function ProductListTable({
     }
   };
 
-  const canEdit = (p: Omit<Product, "createdAt" | "updatedAt">) =>
+  const canEdit = (p: SerializableProduct) =>
     canEditRecord(p, userId, isAdmin || isRD);
 
   return (
@@ -122,9 +120,7 @@ export function ProductListTable({
       {/* ツールバー */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
-            生地一覧
-          </h2>
+          <ListTitle>生地一覧</ListTitle>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">
               全{products.length}件中{" "}
@@ -196,9 +192,7 @@ export function ProductListTable({
 
       {/* カードグリッド */}
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-16 text-center text-slate-400 text-sm">
-          現在登録された情報はありません。
-        </div>
+        <EmptyState className="py-16" />
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {filtered.map((p) => {

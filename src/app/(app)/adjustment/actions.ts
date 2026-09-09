@@ -3,16 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureAuth, type ActionResult } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
-
-type ActionResult = { ok: true } | { ok: false; error: string }
-
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
-}
 
 export type ProductAdjustmentInput = {
   price: number
@@ -27,7 +19,7 @@ export async function updateProductAdjustmentAction(
   data: ProductAdjustmentInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   await db.collection('products').doc(productId).update({
@@ -55,7 +47,7 @@ export async function updateGrayFabricAdjustmentAction(
   data: GrayFabricAdjustmentInput,
 ): Promise<ActionResult> {
   const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   await db.collection('grayFabrics').doc(grayFabricId).update({

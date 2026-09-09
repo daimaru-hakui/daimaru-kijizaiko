@@ -3,6 +3,7 @@ import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { AdjustmentGrayFabricTable } from '@/components/adjustment/AdjustmentGrayFabricTable'
+import { PageContainer } from '@/components/ui/page-container'
 import type { GrayFabric } from '../../../../../types'
 
 export default async function AdjustmentGrayFabricsPage() {
@@ -18,12 +19,10 @@ export default async function AdjustmentGrayFabricsPage() {
   }))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-7xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
-          <AdjustmentGrayFabricTable grayFabrics={grayFabrics} />
-        </div>
+    <PageContainer>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+        <AdjustmentGrayFabricTable grayFabrics={grayFabrics} />
       </div>
-    </div>
+    </PageContainer>
   )
 }

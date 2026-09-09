@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageContainer } from "@/components/ui/page-container";
 
 export default async function SettingsPage() {
   const user = await verifyServerSession();
@@ -17,20 +18,18 @@ export default async function SettingsPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-4xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="flex flex-col md:flex-row gap-1 items-center justify-start">
-            {links.map((link) => (
-              <div key={link.href} className="w-full">
-                <Link href={link.href}>
-                  <Button variant="outline" className="w-full">{link.label}</Button>
-                </Link>
-              </div>
-            ))}
-          </div>
+    <PageContainer maxWidth="max-w-4xl">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="flex flex-col md:flex-row gap-1 items-center justify-start">
+          {links.map((link) => (
+            <div key={link.href} className="w-full">
+              <Link href={link.href}>
+                <Button variant="outline" className="w-full">{link.label}</Button>
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

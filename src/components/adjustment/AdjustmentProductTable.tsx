@@ -8,6 +8,8 @@ import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
 import { buildAdjustmentProductCsv } from '@/lib/adjustment/csv'
+import { EmptyState } from '@/components/list/EmptyState'
+import { ListTitle } from '@/components/list/ListTitle'
 import type { Product } from '../../../types'
 
 type Props = {
@@ -27,9 +29,7 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
       {/* ツールバー */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
-            生地在庫調整
-          </h2>
+          <ListTitle>生地在庫調整</ListTitle>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">
               全{products.length}件中{' '}
@@ -56,9 +56,7 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 py-16 text-center text-slate-400 text-sm">
-          現在登録された情報はありません。
-        </div>
+        <EmptyState className="rounded-lg shadow-none py-16" />
       ) : (
         <Table
           className="w-full"

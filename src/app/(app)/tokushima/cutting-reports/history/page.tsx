@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
+import { withId } from '@/lib/firestore/with-id'
+import { buildUsersMap } from '@/lib/users/map'
 import { CuttingReportHistoryTable } from '@/components/tokushima/CuttingReportHistoryTable'
+import { PageContainer } from '@/components/ui/page-container'
 import type { CuttingReportType } from '../../../../../../types'
 
 type Props = {
@@ -25,9 +27,7 @@ export default async function CuttingReportHistoryPage({ searchParams }: Props) 
     db.collection('products').get(),
   ])
 
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
-  )
+  const usersMap = buildUsersMap(usersSnap.docs)
 
   const productMap: Record<string, { productNumber: string; colorName: string; productName: string }> =
     Object.fromEntries(
@@ -42,17 +42,12 @@ export default async function CuttingReportHistoryPage({ searchParams }: Props) 
     )
 
   const reports = reportsSnap.docs
-    .map((d) => {
-      const raw = toPlainData(d.data()) as Record<string, unknown>
-      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-      return { ...data, id: d.id } as CuttingReportType
-    })
+    .map((d) => withId<CuttingReportType>(d))
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-7xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <PageContainer>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <CuttingReportHistoryTable
           reports={reports}
           usersMap={usersMap}
@@ -60,8 +55,7 @@ export default async function CuttingReportHistoryPage({ searchParams }: Props) 
           startDay={startDay}
           endDay={endDay}
         />
-        </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

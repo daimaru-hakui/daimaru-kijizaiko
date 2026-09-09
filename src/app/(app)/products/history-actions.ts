@@ -3,7 +3,8 @@
 import { ensureAuth } from '@/lib/actions'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { toPlainData } from '@/lib/firestore/serialize'
-import type { History } from '../../../../types'
+import { withId } from '@/lib/firestore/with-id'
+import type { SerializableHistory } from '../../../../types'
 
 export type ProductCuttingHistory = {
   id: string
@@ -66,7 +67,7 @@ export async function getProductPurchaseHistoryAction(
   productId: string,
   startDay: string,
   endDay: string,
-): Promise<Result<Omit<History, 'createdAt' | 'updatedAt'>>> {
+): Promise<Result<SerializableHistory>> {
   const auth = await ensureAuth()
   if (!auth.ok) return auth
 
@@ -78,10 +79,7 @@ export async function getProductPurchaseHistoryAction(
     .get()
 
   const contents = snap.docs
-    .map((doc) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = doc.data()
-      return { ...(toPlainData(data) as object), id: doc.id } as Omit<History, 'createdAt' | 'updatedAt'>
-    })
+    .map((doc) => withId<SerializableHistory>(doc))
     .filter((row) => row.productId === productId && row.quantity > 0)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 
