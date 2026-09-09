@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { HEAD } from "@/components/ui/table-styles";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -52,14 +53,14 @@ export const AuthTable: FC<Props> = ({ users }) => {
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50">
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">ID</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">名前</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">管理者</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">R&D</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">営業</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">経理</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">徳島工場</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">編集</TableHead>
+            <TableHead className={HEAD}>ID</TableHead>
+            <TableHead className={HEAD}>名前</TableHead>
+            <TableHead className={HEAD}>管理者</TableHead>
+            <TableHead className={HEAD}>R&D</TableHead>
+            <TableHead className={HEAD}>営業</TableHead>
+            <TableHead className={HEAD}>経理</TableHead>
+            <TableHead className={HEAD}>徳島工場</TableHead>
+            <TableHead className={HEAD}>編集</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
