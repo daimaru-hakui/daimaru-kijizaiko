@@ -6,6 +6,7 @@ import { ensureRoles, hasAnyRole, type ActionResult, type UserRoles } from '@/li
 import { canEditRecord } from '@/lib/permissions'
 import { getTodayDate } from '@/lib/gray-fabrics/dates'
 import { mathRound2nd } from '@/lib/utils'
+import { applyStockDelta, replaceQuantity } from '@/lib/stock'
 import type { GrayFabric, GrayFabricHistory } from '../../../../types'
 import { FieldValue, type DocumentSnapshot } from 'firebase-admin/firestore'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
@@ -122,7 +123,7 @@ export async function orderGrayFabricAction(
       if (!grayFabricSnap.exists) throw new Error('grayFabric does not exist')
 
       commitSerial()
-      const newWip = mathRound2nd(Number(grayFabricSnap.data()!.wip) + Number(items.quantity))
+      const newWip = applyStockDelta(grayFabricSnap.data()!.wip, items.quantity)
       transaction.update(grayFabricRef, { wip: newWip })
 
       const orderRef = db.collection('grayFabricOrders').doc()
@@ -172,7 +173,7 @@ export async function deleteGrayFabricOrderAction(
       if (!orderSnap.exists) throw new Error('history does not exist')
       if (!canEditSnap(orderSnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
-      const newWip = mathRound2nd(Number(snap.data()!.wip) - Number(quantity))
+      const newWip = applyStockDelta(snap.data()!.wip, -quantity)
       transaction.update(grayFabricRef, { wip: newWip })
       transaction.delete(orderRef)
     })
@@ -212,9 +213,7 @@ export async function updateOrderHistoryAction(
       if (!historySnap.exists) throw new Error('history does not exist')
       if (!canEditSnap(historySnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
-      const newWip = mathRound2nd(
-        Number(fabricSnap.data()!.wip) - Number(oldQuantity) + Number(items.quantity),
-      )
+      const newWip = replaceQuantity(fabricSnap.data()!.wip, oldQuantity, items.quantity)
       transaction.update(grayFabricRef, { wip: newWip })
       transaction.update(historyRef, {
         quantity: mathRound2nd(Number(items.quantity)),
@@ -253,9 +252,7 @@ export async function updateConfirmHistoryAction(
       if (!historySnap.exists) throw new Error('history does not exist')
       if (!canEditSnap(historySnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
-      const newStock = mathRound2nd(
-        Number(fabricSnap.data()!.stock) - Number(oldQuantity) + Number(items.quantity),
-      )
+      const newStock = replaceQuantity(fabricSnap.data()!.stock, oldQuantity, items.quantity)
       transaction.update(grayFabricRef, { stock: newStock })
       transaction.update(historyRef, {
         quantity: mathRound2nd(Number(items.quantity)),
@@ -301,10 +298,12 @@ export async function confirmProcessingAction(
       if (!orderSnap.exists) throw new Error('history does not exist')
       if (!canEditSnap(orderSnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
-      const newWip = mathRound2nd(
-        Number(fabricSnap.data()!.wip) - Number(history.quantity) + Number(items.remainingOrder),
+      const newWip = replaceQuantity(
+        fabricSnap.data()!.wip,
+        history.quantity,
+        items.remainingOrder,
       )
-      const newStock = mathRound2nd(Number(fabricSnap.data()!.stock) + Number(items.quantity))
+      const newStock = applyStockDelta(fabricSnap.data()!.stock, items.quantity)
       transaction.update(grayFabricRef, { wip: newWip, stock: newStock })
 
       transaction.update(orderRef, {

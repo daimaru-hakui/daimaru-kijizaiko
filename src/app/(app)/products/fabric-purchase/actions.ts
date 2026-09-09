@@ -5,6 +5,9 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
+import { applyStockDelta, replaceQuantity } from '@/lib/stock'
+import { applyPurchaseOrderDelta, isTokushimaFactory } from '@/lib/orders/stock'
+import { HOUSE_FACTORY } from '@/lib/constants'
 import { ensureAuth, ensureRoles, hasAnyRole, runAuthedAction, runAuthedActionWith } from '@/lib/actions'
 import { canEditAccountingRecord, canEditRecord } from '@/lib/permissions'
 import { withId } from '@/lib/firestore/with-id'
@@ -77,16 +80,10 @@ export async function orderFabricPurchaseAction(
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
       commitSerial()
-      if (data.stockType === 'stock') {
-        tx.update(productRef, {
-          externalStock: mathRound2nd(externalStock - data.quantity),
-          arrivingQuantity: mathRound2nd(arrivingQuantity + data.quantity),
-        })
-      } else {
-        tx.update(productRef, {
-          arrivingQuantity: mathRound2nd(arrivingQuantity + data.quantity),
-        })
-      }
+      tx.update(
+        productRef,
+        applyPurchaseOrderDelta({ arrivingQuantity, externalStock }, data.quantity, data.stockType),
+      )
 
       tx.set(historyRef, {
         serialNumber: newSerial,
@@ -104,7 +101,7 @@ export async function orderFabricPurchaseAction(
         supplierName: data.supplierName,
         orderedAt: data.orderedAt || getTodayDate(),
         scheduledAt: data.scheduledAt || getTodayDate(),
-        stockPlace: data.stockPlace || '徳島工場',
+        stockPlace: data.stockPlace || HOUSE_FACTORY,
         accounting: false,
         createUser: uid,
         updateUser: uid,
@@ -161,13 +158,14 @@ export async function confirmFabricPurchaseAction(
       // 入荷履歴の担当者は確定操作をした人ではなく発注した人。経理の担当者絞り込みがこれを見る
       const orderedBy: string = orderSnap.data()?.createUser ?? uid
 
-      const newArrivingQuantity = mathRound2nd(
-        arrivingQuantity - currentOrderQuantity + data.remainingOrder,
+      const newArrivingQuantity = replaceQuantity(
+        arrivingQuantity,
+        currentOrderQuantity,
+        data.remainingOrder,
       )
-      const newTokushimaStock =
-        data.stockPlace === '徳島工場'
-          ? mathRound2nd(tokushimaStock + data.quantity)
-          : tokushimaStock
+      const newTokushimaStock = isTokushimaFactory(data.stockPlace)
+        ? applyStockDelta(tokushimaStock, data.quantity)
+        : tokushimaStock
 
       tx.update(productRef, {
         arrivingQuantity: newArrivingQuantity,
@@ -248,16 +246,10 @@ export async function updateFabricPurchaseOrderAction(
 
       const diff = data.currentQuantity - data.quantity
 
-      if (data.stockType === 'stock') {
-        tx.update(productRef, {
-          externalStock: mathRound2nd(externalStock + diff),
-          arrivingQuantity: mathRound2nd(arrivingQuantity - diff),
-        })
-      } else {
-        tx.update(productRef, {
-          arrivingQuantity: mathRound2nd(arrivingQuantity - diff),
-        })
-      }
+      tx.update(
+        productRef,
+        applyPurchaseOrderDelta({ arrivingQuantity, externalStock }, -diff, data.stockType),
+      )
 
       tx.update(orderRef, {
         quantity: mathRound2nd(data.quantity),
@@ -302,16 +294,14 @@ export async function deleteFabricPurchaseOrderAction(
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
-      if (data.stockType === 'stock') {
-        tx.update(productRef, {
-          externalStock: mathRound2nd(externalStock + data.quantity),
-          arrivingQuantity: mathRound2nd(arrivingQuantity - data.quantity),
-        })
-      } else {
-        tx.update(productRef, {
-          arrivingQuantity: mathRound2nd(arrivingQuantity - data.quantity),
-        })
-      }
+      tx.update(
+        productRef,
+        applyPurchaseOrderDelta(
+          { arrivingQuantity, externalStock },
+          -data.quantity,
+          data.stockType,
+        ),
+      )
 
       tx.delete(orderRef)
     })
@@ -355,9 +345,9 @@ export async function updateFabricPurchaseConfirmAction(
       const productSnap = await tx.get(productRef)
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
 
-      if (data.stockPlace === '徳島工場') {
+      if (isTokushimaFactory(data.stockPlace)) {
         tx.update(productRef, {
-          tokushimaStock: mathRound2nd(tokushimaStock - data.currentQuantity + data.quantity),
+          tokushimaStock: replaceQuantity(tokushimaStock, data.currentQuantity, data.quantity),
         })
       }
 

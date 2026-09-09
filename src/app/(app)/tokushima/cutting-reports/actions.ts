@@ -6,6 +6,8 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
 import { ensureRoles, type ActionResult, type Role } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
+import { applyStockDelta } from '@/lib/stock'
+import { buildTokushimaStockDelta } from '@/lib/cutting-reports/stock'
 import { withId } from '@/lib/firestore/with-id'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { CuttingReportType } from '../../../../../types'
@@ -57,11 +59,8 @@ export async function addCuttingReportAction(
 
   try {
     await db.runTransaction(async (tx) => {
-      // step1: net集計 Map を作る（同一 productId の重複対応）
-      const delta = new Map<string, number>()
-      for (const p of data.products) {
-        delta.set(p.productId, (delta.get(p.productId) ?? 0) + p.quantity)
-      }
+      // step1: 在庫差分を集計（裁断した分だけ減る。同一 productId の重複対応）
+      const delta = buildTokushimaStockDelta([], data.products)
 
       // step2: 全read
       const { next: newSerial, commit: commitSerial } = await prepareSerialNumber(tx, 'cuttingReportNumbers')
@@ -75,9 +74,9 @@ export async function addCuttingReportAction(
 
       // step3: 全write
       commitSerial()
-      for (const [productId, qty] of delta) {
+      for (const [productId, deltaQty] of delta) {
         const ref = db.collection('products').doc(productId)
-        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] - qty) })
+        tx.update(ref, { tokushimaStock: applyStockDelta(stockByProduct[productId], deltaQty) })
       }
       tx.set(reportRef, {
         staff: data.staff,
@@ -138,13 +137,7 @@ export async function updateCuttingReportAction(
         reportSnap.data()?.products ?? []
 
       // step2: net delta を集計（旧: 在庫を戻す方向、新: 減算する方向）
-      const delta = new Map<string, number>()
-      for (const op of oldProducts) {
-        delta.set(op.productId, (delta.get(op.productId) ?? 0) + op.quantity)
-      }
-      for (const np of data.products) {
-        delta.set(np.productId, (delta.get(np.productId) ?? 0) - np.quantity)
-      }
+      const delta = buildTokushimaStockDelta(oldProducts, data.products)
 
       // step3: 全 product を read
       const stockByProduct: Record<string, number> = {}
@@ -157,7 +150,7 @@ export async function updateCuttingReportAction(
       // step4: 全 write
       for (const [productId, deltaQty] of delta) {
         const ref = db.collection('products').doc(productId)
-        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] + deltaQty) })
+        tx.update(ref, { tokushimaStock: applyStockDelta(stockByProduct[productId], deltaQty) })
       }
       tx.update(reportRef, {
         staff: data.staff,
@@ -202,11 +195,8 @@ export async function deleteCuttingReportAction(id: string): Promise<ActionResul
       const products: { productId: string; quantity: number }[] =
         reportSnap.data()?.products ?? []
 
-      // step2: net集計（同一 productId の重複対応）
-      const delta = new Map<string, number>()
-      for (const p of products) {
-        delta.set(p.productId, (delta.get(p.productId) ?? 0) + p.quantity)
-      }
+      // step2: 在庫差分を集計（裁断を取り消すので戻す方向。同一 productId の重複対応）
+      const delta = buildTokushimaStockDelta(products, [])
 
       // step3: 全 product を read
       const stockByProduct: Record<string, number> = {}
@@ -217,9 +207,9 @@ export async function deleteCuttingReportAction(id: string): Promise<ActionResul
       }
 
       // step4: 全 write（在庫を戻す）
-      for (const [productId, qty] of delta) {
+      for (const [productId, deltaQty] of delta) {
         const ref = db.collection('products').doc(productId)
-        tx.update(ref, { tokushimaStock: mathRound2nd(stockByProduct[productId] + qty) })
+        tx.update(ref, { tokushimaStock: applyStockDelta(stockByProduct[productId], deltaQty) })
       }
       tx.delete(reportRef)
     })

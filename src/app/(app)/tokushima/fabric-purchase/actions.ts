@@ -6,6 +6,8 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { ensureRoles, hasAnyRole, type ActionResult, type UserRoles } from '@/lib/actions'
 import { canEditRecord, canEditAccountingRecord } from '@/lib/permissions'
 import { mathRound2nd } from '@/lib/utils'
+import { applyStockDelta, replaceQuantity } from '@/lib/stock'
+import { applyPurchaseOrderDelta, isTokushimaFactory } from '@/lib/orders/stock'
 
 // UI (TokushimaFabricPurchaseOrderTable / ConfirmTable) の canEdit と同じ条件。
 // proxy.ts のパス認可は Server Action の POST では効かないため、ここで所有者判定まで行う
@@ -61,13 +63,14 @@ export async function confirmFabricPurchaseAction(
       // 入荷履歴の担当者は確定操作をした人ではなく発注した人。経理の担当者絞り込みがこれを見る
       const orderedBy: string = orderSnap.data()?.createUser ?? auth.uid
 
-      const newArrivingQuantity = mathRound2nd(
-        arrivingQuantity - currentOrderQuantity + data.remainingOrder,
+      const newArrivingQuantity = replaceQuantity(
+        arrivingQuantity,
+        currentOrderQuantity,
+        data.remainingOrder,
       )
-      const newTokushimaStock =
-        data.stockPlace === '徳島工場'
-          ? mathRound2nd(tokushimaStock + data.quantity)
-          : tokushimaStock
+      const newTokushimaStock = isTokushimaFactory(data.stockPlace)
+        ? applyStockDelta(tokushimaStock, data.quantity)
+        : tokushimaStock
 
       tx.update(productRef, {
         arrivingQuantity: newArrivingQuantity,
@@ -151,16 +154,10 @@ export async function updateFabricPurchaseOrderAction(
 
       const diff = data.currentQuantity - data.quantity
 
-      if (data.stockType === 'stock') {
-        tx.update(productRef, {
-          externalStock: mathRound2nd(externalStock + diff),
-          arrivingQuantity: mathRound2nd(arrivingQuantity - diff),
-        })
-      } else {
-        tx.update(productRef, {
-          arrivingQuantity: mathRound2nd(arrivingQuantity - diff),
-        })
-      }
+      tx.update(
+        productRef,
+        applyPurchaseOrderDelta({ arrivingQuantity, externalStock }, -diff, data.stockType),
+      )
 
       tx.update(orderRef, {
         quantity: mathRound2nd(data.quantity),
@@ -210,16 +207,14 @@ export async function deleteFabricPurchaseOrderAction(
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
-      if (data.stockType === 'stock') {
-        tx.update(productRef, {
-          externalStock: mathRound2nd(externalStock + data.quantity),
-          arrivingQuantity: mathRound2nd(arrivingQuantity - data.quantity),
-        })
-      } else {
-        tx.update(productRef, {
-          arrivingQuantity: mathRound2nd(arrivingQuantity - data.quantity),
-        })
-      }
+      tx.update(
+        productRef,
+        applyPurchaseOrderDelta(
+          { arrivingQuantity, externalStock },
+          -data.quantity,
+          data.stockType,
+        ),
+      )
 
       tx.delete(orderRef)
     })
@@ -270,9 +265,9 @@ export async function updateFabricPurchaseConfirmAction(
       }
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
 
-      if (data.stockPlace === '徳島工場') {
+      if (isTokushimaFactory(data.stockPlace)) {
         tx.update(productRef, {
-          tokushimaStock: mathRound2nd(tokushimaStock - data.currentQuantity + data.quantity),
+          tokushimaStock: replaceQuantity(tokushimaStock, data.currentQuantity, data.quantity),
         })
       }
 

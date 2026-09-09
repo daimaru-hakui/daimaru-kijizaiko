@@ -5,8 +5,8 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { ensureRoles, type ActionResult } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
-
-const TOKUSHIMA_FACTORY = '徳島工場'
+import { replaceQuantity } from '@/lib/stock'
+import { isTokushimaFactory } from '@/lib/orders/stock'
 
 export type UpdateHistoryInput = {
   quantity: number
@@ -32,12 +32,12 @@ export async function updateHistoryAccountingOrderAction(
 
   try {
     await db.runTransaction(async (tx) => {
-      if (stockPlace === TOKUSHIMA_FACTORY) {
+      if (isTokushimaFactory(stockPlace)) {
         const productSnap = await tx.get(productRef)
         if (!productSnap.exists) throw new Error('商品が見つかりません')
         const currentStock: number = (productSnap.data()?.tokushimaStock as number) ?? 0
         tx.update(productRef, {
-          tokushimaStock: mathRound2nd(currentStock - currentQuantity + Number(data.quantity)),
+          tokushimaStock: replaceQuantity(currentStock, currentQuantity, data.quantity),
         })
       }
       tx.update(historyRef, {
@@ -81,12 +81,12 @@ export async function confirmProcessingAccountingAction(
 
   try {
     await db.runTransaction(async (tx) => {
-      if (stockPlace === TOKUSHIMA_FACTORY) {
+      if (isTokushimaFactory(stockPlace)) {
         const productSnap = await tx.get(productRef)
         if (!productSnap.exists) throw new Error('商品が見つかりません')
         const currentStock: number = (productSnap.data()?.tokushimaStock as number) ?? 0
         tx.update(productRef, {
-          tokushimaStock: mathRound2nd(currentStock - currentQuantity + Number(data.quantity)),
+          tokushimaStock: replaceQuantity(currentStock, currentQuantity, data.quantity),
         })
       }
       tx.update(historyRef, {

@@ -5,6 +5,7 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
+import { applyStockDelta, replaceQuantity } from '@/lib/stock'
 import { ensureRoles, hasAnyRole, runAuthedAction } from '@/lib/actions'
 import { canEditRecord } from '@/lib/permissions'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
@@ -53,10 +54,10 @@ export async function orderFabricDyeingFromStockAction(
 
       commitSerial()
       const grayStock: number = grayFabricSnap.data()?.stock ?? 0
-      tx.update(grayFabricRef, { stock: mathRound2nd(grayStock - data.quantity) })
+      tx.update(grayFabricRef, { stock: applyStockDelta(grayStock, -data.quantity) })
 
       const wip: number = productSnap.data()?.wip ?? 0
-      tx.update(productRef, { wip: mathRound2nd(wip + data.quantity) })
+      tx.update(productRef, { wip: applyStockDelta(wip, data.quantity) })
 
       tx.set(historyRef, {
         serialNumber: newSerial,
@@ -100,7 +101,7 @@ export async function orderFabricDyeingFromRunningAction(
 
       commitSerial()
       const wip: number = productSnap.data()?.wip ?? 0
-      tx.update(productRef, { wip: mathRound2nd(wip + data.quantity) })
+      tx.update(productRef, { wip: applyStockDelta(wip, data.quantity) })
 
       tx.set(historyRef, {
         serialNumber: newSerial,
@@ -166,8 +167,8 @@ export async function confirmFabricDyeingAction(
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
       tx.update(productRef, {
-        wip: mathRound2nd(wip - data.quantity + data.remainingOrder),
-        externalStock: mathRound2nd(externalStock + data.quantity),
+        wip: replaceQuantity(wip, data.quantity, data.remainingOrder),
+        externalStock: applyStockDelta(externalStock, data.quantity),
       })
 
       tx.update(orderRef, {
@@ -245,10 +246,10 @@ export async function updateFabricDyeingOrderAction(
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
-        tx.update(grayFabricRef, { stock: mathRound2nd(stock + diff) })
+        tx.update(grayFabricRef, { stock: applyStockDelta(stock, diff) })
       }
 
-      tx.update(productRef, { wip: mathRound2nd(wip - diff) })
+      tx.update(productRef, { wip: applyStockDelta(wip, -diff) })
 
       tx.update(orderRef, {
         quantity: mathRound2nd(data.quantity),
@@ -296,10 +297,10 @@ export async function deleteFabricDyeingOrderAction(
         const grayFabricRef = db.collection('grayFabrics').doc(data.grayFabricId)
         const grayFabricSnap = await tx.get(grayFabricRef)
         const stock: number = grayFabricSnap.data()?.stock ?? 0
-        tx.update(grayFabricRef, { stock: mathRound2nd(stock + data.quantity) })
+        tx.update(grayFabricRef, { stock: applyStockDelta(stock, data.quantity) })
       }
 
-      tx.update(productRef, { wip: mathRound2nd(wip - data.quantity) })
+      tx.update(productRef, { wip: applyStockDelta(wip, -data.quantity) })
       tx.delete(orderRef)
     })
   }, '削除に失敗しました')
@@ -336,7 +337,7 @@ export async function updateFabricDyeingConfirmAction(
       const productSnap = await tx.get(productRef)
       const externalStock: number = productSnap.data()?.externalStock ?? 0
       tx.update(productRef, {
-        externalStock: mathRound2nd(externalStock - (data.currentQuantity - data.quantity)),
+        externalStock: replaceQuantity(externalStock, data.currentQuantity, data.quantity),
       })
 
       tx.update(confirmRef, {
