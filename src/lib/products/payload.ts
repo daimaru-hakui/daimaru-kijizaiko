@@ -1,6 +1,6 @@
 import { FieldValue } from 'firebase-admin/firestore'
 import { mathRound2nd } from '@/lib/utils'
-import type { AddProductInput } from '@/app/(app)/products/actions'
+import type { AddProductInput } from '../../../types'
 
 export function buildProductCommonPayload(args: {
   data: AddProductInput

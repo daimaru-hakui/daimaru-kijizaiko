@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
-import { getAdminDb } from '@/lib/firebase/admin'
-import { AppShell, type UserRoles } from '@/components/app-shell'
+import { getAppShellUser } from '@/lib/users/queries'
+import { AppShell } from '@/components/app-shell'
 
 export default async function AppLayout({
   children,
@@ -13,17 +13,7 @@ export default async function AppLayout({
     redirect('/login')
   }
 
-  const db = getAdminDb()
-  const userDoc = await db.collection('users').doc(token.uid).get()
-  const data = userDoc.data() ?? {}
-  const userName: string = data.name ?? ''
-  const roles: UserRoles = {
-    admin: !!data.admin,
-    rd: !!data.rd,
-    tokushima: !!data.tokushima,
-    accounting: !!data.accounting,
-    sales: !!data.sales,
-  }
+  const { userName, roles } = await getAppShellUser(token.uid)
 
   return (
     <AppShell userName={userName} roles={roles}>

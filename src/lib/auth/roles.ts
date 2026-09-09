@@ -49,3 +49,24 @@ export function matchRoute(pathname: string, user: UserClaims | null): boolean {
   if ('authenticated' in rule) return true
   return rule.roles.some((role) => !!user[role])
 }
+
+export type RoleFlags = {
+  isAdmin: boolean
+  isRD: boolean
+  isTokushima: boolean
+  isAccounting: boolean
+}
+
+/**
+ * users ドキュメントから画面の出し分けに使うフラグを組み立てる。
+ * 管理者はすべての部門の権限を兼ねる。
+ */
+export function buildRoleFlags(userData: Record<string, unknown> | undefined): RoleFlags {
+  const admin = userData?.admin === true
+  return {
+    isAdmin: admin,
+    isRD: admin || userData?.rd === true,
+    isTokushima: admin || userData?.tokushima === true,
+    isAccounting: admin || userData?.accounting === true,
+  }
+}

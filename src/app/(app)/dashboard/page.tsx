@@ -1,12 +1,10 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
-import { getAdminDb } from '@/lib/firebase/admin'
 import { calcTotalQuantity, calcTotalPrice } from '@/lib/dashboard/stats'
-import { buildUsersMap } from '@/lib/users/map'
+import { getDashboardData } from '@/lib/dashboard/queries'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { Charts } from '@/components/dashboard/Charts'
 import { Layers, Shirt, Timer, Droplets, Truck } from 'lucide-react'
-import type { Product } from '../../../../types'
 
 const QUANTITY_KEYS = ['wip', 'externalStock', 'arrivingQuantity', 'tokushimaStock'] as const
 type QKey = typeof QUANTITY_KEYS[number]
@@ -59,30 +57,16 @@ export default async function DashboardPage() {
   const user = await verifyServerSession()
   if (!user) redirect('/login')
 
-  const db = getAdminDb()
+  const {
+    products,
+    productsMap,
+    usersMap,
+    grayFabricCount,
+    grayFabricOrderCount,
+    fabricDyeingOrderCount,
+    fabricPurchaseOrderCount,
+  } = await getDashboardData()
 
-  const [
-    productsSnap,
-    grayFabricsSnap,
-    grayFabricOrdersSnap,
-    fabricDyeingOrdersSnap,
-    fabricPurchaseOrdersSnap,
-    usersSnap,
-  ] = await Promise.all([
-    db.collection('products').where('deletedAt', '==', '').get(),
-    db.collection('grayFabrics').get(),
-    db.collection('grayFabricOrders').where('quantity', '>', 0).get(),
-    db.collection('fabricDyeingOrders').where('quantity', '>', 0).get(),
-    db.collection('fabricPurchaseOrders').where('quantity', '>', 0).get(),
-    db.collection('users').get(),
-  ])
-
-  const products: Product[] = productsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
-  const productsMap = Object.fromEntries(
-    products.map(p => [p.id, { productNumber: p.productNumber, colorName: p.colorName }])
-  )
-  const usersMap = buildUsersMap(usersSnap.docs)
-  const grayFabricCount = grayFabricsSnap.size
   const qKeys = [...QUANTITY_KEYS] as QKey[]
 
   return (
@@ -103,9 +87,9 @@ export default async function DashboardPage() {
             <CountBadge icon={Shirt}   label="生地登録"    value={products.length}              iconBg="bg-blue-50"     iconColor="text-blue-700" divider={false} />
           </div>
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
-            <CountBadge icon={Timer}    label="キバタ仕掛" value={grayFabricOrdersSnap.size}    iconBg="bg-violet-50"   iconColor="text-violet-700" />
-            <CountBadge icon={Droplets} label="染め仕掛"   value={fabricDyeingOrdersSnap.size}  iconBg="bg-cyan-50"     iconColor="text-cyan-700" />
-            <CountBadge icon={Truck}    label="入荷予定"   value={fabricPurchaseOrdersSnap.size} iconBg="bg-amber-50"   iconColor="text-amber-600" divider={false} />
+            <CountBadge icon={Timer}    label="キバタ仕掛" value={grayFabricOrderCount}         iconBg="bg-violet-50"   iconColor="text-violet-700" />
+            <CountBadge icon={Droplets} label="染め仕掛"   value={fabricDyeingOrderCount}       iconBg="bg-cyan-50"     iconColor="text-cyan-700" />
+            <CountBadge icon={Truck}    label="入荷予定"   value={fabricPurchaseOrderCount}      iconBg="bg-amber-50"   iconColor="text-amber-600" divider={false} />
           </div>
         </div>
 

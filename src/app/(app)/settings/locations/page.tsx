@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
-import { getAdminDb } from "@/lib/firebase/admin";
-import { parseDocs } from "@/lib/firestore/parse";
-import { locationSchema } from "@/lib/firestore/schemas";
+import { getLocationsPageData } from "@/lib/settings/queries";
 import { LocationsTable } from "./_components/LocationsTable";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,11 +10,7 @@ export default async function LocationsPage() {
   const user = await verifyServerSession();
   if (!user) redirect("/login");
 
-  const snap = await getAdminDb()
-    .collection("locations")
-    .orderBy("order", "asc")
-    .get();
-  const locations = parseDocs(snap.docs, locationSchema, "locations");
+  const { locations } = await getLocationsPageData();
 
   return (
     <PageContainer maxWidth="max-w-4xl">

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getStockPlaceNewPageData } from "@/lib/settings/queries";
 import { StockPlaceInputArea } from "@/components/settings/stock-places/StockPlaceInputArea";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,7 @@ export default async function StockPlaceNewPage() {
   const user = await verifyServerSession();
   if (!user) redirect("/login");
 
-  // 同名の送り先を二重登録しないよう、登録済みの名前を渡す
-  const snap = await getAdminDb().collection("stockPlaces").get();
-  const existingNames = snap.docs.map((d) => (d.data().name ?? "") as string);
+  const { existingNames } = await getStockPlaceNewPageData();
 
   return (
     <PageContainer maxWidth="max-w-xl">

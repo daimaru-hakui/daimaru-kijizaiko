@@ -1,14 +1,10 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
-import { getAdminDb } from '@/lib/firebase/admin'
-import { withId } from '@/lib/firestore/with-id'
-import { canEditRecord } from '@/lib/permissions'
-import { getProductFormOptions } from '@/lib/products/form-data'
+import { getProductEditPageData } from '@/lib/products/queries'
 import { ProductForm } from '@/components/products/ProductForm'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '@/components/ui/page-container'
-import type { Product } from '../../../../../../types'
 import { features } from '../../../../../../datalist'
 
 type Props = {
@@ -20,20 +16,10 @@ export default async function ProductEditPage({ params }: Props) {
   if (!user) redirect('/login')
 
   const { id } = await params
-  const db = getAdminDb()
-  const [productSnap, userDocSnap, options] = await Promise.all([
-    db.collection('products').doc(id).get(),
-    db.collection('users').doc(user.uid).get(),
-    getProductFormOptions(),
-  ])
+  const data = await getProductEditPageData(id, user.uid)
 
-  if (!productSnap.exists || productSnap.data()?.deletedAt) notFound()
-
-  const product = withId<Product>(productSnap)
-
-  const userData = userDocSnap.data()
-  const isPrivileged = Boolean(userData?.admin || userData?.rd)
-  if (!canEditRecord(product, user.uid, isPrivileged)) redirect('/products')
+  if (!data) notFound()
+  if (!data.canEdit) redirect('/products')
 
   return (
     <PageContainer maxWidth="max-w-2xl">
@@ -46,7 +32,7 @@ export default async function ProductEditPage({ params }: Props) {
             </Button>
           </Link>
         </div>
-        <ProductForm {...options} features={features} product={product} />
+        <ProductForm {...data.options} features={features} product={data.product} />
       </div>
     </PageContainer>
   )

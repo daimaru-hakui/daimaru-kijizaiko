@@ -214,3 +214,35 @@ export type CuttingSchedule = {
   quantity: number,
   scheduledAt: string,
 }
+
+export type AddProductInput = {
+  productType: string
+  staff: string
+  supplierId: string
+  grayFabricId: string
+  interfacing: boolean
+  lining: boolean
+  productNum: string
+  colorNum: string
+  colorName: string
+  productName: string
+  price: number
+  materialName: string
+  materials: Record<string, number>
+  fabricWidth: number
+  fabricWeight: number
+  fabricLength: number
+  features: string[]
+  noteProduct: string
+  noteFabric: string
+  noteEtc: string
+  externalStock: number
+  tokushimaStock: number
+  locations: string[]
+}
+
+export type UpdateProductInput = AddProductInput & {
+  productId: string
+  wip: number
+  arrivingQuantity: number
+}
