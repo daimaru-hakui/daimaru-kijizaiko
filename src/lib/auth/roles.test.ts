@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { matchRoute, type UserClaims } from '../../../src/lib/auth/roles'
+import { matchRoute, type UserClaims } from './roles'
 
 const admin: UserClaims = { uid: 'u1', admin: true, rd: false, sales: false, accounting: false, tokushima: false, order: false }
 const tokushima: UserClaims = { uid: 'u2', admin: false, rd: false, sales: false, accounting: false, tokushima: true, order: false }
