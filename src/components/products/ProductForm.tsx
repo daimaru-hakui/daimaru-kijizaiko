@@ -148,7 +148,7 @@ export function ProductForm({
 
     const data = {
       productType: form.productType,
-      staff: form.productType === '2' ? form.staff : 'R&D',
+      staff: form.staff,
       supplierId: form.supplierId,
       grayFabricId: form.grayFabricId,
       interfacing: form.interfacing,
