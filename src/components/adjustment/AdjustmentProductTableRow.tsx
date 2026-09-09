@@ -67,67 +67,57 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
         <>
           {isRD && (
             <>
-              <TableCell className="p-1">
-                <div className="flex justify-end">
-                  <NumberInput
-                    className="w-32"
-                    inputClassName="px-1"
-                    min={0}
-                    max={100000}
-                    value={items.price}
-                    onChange={(_, v) => handleChange('price', v)}
-                  />
-                </div>
+              <TableCell className="px-4 py-1">
+                <NumberInput
+                  className="w-32"
+                  inputClassName="px-1"
+                  min={0}
+                  max={100000}
+                  value={items.price}
+                  onChange={(_, v) => handleChange('price', v)}
+                />
               </TableCell>
-              <TableCell className="p-1">
-                <div className="flex justify-end">
-                  <NumberInput
-                    className="w-32"
-                    inputClassName="px-1"
-                    min={0}
-                    max={100000}
-                    value={mathRound2nd(items.wip)}
-                    onChange={(_, v) => handleChange('wip', v)}
-                  />
-                </div>
+              <TableCell className="px-4 py-1">
+                <NumberInput
+                  className="w-32"
+                  inputClassName="px-1"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.wip)}
+                  onChange={(_, v) => handleChange('wip', v)}
+                />
               </TableCell>
-              <TableCell className="p-1">
-                <div className="flex justify-end">
-                  <NumberInput
-                    className="w-32"
-                    inputClassName="px-1"
-                    min={0}
-                    max={100000}
-                    value={mathRound2nd(items.externalStock)}
-                    onChange={(_, v) => handleChange('externalStock', v)}
-                  />
-                </div>
+              <TableCell className="px-4 py-1">
+                <NumberInput
+                  className="w-32"
+                  inputClassName="px-1"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.externalStock)}
+                  onChange={(_, v) => handleChange('externalStock', v)}
+                />
               </TableCell>
-              <TableCell className="p-1">
-                <div className="flex justify-end">
-                  <NumberInput
-                    className="w-32"
-                    inputClassName="px-1"
-                    min={0}
-                    max={100000}
-                    value={mathRound2nd(items.arrivingQuantity)}
-                    onChange={(_, v) => handleChange('arrivingQuantity', v)}
-                  />
-                </div>
+              <TableCell className="px-4 py-1">
+                <NumberInput
+                  className="w-32"
+                  inputClassName="px-1"
+                  min={0}
+                  max={100000}
+                  value={mathRound2nd(items.arrivingQuantity)}
+                  onChange={(_, v) => handleChange('arrivingQuantity', v)}
+                />
               </TableCell>
             </>
           )}
-          <TableCell className="p-1">
-            <div className="flex justify-end">
-              <NumberInput
-                className="w-32"
-                inputClassName="px-1"
-                min={0}
-                max={100000}
-                value={mathRound2nd(items.tokushimaStock)}
-                onChange={(_, v) => handleChange('tokushimaStock', v)}
-              />
-            </div>
+          <TableCell className="px-4 py-1">
+            <NumberInput
+              className="w-32"
+              inputClassName="px-1"
+              min={0}
+              max={100000}
+              value={mathRound2nd(items.tokushimaStock)}
+              onChange={(_, v) => handleChange('tokushimaStock', v)}
+            />
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-2">

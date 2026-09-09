@@ -11,7 +11,7 @@ import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
-import { HEAD, HEAD_NUM } from './table-styles'
+import { HEAD } from './table-styles'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -54,9 +54,9 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
           <TableHeader className="sticky top-0 z-10 bg-slate-50 shadow-[inset_0_-1px_0_#e2e8f0]">
             <TableRow className="bg-slate-50 hover:bg-slate-50">
               <TableHead className={HEAD}>生地品番</TableHead>
-              <TableHead className={HEAD_NUM}>単価（円）</TableHead>
-              <TableHead className={HEAD_NUM}>キバタ仕掛(m)</TableHead>
-              <TableHead className={HEAD_NUM}>キバタ在庫(m)</TableHead>
+              <TableHead className={HEAD}>単価（円）</TableHead>
+              <TableHead className={HEAD}>キバタ仕掛(m)</TableHead>
+              <TableHead className={HEAD}>キバタ在庫(m)</TableHead>
               <TableHead className={HEAD}>処理</TableHead>
             </TableRow>
           </TableHeader>

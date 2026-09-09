@@ -1,5 +1,5 @@
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { HEAD, HEAD_NUM } from './table-styles'
+import { HEAD } from './table-styles'
 
 type Props = {
   isRD: boolean
@@ -18,13 +18,13 @@ export function AdjustmentProductHeader({ isRD, isTokushima }: Props) {
           <>
             {isRD && (
               <>
-                <TableHead className={HEAD_NUM}>単価（円）</TableHead>
-                <TableHead className={HEAD_NUM}>染め仕掛(m)</TableHead>
-                <TableHead className={HEAD_NUM}>外部在庫(m)</TableHead>
-                <TableHead className={HEAD_NUM}>入荷待ち(m)</TableHead>
+                <TableHead className={HEAD}>単価（円）</TableHead>
+                <TableHead className={HEAD}>染め仕掛(m)</TableHead>
+                <TableHead className={HEAD}>外部在庫(m)</TableHead>
+                <TableHead className={HEAD}>入荷待ち(m)</TableHead>
               </>
             )}
-            <TableHead className={HEAD_NUM}>徳島在庫(m)</TableHead>
+            <TableHead className={HEAD}>徳島在庫(m)</TableHead>
             <TableHead className={HEAD}>処理</TableHead>
           </>
         )}
