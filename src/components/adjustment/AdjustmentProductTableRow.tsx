@@ -62,7 +62,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
     <TableRow>
       <TableCell>{usersMap[product.staff] ?? product.staff}</TableCell>
       <TableCell>{product.productNumber}</TableCell>
-      <TableCell>{product.colorName}</TableCell>
+      {/* 色名は途中で折り返すと読みにくいので折り返さない */}
+      <TableCell className="whitespace-nowrap">{product.colorName}</TableCell>
       {showEdit && (
         <>
           {isRD && (
