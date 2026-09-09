@@ -24,6 +24,25 @@ const baseProps = {
   usersMap: { user1: '山田太郎' },
 }
 
+describe('AdjustmentProductTable ツールバー', () => {
+  it('全件数と絞り込み後の件数を表示する', () => {
+    render(<AdjustmentProductTable {...baseProps} isRD isTokushima />)
+    expect(screen.getByText(/全1件中/)).toBeInTheDocument()
+    expect(screen.getByText('1件')).toBeInTheDocument()
+  })
+
+  it('絞り込み条件を戻すリセットボタンがある', () => {
+    render(<AdjustmentProductTable {...baseProps} isRD isTokushima />)
+    expect(screen.getByRole('button', { name: 'リセット' })).toBeInTheDocument()
+  })
+
+  it('該当がないときは表ではなく案内を出す', () => {
+    render(<AdjustmentProductTable {...baseProps} products={[]} isRD isTokushima />)
+    expect(screen.getByText('現在登録された情報はありません。')).toBeInTheDocument()
+    expect(screen.queryByRole('table')).toBeNull()
+  })
+})
+
 describe('AdjustmentProductTable 権限による表示', () => {
   it('権限があるとき編集入力欄が表示される', () => {
     render(<AdjustmentProductTable {...baseProps} isRD={true} isTokushima={true} />)

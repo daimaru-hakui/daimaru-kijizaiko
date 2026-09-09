@@ -13,3 +13,11 @@ export function canEditAccountingRecord(
 ): boolean {
   return (isPrivileged || record.createUser === userId) && record.accounting !== true
 }
+
+/** 一覧の CSV は在庫や単価をまとめて持ち出せるため、R&D (と管理者) だけに許可する */
+export function canDownloadCsv(roles: {
+  rd: boolean
+  admin: boolean
+}): boolean {
+  return roles.rd || roles.admin
+}

@@ -4,9 +4,16 @@ import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  React.HTMLAttributes<HTMLTableElement> & {
+    /**
+     * スクロール枠 (table を包む div) の class。
+     * 高さ制限を外側の div に置くと、この div の overflow-auto が
+     * スクロール枠として先に効いてしまい sticky なヘッダーが追従しない。
+     */
+    containerClassName?: string
+  }
+>(({ className, containerClassName, ...props }, ref) => (
+  <div className={cn("relative w-full overflow-auto", containerClassName)}>
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}

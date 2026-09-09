@@ -19,7 +19,7 @@ export default async function SuppliersPage() {
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-4xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
           <div className="flex justify-between items-center mb-5">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">仕入先一覧</h2>
             <Link href="/settings/suppliers/new">

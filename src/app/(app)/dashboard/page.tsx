@@ -26,7 +26,7 @@ function CountBadge({
   divider?: boolean
 }) {
   return (
-    <div className={`flex items-center gap-3 flex-1 min-w-0 ${divider ? 'border-r border-slate-100 pr-4' : ''}`}>
+    <div className={`flex items-center gap-2 sm:gap-3 flex-1 min-w-0 ${divider ? 'border-r border-slate-100 pr-2 sm:pr-4' : ''}`}>
       <div className={`shrink-0 p-2 rounded-lg ${iconBg}`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
@@ -34,7 +34,7 @@ function CountBadge({
         <p className="text-[11px] font-semibold text-slate-400 tracking-[0.1em] uppercase leading-none truncate">
           {label}
         </p>
-        <p className="mt-1 text-2xl font-bold tabular-nums text-slate-900 leading-none">
+        <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums text-slate-900 leading-none">
           {value.toLocaleString()}
           <span className="text-xs font-normal text-slate-400 ml-1">件</span>
         </p>
@@ -99,11 +99,11 @@ export default async function DashboardPage() {
         {/* カウントカード */}
         <SectionHeading>登録・仕掛 件数</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
             <CountBadge icon={Layers}  label="キバタ登録"  value={grayFabricCount}             iconBg="bg-slate-100"   iconColor="text-slate-600" />
             <CountBadge icon={Shirt}   label="生地登録"    value={products.length}              iconBg="bg-blue-50"     iconColor="text-blue-700" divider={false} />
           </div>
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
             <CountBadge icon={Timer}    label="キバタ仕掛" value={grayFabricOrdersSnap.size}    iconBg="bg-violet-50"   iconColor="text-violet-700" />
             <CountBadge icon={Droplets} label="染め仕掛"   value={fabricDyeingOrdersSnap.size}  iconBg="bg-cyan-50"     iconColor="text-cyan-700" />
             <CountBadge icon={Truck}    label="入荷予定"   value={fabricPurchaseOrdersSnap.size} iconBg="bg-amber-50"   iconColor="text-amber-600" divider={false} />

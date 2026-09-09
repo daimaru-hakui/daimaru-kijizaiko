@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { FilterInput, FilterSelect } from '@/components/filters/fields'
 import { InlineStat } from '@/components/products/shared'
+import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildGrayFabricCsv } from '@/lib/gray-fabrics/csv'
 import { matchesProductNumber } from '@/lib/utils'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import { buildOptions } from '@/lib/filters/options'
@@ -67,6 +70,10 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
                 <span className="font-semibold text-slate-700">{filtered.length}件</span>
                 表示
               </span>
+              <CsvDownloadButton
+                filename="キバタ一覧"
+                build={() => buildGrayFabricCsv(filtered)}
+              />
               <Button
                 size="sm"
                 asChild
@@ -109,74 +116,65 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
             {filtered.map((fabric) => {
               const canEdit = isRD || fabric.createUser === currentUserId
               return (
-                <div
-                  key={fabric.id}
-                  className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
-                >
-                  {/* 左アクセントライン */}
-                  <div className="w-1 shrink-0 bg-indigo-600" />
-
-                  {/* ペインボディ */}
-                  <div className="flex-1 grid grid-cols-[2fr_1.5fr_2fr_2fr_auto] divide-x divide-slate-100 min-w-0">
-                    {/* ペイン1: 品番・品名 */}
-                    <div className="px-3 py-1.5 flex flex-col justify-center gap-1 min-w-0">
-                      <span className="font-bold text-slate-900 text-sm leading-none">
-                        {fabric.productNumber}
-                      </span>
-                      <div
-                        className="text-xs text-slate-700 truncate leading-none"
-                        title={fabric.productName}
-                      >
-                        {fabric.productName}
-                      </div>
+                <ListCard key={fabric.id} mdCols="md:grid-cols-[2fr_1.5fr_2fr_2fr_11rem]">
+                  {/* ペイン1: 品番・品名 */}
+                  <ListCardPane className="py-1.5">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {fabric.productNumber}
+                    </span>
+                    <div
+                      className="text-xs text-slate-700 truncate leading-none"
+                      title={fabric.productName}
+                    >
+                      {fabric.productName}
                     </div>
+                  </ListCardPane>
 
-                    {/* ペイン2: 仕入先 */}
-                    <div className="px-3 py-1.5 flex flex-col justify-center min-w-0">
-                      <span
-                        className="text-xs text-slate-700 leading-none truncate"
-                        title={fabric.supplierName}
-                      >
-                        {fabric.supplierName}
-                      </span>
-                    </div>
+                  {/* ペイン2: 仕入先 */}
+                  <ListCardPane className="py-1.5">
+                    <span
+                      className="text-xs text-slate-700 leading-none truncate"
+                      title={fabric.supplierName}
+                    >
+                      {fabric.supplierName}
+                    </span>
+                  </ListCardPane>
 
-                    {/* ペイン3: 在庫数値 */}
-                    <div className="px-3 py-1.5 grid grid-cols-2 bg-slate-50/60">
-                      <InlineStat label="仕掛" value={fabric.wip} unit="m" />
-                      <InlineStat label="在庫" value={fabric.stock} unit="m" />
-                    </div>
+                  {/* ペイン3: 在庫数値 */}
+                  <ListCardPane stat className="grid-cols-2">
+                    <InlineStat label="仕掛" value={fabric.wip} unit="m" />
+                    <InlineStat label="在庫" value={fabric.stock} unit="m" />
+                  </ListCardPane>
 
-                    {/* ペイン4: コメント */}
-                    <div className="px-3 py-1.5 flex items-center gap-1 min-w-0">
-                      <CommentModal comment={fabric.comment} />
-                      <div
-                        className="text-xs text-slate-600 truncate"
-                        title={fabric.comment}
-                      >
-                        {fabric.comment}
-                      </div>
+                  {/* ペイン4: コメント */}
+                  <ListCardPane className="flex-row items-center py-1.5">
+                    <CommentModal comment={fabric.comment} />
+                    <div
+                      className="text-xs text-slate-600 truncate"
+                      title={fabric.comment}
+                    >
+                      {fabric.comment}
                     </div>
+                  </ListCardPane>
 
-                    {/* ペイン5: アクション */}
-                    <div className="px-2 py-1.5 flex items-center gap-1">
-                      <GrayFabricOrderAreaModal grayFabric={fabric} />
-                      {canEdit && (
-                        <>
-                          <GrayFabricEditModal grayFabric={fabric} suppliers={suppliers} />
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDelete(fabric.id)}
-                          >
-                            削除
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  {/* ペイン5: アクション */}
+                  <ListCardPane action className="py-1.5">
+                    <GrayFabricOrderAreaModal grayFabric={fabric} />
+                    {canEdit && (
+                      <>
+                        <GrayFabricEditModal grayFabric={fabric} suppliers={suppliers} />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDelete(fabric.id)}
+                        >
+                          削除
+                        </Button>
+                      </>
+                    )}
+                  </ListCardPane>
+                </ListCard>
               )
             })}
           </div>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { canEditRecord, canEditAccountingRecord } from './permissions'
+import { canEditRecord, canEditAccountingRecord, canDownloadCsv } from './permissions'
 
 describe('canEditRecord', () => {
   it('作成者本人は編集できる', () => {
@@ -34,5 +34,32 @@ describe('canEditAccountingRecord', () => {
 
   it('経理処理未済・権限ありは編集できる', () => {
     expect(canEditAccountingRecord({ createUser: 'u2' }, 'u1', true)).toBe(true)
+  })
+})
+
+describe('canDownloadCsv', () => {
+  const roles = {
+    admin: false,
+    rd: false,
+    tokushima: false,
+    accounting: false,
+    sales: false,
+  }
+
+  it('R&D 権限があればダウンロードできる', () => {
+    expect(canDownloadCsv({ ...roles, rd: true })).toBe(true)
+  })
+
+  it('管理者は R&D と同じ扱いでダウンロードできる', () => {
+    expect(canDownloadCsv({ ...roles, admin: true })).toBe(true)
+  })
+
+  it('徳島・経理・営業だけの権限ではダウンロードできない', () => {
+    const otherRoles = { ...roles, tokushima: true, accounting: true, sales: true }
+    expect(canDownloadCsv(otherRoles)).toBe(false)
+  })
+
+  it('権限が無ければダウンロードできない', () => {
+    expect(canDownloadCsv(roles)).toBe(false)
   })
 })

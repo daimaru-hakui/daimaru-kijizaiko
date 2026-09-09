@@ -13,7 +13,7 @@ export default async function ColorsPage() {
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
           <ColorsClient initialColors={colors} />
         </div>
       </div>

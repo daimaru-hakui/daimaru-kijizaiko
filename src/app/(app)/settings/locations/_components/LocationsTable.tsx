@@ -5,6 +5,8 @@ import { Location } from "../../../../../../types";
 import { deleteLocationAction } from "@/app/(app)/settings/actions";
 import { CommentModal } from "@/components/CommentModal";
 import { EditLocationModal } from "@/components/settings/locations/EditModal";
+import { CsvDownloadButton } from "@/components/list/CsvDownloadButton";
+import { buildLocationCsv } from "@/lib/settings/csv";
 import { FaTrashAlt } from "react-icons/fa";
 import {
   Table,
@@ -35,35 +37,43 @@ export const LocationsTable: FC<Props> = ({ locations }) => {
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-slate-50">
-          <TableHead className={HEAD_NOWRAP}>順番</TableHead>
-          <TableHead className={HEAD_NOWRAP}>保管場所</TableHead>
-          <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
-          <TableHead className={HEAD_NOWRAP}>編集</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {locations.map((location) => (
-          <TableRow key={location.id}>
-            <TableCell className="whitespace-nowrap">{location.order}</TableCell>
-            <TableCell className="whitespace-nowrap">{location.name}</TableCell>
-            <TableCell>
-              <div className="flex gap-3 items-center">
-                <CommentModal comment={location.comment} />
-                {location.comment.slice(0, 10) + (location.comment.length > 10 ? "..." : "")}
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center justify-center gap-3">
-                <EditLocationModal location={location} />
-                <FaTrashAlt color="#444" cursor="pointer" onClick={() => handleDelete(location.id)} />
-              </div>
-            </TableCell>
+    <>
+      <div className="flex justify-end mb-3">
+        <CsvDownloadButton
+          filename="徳島保管場所一覧"
+          build={() => buildLocationCsv(locations)}
+        />
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-50">
+            <TableHead className={HEAD_NOWRAP}>順番</TableHead>
+            <TableHead className={HEAD_NOWRAP}>保管場所</TableHead>
+            <TableHead className={`w-full ${HEAD}`}>コメント</TableHead>
+            <TableHead className={HEAD_NOWRAP}>編集</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {locations.map((location) => (
+            <TableRow key={location.id}>
+              <TableCell className="whitespace-nowrap">{location.order}</TableCell>
+              <TableCell className="whitespace-nowrap">{location.name}</TableCell>
+              <TableCell>
+                <div className="flex gap-3 items-center">
+                  <CommentModal comment={location.comment} />
+                  {location.comment.slice(0, 10) + (location.comment.length > 10 ? "..." : "")}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center justify-center gap-3">
+                  <EditLocationModal location={location} />
+                  <FaTrashAlt color="#444" cursor="pointer" onClick={() => handleDelete(location.id)} />
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 };

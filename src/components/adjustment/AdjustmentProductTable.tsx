@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { Table, TableBody } from '@/components/ui/table'
 import { AdjustmentProductHeader } from './AdjustmentProductHeader'
 import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
-import { AdjustmentProductSearchBar } from './AdjustmentProductSearchBar'
-import { matchesProductNumber } from '@/lib/utils'
-import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildAdjustmentProductCsv } from '@/lib/adjustment/csv'
 import type { Product } from '../../../types'
 
 type Props = {
@@ -17,25 +18,52 @@ type Props = {
 }
 
 export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }: Props) {
-  const [searchText, setSearchText] = useState('')
+  const { values, filter, setValue, reset } = useListFilter()
 
-  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
-  const search = useDebounce(searchText, SEARCH_DEBOUNCE_MS)
-
-  const filtered = products.filter((p) =>
-    matchesProductNumber(p.productNumber, search)
-  )
+  const filtered = products.filter((p) => matchesListFilter(p, filter))
 
   return (
-    <div className="w-full">
-      <AdjustmentProductSearchBar searchText={searchText} setSearchText={setSearchText} />
-      {!isRD && !isTokushima && (
-        <p className="mt-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-          在庫の編集には R&D・徳島・管理者のいずれかの権限が必要です。
-        </p>
-      )}
-      <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
-        <Table className="w-full">
+    <div className="space-y-4">
+      {/* ツールバー */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
+            生地在庫調整
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500">
+              全{products.length}件中{' '}
+              <span className="font-semibold text-slate-700">{filtered.length}件</span>
+              表示
+            </span>
+            <CsvDownloadButton
+              filename="生地在庫調整"
+              build={() => buildAdjustmentProductCsv(filtered, usersMap)}
+            />
+          </div>
+        </div>
+        <ListFilterBar
+          values={values}
+          onChange={setValue}
+          onReset={reset}
+          fields={['productNumber']}
+        />
+        {!isRD && !isTokushima && (
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+            在庫の編集には R&D・徳島・管理者のいずれかの権限が必要です。
+          </p>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="rounded-lg border border-slate-200 py-16 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <Table
+          className="w-full"
+          containerClassName="rounded-lg border border-slate-200 max-h-[calc(100vh-300px)] sm:max-h-[calc(100vh-240px)]"
+        >
           <AdjustmentProductHeader isRD={isRD} isTokushima={isTokushima} />
           <TableBody>
             {filtered.map((product) => (
@@ -49,7 +77,7 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
             ))}
           </TableBody>
         </Table>
-      </div>
+      )}
     </div>
   )
 }

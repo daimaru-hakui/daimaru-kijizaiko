@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { GiCancel } from 'react-icons/gi'
+import { RotateCcw } from 'lucide-react'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
@@ -62,41 +62,46 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
     <TableRow>
       <TableCell>{usersMap[product.staff] ?? product.staff}</TableCell>
       <TableCell>{product.productNumber}</TableCell>
-      <TableCell>{product.colorName}</TableCell>
+      {/* 色名は途中で折り返すと読みにくいので折り返さない */}
+      <TableCell className="whitespace-nowrap">{product.colorName}</TableCell>
       {showEdit && (
         <>
           {isRD && (
             <>
-              <TableCell className="p-1">
+              <TableCell className="px-4 py-1">
                 <NumberInput
-                  className="w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={items.price}
                   onChange={(_, v) => handleChange('price', v)}
                 />
               </TableCell>
-              <TableCell className="p-1">
+              <TableCell className="px-4 py-1">
                 <NumberInput
-                  className="w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.wip)}
                   onChange={(_, v) => handleChange('wip', v)}
                 />
               </TableCell>
-              <TableCell className="p-1">
+              <TableCell className="px-4 py-1">
                 <NumberInput
-                  className="w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.externalStock)}
                   onChange={(_, v) => handleChange('externalStock', v)}
                 />
               </TableCell>
-              <TableCell className="p-1">
+              <TableCell className="px-4 py-1">
                 <NumberInput
-                  className="w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.arrivingQuantity)}
@@ -105,9 +110,10 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
             </>
           )}
-          <TableCell className="p-1">
+          <TableCell className="px-4 py-1">
             <NumberInput
-              className="w-40"
+              className="w-32"
+              inputClassName="px-1"
               min={0}
               max={100000}
               value={mathRound2nd(items.tokushimaStock)}
@@ -119,7 +125,16 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               <Button size="sm" disabled={saving} onClick={handleUpdate}>
                 更新
               </Button>
-              <GiCancel className="cursor-pointer" onClick={handleReset} />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="入力を元に戻す"
+                className="h-8 w-8 text-slate-400 hover:text-slate-700"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
             </div>
           </TableCell>
         </>

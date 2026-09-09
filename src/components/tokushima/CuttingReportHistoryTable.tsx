@@ -3,6 +3,13 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
+import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import {
+  buildCuttingHistoryCsv,
+  calcScale,
+  toCuttingHistoryRows,
+} from '@/lib/cutting-reports/csv'
 import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
@@ -19,25 +26,6 @@ type Props = {
   endDay: string
 }
 
-type HistoryRow = {
-  reportId: string
-  serialNumber: number
-  cuttingDate: string
-  staff: string
-  processNumber: string
-  client: string
-  itemName: string
-  totalQuantity: number
-  category: string
-  productId: string
-  quantity: number
-}
-
-function calcScale(meter: number, total: number) {
-  if (!meter || !total) return '0'
-  return (meter / total).toFixed(2)
-}
-
 export function CuttingReportHistoryTable({ reports, usersMap, productMap, startDay, endDay }: Props) {
   const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
     '/tokushima/cutting-reports/history',
@@ -46,21 +34,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
   )
   const { values, filter, setValue, reset } = useListFilter()
 
-  const rows: HistoryRow[] = reports.flatMap((report) =>
-    (report.products ?? []).map((p) => ({
-      reportId: report.id,
-      serialNumber: report.serialNumber,
-      cuttingDate: report.cuttingDate,
-      staff: report.staff,
-      processNumber: report.processNumber,
-      client: report.client,
-      itemName: report.itemName,
-      totalQuantity: report.totalQuantity,
-      category: p.category,
-      productId: p.productId,
-      quantity: p.quantity,
-    }))
-  )
+  const rows = toCuttingHistoryRows(reports)
 
   const filtered = rows.filter((r) => matchesListFilter(r, filter))
 
@@ -72,8 +46,14 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
   const staffOptions = buildOptions(reports.map((r) => r.staff), usersMap)
 
   return (
-    <div className="p-6 space-y-4">
-      <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
+    <div className="p-4 sm:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
+        <CsvDownloadButton
+          filename="裁断生地一覧"
+          build={() => buildCuttingHistoryCsv(filtered, usersMap, productMap)}
+        />
+      </div>
 
       <PeriodFilterBar
         start={start}
@@ -99,77 +79,68 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
             const prod = productMap[row.productId]
             const staffName = row.staff === 'R&D' ? 'R&D' : (usersMap[row.staff] ?? row.staff)
             return (
-              <div
-                key={idx}
-                className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden transition-shadow hover:shadow-md flex"
-              >
-                {/* 左アクセントライン */}
-                <div className="w-1 shrink-0 bg-indigo-600" />
-
-                {/* ペインボディ */}
-                <div className="flex-1 grid grid-cols-[2fr_1.5fr_2fr_2fr] divide-x divide-slate-100 min-w-0">
-                  {/* ペイン1: 生地品番・色・品名・NO. */}
-                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-bold text-slate-900 text-sm leading-none">
-                        {prod?.productNumber ?? row.productId}
-                      </span>
-                      {prod?.colorName && <Chip label={prod.colorName} />}
-                      {row.category && <Chip label={row.category} variant="slate" />}
-                    </div>
-                    <div
-                      className="text-xs text-slate-700 truncate leading-none"
-                      title={prod?.productName ?? ''}
-                    >
-                      {prod?.productName ?? ''}
-                    </div>
-                    <div className="text-xs text-slate-400 leading-none">
-                      NO.{formatSerialNumber(row.serialNumber)}
-                    </div>
+              <ListCard key={idx} mdCols="md:grid-cols-[2fr_1.5fr_2fr_2fr]">
+                {/* ペイン1: 生地品番・色・品名・NO. */}
+                <ListCardPane>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-slate-900 text-sm leading-none">
+                      {prod?.productNumber ?? row.productId}
+                    </span>
+                    {prod?.colorName && <Chip label={prod.colorName} />}
+                    {row.category && <Chip label={row.category} variant="slate" />}
                   </div>
-
-                  {/* ペイン2: 担当・日付・指示書 */}
-                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
-                    <div className="flex items-center gap-1 flex-wrap">
-                      <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
-                      <Chip label={staffName} variant="indigo" />
-                    </div>
-                    <div className="text-xs text-slate-600 leading-none">
-                      裁断日: {row.cuttingDate}
-                    </div>
-                    <div className="text-xs text-slate-600 leading-none">
-                      指示書NO.{row.processNumber}
-                    </div>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={prod?.productName ?? ''}
+                  >
+                    {prod?.productName ?? ''}
                   </div>
-
-                  {/* ペイン3: 数値 */}
-                  <div className="px-3 py-2 grid grid-cols-3 bg-slate-50/60">
-                    <InlineStat label="数量" value={row.quantity} unit="m" />
-                    <InlineStat label="総枚数" value={row.totalQuantity} unit="" />
-                    <InlineStat
-                      label="用尺"
-                      value={Number(calcScale(row.quantity, row.totalQuantity))}
-                      unit="m"
-                    />
+                  <div className="text-xs text-slate-400 leading-none">
+                    NO.{formatSerialNumber(row.serialNumber)}
                   </div>
+                </ListCardPane>
 
-                  {/* ペイン4: 受注先・製品名 */}
-                  <div className="px-3 py-2 flex flex-col justify-center gap-1 min-w-0">
-                    <div
-                      className="text-xs text-slate-700 truncate leading-none"
-                      title={row.client}
-                    >
-                      受注先: {row.client}
-                    </div>
-                    <div
-                      className="text-xs text-slate-600 truncate leading-none"
-                      title={row.itemName}
-                    >
-                      製品名: {row.itemName}
-                    </div>
+                {/* ペイン2: 担当・日付・指示書 */}
+                <ListCardPane>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-xs text-slate-500 leading-none shrink-0">担当</span>
+                    <Chip label={staffName} variant="indigo" />
                   </div>
-                </div>
-              </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    裁断日: {row.cuttingDate}
+                  </div>
+                  <div className="text-xs text-slate-600 leading-none">
+                    指示書NO.{row.processNumber}
+                  </div>
+                </ListCardPane>
+
+                {/* ペイン3: 数値 */}
+                <ListCardPane stat className="grid-cols-3">
+                  <InlineStat label="数量" value={row.quantity} unit="m" />
+                  <InlineStat label="総枚数" value={row.totalQuantity} unit="" />
+                  <InlineStat
+                    label="用尺"
+                    value={Number(calcScale(row.quantity, row.totalQuantity))}
+                    unit="m"
+                  />
+                </ListCardPane>
+
+                {/* ペイン4: 受注先・製品名 */}
+                <ListCardPane>
+                  <div
+                    className="text-xs text-slate-700 truncate leading-none"
+                    title={row.client}
+                  >
+                    受注先: {row.client}
+                  </div>
+                  <div
+                    className="text-xs text-slate-600 truncate leading-none"
+                    title={row.itemName}
+                  >
+                    製品名: {row.itemName}
+                  </div>
+                </ListCardPane>
+              </ListCard>
             )
           })}
         </div>
