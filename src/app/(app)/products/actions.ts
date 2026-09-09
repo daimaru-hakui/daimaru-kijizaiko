@@ -5,11 +5,27 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
-import { ensureAuth, runAuthedAction } from '@/lib/actions'
+import { ensureAuth, ensureRoles, hasAnyRole, runAuthedAction } from '@/lib/actions'
+import { canEditRecord } from '@/lib/permissions'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { buildProductCommonPayload } from '@/lib/products/payload'
 import type { ActionResult } from '@/lib/actions'
 import type { Product } from '../../../../types'
+
+/**
+ * 生地を更新/削除できるのは R&D (と管理者) か、その生地を登録した本人だけ。
+ * UI (ProductListTable の isAdmin || isRD, 編集ページの isPrivileged) と同じ条件をサーバー側でも守る。
+ */
+async function ensureProductEditor(productId: string): Promise<{ uid: string }> {
+  const auth = await ensureRoles([])
+  if (!auth.ok) throw new Error(auth.error)
+  const privileged = hasAnyRole(auth.roles, ['rd', 'admin'])
+  const productSnap = await getAdminDb().collection('products').doc(productId).get()
+  if (!canEditRecord({ createUser: productSnap.data()?.createUser }, auth.uid, privileged)) {
+    throw new Error('権限がありません')
+  }
+  return { uid: auth.uid }
+}
 
 export async function getProductsAction(): Promise<
   { ok: true; contents: Product[] } | { ok: false; error: string }
@@ -90,7 +106,8 @@ export type UpdateProductInput = AddProductInput & {
 }
 
 export async function updateProductAction(data: UpdateProductInput): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+  const result = await runAuthedAction(async () => {
+    const { uid } = await ensureProductEditor(data.productId)
     const db = getAdminDb()
 
     const supplierSnap = await db.collection('suppliers').doc(data.supplierId).get()
@@ -110,6 +127,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<Act
 
 export async function deleteProductAction(productId: string): Promise<ActionResult> {
   const result = await runAuthedAction(async () => {
+    await ensureProductEditor(productId)
     const db = getAdminDb()
     await db.collection('products').doc(productId).update({
       deletedAt: getTodayDate(),

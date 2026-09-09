@@ -20,14 +20,19 @@ const mockTransactionUpdate = vi.fn()
 const mockTransactionSet = vi.fn()
 const mockTransactionDelete = vi.fn()
 const mockRunTransaction = vi.fn()
+const mockUserDocGet = vi.fn()
+let roles: Record<string, boolean>
 
 const makeMockDb = () => ({
-  collection: (name: string) => ({
-    doc: (id?: string) => ({
-      id: id || 'auto-id',
-      path: `${name}/${id || 'auto-id'}`,
-    }),
-  }),
+  collection: (name: string) =>
+    name === 'users'
+      ? { doc: () => ({ get: mockUserDocGet }) }
+      : {
+          doc: (id?: string) => ({
+            id: id || 'auto-id',
+            path: `${name}/${id || 'auto-id'}`,
+          }),
+        },
   runTransaction: mockRunTransaction,
 })
 
@@ -35,6 +40,11 @@ beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
+  // 既定は特権なし。所有者判定は履歴 doc の createUser で行う
+  roles = {}
+  mockUserDocGet.mockImplementation(async () => ({ exists: true, data: () => roles }))
+  // mockResolvedValueOnce で指定しなかった read は user1 が作った履歴として返す
+  mockTransactionGet.mockResolvedValue({ data: () => ({ createUser: 'user1' }) })
   // Firestore の「全 read を全 write より前に」制約を再現するモック
   mockRunTransaction.mockImplementation(async (fn: any) => {
     let hasWritten = false
@@ -303,8 +313,9 @@ describe('updateFabricDyeingOrderAction', () => {
   })
 
   it('stockType=stock: grayFabric.stock と product.wip が更新される', async () => {
-    // B9修正後の read 順序: product 先, grayFabric 後
+    // read 順序: 履歴 (認可) → product → grayFabric
     mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
       .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })     // product
       .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })  // grayFabric
     const result = await updateFabricDyeingOrderAction(base)
@@ -316,7 +327,9 @@ describe('updateFabricDyeingOrderAction', () => {
   })
 
   it('stockType=ranning: product.wip のみ更新される', async () => {
-    mockTransactionGet.mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
     const result = await updateFabricDyeingOrderAction({ ...base, stockType: 'ranning', grayFabricId: '' })
     expect(result).toEqual({ ok: true })
     expect(mockTransactionUpdate.mock.calls[0][1].wip).toBe(40)
@@ -324,11 +337,60 @@ describe('updateFabricDyeingOrderAction', () => {
 
   it('浮動小数点の丸め: stock と wip が小数第2位まで丸められる', async () => {
     mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
       .mockResolvedValueOnce({ data: () => ({ wip: 100.2 }) })
       .mockResolvedValueOnce({ data: () => ({ stock: 0.1 }) })
     await updateFabricDyeingOrderAction({ ...base, currentQuantity: 33.4, quantity: 0 })
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 33.5 })
     expect(mockTransactionUpdate.mock.calls[1][1].wip).toBe(66.8)
+  })
+
+  describe('認可', () => {
+    const othersOrder = { data: () => ({ createUser: 'other', wip: 60, stock: 100 }) }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は Firestore に書き込まない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await updateFabricDyeingOrderAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('特権なしでも所有者なら更新できる', async () => {
+      mockTransactionGet.mockResolvedValue({ data: () => ({ createUser: 'user1', wip: 60, stock: 100 }) })
+      const result = await updateFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd は非所有者の発注も更新できる', async () => {
+      roles = { rd: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('admin は非所有者の発注も更新できる', async () => {
+      roles = { admin: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('tokushima は非所有者の発注を更新できない', async () => {
+      roles = { tokushima: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('users doc の読み取りは 1 回だけ', async () => {
+      await updateFabricDyeingOrderAction(base)
+      expect(mockUserDocGet).toHaveBeenCalledOnce()
+    })
   })
 })
 
@@ -351,8 +413,9 @@ describe('deleteFabricDyeingOrderAction', () => {
   })
 
   it('stockType=stock: grayFabric.stock が戻り order が削除される', async () => {
-    // B9修正後の read 順序: product 先, grayFabric 後
+    // read 順序: 履歴 (認可) → product → grayFabric
     mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
       .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })     // product
       .mockResolvedValueOnce({ data: () => ({ stock: 100 }) })  // grayFabric
     const result = await deleteFabricDyeingOrderAction(base)
@@ -365,7 +428,9 @@ describe('deleteFabricDyeingOrderAction', () => {
   })
 
   it('stockType=ranning: product.wip のみ変更', async () => {
-    mockTransactionGet.mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ wip: 60 }) })
     const result = await deleteFabricDyeingOrderAction({ ...base, stockType: 'ranning', grayFabricId: '' })
     expect(result).toEqual({ ok: true })
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ wip: 20 })
@@ -374,11 +439,41 @@ describe('deleteFabricDyeingOrderAction', () => {
 
   it('浮動小数点の丸め: stock と wip が小数第2位まで丸められる', async () => {
     mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
       .mockResolvedValueOnce({ data: () => ({ wip: 100.2 }) })
       .mockResolvedValueOnce({ data: () => ({ stock: 0.1 }) })
     await deleteFabricDyeingOrderAction({ ...base, quantity: 33.4 })
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ stock: 33.5 })
     expect(mockTransactionUpdate.mock.calls[1][1]).toEqual({ wip: 66.8 })
+  })
+
+  describe('認可', () => {
+    const othersOrder = { data: () => ({ createUser: 'other', wip: 60, stock: 100 }) }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await deleteFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は order を削除しない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await deleteFabricDyeingOrderAction(base)
+      expect(mockTransactionDelete).not.toHaveBeenCalled()
+    })
+
+    it('特権なし・非所有者は在庫も更新しない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await deleteFabricDyeingOrderAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('rd は非所有者の発注も削除できる', async () => {
+      roles = { rd: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await deleteFabricDyeingOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
 
@@ -403,9 +498,9 @@ describe('updateFabricDyeingConfirmAction', () => {
   })
 
   it('正常系: externalStock が差分で更新され ok:true を返す', async () => {
-    mockTransactionGet.mockResolvedValueOnce({
-      data: () => ({ externalStock: 100 }),
-    })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ externalStock: 100 }) })
     const result = await updateFabricDyeingConfirmAction(base)
     expect(result).toEqual({ ok: true })
     // externalStock = 100 - (30 - 20) = 90
@@ -414,8 +509,33 @@ describe('updateFabricDyeingConfirmAction', () => {
   })
 
   it('浮動小数点の丸め: externalStock が小数第2位まで丸められる', async () => {
-    mockTransactionGet.mockResolvedValueOnce({ data: () => ({ externalStock: 100.2 }) })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ externalStock: 100.2 }) })
     await updateFabricDyeingConfirmAction({ ...base, currentQuantity: 33.4, quantity: 0 })
     expect(mockTransactionUpdate.mock.calls[0][1]).toEqual({ externalStock: 66.8 })
+  })
+
+  describe('認可', () => {
+    const othersConfirm = { data: () => ({ createUser: 'other', externalStock: 100 }) }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      const result = await updateFabricDyeingConfirmAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は Firestore に書き込まない', async () => {
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      await updateFabricDyeingConfirmAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('admin は非所有者の入荷も更新できる', async () => {
+      roles = { admin: true }
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      const result = await updateFabricDyeingConfirmAction(base)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })

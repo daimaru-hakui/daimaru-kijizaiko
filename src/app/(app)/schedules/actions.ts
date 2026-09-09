@@ -3,15 +3,13 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, hasAnyRole, type ActionResult, type UserRoles } from '@/lib/actions'
+import { canEditRecord } from '@/lib/permissions'
 import { mathRound2nd } from '@/lib/utils'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
-
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
+/** UI (SchedulesTable) と同じく、所有者か R&D / 管理者だけが更新・削除できる */
+function isPrivileged(roles: UserRoles): boolean {
+  return hasAnyRole(roles, ['rd', 'admin'])
 }
 
 export type AddScheduleInput = {
@@ -24,8 +22,8 @@ export type AddScheduleInput = {
 }
 
 export async function addScheduleAction(data: AddScheduleInput): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const uuid = crypto.randomUUID()
@@ -72,11 +70,18 @@ export type UpdateScheduleInput = {
 }
 
 export async function updateScheduleAction(data: UpdateScheduleInput): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
-  await db.collection('cuttingSchedules').doc(data.id).update({
+  const scheduleRef = db.collection('cuttingSchedules').doc(data.id)
+  const snap = await scheduleRef.get()
+  if (!snap.exists) return { ok: false, error: 'データが登録されていません' }
+  if (!canEditRecord(snap.data() as { createUser: string }, auth.uid, isPrivileged(auth.roles))) {
+    return { ok: false, error: '権限がありません' }
+  }
+
+  await scheduleRef.update({
     staff: data.staff,
     processNumber: data.processNumber,
     itemName: data.itemName,
@@ -94,8 +99,8 @@ export async function deleteScheduleAction(
   id: string,
   productId: string,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const scheduleRef = db.collection('cuttingSchedules').doc(id)
@@ -105,6 +110,9 @@ export async function deleteScheduleAction(
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(scheduleRef)
       if (!snap.exists) throw new Error('データが登録されていません')
+      if (!canEditRecord(snap.data() as { createUser: string }, auth.uid, isPrivileged(auth.roles))) {
+        throw new Error('権限がありません')
+      }
 
       tx.update(productRef, {
         cuttingSchedules: FieldValue.arrayRemove(id),

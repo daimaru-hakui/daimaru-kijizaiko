@@ -3,18 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, type ActionResult } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
-
 const TOKUSHIMA_FACTORY = '徳島工場'
-
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
-}
 
 export type UpdateHistoryInput = {
   quantity: number
@@ -31,8 +23,8 @@ export async function updateHistoryAccountingOrderAction(
   currentQuantity: number,
   data: UpdateHistoryInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(['accounting', 'admin'])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(productId)
@@ -80,8 +72,8 @@ export async function confirmProcessingAccountingAction(
   currentQuantity: number,
   data: ConfirmInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(['accounting', 'admin'])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(productId)

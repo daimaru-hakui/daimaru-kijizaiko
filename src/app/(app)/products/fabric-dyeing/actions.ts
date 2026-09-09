@@ -5,9 +5,20 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
-import { runAuthedAction } from '@/lib/actions'
+import { ensureRoles, hasAnyRole, runAuthedAction } from '@/lib/actions'
+import { canEditRecord } from '@/lib/permissions'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { ActionResult } from '@/lib/actions'
+
+/**
+ * 染色の履歴を更新/削除できるのは R&D (と管理者) か、その履歴を作った本人だけ。
+ * UI (FabricDyeing*Table の isRD = rd || admin) と同じ条件をサーバー側でも守る。
+ */
+async function ensureDyeingEditor(): Promise<{ uid: string; privileged: boolean }> {
+  const auth = await ensureRoles([])
+  if (!auth.ok) throw new Error(auth.error)
+  return { uid: auth.uid, privileged: hasAnyRole(auth.roles, ['rd', 'admin']) }
+}
 
 export type OrderFabricDyeingInput = {
   productId: string
@@ -214,13 +225,19 @@ export type UpdateFabricDyeingOrderInput = {
 export async function updateFabricDyeingOrderAction(
   data: UpdateFabricDyeingOrderInput,
 ): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+  const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensureDyeingEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const orderRef = db.collection('fabricDyeingOrders').doc(data.historyId)
     const diff = data.currentQuantity - data.quantity
 
     await db.runTransaction(async (tx) => {
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const wip: number = productSnap.data()?.wip ?? 0
 
@@ -261,11 +278,17 @@ export async function deleteFabricDyeingOrderAction(
   data: DeleteFabricDyeingOrderInput,
 ): Promise<ActionResult> {
   const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensureDyeingEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const orderRef = db.collection('fabricDyeingOrders').doc(data.historyId)
 
     await db.runTransaction(async (tx) => {
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const wip: number = productSnap.data()?.wip ?? 0
 
@@ -298,12 +321,18 @@ export type UpdateFabricDyeingConfirmInput = {
 export async function updateFabricDyeingConfirmAction(
   data: UpdateFabricDyeingConfirmInput,
 ): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+  const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensureDyeingEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const confirmRef = db.collection('fabricDyeingConfirms').doc(data.historyId)
 
     await db.runTransaction(async (tx) => {
+      const confirmSnap = await tx.get(confirmRef)
+      if (!canEditRecord({ createUser: confirmSnap.data()?.createUser }, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const externalStock: number = productSnap.data()?.externalStock ?? 0
       tx.update(productRef, {
