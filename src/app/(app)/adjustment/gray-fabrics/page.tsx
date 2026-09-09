@@ -1,22 +1,14 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
-import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
+import { getAdjustmentGrayFabrics } from '@/lib/adjustment/queries'
 import { AdjustmentGrayFabricTable } from '@/components/adjustment/AdjustmentGrayFabricTable'
 import { PageContainer } from '@/components/ui/page-container'
-import type { GrayFabric } from '../../../../../types'
 
 export default async function AdjustmentGrayFabricsPage() {
   const user = await verifyServerSession()
   if (!user) redirect('/login')
 
-  const db = getAdminDb()
-  const snap = await db.collection('grayFabrics').orderBy('productNumber').get()
-
-  const grayFabrics = snap.docs.map((d) => ({
-    ...(toPlainData(d.data()) as Omit<GrayFabric, 'id'>),
-    id: d.id,
-  }))
+  const grayFabrics = await getAdjustmentGrayFabrics()
 
   return (
     <PageContainer>

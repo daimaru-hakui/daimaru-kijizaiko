@@ -1,9 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
-import { getAdminDb } from '@/lib/firebase/admin'
 import { formatJstDateTime } from '@/lib/dates'
-import { parseDocs } from '@/lib/firestore/parse'
-import { stockPlaceSchema } from '@/lib/firestore/schemas'
+import { getOrderSheetData } from '@/lib/complete/queries'
 import { PageContainer } from '@/components/ui/page-container'
 import { OrderSheet } from './_components/OrderSheet'
 
@@ -24,20 +22,8 @@ export default async function CompletePage({ params, searchParams }: Props) {
   const { id } = await params
   const query = await searchParams
 
-  const db = getAdminDb()
-  const [productSnap, stockPlacesSnap, userSnap] = await Promise.all([
-    db.collection('products').doc(id).get(),
-    db.collection('stockPlaces').get(),
-    db.collection('users').doc(user.uid).get(),
-  ])
-
-  if (!productSnap.exists) notFound()
-
-  const product = productSnap.data() ?? {}
-  const stockPlace = query.stockPlace ?? '徳島工場'
-  const stockPlaceInfo = parseDocs(stockPlacesSnap.docs, stockPlaceSchema, 'stockPlaces').find(
-    (p) => p.name === stockPlace
-  )
+  const data = await getOrderSheetData(id, user.uid, query.stockPlace)
+  if (!data) notFound()
 
   return (
     <PageContainer maxWidth="max-w-3xl">
@@ -45,15 +31,11 @@ export default async function CompletePage({ params, searchParams }: Props) {
         serialNumber={Number(query.serialNumber ?? 0)}
         quantity={Number(query.quantity ?? 0)}
         scheduledAt={query.scheduledAt ?? ''}
-        stockPlace={stockPlace}
-        createUserName={(userSnap.data()?.name as string) ?? ''}
+        stockPlace={data.stockPlace}
+        createUserName={data.createUserName}
         issuedAt={formatJstDateTime(new Date())}
-        product={{
-          productNumber: (product.productNumber as string) ?? '',
-          productName: (product.productName as string) ?? '',
-          supplierName: (product.supplierName as string) ?? '',
-        }}
-        stockPlaceInfo={stockPlaceInfo}
+        product={data.product}
+        stockPlaceInfo={data.stockPlaceInfo}
       />
     </PageContainer>
   )
