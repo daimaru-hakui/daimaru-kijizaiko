@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEdit } from 'react-icons/fa'
+import { Pencil } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ export function StockEditDialog({ productId, currentStock, onUpdatedAction }: Pr
 
   return (
     <>
-      <FaEdit className="cursor-pointer text-sm ml-1" onClick={() => setOpen(true)} />
+      <Pencil className="cursor-pointer h-3.5 w-3.5 ml-1" onClick={() => setOpen(true)} />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-xs">
           <DialogHeader>

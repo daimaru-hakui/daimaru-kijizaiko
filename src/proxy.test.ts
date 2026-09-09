@@ -1,10 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import type { UserClaims } from '../src/lib/auth/roles'
+import type { UserClaims } from '@/lib/auth/roles'
 
 const mockVerifySessionCookie = vi.fn()
 const mockUserDocGet = vi.fn()
 
-vi.mock('../src/lib/firebase/admin', () => ({
+vi.mock('@/lib/firebase/admin', () => ({
   getAdminAuth: vi.fn(() => ({ verifySessionCookie: mockVerifySessionCookie })),
   getAdminDb: vi.fn(() => ({
     collection: vi.fn(() => ({
@@ -21,7 +21,7 @@ function makeNextRequest(pathname: string, sessionCookie?: string) {
 
 async function runProxy(pathname: string, sessionCookie?: string) {
   const req = makeNextRequest(pathname, sessionCookie)
-  const { proxy } = await import('../src/proxy')
+  const { proxy } = await import('./proxy')
   return proxy(req as unknown as Parameters<typeof proxy>[0])
 }
 

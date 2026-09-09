@@ -1,7 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
-import { FaTrashAlt } from 'react-icons/fa'
+import { Trash2 } from 'lucide-react'
 import { CommentModal } from '@/components/CommentModal'
 import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
 import {
@@ -96,11 +96,11 @@ export function MasterTable<T extends MasterEntity>({
                 <div className="flex items-center justify-center gap-3">
                   <MasterEditModal row={row} form={form} />
                   {canDelete(row) && (
-                    <FaTrashAlt
+                    <Trash2
                       role="button"
                       aria-label="削除"
                       color="#444"
-                      cursor="pointer"
+                      className="h-3.5 w-3.5 cursor-pointer"
                       onClick={() => handleDelete(row.id)}
                     />
                   )}

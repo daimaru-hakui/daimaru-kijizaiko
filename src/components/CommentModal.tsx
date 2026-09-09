@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FC } from "react";
-import { FaRegCommentDots } from "react-icons/fa";
+import { MessageSquareText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ export const CommentModal: FC<Props> = ({ comment }) => {
           aria-label="コメントを表示"
           onClick={() => setOpen(true)}
         >
-          <FaRegCommentDots fontSize="16px" />
+          <MessageSquareText className="h-4 w-4" />
         </Button>
       )}
 

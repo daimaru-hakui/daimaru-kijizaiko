@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FC } from "react";
-import { FaTrashAlt } from "react-icons/fa";
+import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CsvDownloadButton } from "@/components/list/CsvDownloadButton";
@@ -107,7 +107,11 @@ export const ColorsClient: FC<Props> = ({ initialColors }) => {
             >
               <TableCell className="w-full">{c}</TableCell>
               <TableCell className="w-5">
-                <FaTrashAlt color="#444" cursor="pointer" onClick={() => handleDelete(c)} />
+                <Trash2
+                  color="#444"
+                  className="h-3.5 w-3.5 cursor-pointer"
+                  onClick={() => handleDelete(c)}
+                />
               </TableCell>
             </TableRow>
           ))}
