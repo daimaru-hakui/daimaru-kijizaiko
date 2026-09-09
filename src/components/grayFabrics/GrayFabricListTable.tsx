@@ -15,6 +15,8 @@ import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricEditModal } from './GrayFabricEditModal'
 import { GrayFabricOrderAreaModal } from './GrayFabricOrderAreaModal'
 import { deleteGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
+import { EmptyState } from '@/components/list/EmptyState'
+import { ListTitle } from '@/components/list/ListTitle'
 import type { GrayFabric } from '../../../types'
 
 type Supplier = { id: string; name: string }
@@ -61,9 +63,7 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
         {/* ツールバー */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
-              キバタ一覧
-            </h2>
+            <ListTitle>キバタ一覧</ListTitle>
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-500">
                 全{grayFabrics.length}件中{' '}
@@ -108,9 +108,7 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
 
         {/* カードグリッド */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-16 text-center text-slate-400 text-sm">
-            現在登録された情報はありません。
-          </div>
+          <EmptyState className="py-16" />
         ) : (
           <div className="grid grid-cols-1 gap-3">
             {filtered.map((fabric) => {

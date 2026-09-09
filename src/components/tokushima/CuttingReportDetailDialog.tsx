@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { HEAD } from '@/components/ui/table-styles'
 import { CuttingReportForm } from './CuttingReportForm'
 import { deleteCuttingReportAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
@@ -141,12 +142,12 @@ export function CuttingReportDetailDialog({
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50">
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">種別</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">色</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">品名</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">数量</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 tracking-wider text-right">用尺</TableHead>
+                  <TableHead className={HEAD}>種別</TableHead>
+                  <TableHead className={HEAD}>生地品番</TableHead>
+                  <TableHead className={HEAD}>色</TableHead>
+                  <TableHead className={HEAD}>品名</TableHead>
+                  <TableHead className={`${HEAD} text-right`}>数量</TableHead>
+                  <TableHead className={`${HEAD} text-right`}>用尺</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

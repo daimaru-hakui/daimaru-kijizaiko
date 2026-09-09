@@ -14,6 +14,8 @@ import { matchesListFilter } from '@/lib/filters/list-filter'
 import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
 import { buildAdjustmentGrayFabricCsv } from '@/lib/adjustment/csv'
 import { HEAD } from '@/components/ui/table-styles'
+import { EmptyState } from '@/components/list/EmptyState'
+import { ListTitle } from '@/components/list/ListTitle'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -30,9 +32,7 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
       {/* ツールバー */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
-            キバタ在庫調整
-          </h2>
+          <ListTitle>キバタ在庫調整</ListTitle>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">
               全{grayFabrics.length}件中{' '}
@@ -54,9 +54,7 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 py-16 text-center text-slate-400 text-sm">
-          現在登録された情報はありません。
-        </div>
+        <EmptyState className="rounded-lg shadow-none py-16" />
       ) : (
         <Table containerClassName="rounded-lg border border-slate-200 max-h-[calc(100vh-300px)] sm:max-h-[calc(100vh-240px)]">
           <TableHeader className="sticky top-0 z-10 bg-slate-50 shadow-[inset_0_-1px_0_#e2e8f0]">

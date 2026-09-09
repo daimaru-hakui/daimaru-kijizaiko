@@ -12,6 +12,8 @@ import { matchesListFilter } from '@/lib/filters/list-filter'
 import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
 import type { CuttingSchedule } from '../../../types'
 import { buildOptions } from '@/lib/filters/options'
+import { EmptyState } from '@/components/list/EmptyState'
+import { ListTitle } from '@/components/list/ListTitle'
 
 type UserOption = { id: string; name: string }
 type ProductOption = { id: string; productNumber: string; colorName: string }
@@ -43,7 +45,7 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
   return (
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">使用予定一覧</h2>
+        <ListTitle>使用予定一覧</ListTitle>
         <div className="flex items-center gap-2">
           <CsvDownloadButton
             filename="使用予定一覧"
@@ -62,9 +64,7 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
       />
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
-          現在登録された情報はありません。
-        </div>
+        <EmptyState />
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {filtered.map((schedule) => {

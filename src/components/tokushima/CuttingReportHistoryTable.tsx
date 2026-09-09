@@ -17,6 +17,8 @@ import { buildOptions } from '@/lib/filters/options'
 import { PeriodFilterBar } from '@/components/filters/PeriodFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
+import { EmptyState } from '@/components/list/EmptyState'
+import { ListTitle } from '@/components/list/ListTitle'
 
 type Props = {
   reports: CuttingReportType[]
@@ -48,7 +50,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
   return (
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
+        <ListTitle>裁断生地一覧</ListTitle>
         <CsvDownloadButton
           filename="裁断生地一覧"
           build={() => buildCuttingHistoryCsv(filtered, usersMap, productMap)}
@@ -70,9 +72,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
       />
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-12 text-center text-slate-400 text-sm">
-          現在登録された情報はありません。
-        </div>
+        <EmptyState />
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {filtered.map((row, idx) => {

@@ -1,6 +1,6 @@
 import { buildCsv } from '@/lib/csv'
 import { toFiniteNumber } from '@/lib/numbers'
-import type { GrayFabric, Product } from '../../../types'
+import type { GrayFabric, SerializableProduct } from '../../../types'
 
 const PRODUCT_HEADERS = [
   '担当',
@@ -14,7 +14,7 @@ const PRODUCT_HEADERS = [
 ]
 
 export function buildAdjustmentProductCsv(
-  products: Omit<Product, 'createdAt' | 'updatedAt'>[],
+  products: SerializableProduct[],
   usersMap: Record<string, string>,
 ): string {
   const rows = products.map((p) => [

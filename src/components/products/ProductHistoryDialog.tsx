@@ -25,9 +25,8 @@ import {
   getProductPurchaseHistoryAction,
   type ProductCuttingHistory,
 } from '@/app/(app)/products/history-actions'
-import type { History } from '../../../types'
-
-type PurchaseHistory = Omit<History, 'createdAt' | 'updatedAt'>
+import { HEAD } from '@/components/ui/table-styles'
+import type { SerializableHistory } from '../../../types'
 
 type Props = {
   productId: string
@@ -37,8 +36,6 @@ type Props = {
   onCloseAction: () => void
   usersMap: Record<string, string>
 }
-
-const HEAD = 'text-xs font-semibold text-slate-500 tracking-wider'
 
 export function ProductHistoryDialog({
   productId,
@@ -52,7 +49,7 @@ export function ProductHistoryDialog({
   const [endDay, setEndDay] = useState(getTodayDate())
   const [loading, setLoading] = useState(true)
   const [cuttings, setCuttings] = useState<ProductCuttingHistory[]>([])
-  const [purchases, setPurchases] = useState<PurchaseHistory[]>([])
+  const [purchases, setPurchases] = useState<SerializableHistory[]>([])
 
   useEffect(() => {
     let cancelled = false

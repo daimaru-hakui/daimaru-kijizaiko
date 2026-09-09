@@ -1,28 +1,26 @@
-import { getMixed, getFabricStd } from "@/lib/utils";
-import { buildCsv } from "@/lib/csv";
-import type { Product } from "../../../types";
-
-type ProductRow = Omit<Product, "createdAt" | "updatedAt">;
+import { getMixed, getFabricStd } from '@/lib/utils'
+import { buildCsv } from '@/lib/csv'
+import type { SerializableProduct } from '../../../types'
 
 const HEADERS = [
-  "担当",
-  "品番",
-  "色番",
-  "色",
-  "品名",
-  "単価",
-  "生地仕掛",
-  "外部在庫",
-  "入荷待ち",
-  "徳島在庫",
-  "組織名",
-  "混率",
-  "規格",
-  "機能性",
-];
+  '担当',
+  '品番',
+  '色番',
+  '色',
+  '品名',
+  '単価',
+  '生地仕掛',
+  '外部在庫',
+  '入荷待ち',
+  '徳島在庫',
+  '組織名',
+  '混率',
+  '規格',
+  '機能性',
+]
 
 export function buildProductCsv(
-  products: ProductRow[],
+  products: SerializableProduct[],
   usersMap: Record<string, string>,
 ): string {
   const rows = products.map((p) => [
@@ -37,10 +35,10 @@ export function buildProductCsv(
     p.arrivingQuantity,
     p.tokushimaStock,
     p.materialName,
-    getMixed(p.materials as Parameters<typeof getMixed>[0]).join(" "),
+    getMixed(p.materials as Parameters<typeof getMixed>[0]).join(' '),
     getFabricStd(p.fabricWidth, p.fabricLength, p.fabricWeight),
-    (p.features ?? []).join(" "),
-  ]);
+    (p.features ?? []).join(' '),
+  ])
 
-  return buildCsv(HEADERS, rows);
+  return buildCsv(HEADERS, rows)
 }
