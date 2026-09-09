@@ -135,6 +135,7 @@ export function ProductOrderForm({ product, stockPlaces, tab, onCloseAction: onC
           <Label>発注日</Label>
           <Input
             type="date"
+            className="date-input-icon-right"
             value={orderedAt}
             onChange={(e) => setOrderedAt(e.target.value)}
           />
@@ -143,6 +144,7 @@ export function ProductOrderForm({ product, stockPlaces, tab, onCloseAction: onC
           <Label>{tab === 'dyeing' ? '仕上予定日' : '入荷予定日'}</Label>
           <Input
             type="date"
+            className="date-input-icon-right"
             value={scheduledAt}
             onChange={(e) => setScheduledAt(e.target.value)}
           />

@@ -63,3 +63,23 @@
     display: none !important;
   }
 }
+
+/* 日付入力のカレンダーアイコンを入力欄の右端に寄せる (Chromium 系)。
+   アイコンの見た目の右余白が左の px-3 と揃うよう padding で調整する */
+.date-input-icon-right {
+  position: relative;
+  padding-right: 2.25rem;
+}
+.date-input-icon-right::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.date-input-icon-right::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--color-muted, rgb(0 0 0 / 0.06));
+}
