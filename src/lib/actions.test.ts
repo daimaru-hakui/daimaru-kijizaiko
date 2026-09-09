@@ -5,7 +5,7 @@ vi.mock('@/lib/firebase/admin', () => ({ getAdminDb: vi.fn() }))
 
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { ensureRoles, runAuthedAction, runAuthedActionWith } from './actions'
+import { ensureRoles, hasAnyRole, runAuthedAction, runAuthedActionWith } from './actions'
 
 const mockUserDocGet = vi.fn()
 
@@ -106,5 +106,17 @@ describe('ensureRoles', () => {
     mockUserDocGet.mockResolvedValue({ exists: true, data: () => ({ tokushima: true }) })
     const result = await ensureRoles([])
     expect(result).toEqual({ ok: true, uid: 'user1', roles: expect.objectContaining({ tokushima: true }) })
+  })
+})
+
+describe('hasAnyRole', () => {
+  const roles = { admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+
+  it('必要なロールのいずれかを持てば true', () => {
+    expect(hasAnyRole(roles, ['rd', 'admin'])).toBe(true)
+  })
+
+  it('ひとつも持たなければ false', () => {
+    expect(hasAnyRole(roles, ['tokushima', 'admin'])).toBe(false)
   })
 })

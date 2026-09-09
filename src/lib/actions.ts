@@ -22,6 +22,10 @@ export async function ensureAuth(): Promise<AuthResult> {
  * 更新系の Action は必ずここでサーバー側の認可を行う。
  * required が空なら「ログイン済みなら誰でも」だが、所有者判定のためロールは返す。
  */
+export function hasAnyRole(roles: UserRoles, required: Role[]): boolean {
+  return required.some((r) => roles[r])
+}
+
 export async function ensureRoles(required: Role[]): Promise<RoleAuthResult> {
   const auth = await ensureAuth()
   if (!auth.ok) return auth
@@ -29,7 +33,7 @@ export async function ensureRoles(required: Role[]): Promise<RoleAuthResult> {
   if (!snap.exists) return { ok: false, error: '権限がありません' }
   const data = snap.data() ?? {}
   const roles = Object.fromEntries(ROLES.map((r) => [r, data[r] === true])) as UserRoles
-  if (required.length > 0 && !required.some((r) => roles[r])) {
+  if (required.length > 0 && !hasAnyRole(roles, required)) {
     return { ok: false, error: '権限がありません' }
   }
   return { ok: true, uid: auth.uid, roles }
