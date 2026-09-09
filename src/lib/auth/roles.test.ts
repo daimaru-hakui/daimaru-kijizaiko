@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { matchRoute, type UserClaims } from './roles'
+import { buildRoleFlags, matchRoute, type UserClaims } from './roles'
 
 const admin: UserClaims = { uid: 'u1', admin: true, rd: false, sales: false, accounting: false, tokushima: false, order: false }
 const tokushima: UserClaims = { uid: 'u2', admin: false, rd: false, sales: false, accounting: false, tokushima: true, order: false }
@@ -98,6 +98,35 @@ describe('matchRoute', () => {
       const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
       expect(matchRoute('/tokushima/fabric-purchase/orders', rd)).toBe(true)
       expect(matchRoute('/tokushima/fabric-purchase/orders', noRole)).toBe(false)
+    })
+  })
+})
+
+describe('buildRoleFlags', () => {
+  it('admin は R&D と徳島の権限も兼ねる', () => {
+    expect(buildRoleFlags({ admin: true })).toEqual({
+      isAdmin: true,
+      isRD: true,
+      isTokushima: true,
+      isAccounting: true,
+    })
+  })
+
+  it('rd は R&D だけ true になる', () => {
+    expect(buildRoleFlags({ rd: true })).toEqual({
+      isAdmin: false,
+      isRD: true,
+      isTokushima: false,
+      isAccounting: false,
+    })
+  })
+
+  it('users ドキュメントが無い場合はすべて false', () => {
+    expect(buildRoleFlags(undefined)).toEqual({
+      isAdmin: false,
+      isRD: false,
+      isTokushima: false,
+      isAccounting: false,
     })
   })
 })
