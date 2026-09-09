@@ -10,7 +10,7 @@ type Props = {
 
 export function AdjustmentGrayFabricSearchBar({ searchText, setSearchText }: Props) {
   return (
-    <div className="mt-4 flex items-end gap-1">
+    <div className="mt-4 flex flex-wrap items-end gap-1">
       <FilterInput label="品番" value={searchText} onChange={setSearchText} />
       <GiCancel className="mb-2 cursor-pointer" onClick={() => setSearchText('')} />
     </div>

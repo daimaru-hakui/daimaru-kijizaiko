@@ -27,7 +27,7 @@ export default async function SerialNumbersPage() {
   return (
     <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
       <div className="max-w-lg mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
           <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">発注ナンバー</h2>
           <Table>
             <TableHeader>

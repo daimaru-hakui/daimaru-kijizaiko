@@ -34,22 +34,23 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
           在庫の編集には R&D・徳島・管理者のいずれかの権限が必要です。
         </p>
       )}
-      <div className="mt-4 w-full overflow-x-auto" style={{ maxHeight: 'calc(100vh - 255px)', overflowY: 'auto' }}>
-        <Table className="w-full">
-          <AdjustmentProductHeader isRD={isRD} isTokushima={isTokushima} />
-          <TableBody>
-            {filtered.map((product) => (
-              <AdjustmentProductTableRow
-                key={product.id}
-                product={product}
-                usersMap={usersMap}
-                isRD={isRD}
-                isTokushima={isTokushima}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Table
+        className="w-full"
+        containerClassName="mt-4 max-h-[calc(100vh-330px)] sm:max-h-[calc(100vh-255px)]"
+      >
+        <AdjustmentProductHeader isRD={isRD} isTokushima={isTokushima} />
+        <TableBody>
+          {filtered.map((product) => (
+            <AdjustmentProductTableRow
+              key={product.id}
+              product={product}
+              usersMap={usersMap}
+              isRD={isRD}
+              isTokushima={isTokushima}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }
