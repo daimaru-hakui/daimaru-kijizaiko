@@ -25,6 +25,7 @@ import {
   updateLocationAction,
   deleteLocationAction,
   toggleUserAuthAction,
+  updateUserProfileAction,
   addColorAction,
   deleteColorAction,
   reorderColorsAction,
@@ -33,10 +34,20 @@ import {
 } from './actions'
 
 const mockCollection = vi.fn()
+const mockUserUpdate = vi.fn()
+let roles: Record<string, boolean>
 
 beforeEach(() => {
   vi.clearAllMocks()
-  vi.mocked(getAdminDb).mockReturnValue({ collection: mockCollection } as any)
+  roles = { admin: true }
+  // users コレクションはロール判定 (ensureRoles) と権限更新の両方で使う
+  const usersDoc = {
+    get: vi.fn(async () => ({ exists: true, data: () => roles })),
+    update: mockUserUpdate,
+  }
+  vi.mocked(getAdminDb).mockReturnValue({
+    collection: (name: string) => (name === 'users' ? { doc: () => usersDoc } : mockCollection(name)),
+  } as any)
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user123' } as any)
 })
 
@@ -165,6 +176,50 @@ describe('toggleUserAuthAction', () => {
   it('uid が空のとき ok:false を返す', async () => {
     const result = await toggleUserAuthAction('', 'rd', false)
     expect(result).toEqual({ ok: false, error: 'uid は必須です' })
+  })
+
+  it('admin でないユーザーは権限を変更できない', async () => {
+    roles = { rd: true }
+    const result = await toggleUserAuthAction('user123', 'admin', false)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+    expect(mockUserUpdate).not.toHaveBeenCalled()
+  })
+
+  it('ロール以外のフィールド名は拒否する', async () => {
+    const result = await toggleUserAuthAction('other', 'rank', false)
+    expect(result).toEqual({ ok: false, error: '不正な権限項目です' })
+    expect(mockUserUpdate).not.toHaveBeenCalled()
+  })
+
+  it('admin は指定したロールを反転できる', async () => {
+    const result = await toggleUserAuthAction('other', 'rd', false)
+    expect(mockUserUpdate).toHaveBeenCalledWith({ rd: true })
+    expect(result).toEqual({ ok: true })
+  })
+})
+
+describe('updateUserProfileAction', () => {
+  it('admin でないユーザーはプロフィールを変更できない', async () => {
+    roles = { rd: true, sales: true }
+    const result = await updateUserProfileAction('user123', 1, '山田')
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+    expect(mockUserUpdate).not.toHaveBeenCalled()
+  })
+})
+
+describe('rd / admin 以外のユーザーは設定マスタを変更できない', () => {
+  beforeEach(() => {
+    roles = { sales: true }
+  })
+
+  it('addSupplierAction は 権限エラー を返す', async () => {
+    const result = await addSupplierAction({ name: '山田商会', kana: '', comment: '' })
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('deleteLocationAction は 権限エラー を返す', async () => {
+    const result = await deleteLocationAction('id1')
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
   })
 })
 

@@ -3,15 +3,17 @@
 import { getAdminDb } from '@/lib/firebase/admin'
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, ROLES, type ActionResult, type Role } from '@/lib/actions'
 import type { Supplier, StockPlace, Location } from '../../../../types'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+/** 設定画面は proxy.ts で rd / admin に限定しているので、Action 側も同じ条件で守る */
+async function ensureRole(required: Role[]): Promise<{ ok: false; error: string } | null> {
+  const auth = await ensureRoles(required)
+  return auth.ok ? null : auth
+}
 
-async function ensureAuth(): Promise<{ ok: false; error: string } | null> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return null
+function isRole(prop: string): prop is Role {
+  return (ROLES as readonly string[]).includes(prop)
 }
 
 // === Users ===
@@ -20,9 +22,10 @@ export async function toggleUserAuthAction(
   prop: string,
   current: boolean
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['admin'])
   if (authErr) return authErr
   if (!uid) return { ok: false, error: 'uid は必須です' }
+  if (!isRole(prop)) return { ok: false, error: '不正な権限項目です' }
   try {
     await getAdminDb().collection('users').doc(uid).update({ [prop]: !current })
     revalidatePath('/settings/auth')
@@ -37,7 +40,7 @@ export async function updateUserProfileAction(
   rank: number,
   name: string
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['admin'])
   if (authErr) return authErr
   if (!uid) return { ok: false, error: 'uid は必須です' }
   try {
@@ -53,7 +56,7 @@ export async function updateUserProfileAction(
 export async function addSupplierAction(
   data: Pick<Supplier, 'name' | 'kana' | 'comment'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!data.name) return { ok: false, error: '仕入先名は必須です' }
   try {
@@ -74,7 +77,7 @@ export async function updateSupplierAction(
   id: string,
   data: Pick<Supplier, 'name' | 'kana' | 'comment'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   if (!data.name) return { ok: false, error: '仕入先名は必須です' }
@@ -93,7 +96,7 @@ export async function updateSupplierAction(
 }
 
 export async function deleteSupplierAction(id: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   try {
@@ -109,7 +112,7 @@ export async function deleteSupplierAction(id: string): Promise<ActionResult> {
 export async function addStockPlaceAction(
   data: Omit<StockPlace, 'id'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!data.name) return { ok: false, error: '送り先名は必須です' }
   try {
@@ -133,7 +136,7 @@ export async function updateStockPlaceAction(
   id: string,
   data: Omit<StockPlace, 'id'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   if (!data.name) return { ok: false, error: '送り先名は必須です' }
@@ -155,7 +158,7 @@ export async function updateStockPlaceAction(
 }
 
 export async function deleteStockPlaceAction(id: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   try {
@@ -171,7 +174,7 @@ export async function deleteStockPlaceAction(id: string): Promise<ActionResult> 
 export async function addLocationAction(
   data: Omit<Location, 'id'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!data.name) return { ok: false, error: '保管場所名は必須です' }
   try {
@@ -192,7 +195,7 @@ export async function updateLocationAction(
   id: string,
   data: Omit<Location, 'id'>
 ): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   if (!data.name) return { ok: false, error: '保管場所名は必須です' }
@@ -211,7 +214,7 @@ export async function updateLocationAction(
 }
 
 export async function deleteLocationAction(id: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!id) return { ok: false, error: 'id は必須です' }
   try {
@@ -225,7 +228,7 @@ export async function deleteLocationAction(id: string): Promise<ActionResult> {
 
 // === Colors ===
 export async function addColorAction(color: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!color) return { ok: false, error: '色名は必須です' }
   try {
@@ -240,7 +243,7 @@ export async function addColorAction(color: string): Promise<ActionResult> {
 }
 
 export async function deleteColorAction(color: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!color) return { ok: false, error: '色名は必須です' }
   try {
@@ -255,7 +258,7 @@ export async function deleteColorAction(color: string): Promise<ActionResult> {
 }
 
 export async function reorderColorsAction(colors: string[]): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (colors.length === 0) return { ok: false, error: '色リストが空です' }
   try {
@@ -269,7 +272,7 @@ export async function reorderColorsAction(colors: string[]): Promise<ActionResul
 
 // === Material Names ===
 export async function addMaterialNameAction(name: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!name) return { ok: false, error: '組織名は必須です' }
   try {
@@ -284,7 +287,7 @@ export async function addMaterialNameAction(name: string): Promise<ActionResult>
 }
 
 export async function deleteMaterialNameAction(name: string): Promise<ActionResult> {
-  const authErr = await ensureAuth()
+  const authErr = await ensureRole(['rd', 'admin'])
   if (authErr) return authErr
   if (!name) return { ok: false, error: '組織名は必須です' }
   try {
