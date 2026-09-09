@@ -69,7 +69,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
             <>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24 sm:w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={items.price}
@@ -78,7 +79,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24 sm:w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.wip)}
@@ -87,7 +89,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24 sm:w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.externalStock)}
@@ -96,7 +99,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
               </TableCell>
               <TableCell className="p-1">
                 <NumberInput
-                  className="w-24 sm:w-40"
+                  className="w-32"
+                  inputClassName="px-1"
                   min={0}
                   max={100000}
                   value={mathRound2nd(items.arrivingQuantity)}
@@ -107,7 +111,8 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
           )}
           <TableCell className="p-1">
             <NumberInput
-              className="w-24 sm:w-40"
+              className="w-32"
+              inputClassName="px-1"
               min={0}
               max={100000}
               value={mathRound2nd(items.tokushimaStock)}

@@ -54,7 +54,8 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       <TableCell>{grayFabric.productNumber}</TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24 sm:w-40"
+          className="w-32"
+          inputClassName="px-1"
           min={0}
           max={100000}
           value={items.price}
@@ -63,7 +64,8 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       </TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24 sm:w-40"
+          className="w-32"
+          inputClassName="px-1"
           min={0}
           max={100000}
           value={mathRound2nd(items.wip)}
@@ -72,7 +74,8 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
       </TableCell>
       <TableCell className="p-1">
         <NumberInput
-          className="w-24 sm:w-40"
+          className="w-32"
+          inputClassName="px-1"
           min={0}
           max={100000}
           value={mathRound2nd(items.stock)}
