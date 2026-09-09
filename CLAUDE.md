@@ -3,25 +3,17 @@
 大丸白衣の生地在庫管理システム。生地の発注・入荷・染色・裁断・在庫調整をトラッキングする社内ツール。
 
 パッケージマネージャ: pnpm
-テストフレームワーク: Vitest + @testing-library/react + Playwright (E2E)
+テストフレームワーク: Vitest + @testing-library/react
 
 @.claude/rules/testing.md
 @.claude/rules/commits.md
 
 ---
 
-## リニューアル中 (renewal ブランチ)
+## リニューアル (完了)
 
-現在 5 フェーズの大規模リニューアルを進行中。
+Next.js 16 + App Router + shadcn/ui + Firebase セッションクッキー認証への 5 フェーズ移行は完了し、main にマージ済み。
 計画書: `/home/mukai/.claude/plans/next16-react-css-shadcnui-firebaseauth-noble-hammock.md`
-
-| フェーズ | 内容 | 状態 |
-|---------|------|------|
-| Phase 1 | テスト基盤構築 & 環境整備 | 🔄 進行中 |
-| Phase 2 | Next.js 16 + 依存アップグレード | ⬜ 未着手 |
-| Phase 3 | Firebase Auth セッションクッキー化 + proxy.ts 認可 | ⬜ 未着手 |
-| Phase 4 | App Router 移行 + Chakra→shadcn/ui | ⬜ 未着手 |
-| Phase 5 | リファクタリング仕上げ | ⬜ 未着手 |
 
 ---
 
@@ -40,9 +32,10 @@ pnpm start        # 本番サーバー
 pnpm test              # Vitest 全テスト実行
 pnpm test:watch        # ウォッチモード
 pnpm test:coverage     # カバレッジ付き
-pnpm e2e               # Playwright E2E テスト
 pnpm emulator          # Firebase Emulator 起動
 ```
+
+E2E は未整備。`playwright.config.ts` はあるが `e2e/` にテストが 1 本もないため `pnpm e2e` は動かない。
 
 ### 型チェック / Lint
 
@@ -66,7 +59,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 FIREBASE_SERVICE_ACCOUNT_KEY=  # JSON 文字列
-BACKEND_API_KEY=                # Phase 3 で廃止予定
+BACKEND_API_KEY=                # /api/cutting-reports (外部システム連携) 専用
 ```
 
 ---
@@ -93,17 +86,24 @@ BACKEND_API_KEY=                # Phase 3 で廃止予定
 
 ```
 src/
-  app/              (Phase 4 以降) エントリポイント・ルーティング層
-  pages/            (Phase 3 まで) Pages Router のページと API ルート
-  components/       UI 層。副作用は lib/ 経由で呼ぶ
+  app/              エントリポイント・ルーティング層。page.tsx / layout.tsx / route.ts / actions.ts
+  components/       UI 層。副作用は Server Action か lib/ 経由で呼ぶ
   hooks/            カスタム hooks
-  lib/              (Phase 4 以降) 純粋ロジック層。フレームワーク非依存
-  types/            型定義
-store/              Zustand store (Phase 5 で縮小予定)
-tests/              テストファイル
-e2e/                Playwright E2E テスト
-firebase/           Firebase 初期化 (Phase 2 で src/lib/firebase/ へ移設)
+  lib/              純粋ロジック層。原則フレームワーク非依存
+  proxy.ts          Next.js 16 の Proxy。全リクエストの認証・ロール認可
+types/              型定義
+tests/              I/O 境界の統合テスト用の足場 (msw / Firebase Emulator)
 ```
+
+テストは対象と同階層に `<name>.test.ts(x)` で置く。`tests/` は実 DB / MSW を使う統合テスト専用。
+
+### lib の例外 (I/O アダプタとして許容)
+
+純粋ロジック層だが、次の 3 つだけは外部に依存してよい。ここを境界にして他の lib を純粋に保つ。
+
+- `lib/firebase/{admin,client}.ts`: Firebase SDK の初期化
+- `lib/auth/session.ts`: `next/headers` のクッキー読み取り
+- `lib/download.ts`: ブラウザの DOM API (Blob ダウンロード)
 
 ---
 
@@ -133,5 +133,7 @@ firebase/           Firebase 初期化 (Phase 2 で src/lib/firebase/ へ移設)
 - UI / エントリ層にビジネスロジックや I/O を直書きする
 - `main` ブランチへの直接 push
 - `--no-verify` でコミットフックを skip する
-- 管理者 UID をソースコードにハードコードする (Phase 3 で解消)
-- `BACKEND_API_KEY` だけで API を認可する (Phase 3 で解消)
+- 管理者 UID をソースコードにハードコードする (権限は Firestore の users ドキュメントのフラグで判定する)
+- Server Action を `ensureAuth` (ログイン確認) だけで通す。更新・削除は必ず `ensureRoles` と `lib/permissions.ts` でサーバー側の認可を行う
+- `BACKEND_API_KEY` だけで API を認可する
+  - 例外: `/api/cutting-reports` のみ。外部システム (daimaru-portal) がセッションクッキーを持てないため。ヘッダ方式への移行は portal 側の改修待ち

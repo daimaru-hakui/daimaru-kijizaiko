@@ -11,7 +11,7 @@ paths:
 ### ファイル配置
 
 - 対象ファイルと同階層に `<name>.test.ts` / `<name>.test.tsx` を置く
-- または `tests/` / `__tests__/` ディレクトリに集約 (プロジェクト慣習に従う)
+- `tests/` は実 DB (Firebase Emulator) / MSW を使う統合テスト専用
 - テストファイル名は `<対象>.test.ts` で統一
 
 ### テストの粒度
