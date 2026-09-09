@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { FilterInput, FilterSelect } from '@/components/filters/fields'
 import { InlineStat } from '@/components/products/shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildGrayFabricCsv } from '@/lib/gray-fabrics/csv'
 import { matchesProductNumber } from '@/lib/utils'
 import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
 import { buildOptions } from '@/lib/filters/options'
@@ -68,6 +70,10 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
                 <span className="font-semibold text-slate-700">{filtered.length}件</span>
                 表示
               </span>
+              <CsvDownloadButton
+                filename="キバタ一覧"
+                build={() => buildGrayFabricCsv(filtered)}
+              />
               <Button
                 size="sm"
                 asChild

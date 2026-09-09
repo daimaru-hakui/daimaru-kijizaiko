@@ -4,6 +4,12 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import {
+  buildCuttingHistoryCsv,
+  calcScale,
+  toCuttingHistoryRows,
+} from '@/lib/cutting-reports/csv'
 import type { CuttingReportType } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
@@ -20,25 +26,6 @@ type Props = {
   endDay: string
 }
 
-type HistoryRow = {
-  reportId: string
-  serialNumber: number
-  cuttingDate: string
-  staff: string
-  processNumber: string
-  client: string
-  itemName: string
-  totalQuantity: number
-  category: string
-  productId: string
-  quantity: number
-}
-
-function calcScale(meter: number, total: number) {
-  if (!meter || !total) return '0'
-  return (meter / total).toFixed(2)
-}
-
 export function CuttingReportHistoryTable({ reports, usersMap, productMap, startDay, endDay }: Props) {
   const { start, end, setStart, setEnd, resetPeriod } = usePeriodSearch(
     '/tokushima/cutting-reports/history',
@@ -47,21 +34,7 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
   )
   const { values, filter, setValue, reset } = useListFilter()
 
-  const rows: HistoryRow[] = reports.flatMap((report) =>
-    (report.products ?? []).map((p) => ({
-      reportId: report.id,
-      serialNumber: report.serialNumber,
-      cuttingDate: report.cuttingDate,
-      staff: report.staff,
-      processNumber: report.processNumber,
-      client: report.client,
-      itemName: report.itemName,
-      totalQuantity: report.totalQuantity,
-      category: p.category,
-      productId: p.productId,
-      quantity: p.quantity,
-    }))
-  )
+  const rows = toCuttingHistoryRows(reports)
 
   const filtered = rows.filter((r) => matchesListFilter(r, filter))
 
@@ -74,7 +47,13 @@ export function CuttingReportHistoryTable({ reports, usersMap, productMap, start
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断生地一覧</h2>
+        <CsvDownloadButton
+          filename="裁断生地一覧"
+          build={() => buildCuttingHistoryCsv(filtered, usersMap, productMap)}
+        />
+      </div>
 
       <PeriodFilterBar
         start={start}

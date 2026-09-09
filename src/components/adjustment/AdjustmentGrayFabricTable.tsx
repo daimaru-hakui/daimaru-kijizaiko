@@ -11,6 +11,8 @@ import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildAdjustmentGrayFabricCsv } from '@/lib/adjustment/csv'
 import { HEAD } from './table-styles'
 import type { GrayFabric } from '../../../types'
 
@@ -31,11 +33,17 @@ export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
           <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
             キバタ在庫調整
           </h2>
-          <span className="text-sm text-slate-500">
-            全{grayFabrics.length}件中{' '}
-            <span className="font-semibold text-slate-700">{filtered.length}件</span>
-            表示
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500">
+              全{grayFabrics.length}件中{' '}
+              <span className="font-semibold text-slate-700">{filtered.length}件</span>
+              表示
+            </span>
+            <CsvDownloadButton
+              filename="キバタ在庫調整"
+              build={() => buildAdjustmentGrayFabricCsv(filtered)}
+            />
+          </div>
         </div>
         <ListFilterBar
           values={values}

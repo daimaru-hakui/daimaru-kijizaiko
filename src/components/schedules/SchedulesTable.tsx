@@ -3,6 +3,8 @@
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildScheduleCsv } from '@/lib/schedules/csv'
 import { ScheduleModal } from './ScheduleModal'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
@@ -42,7 +44,13 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">使用予定一覧</h2>
-        <ScheduleModal mode="new" salesUsers={salesUsers} products={products} />
+        <div className="flex items-center gap-2">
+          <CsvDownloadButton
+            filename="使用予定一覧"
+            build={() => buildScheduleCsv(filtered, usersMap, productMap)}
+          />
+          <ScheduleModal mode="new" salesUsers={salesUsers} products={products} />
+        </div>
       </div>
 
       <ListFilterBar

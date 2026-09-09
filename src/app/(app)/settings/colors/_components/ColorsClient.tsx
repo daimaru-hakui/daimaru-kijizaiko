@@ -4,6 +4,8 @@ import { useState, FC } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CsvDownloadButton } from "@/components/list/CsvDownloadButton";
+import { buildNameListCsv } from "@/lib/settings/csv";
 import {
   Table,
   TableBody,
@@ -68,7 +70,13 @@ export const ColorsClient: FC<Props> = ({ initialColors }) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">色</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">色</h1>
+        <CsvDownloadButton
+          filename="色一覧"
+          build={() => buildNameListCsv("色", colors)}
+        />
+      </div>
       <div className="flex gap-3 mt-3">
         <Input
           autoFocus

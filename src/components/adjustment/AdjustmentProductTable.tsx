@@ -6,6 +6,8 @@ import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildAdjustmentProductCsv } from '@/lib/adjustment/csv'
 import type { Product } from '../../../types'
 
 type Props = {
@@ -28,11 +30,17 @@ export function AdjustmentProductTable({ products, usersMap, isRD, isTokushima }
           <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
             生地在庫調整
           </h2>
-          <span className="text-sm text-slate-500">
-            全{products.length}件中{' '}
-            <span className="font-semibold text-slate-700">{filtered.length}件</span>
-            表示
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500">
+              全{products.length}件中{' '}
+              <span className="font-semibold text-slate-700">{filtered.length}件</span>
+              表示
+            </span>
+            <CsvDownloadButton
+              filename="生地在庫調整"
+              build={() => buildAdjustmentProductCsv(filtered, usersMap)}
+            />
+          </div>
         </div>
         <ListFilterBar
           values={values}

@@ -9,6 +9,8 @@ import {
 } from '@/app/(app)/products/fabric-dyeing/actions'
 import { InlineStat, Chip } from '../shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildHistoryCsv } from '@/lib/history/csv'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
@@ -62,11 +64,22 @@ export function FabricDyeingOrderTable({
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">染色発注一覧</h2>
-        <Link href="/products/fabric-dyeing/confirms">
-          <Button size="sm" variant="outline">履歴</Button>
-        </Link>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">染色発注一覧</h2>
+          <Link href="/products/fabric-dyeing/confirms">
+            <Button size="sm" variant="outline">履歴</Button>
+          </Link>
+        </div>
+        <CsvDownloadButton
+          filename="染色発注一覧"
+          build={() =>
+            buildHistoryCsv(filtered, usersMap, {
+              dateLabel: '仕上予定',
+              dateKey: 'scheduledAt',
+            })
+          }
+        />
       </div>
 
       <ListFilterBar

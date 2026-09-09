@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildCuttingReportCsv } from '@/lib/cutting-reports/csv'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
@@ -28,52 +30,6 @@ type Props = {
   productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
   startDay: string
   endDay: string
-}
-
-function buildCsvData(
-  reports: CuttingReportType[],
-  usersMap: Record<string, string>,
-  productMap: Record<string, { productNumber: string; colorName: string; productName: string }>
-) {
-  const headers = [
-    '伝票ナンバー', '裁断日', '担当者名', '加工指示書No.', '種別',
-    '品名', '受注先名', '数量', 'カテゴリー', '生地品番', '数量', '用尺',
-  ]
-  const rows: (string | number)[][] = [headers]
-  reports.forEach((report) => {
-    report.products?.forEach((p) => {
-      const scale = (!p.quantity || !report.totalQuantity)
-        ? 0
-        : (p.quantity / report.totalQuantity).toFixed(2)
-      const prod = productMap[p.productId]
-      rows.push([
-        report.serialNumber,
-        report.cuttingDate,
-        report.staff === 'R&D' ? 'R&D' : (usersMap[report.staff] ?? report.staff),
-        report.processNumber ? `No.${report.processNumber}` : '',
-        report.itemType === '1' ? '既製品' : '別注品',
-        report.itemName,
-        report.client,
-        report.totalQuantity,
-        p.category,
-        prod?.productNumber ?? p.productId,
-        p.quantity,
-        scale,
-      ])
-    })
-  })
-  return rows
-}
-
-function downloadCsv(data: (string | number)[][], filename: string) {
-  const csv = data.map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
 }
 
 export function CuttingReportListTable({
@@ -124,13 +80,10 @@ export function CuttingReportListTable({
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">裁断報告書</h2>
-        <Button
-          size="sm"
-          className="bg-blue-800 hover:bg-blue-900 text-white"
-          onClick={() => downloadCsv(buildCsvData(reports, usersMap, productMap), `裁断報告書_${startDay}`)}
-        >
-          CSV
-        </Button>
+        <CsvDownloadButton
+          filename="裁断報告書"
+          build={() => buildCuttingReportCsv(filtered, usersMap, productMap)}
+        />
       </div>
 
       <PeriodFilterBar

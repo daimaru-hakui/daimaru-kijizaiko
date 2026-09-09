@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { GrayFabricListTable } from './GrayFabricListTable'
 import type { GrayFabric } from '../../../types'
+import { UserRolesProvider } from '@/components/app-shell/roles-context'
+import type { UserRoles } from '@/components/app-shell/types'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
@@ -108,5 +110,64 @@ describe('GrayFabricListTable 仕入先検索', () => {
     await userEvent.selectOptions(screen.getByLabelText('仕入先'), '別の商社')
     expect(screen.getByText('XX-002')).toBeInTheDocument()
     expect(screen.queryByText('KB-001')).toBeNull()
+  })
+})
+
+const NO_ROLES: UserRoles = {
+  admin: false,
+  rd: false,
+  tokushima: false,
+  accounting: false,
+  sales: false,
+}
+
+const withRoles = (roles: Partial<UserRoles>, ui: React.ReactNode) => (
+  <UserRolesProvider roles={{ ...NO_ROLES, ...roles }}>{ui}</UserRolesProvider>
+)
+
+describe('GrayFabricListTable CSV ダウンロード', () => {
+  it('CSV ボタンが表示される', () => {
+    render(withRoles({ rd: true }, <GrayFabricListTable {...defaultProps} />))
+    expect(screen.getByRole('button', { name: 'CSV' })).toBeInTheDocument()
+  })
+
+  it('R&D 権限がなければ CSV ボタンは表示されない', () => {
+    render(withRoles({ sales: true }, <GrayFabricListTable {...defaultProps} />))
+    expect(screen.queryByRole('button', { name: 'CSV' })).not.toBeInTheDocument()
+  })
+
+  it('絞り込み後は表示中のキバタだけが CSV に含まれる', async () => {
+    const written = vi.fn()
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:mock'),
+      revokeObjectURL: vi.fn(),
+    })
+    // Blob の中身は jsdom から同期的に読めないため、生成時の文字列を捕まえる
+    vi.stubGlobal(
+      'Blob',
+      class {
+        constructor(parts: string[]) {
+          written(parts.join(''))
+        }
+      }
+    )
+
+    render(
+      withRoles(
+        { rd: true },
+        <GrayFabricListTable
+          {...defaultProps}
+          grayFabrics={[makeFabric(), makeFabric({ id: 'gf2', productNumber: 'KB-002' })]}
+        />
+      )
+    )
+    await userEvent.type(screen.getByLabelText('品番'), 'KB-002')
+    await userEvent.click(screen.getByRole('button', { name: 'CSV' }))
+
+    const csv = written.mock.calls[0][0] as string
+    expect(csv).toContain('KB-002')
+    expect(csv).not.toContain('KB-001')
+
+    vi.unstubAllGlobals()
   })
 })

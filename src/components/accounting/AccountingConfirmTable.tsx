@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { InlineStat, Chip } from '@/components/products/shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildHistoryCsv } from '@/lib/history/csv'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
@@ -46,11 +48,22 @@ export function AccountingConfirmTable({ histories, usersMap, startDay, endDay }
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">処理済み</h2>
-        <Link href="/accounting-dept/orders">
-          <Button variant="outline" size="sm">未処理</Button>
-        </Link>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">処理済み</h2>
+          <Link href="/accounting-dept/orders">
+            <Button variant="outline" size="sm">未処理</Button>
+          </Link>
+        </div>
+        <CsvDownloadButton
+          filename="経理処理済み"
+          build={() =>
+            buildHistoryCsv(filtered, usersMap, {
+              dateLabel: '入荷日',
+              dateKey: 'fixedAt',
+            })
+          }
+        />
       </div>
 
       <PeriodFilterBar

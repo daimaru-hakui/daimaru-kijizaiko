@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { deleteFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
 import { InlineStat, Chip } from '../shared'
 import { ListCard, ListCardPane } from '@/components/list/ListCard'
+import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
+import { buildHistoryCsv } from '@/lib/history/csv'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { calcAmount } from '@/lib/numbers'
 import { ListFilterBar } from '@/components/filters/ListFilterBar'
@@ -66,11 +68,22 @@ export function FabricPurchaseOrderTable({
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷予定</h2>
-        <Link href="/products/fabric-purchase/confirms">
-          <Button size="sm" variant="outline">履歴</Button>
-        </Link>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">入荷予定</h2>
+          <Link href="/products/fabric-purchase/confirms">
+            <Button size="sm" variant="outline">履歴</Button>
+          </Link>
+        </div>
+        <CsvDownloadButton
+          filename="生地仕入入荷予定"
+          build={() =>
+            buildHistoryCsv(filtered, usersMap, {
+              dateLabel: '入荷予定',
+              dateKey: 'scheduledAt',
+            })
+          }
+        />
       </div>
 
       <ListFilterBar
