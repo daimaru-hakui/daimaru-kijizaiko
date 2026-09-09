@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildProductCommonPayload } from './payload'
-import type { AddProductInput } from '@/app/(app)/products/actions'
+import type { AddProductInput } from '../../../types'
 
 const baseInput: AddProductInput = {
   productType: '2',

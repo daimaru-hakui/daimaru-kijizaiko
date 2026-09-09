@@ -10,7 +10,7 @@ import { canEditRecord } from '@/lib/permissions'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { buildProductCommonPayload } from '@/lib/products/payload'
 import type { ActionResult } from '@/lib/actions'
-import type { Product } from '../../../../types'
+import type { AddProductInput, Product, UpdateProductInput } from '../../../../types'
 
 /**
  * 生地を更新/削除できるのは R&D (と管理者) か、その生地を登録した本人だけ。
@@ -50,31 +50,6 @@ export async function getProductsAction(): Promise<
   return { ok: true, contents }
 }
 
-export type AddProductInput = {
-  productType: string
-  staff: string
-  supplierId: string
-  grayFabricId: string
-  interfacing: boolean
-  lining: boolean
-  productNum: string
-  colorNum: string
-  colorName: string
-  productName: string
-  price: number
-  materialName: string
-  materials: Record<string, number>
-  fabricWidth: number
-  fabricWeight: number
-  fabricLength: number
-  features: string[]
-  noteProduct: string
-  noteFabric: string
-  noteEtc: string
-  externalStock: number
-  tokushimaStock: number
-  locations: string[]
-}
 
 export async function addProductAction(data: AddProductInput): Promise<ActionResult> {
   const result = await runAuthedAction(async (uid) => {
@@ -99,11 +74,6 @@ export async function addProductAction(data: AddProductInput): Promise<ActionRes
   return result
 }
 
-export type UpdateProductInput = AddProductInput & {
-  productId: string
-  wip: number
-  arrivingQuantity: number
-}
 
 export async function updateProductAction(data: UpdateProductInput): Promise<ActionResult> {
   const result = await runAuthedAction(async () => {
