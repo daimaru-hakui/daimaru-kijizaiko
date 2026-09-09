@@ -6,7 +6,7 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
 import { ensureRoles, type ActionResult, type Role } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
-import { toPlainData } from '@/lib/firestore/serialize'
+import { withId } from '@/lib/firestore/with-id'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { CuttingReportType } from '../../../../../types'
 
@@ -29,10 +29,7 @@ export async function getCuttingReportsByDateAction(
     .endAt(endDay)
     .get()
   const contents = snap.docs
-    .map((doc) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = doc.data()
-      return { ...toPlainData(data) as object, id: doc.id } as CuttingReportType
-    })
+    .map((doc) => withId<CuttingReportType>(doc))
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
   return { ok: true, contents }
 }

@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
+import { withId } from '@/lib/firestore/with-id'
+import { buildUsersMap } from '@/lib/users/map'
 import { FabricDyeingConfirmTable } from '@/components/products/fabric-dyeing/FabricDyeingConfirmTable'
+import { PageContainer } from '@/components/ui/page-container'
 import type { SerializableHistory } from '../../../../../../types'
 
 type Props = {
@@ -29,35 +31,27 @@ export default async function FabricDyeingConfirmsPage({ searchParams }: Props) 
     db.collection('users').doc(user.uid).get(),
   ])
 
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
-  )
+  const usersMap = buildUsersMap(usersSnap.docs)
 
   const userData = userDocSnap.data()
   const isRD = Boolean(userData?.rd || userData?.admin)
 
   const confirms = confirmsSnap.docs
-    .map((d) => {
-      const raw = toPlainData(d.data()) as Record<string, unknown>
-      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-      return { ...data, id: d.id } as unknown as SerializableHistory
-    })
+    .map((d) => withId<SerializableHistory>(d))
     .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-7xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <FabricDyeingConfirmTable
-            confirms={confirms}
-            usersMap={usersMap}
-            userId={user.uid}
-            isRD={isRD}
-            startDay={startDay}
-            endDay={endDay}
-          />
-        </div>
+    <PageContainer>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <FabricDyeingConfirmTable
+          confirms={confirms}
+          usersMap={usersMap}
+          userId={user.uid}
+          isRD={isRD}
+          startDay={startDay}
+          endDay={endDay}
+        />
       </div>
-    </div>
+    </PageContainer>
   )
 }

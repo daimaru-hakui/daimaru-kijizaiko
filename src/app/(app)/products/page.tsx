@@ -2,8 +2,11 @@ import { redirect } from "next/navigation";
 import { verifyServerSession } from "@/lib/auth/session";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { toPlainData } from "@/lib/firestore/serialize";
+import { withId } from "@/lib/firestore/with-id";
+import { buildUsersMap } from "@/lib/users/map";
 import { ProductListTable } from "@/components/products/ProductListTable";
-import type { CuttingSchedule, Product, StockPlace } from "../../../../types";
+import { PageContainer } from "@/components/ui/page-container";
+import type { CuttingSchedule, SerializableProduct, StockPlace } from "../../../../types";
 
 export default async function ProductsPage() {
   const user = await verifyServerSession();
@@ -30,17 +33,11 @@ export default async function ProductsPage() {
     db.collection("grayFabrics").get(),
   ]);
 
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string]),
-  );
+  const usersMap = buildUsersMap(usersSnap.docs);
 
-  const suppliersMap: Record<string, string> = Object.fromEntries(
-    suppliersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string]),
-  );
+  const suppliersMap = buildUsersMap(suppliersSnap.docs);
 
-  const locationsMap: Record<string, string> = Object.fromEntries(
-    locationsSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string]),
-  );
+  const locationsMap = buildUsersMap(locationsSnap.docs);
 
   const grayFabricsMap: Record<
     string,
@@ -77,29 +74,23 @@ export default async function ProductsPage() {
 
   const products = productsSnap.docs
     .filter((d) => !d.data().deletedAt)
-    .map((d) => {
-      const raw = toPlainData(d.data()) as Record<string, unknown>;
-      const { createdAt: _ca, updatedAt: _ua, ...data } = raw;
-      return { ...data, id: d.id } as Omit<Product, "createdAt" | "updatedAt">;
-    })
+    .map((d) => withId<SerializableProduct>(d))
     .sort((a, b) => (a.productNumber < b.productNumber ? -1 : 1));
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-370 mx-auto pt-6">
-        <ProductListTable
-          products={products}
-          usersMap={usersMap}
-          suppliersMap={suppliersMap}
-          locationsMap={locationsMap}
-          grayFabricsMap={grayFabricsMap}
-          cuttingSchedulesMap={cuttingSchedulesMap}
-          stockPlaces={stockPlaces}
-          userId={user.uid}
-          isAdmin={isAdmin}
-          isRD={isRD}
-        />
-      </div>
-    </div>
+    <PageContainer maxWidth="max-w-370">
+      <ProductListTable
+        products={products}
+        usersMap={usersMap}
+        suppliersMap={suppliersMap}
+        locationsMap={locationsMap}
+        grayFabricsMap={grayFabricsMap}
+        cuttingSchedulesMap={cuttingSchedulesMap}
+        stockPlaces={stockPlaces}
+        userId={user.uid}
+        isAdmin={isAdmin}
+        isRD={isRD}
+      />
+    </PageContainer>
   );
 }

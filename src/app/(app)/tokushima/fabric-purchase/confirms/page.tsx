@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
 import { getTodayDate, get3monthsAgo } from '@/lib/dates'
+import { withId } from '@/lib/firestore/with-id'
+import { buildUsersMap } from '@/lib/users/map'
 import { TokushimaFabricPurchaseConfirmTable } from '@/components/tokushima/TokushimaFabricPurchaseConfirmTable'
+import { PageContainer } from '@/components/ui/page-container'
 import type { History } from '../../../../../../types'
 
 const HOUSE_FACTORY = '徳島工場'
@@ -32,27 +34,20 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
     db.collection('users').doc(user.uid).get(),
   ])
 
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map((d) => [d.id, (d.data().name ?? d.id) as string])
-  )
+  const usersMap = buildUsersMap(usersSnap.docs)
 
   const userData = userDocSnap.data()
   const isTokushima = Boolean(userData?.tokushima || userData?.admin)
   const isRD = Boolean(userData?.rd || userData?.admin)
 
   const confirms = confirmsSnap.docs
-    .map((d) => {
-      const raw = toPlainData(d.data()) as Record<string, unknown>
-      const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-      return { ...data, id: d.id } as unknown as History
-    })
+    .map((d) => withId<History>(d))
     .filter((h) => h.stockPlace === HOUSE_FACTORY)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-7xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <PageContainer>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <TokushimaFabricPurchaseConfirmTable
           confirms={confirms}
           usersMap={usersMap}
@@ -62,8 +57,7 @@ export default async function TokushimaFabricPurchaseConfirmsPage({ searchParams
           startDay={startDay}
           endDay={endDay}
         />
-        </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

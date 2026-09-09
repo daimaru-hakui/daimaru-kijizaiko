@@ -7,6 +7,7 @@ import { sortByKana } from "@/lib/sort";
 import { SuppliersTable } from "./_components/SuppliersTable";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageContainer } from "@/components/ui/page-container";
 
 export default async function SuppliersPage() {
   const user = await verifyServerSession();
@@ -17,18 +18,16 @@ export default async function SuppliersPage() {
   const suppliers = sortByKana(parseDocs(snap.docs, supplierSchema, "suppliers"));
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-4xl mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">仕入先一覧</h2>
-            <Link href="/settings/suppliers/new">
-              <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white">新規登録</Button>
-            </Link>
-          </div>
-          <SuppliersTable suppliers={suppliers} />
+    <PageContainer maxWidth="max-w-4xl">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">仕入先一覧</h2>
+          <Link href="/settings/suppliers/new">
+            <Button size="sm" className="bg-blue-800 hover:bg-blue-900 text-white">新規登録</Button>
+          </Link>
         </div>
+        <SuppliersTable suppliers={suppliers} />
       </div>
-    </div>
+    </PageContainer>
   );
 }

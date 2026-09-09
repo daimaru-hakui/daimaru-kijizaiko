@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { calcTotalQuantity, calcTotalPrice } from '@/lib/dashboard/stats'
+import { buildUsersMap } from '@/lib/users/map'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { Charts } from '@/components/dashboard/Charts'
 import { Layers, Shirt, Timer, Droplets, Truck } from 'lucide-react'
@@ -80,9 +81,7 @@ export default async function DashboardPage() {
   const productsMap = Object.fromEntries(
     products.map(p => [p.id, { productNumber: p.productNumber, colorName: p.colorName }])
   )
-  const usersMap: Record<string, string> = Object.fromEntries(
-    usersSnap.docs.map(d => [d.id, (d.data().name ?? d.id) as string])
-  )
+  const usersMap = buildUsersMap(usersSnap.docs)
   const grayFabricCount = grayFabricsSnap.size
   const qKeys = [...QUANTITY_KEYS] as QKey[]
 

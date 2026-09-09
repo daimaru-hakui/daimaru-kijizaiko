@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { verifyServerSession } from '@/lib/auth/session'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { toPlainData } from '@/lib/firestore/serialize'
+import { withId } from '@/lib/firestore/with-id'
 import { sortByKana } from '@/lib/sort'
 import { GrayFabricListTable } from '@/components/grayFabrics/GrayFabricListTable'
 import type { GrayFabric } from '../../../../types'
@@ -32,13 +32,8 @@ export default async function GrayFabricsPage() {
   const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s.name]))
 
   const grayFabrics = fabricsSnap.docs.map((d) => {
-    const raw = toPlainData(d.data()) as Record<string, unknown>
-    const { createdAt: _ca, updatedAt: _ua, ...data } = raw
-    return {
-      ...data,
-      id: d.id,
-      supplierName: supplierMap[data.supplierId as string] ?? '',
-    } as GrayFabric & { supplierName: string }
+    const data = withId<GrayFabric>(d)
+    return { ...data, supplierName: supplierMap[data.supplierId] ?? '' }
   })
 
   return (

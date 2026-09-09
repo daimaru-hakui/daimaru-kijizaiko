@@ -12,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { HEAD } from "@/components/ui/table-styles";
+import { PageContainer } from "@/components/ui/page-container";
 
 // serialNumbers コレクションは各発注タイプのカウンタを保持するだけで
 // リアルタイム更新は不要なため RSC の静的取得で十分
@@ -25,28 +27,26 @@ export default async function SerialNumbersPage() {
   const serialNumbers = parseDocs(snap.docs, serialNumberSchema, "serialNumbers");
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 px-4 pb-16">
-      <div className="max-w-lg mx-auto pt-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">発注ナンバー</h2>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">種類</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">伝票ナンバー</TableHead>
+    <PageContainer maxWidth="max-w-lg">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">発注ナンバー</h2>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50">
+              <TableHead className={HEAD}>種類</TableHead>
+              <TableHead className={HEAD}>伝票ナンバー</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {serialNumbers.map((sn) => (
+              <TableRow key={sn.id}>
+                <TableCell>{sn.name}</TableCell>
+                <TableCell className="font-mono">{formatSerialNumber(sn.serialNumber)}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {serialNumbers.map((sn) => (
-                <TableRow key={sn.id}>
-                  <TableCell>{sn.name}</TableCell>
-                  <TableCell className="font-mono">{formatSerialNumber(sn.serialNumber)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </div>
-    </div>
+    </PageContainer>
   );
 }

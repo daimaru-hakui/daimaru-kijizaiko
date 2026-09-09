@@ -7,10 +7,10 @@ import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
 import { ensureAuth, ensureRoles, hasAnyRole, runAuthedAction, runAuthedActionWith } from '@/lib/actions'
 import { canEditAccountingRecord, canEditRecord } from '@/lib/permissions'
-import { toPlainData } from '@/lib/firestore/serialize'
+import { withId } from '@/lib/firestore/with-id'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { ActionResult, ActionResultWith } from '@/lib/actions'
-import type { History } from '../../../../../types'
+import type { SerializableHistory } from '../../../../../types'
 
 /**
  * 仕入の履歴を更新/削除できるのは 徳島 / R&D (と管理者) か、その履歴を作った本人だけ。
@@ -25,7 +25,7 @@ async function ensurePurchaseEditor(): Promise<{ uid: string; privileged: boolea
 export async function getFabricPurchaseConfirmsByDateAction(
   startDay: string,
   endDay: string,
-): Promise<{ ok: true; contents: Omit<History, 'createdAt' | 'updatedAt'>[] } | { ok: false; error: string }> {
+): Promise<{ ok: true; contents: SerializableHistory[] } | { ok: false; error: string }> {
   const auth = await ensureAuth()
   if (!auth.ok) return auth
 
@@ -37,10 +37,7 @@ export async function getFabricPurchaseConfirmsByDateAction(
     .endAt(endDay)
     .get()
   const contents = snap.docs
-    .map((doc) => {
-      const { createdAt: _ca, updatedAt: _ua, ...data } = doc.data()
-      return { ...toPlainData(data) as object, id: doc.id } as Omit<History, 'createdAt' | 'updatedAt'>
-    })
+    .map((doc) => withId<SerializableHistory>(doc))
     .filter((doc) => doc.quantity > 0)
     .sort((a, b) => (a.fixedAt > b.fixedAt ? -1 : 1))
   return { ok: true, contents }
