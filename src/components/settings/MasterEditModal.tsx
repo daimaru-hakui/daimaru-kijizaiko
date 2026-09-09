@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEdit } from 'react-icons/fa'
+import { Pencil } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MasterInputArea, type MasterEntity, type MasterFormConfig } from './MasterInputArea'
 
@@ -16,11 +16,11 @@ export function MasterEditModal<T extends MasterEntity>({ row, form }: Props<T>)
 
   return (
     <>
-      <FaEdit
+      <Pencil
         role="button"
         aria-label="編集"
         color="#444"
-        cursor="pointer"
+        className="h-3.5 w-3.5 cursor-pointer"
         onClick={() => setOpen(true)}
       />
       <Dialog open={open} onOpenChange={setOpen}>

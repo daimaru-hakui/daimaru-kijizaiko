@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FaPlus } from 'react-icons/fa'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -234,7 +234,7 @@ export function CuttingReportForm({ products, salesUsers, initData, onCloseActio
             onClick={addRow}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-medium text-slate-500 transition-colors hover:border-blue-800 hover:text-blue-800"
           >
-            <FaPlus /> 生地を追加
+            <Plus className="h-3.5 w-3.5" /> 生地を追加
           </button>
         </div>
       </section>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaWindowClose } from 'react-icons/fa'
+import { X } from 'lucide-react'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockEditDialog } from './StockEditDialog'
 import { matchesProductNumber } from '@/lib/utils'
@@ -102,7 +102,7 @@ export function CuttingReportFabricRow({
             className="text-destructive transition-opacity hover:opacity-70"
             onClick={deleteRow}
           >
-            <FaWindowClose />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>
