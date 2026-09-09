@@ -18,17 +18,32 @@ type Props = {
   color?: string;
 };
 
+/**
+ * 数字の大きさ。金額内訳はスマホでも2列に並ぶためカード幅が 160px 前後しかなく、
+ * md の大きさのままだと8桁の金額が溢れる。段階的に詰める。
+ */
+const quantitySizes: Record<string, string> = {
+  "4xl": "text-2xl sm:text-3xl md:text-4xl",
+  "3xl": "text-base sm:text-xl md:text-3xl",
+};
+
 export const StatCard: FC<Props> = ({ title, quantity, unit, fontSize, color = "default" }) => {
   const accent = accentColors[color] ?? accentColors.default;
   return (
-    <div className="relative flex-1 bg-white rounded-xl border border-slate-200 p-5 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <div className="relative flex-1 bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
       <div className={`absolute inset-y-0 left-0 w-1.5 rounded-l-xl ${accent}`} />
       <p className="pl-2 text-[11px] font-semibold text-slate-400 tracking-[0.12em] uppercase leading-none">
         {title}
       </p>
-      <p className={`pl-2 mt-3 font-bold tabular-nums text-slate-900 leading-none ${fontSize === "4xl" ? "text-4xl" : "text-3xl"}`}>
+      <p
+        className={`pl-2 mt-2 sm:mt-3 font-bold tabular-nums text-slate-900 leading-none ${
+          quantitySizes[fontSize] ?? quantitySizes["3xl"]
+        }`}
+      >
         {quantity}
-        <span className="text-sm font-normal text-slate-400 ml-1.5">{unit}</span>
+        <span className="text-xs sm:text-sm font-normal text-slate-400 ml-1 sm:ml-1.5">
+          {unit}
+        </span>
       </p>
     </div>
   );
