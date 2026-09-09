@@ -31,6 +31,11 @@ const renderRow = (grayFabric: GrayFabric) =>
   )
 
 describe('AdjustmentGrayFabricRow', () => {
+  it('入力を元に戻す操作に名前が付いている', () => {
+    renderRow(makeGrayFabric())
+    expect(screen.getByRole('button', { name: '入力を元に戻す' })).toBeInTheDocument()
+  })
+
   it('価格・仕掛・在庫が入力欄に表示される', () => {
     renderRow(makeGrayFabric())
     const inputs = screen.getAllByRole('spinbutton')

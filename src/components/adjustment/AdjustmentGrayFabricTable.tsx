@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -9,9 +8,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
-import { AdjustmentGrayFabricSearchBar } from './AdjustmentGrayFabricSearchBar'
-import { matchesProductNumber } from '@/lib/utils'
-import { useDebounce, SEARCH_DEBOUNCE_MS } from '@/hooks/useDebounce'
+import { ListFilterBar } from '@/components/filters/ListFilterBar'
+import { useListFilter } from '@/hooks/useListFilter'
+import { matchesListFilter } from '@/lib/filters/list-filter'
+import { HEAD, HEAD_NUM } from './table-styles'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -19,36 +19,54 @@ type Props = {
 }
 
 export function AdjustmentGrayFabricTable({ grayFabrics }: Props) {
-  const [searchText, setSearchText] = useState('')
+  const { values, filter, setValue, reset } = useListFilter()
 
-  // 入力のたびに全件を絞り込むと件数が多いときに引っかかるため、入力が落ち着いてから絞り込む
-  const search = useDebounce(searchText, SEARCH_DEBOUNCE_MS)
-
-  const filtered = grayFabrics.filter((g) =>
-    matchesProductNumber(g.productNumber, search)
-  )
+  const filtered = grayFabrics.filter((g) => matchesListFilter(g, filter))
 
   return (
-    <div className="w-full">
-      <AdjustmentGrayFabricSearchBar searchText={searchText} setSearchText={setSearchText} />
-      <Table
-        containerClassName="mt-4 max-h-[calc(100vh-330px)] sm:max-h-[calc(100vh-255px)]"
-      >
-        <TableHeader className="sticky top-0 bg-white z-10">
-          <TableRow className="bg-slate-50">
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">生地品番</TableHead>
-            <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">単価（円）</TableHead>
-            <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">キバタ仕掛(m)</TableHead>
-            <TableHead className="text-right text-xs font-semibold text-slate-500 tracking-wider">キバタ在庫(m)</TableHead>
-            <TableHead className="text-xs font-semibold text-slate-500 tracking-wider">処理</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filtered.map((grayFabric) => (
-            <AdjustmentGrayFabricRow key={grayFabric.id} grayFabric={grayFabric} />
-          ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-4">
+      {/* ツールバー */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight shrink-0">
+            キバタ在庫調整
+          </h2>
+          <span className="text-sm text-slate-500">
+            全{grayFabrics.length}件中{' '}
+            <span className="font-semibold text-slate-700">{filtered.length}件</span>
+            表示
+          </span>
+        </div>
+        <ListFilterBar
+          values={values}
+          onChange={setValue}
+          onReset={reset}
+          fields={['productNumber']}
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="rounded-lg border border-slate-200 py-16 text-center text-slate-400 text-sm">
+          現在登録された情報はありません。
+        </div>
+      ) : (
+        <Table containerClassName="rounded-lg border border-slate-200 max-h-[calc(100vh-300px)] sm:max-h-[calc(100vh-240px)]">
+          <TableHeader className="sticky top-0 z-10 bg-slate-50 shadow-[inset_0_-1px_0_#e2e8f0]">
+            <TableRow className="bg-slate-50 hover:bg-slate-50">
+              <TableHead className={HEAD}>生地品番</TableHead>
+              <TableHead className={HEAD_NUM}>単価（円）</TableHead>
+              <TableHead className={HEAD_NUM}>キバタ仕掛(m)</TableHead>
+              <TableHead className={HEAD_NUM}>キバタ在庫(m)</TableHead>
+              <TableHead className={HEAD}>処理</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((grayFabric) => (
+              <AdjustmentGrayFabricRow key={grayFabric.id} grayFabric={grayFabric} />
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   )
 }

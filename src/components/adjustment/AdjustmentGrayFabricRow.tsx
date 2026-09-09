@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { GiCancel } from 'react-icons/gi'
+import { RotateCcw } from 'lucide-react'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
@@ -50,44 +50,59 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
   }
 
   return (
-    <TableRow className="h-[50px]">
+    <TableRow>
       <TableCell>{grayFabric.productNumber}</TableCell>
       <TableCell className="p-1">
-        <NumberInput
-          className="w-32"
-          inputClassName="px-1"
-          min={0}
-          max={100000}
-          value={items.price}
-          onChange={(_, v) => handleChange('price', v)}
-        />
+        <div className="flex justify-end">
+          <NumberInput
+            className="w-32"
+            inputClassName="px-1"
+            min={0}
+            max={100000}
+            value={items.price}
+            onChange={(_, v) => handleChange('price', v)}
+          />
+        </div>
       </TableCell>
       <TableCell className="p-1">
-        <NumberInput
-          className="w-32"
-          inputClassName="px-1"
-          min={0}
-          max={100000}
-          value={mathRound2nd(items.wip)}
-          onChange={(_, v) => handleChange('wip', v)}
-        />
+        <div className="flex justify-end">
+          <NumberInput
+            className="w-32"
+            inputClassName="px-1"
+            min={0}
+            max={100000}
+            value={mathRound2nd(items.wip)}
+            onChange={(_, v) => handleChange('wip', v)}
+          />
+        </div>
       </TableCell>
       <TableCell className="p-1">
-        <NumberInput
-          className="w-32"
-          inputClassName="px-1"
-          min={0}
-          max={100000}
-          value={mathRound2nd(items.stock)}
-          onChange={(_, v) => handleChange('stock', v)}
-        />
+        <div className="flex justify-end">
+          <NumberInput
+            className="w-32"
+            inputClassName="px-1"
+            min={0}
+            max={100000}
+            value={mathRound2nd(items.stock)}
+            onChange={(_, v) => handleChange('stock', v)}
+          />
+        </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
           <Button size="sm" disabled={saving} onClick={handleUpdate}>
             更新
           </Button>
-          <GiCancel className="cursor-pointer" onClick={handleReset} />
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            aria-label="入力を元に戻す"
+            className="h-8 w-8 text-slate-400 hover:text-slate-700"
+            onClick={handleReset}
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
         </div>
       </TableCell>
     </TableRow>
