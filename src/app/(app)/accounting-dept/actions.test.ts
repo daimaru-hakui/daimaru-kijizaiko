@@ -20,16 +20,19 @@ import {
 const mockTransactionGet = vi.fn()
 const mockTransactionUpdate = vi.fn()
 const mockRunTransaction = vi.fn()
+let roles: Record<string, boolean>
 
 const makeMockDb = () => ({
-  collection: (name: string) => ({
-    doc: (id: string) => ({ id, path: `${name}/${id}` }),
-  }),
+  collection: (name: string) =>
+    name === 'users'
+      ? { doc: () => ({ get: async () => ({ exists: true, data: () => roles }) }) }
+      : { doc: (id: string) => ({ id, path: `${name}/${id}` }) },
   runTransaction: mockRunTransaction,
 })
 
 beforeEach(() => {
   vi.clearAllMocks()
+  roles = { accounting: true }
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
   mockRunTransaction.mockImplementation(async (fn: any) => {
@@ -60,6 +63,29 @@ describe('updateHistoryAccountingOrderAction', () => {
     )
     expect(result).toEqual({ ok: false, error: '認証が必要です' })
     expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('accounting/admin 以外のロールは { ok: false, error: "権限がありません" } を返す', async () => {
+    roles = { sales: true, rd: true }
+    const result = await updateHistoryAccountingOrderAction(
+      'hist1', 'prod1', '倉庫A', 80, baseInput
+    )
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('権限がない場合は Firestore に書き込まない', async () => {
+    roles = { sales: true }
+    await updateHistoryAccountingOrderAction('hist1', 'prod1', '倉庫A', 80, baseInput)
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('admin ロールでも実行できる', async () => {
+    roles = { admin: true }
+    mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ tokushimaStock: 200 }) })
+    const result = await updateHistoryAccountingOrderAction(
+      'hist1', 'prod1', '倉庫A', 80, baseInput
+    )
+    expect(result).toEqual({ ok: true })
   })
 
   it('徳島工場以外: products を更新せず history のみ更新する', async () => {
@@ -151,6 +177,29 @@ describe('confirmProcessingAccountingAction', () => {
     )
     expect(result).toEqual({ ok: false, error: '認証が必要です' })
     expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('accounting/admin 以外のロールは { ok: false, error: "権限がありません" } を返す', async () => {
+    roles = { sales: true, rd: true }
+    const result = await confirmProcessingAccountingAction(
+      'hist1', 'prod1', '倉庫A', 100, baseInput
+    )
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('権限がない場合は Firestore に書き込まない', async () => {
+    roles = { sales: true }
+    await confirmProcessingAccountingAction('hist1', 'prod1', '倉庫A', 100, baseInput)
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('admin ロールでも実行できる', async () => {
+    roles = { admin: true }
+    mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ tokushimaStock: 300 }) })
+    const result = await confirmProcessingAccountingAction(
+      'hist1', 'prod1', '倉庫A', 100, baseInput
+    )
+    expect(result).toEqual({ ok: true })
   })
 
   it('正常系: accounting: true をセットする', async () => {

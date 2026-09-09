@@ -2,19 +2,30 @@
 
 import { revalidatePath } from 'next/cache'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, hasAnyRole, type ActionResult, type UserRoles } from '@/lib/actions'
+import { canEditRecord } from '@/lib/permissions'
 import { getTodayDate } from '@/lib/gray-fabrics/dates'
 import { mathRound2nd } from '@/lib/utils'
 import type { GrayFabric, GrayFabricHistory } from '../../../../types'
-import { FieldValue } from 'firebase-admin/firestore'
+import { FieldValue, type DocumentSnapshot } from 'firebase-admin/firestore'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+const FORBIDDEN = '権限がありません'
 
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
+/** UI (GrayFabric*Table) と同じく、所有者か R&D / 管理者だけが更新・削除できる */
+function isPrivileged(roles: UserRoles): boolean {
+  return hasAnyRole(roles, ['rd', 'admin'])
+}
+
+function canEditSnap(snap: DocumentSnapshot, uid: string, roles: UserRoles): boolean {
+  return canEditRecord(snap.data() as { createUser: string }, uid, isPrivileged(roles))
+}
+
+/** トランザクション内で所有者チェックに失敗したときは権限エラーを、それ以外は fallback を返す */
+function toActionError(e: unknown, fallback: string): ActionResult {
+  if (e instanceof Error && e.message === FORBIDDEN) return { ok: false, error: FORBIDDEN }
+  console.error(e)
+  return { ok: false, error: fallback }
 }
 
 export type GrayFabricFormData = {
@@ -25,8 +36,8 @@ export type GrayFabricFormData = {
 }
 
 export async function addGrayFabricAction(data: GrayFabricFormData): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
   if (!data.productNumber) return { ok: false, error: '品番は必須です' }
 
   const db = getAdminDb()
@@ -50,31 +61,38 @@ export async function updateGrayFabricAction(
   id: string,
   data: GrayFabricFormData,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
-  await db
-    .collection('grayFabrics')
-    .doc(id)
-    .update({
-      productName: data.productName || '',
-      productNumber: data.productNumber || '',
-      supplierId: data.supplierId || '',
-      comment: data.comment || '',
-      updateUser: auth.uid,
-      updatedAt: FieldValue.serverTimestamp(),
-    })
+  const ref = db.collection('grayFabrics').doc(id)
+  const snap = await ref.get()
+  if (!snap.exists) return { ok: false, error: 'キバタが登録されていません' }
+  if (!canEditSnap(snap, auth.uid, auth.roles)) return { ok: false, error: FORBIDDEN }
+
+  await ref.update({
+    productName: data.productName || '',
+    productNumber: data.productNumber || '',
+    supplierId: data.supplierId || '',
+    comment: data.comment || '',
+    updateUser: auth.uid,
+    updatedAt: FieldValue.serverTimestamp(),
+  })
   revalidatePath('/gray-fabrics')
   return { ok: true }
 }
 
 export async function deleteGrayFabricAction(id: string): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
-  await db.collection('grayFabrics').doc(id).delete()
+  const ref = db.collection('grayFabrics').doc(id)
+  const snap = await ref.get()
+  if (!snap.exists) return { ok: false, error: 'キバタが登録されていません' }
+  if (!canEditSnap(snap, auth.uid, auth.roles)) return { ok: false, error: FORBIDDEN }
+
+  await ref.delete()
   revalidatePath('/gray-fabrics')
   return { ok: true }
 }
@@ -90,8 +108,8 @@ export async function orderGrayFabricAction(
   grayFabric: Pick<GrayFabric, 'id' | 'productNumber' | 'productName' | 'price' | 'supplierId'> & { supplierName: string },
   items: OrderItems,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
   if (!items.quantity || items.quantity <= 0) return { ok: false, error: '数量を入力してください' }
 
   const db = getAdminDb()
@@ -139,8 +157,8 @@ export async function deleteGrayFabricOrderAction(
   grayFabricId: string,
   quantity: number,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const grayFabricRef = db.collection('grayFabrics').doc(grayFabricId)
@@ -150,14 +168,16 @@ export async function deleteGrayFabricOrderAction(
     await db.runTransaction(async (transaction) => {
       const snap = await transaction.get(grayFabricRef)
       if (!snap.exists) throw new Error('grayFabric does not exist')
+      const orderSnap = await transaction.get(orderRef)
+      if (!orderSnap.exists) throw new Error('history does not exist')
+      if (!canEditSnap(orderSnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
       const newWip = mathRound2nd(Number(snap.data()!.wip) - Number(quantity))
       transaction.update(grayFabricRef, { wip: newWip })
       transaction.delete(orderRef)
     })
   } catch (e) {
-    console.error(e)
-    return { ok: false, error: '削除処理に失敗しました' }
+    return toActionError(e, '削除処理に失敗しました')
   }
   revalidatePath('/gray-fabrics/orders')
   return { ok: true }
@@ -177,8 +197,8 @@ export async function updateOrderHistoryAction(
   oldQuantity: number,
   items: HistoryEditItems,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const grayFabricRef = db.collection('grayFabrics').doc(grayFabricId)
@@ -190,6 +210,7 @@ export async function updateOrderHistoryAction(
       if (!fabricSnap.exists) throw new Error('grayFabric does not exist')
       const historySnap = await transaction.get(historyRef)
       if (!historySnap.exists) throw new Error('history does not exist')
+      if (!canEditSnap(historySnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
       const newWip = mathRound2nd(
         Number(fabricSnap.data()!.wip) - Number(oldQuantity) + Number(items.quantity),
@@ -205,8 +226,7 @@ export async function updateOrderHistoryAction(
       })
     })
   } catch (e) {
-    console.error(e)
-    return { ok: false, error: '更新処理に失敗しました' }
+    return toActionError(e, '更新処理に失敗しました')
   }
   revalidatePath('/gray-fabrics/orders')
   return { ok: true }
@@ -218,8 +238,8 @@ export async function updateConfirmHistoryAction(
   oldQuantity: number,
   items: HistoryEditItems,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const grayFabricRef = db.collection('grayFabrics').doc(grayFabricId)
@@ -231,6 +251,7 @@ export async function updateConfirmHistoryAction(
       if (!fabricSnap.exists) throw new Error('grayFabric does not exist')
       const historySnap = await transaction.get(historyRef)
       if (!historySnap.exists) throw new Error('history does not exist')
+      if (!canEditSnap(historySnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
       const newStock = mathRound2nd(
         Number(fabricSnap.data()!.stock) - Number(oldQuantity) + Number(items.quantity),
@@ -245,8 +266,7 @@ export async function updateConfirmHistoryAction(
       })
     })
   } catch (e) {
-    console.error(e)
-    return { ok: false, error: '更新処理に失敗しました' }
+    return toActionError(e, '更新処理に失敗しました')
   }
   revalidatePath('/gray-fabrics/confirms')
   return { ok: true }
@@ -265,8 +285,8 @@ export async function confirmProcessingAction(
   history: Pick<GrayFabricHistory, 'id' | 'grayFabricId' | 'serialNumber' | 'productNumber' | 'productName' | 'supplierId' | 'supplierName' | 'orderedAt' | 'scheduledAt' | 'quantity'>,
   items: ConfirmItems,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const grayFabricRef = db.collection('grayFabrics').doc(history.grayFabricId)
@@ -277,6 +297,9 @@ export async function confirmProcessingAction(
     await db.runTransaction(async (transaction) => {
       const fabricSnap = await transaction.get(grayFabricRef)
       if (!fabricSnap.exists) throw new Error('grayFabric does not exist')
+      const orderSnap = await transaction.get(orderRef)
+      if (!orderSnap.exists) throw new Error('history does not exist')
+      if (!canEditSnap(orderSnap, auth.uid, auth.roles)) throw new Error(FORBIDDEN)
 
       const newWip = mathRound2nd(
         Number(fabricSnap.data()!.wip) - Number(history.quantity) + Number(items.remainingOrder),
@@ -311,8 +334,7 @@ export async function confirmProcessingAction(
       })
     })
   } catch (e) {
-    console.error(e)
-    return { ok: false, error: '確定処理に失敗しました' }
+    return toActionError(e, '確定処理に失敗しました')
   }
   revalidatePath('/gray-fabrics/orders')
   revalidatePath('/gray-fabrics/confirms')

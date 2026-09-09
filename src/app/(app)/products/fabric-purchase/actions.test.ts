@@ -20,14 +20,19 @@ const mockTransactionUpdate = vi.fn()
 const mockTransactionSet = vi.fn()
 const mockTransactionDelete = vi.fn()
 const mockRunTransaction = vi.fn()
+const mockUserDocGet = vi.fn()
+let roles: Record<string, boolean>
 
 const makeMockDb = () => ({
-  collection: (name: string) => ({
-    doc: (id?: string) => ({
-      id: id || 'auto-id',
-      path: `${name}/${id || 'auto-id'}`,
-    }),
-  }),
+  collection: (name: string) =>
+    name === 'users'
+      ? { doc: () => ({ get: mockUserDocGet }) }
+      : {
+          doc: (id?: string) => ({
+            id: id || 'auto-id',
+            path: `${name}/${id || 'auto-id'}`,
+          }),
+        },
   runTransaction: mockRunTransaction,
 })
 
@@ -35,6 +40,11 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
+  // 既定は特権なし。所有者判定は履歴 doc の createUser で行う
+  roles = {}
+  mockUserDocGet.mockImplementation(async () => ({ exists: true, data: () => roles }))
+  // mockResolvedValueOnce で指定しなかった read は user1 が作った履歴として返す
+  mockTransactionGet.mockResolvedValue({ data: () => ({ createUser: 'user1' }) })
   mockRunTransaction.mockImplementation(async (fn: any) => {
     const tx = {
       get: mockTransactionGet,
@@ -208,12 +218,71 @@ describe('updateFabricPurchaseOrderAction', () => {
   })
 
   it('正常系: transaction が呼ばれ ok:true を返す', async () => {
-    mockTransactionGet.mockResolvedValueOnce({
-      data: () => ({ arrivingQuantity: 100, externalStock: 10 }),
-    })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 100, externalStock: 10 }) })
     const result = await updateFabricPurchaseOrderAction(base)
     expect(result).toEqual({ ok: true })
     expect(mockRunTransaction).toHaveBeenCalledOnce()
+  })
+
+  describe('認可', () => {
+    const othersOrder = {
+      data: () => ({ createUser: 'other', arrivingQuantity: 100, externalStock: 10 }),
+    }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は Firestore に書き込まない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await updateFabricPurchaseOrderAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('特権なしでも所有者なら更新できる', async () => {
+      mockTransactionGet.mockResolvedValue({
+        data: () => ({ createUser: 'user1', arrivingQuantity: 100, externalStock: 10 }),
+      })
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('tokushima は非所有者の発注も更新できる', async () => {
+      roles = { tokushima: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd は非所有者の発注も更新できる', async () => {
+      roles = { rd: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('admin は非所有者の発注も更新できる', async () => {
+      roles = { admin: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('sales は非所有者の発注を更新できない', async () => {
+      roles = { sales: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await updateFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('users doc の読み取りは 1 回だけ', async () => {
+      await updateFabricPurchaseOrderAction(base)
+      expect(mockUserDocGet).toHaveBeenCalledOnce()
+    })
   })
 })
 
@@ -235,12 +304,43 @@ describe('deleteFabricPurchaseOrderAction', () => {
   })
 
   it('正常系: transaction が呼ばれ ok:true を返す', async () => {
-    mockTransactionGet.mockResolvedValueOnce({
-      data: () => ({ arrivingQuantity: 100, externalStock: 10 }),
-    })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ arrivingQuantity: 100, externalStock: 10 }) })
     const result = await deleteFabricPurchaseOrderAction(base)
     expect(result).toEqual({ ok: true })
     expect(mockTransactionDelete).toHaveBeenCalledOnce()
+  })
+
+  describe('認可', () => {
+    const othersOrder = {
+      data: () => ({ createUser: 'other', arrivingQuantity: 100, externalStock: 10 }),
+    }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await deleteFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は order を削除しない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await deleteFabricPurchaseOrderAction(base)
+      expect(mockTransactionDelete).not.toHaveBeenCalled()
+    })
+
+    it('特権なし・非所有者は在庫も更新しない', async () => {
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      await deleteFabricPurchaseOrderAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('tokushima は非所有者の発注も削除できる', async () => {
+      roles = { tokushima: true }
+      mockTransactionGet.mockResolvedValue(othersOrder)
+      const result = await deleteFabricPurchaseOrderAction(base)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
 
@@ -266,12 +366,58 @@ describe('updateFabricPurchaseConfirmAction', () => {
   })
 
   it('正常系: transaction が呼ばれ ok:true を返す', async () => {
-    mockTransactionGet.mockResolvedValueOnce({
-      data: () => ({ tokushimaStock: 100 }),
-    })
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ createUser: 'user1' }) }) // 履歴 (所有者)
+      .mockResolvedValueOnce({ data: () => ({ tokushimaStock: 100 }) })
     const result = await updateFabricPurchaseConfirmAction(base)
     expect(result).toEqual({ ok: true })
     expect(mockRunTransaction).toHaveBeenCalledOnce()
+  })
+
+  describe('認可', () => {
+    const othersConfirm = { data: () => ({ createUser: 'other', tokushimaStock: 100 }) }
+    const accountedOwnConfirm = {
+      data: () => ({ createUser: 'user1', accounting: true, tokushimaStock: 100 }),
+    }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      const result = await updateFabricPurchaseConfirmAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は Firestore に書き込まない', async () => {
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      await updateFabricPurchaseConfirmAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
+
+    it('tokushima は非所有者の入荷も更新できる', async () => {
+      roles = { tokushima: true }
+      mockTransactionGet.mockResolvedValue(othersConfirm)
+      const result = await updateFabricPurchaseConfirmAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('経理処理済みの入荷は所有者でも更新できない', async () => {
+      mockTransactionGet.mockResolvedValue(accountedOwnConfirm)
+      const result = await updateFabricPurchaseConfirmAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('経理処理済みの入荷は admin でも更新できない', async () => {
+      roles = { admin: true }
+      mockTransactionGet.mockResolvedValue(accountedOwnConfirm)
+      const result = await updateFabricPurchaseConfirmAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('経理処理済みの入荷は Firestore に書き込まない', async () => {
+      roles = { admin: true }
+      mockTransactionGet.mockResolvedValue(accountedOwnConfirm)
+      await updateFabricPurchaseConfirmAction(base)
+      expect(mockTransactionUpdate).not.toHaveBeenCalled()
+    })
   })
 })
 

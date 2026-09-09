@@ -3,16 +3,15 @@
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, hasAnyRole, type ActionResult, type UserRoles } from '@/lib/actions'
+import { canEditRecord, canEditAccountingRecord } from '@/lib/permissions'
 import { mathRound2nd } from '@/lib/utils'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
-
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
-}
+// UI (TokushimaFabricPurchaseOrderTable / ConfirmTable) の canEdit と同じ条件。
+// proxy.ts のパス認可は Server Action の POST では効かないため、ここで所有者判定まで行う
+const canManageOrders = (roles: UserRoles) => hasAnyRole(roles, ['tokushima', 'rd', 'admin'])
+// 削除は UI の canDelete に合わせて tokushima を含めない
+const canDeleteOrders = (roles: UserRoles) => hasAnyRole(roles, ['rd', 'admin'])
 
 export type ConfirmFabricPurchaseInput = {
   historyId: string
@@ -39,8 +38,9 @@ export type ConfirmFabricPurchaseInput = {
 export async function confirmFabricPurchaseAction(
   data: ConfirmFabricPurchaseInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
+  const privileged = canManageOrders(auth.roles)
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -51,6 +51,9 @@ export async function confirmFabricPurchaseAction(
     await db.runTransaction(async (tx) => {
       const productSnap = await tx.get(productRef)
       const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, auth.uid, privileged)) {
+        throw new Error('権限がありません')
+      }
 
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
@@ -128,8 +131,9 @@ export type UpdateFabricPurchaseOrderInput = {
 export async function updateFabricPurchaseOrderAction(
   data: UpdateFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
+  const privileged = canManageOrders(auth.roles)
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -138,6 +142,10 @@ export async function updateFabricPurchaseOrderAction(
   try {
     await db.runTransaction(async (tx) => {
       const productSnap = await tx.get(productRef)
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, auth.uid, privileged)) {
+        throw new Error('権限がありません')
+      }
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
@@ -184,8 +192,9 @@ export type DeleteFabricPurchaseOrderInput = {
 export async function deleteFabricPurchaseOrderAction(
   data: DeleteFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
+  const privileged = canDeleteOrders(auth.roles)
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -194,6 +203,10 @@ export async function deleteFabricPurchaseOrderAction(
   try {
     await db.runTransaction(async (tx) => {
       const productSnap = await tx.get(productRef)
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, auth.uid, privileged)) {
+        throw new Error('権限がありません')
+      }
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
 
@@ -233,8 +246,9 @@ export type UpdateFabricPurchaseConfirmInput = {
 export async function updateFabricPurchaseConfirmAction(
   data: UpdateFabricPurchaseConfirmInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
+  const privileged = canManageOrders(auth.roles)
 
   const db = getAdminDb()
   const productRef = db.collection('products').doc(data.productId)
@@ -243,6 +257,17 @@ export async function updateFabricPurchaseConfirmAction(
   try {
     await db.runTransaction(async (tx) => {
       const productSnap = await tx.get(productRef)
+      const confirmSnap = await tx.get(confirmRef)
+      const confirm = confirmSnap.data() ?? {}
+      if (
+        !canEditAccountingRecord(
+          { createUser: confirm.createUser, accounting: confirm.accounting },
+          auth.uid,
+          privileged,
+        )
+      ) {
+        throw new Error('権限がありません')
+      }
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
 
       if (data.stockPlace === '徳島工場') {

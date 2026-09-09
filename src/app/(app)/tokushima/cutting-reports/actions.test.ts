@@ -22,21 +22,25 @@ const mockTransactionDelete = vi.fn()
 const mockRunTransaction = vi.fn()
 const mockDelete = vi.fn()
 const mockUpdate = vi.fn()
+let roles: Record<string, boolean>
 
 const makeMockDb = () => ({
-  collection: (name: string) => ({
-    doc: (id?: string) => ({
-      id: id || 'auto-id',
-      path: `${name}/${id || 'auto-id'}`,
-      update: mockUpdate,
-      delete: mockDelete,
-    }),
-    orderBy: () => ({
-      startAt: () => ({
-        endAt: () => ({ get: vi.fn().mockResolvedValue({ docs: [] }) }),
-      }),
-    }),
-  }),
+  collection: (name: string) =>
+    name === 'users'
+      ? { doc: () => ({ get: async () => ({ exists: true, data: () => roles }) }) }
+      : {
+          doc: (id?: string) => ({
+            id: id || 'auto-id',
+            path: `${name}/${id || 'auto-id'}`,
+            update: mockUpdate,
+            delete: mockDelete,
+          }),
+          orderBy: () => ({
+            startAt: () => ({
+              endAt: () => ({ get: vi.fn().mockResolvedValue({ docs: [] }) }),
+            }),
+          }),
+        },
   runTransaction: mockRunTransaction,
 })
 
@@ -45,6 +49,7 @@ beforeEach(() => {
   // clearAllMocks は mockResolvedValueOnce キューを消去しないため、
   // 途中例外で中断したテストの残りキューが次テストに漏れる。
   vi.resetAllMocks()
+  roles = { tokushima: true }
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
   // Firestore の「全 read を全 write より前に」制約を再現するモック
@@ -404,5 +409,122 @@ describe('updateTokushimaStockAction', () => {
     await updateTokushimaStockAction('prod1', 100.005)
     const [updateData] = mockUpdate.mock.calls[0]
     expect(updateData.tokushimaStock).toBe(100.01)
+  })
+})
+
+// ----------------------------------------------------------------
+// 認可: 裁断報告書の更新系は tokushima / rd / admin のみ (UI の canEdit と同じ)
+// ----------------------------------------------------------------
+describe('addCuttingReportAction の認可', () => {
+  const base = {
+    staff: 'user1',
+    processNumber: 'P-001',
+    cuttingDate: '2026-06-01',
+    itemName: 'ジャケット',
+    itemType: 'jacket',
+    client: 'clientA',
+    totalQuantity: 100,
+    comment: '',
+    products: [{ category: 'cat1', productId: 'prod1', quantity: 50 }],
+  }
+
+  it('ロールがない場合は 権限エラー を返す', async () => {
+    roles = {}
+    const result = await addCuttingReportAction(base)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('ロールがない場合は transaction を開始しない', async () => {
+    roles = {}
+    await addCuttingReportAction(base)
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('sales ロールだけでは登録できない', async () => {
+    roles = { sales: true }
+    const result = await addCuttingReportAction(base)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('rd ロールなら登録できる', async () => {
+    roles = { rd: true }
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ tokushimaStock: 50 }) })
+    const result = await addCuttingReportAction(base)
+    expect(result).toEqual({ ok: true })
+  })
+
+  it('admin ロールなら登録できる', async () => {
+    roles = { admin: true }
+    mockTransactionGet
+      .mockResolvedValueOnce({ data: () => ({ serialNumber: 10 }) })
+      .mockResolvedValueOnce({ data: () => ({ tokushimaStock: 50 }) })
+    const result = await addCuttingReportAction(base)
+    expect(result).toEqual({ ok: true })
+  })
+})
+
+describe('updateCuttingReportAction の認可', () => {
+  const base = {
+    id: 'report1',
+    staff: 'user1',
+    processNumber: 'P-002',
+    cuttingDate: '2026-06-01',
+    itemName: 'パンツ',
+    itemType: 'pants',
+    client: 'clientB',
+    totalQuantity: 80,
+    comment: '',
+    products: [{ category: 'cat1', productId: 'prod1', quantity: 40 }],
+  }
+
+  it('ロールがない場合は 権限エラー を返す', async () => {
+    roles = {}
+    const result = await updateCuttingReportAction(base)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('ロールがない場合は transaction を開始しない', async () => {
+    roles = {}
+    await updateCuttingReportAction(base)
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+})
+
+describe('deleteCuttingReportAction の認可', () => {
+  it('ロールがない場合は 権限エラー を返す', async () => {
+    roles = {}
+    const result = await deleteCuttingReportAction('report1')
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('ロールがない場合は transaction を開始しない', async () => {
+    roles = {}
+    await deleteCuttingReportAction('report1')
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+})
+
+describe('alreadyReadAction の認可', () => {
+  it('ロールがなくてもログイン済みなら既読にできる', async () => {
+    roles = {}
+    mockUpdate.mockResolvedValue(undefined)
+    const result = await alreadyReadAction('report1', 'user1')
+    expect(result).toEqual({ ok: true })
+  })
+})
+
+describe('updateTokushimaStockAction の認可', () => {
+  it('ロールがない場合は 権限エラー を返す', async () => {
+    roles = {}
+    const result = await updateTokushimaStockAction('prod1', 100)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('ロールがない場合は Firestore に書き込まない', async () => {
+    roles = {}
+    await updateTokushimaStockAction('prod1', 100)
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
 })

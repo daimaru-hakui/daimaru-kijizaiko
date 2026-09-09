@@ -4,12 +4,15 @@ import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
+import { ensureRoles, type ActionResult, type Role } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { CuttingReportType } from '../../../../../types'
 
-type ActionResult = { ok: true } | { ok: false; error: string }
+// UI (CuttingReportDetailDialog の canEdit = isTokushima || isRD、admin を含む) と同じ条件。
+// proxy.ts のパス認可は Server Action の POST では効かないため、更新系はここでロールを要求する
+const EDITOR_ROLES: Role[] = ['tokushima', 'rd', 'admin']
 
 export async function getCuttingReportsByDateAction(
   startDay: string,
@@ -34,12 +37,6 @@ export async function getCuttingReportsByDateAction(
   return { ok: true, contents }
 }
 
-async function ensureAuth(): Promise<{ uid: string } | { ok: false; error: string }> {
-  const user = await verifyServerSession()
-  if (!user) return { ok: false, error: '認証が必要です' }
-  return { uid: user.uid }
-}
-
 export type AddCuttingReportInput = {
   staff: string
   processNumber: string
@@ -55,8 +52,8 @@ export type AddCuttingReportInput = {
 export async function addCuttingReportAction(
   data: AddCuttingReportInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(EDITOR_ROLES)
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const reportRef = db.collection('cuttingReports').doc()
@@ -130,8 +127,8 @@ export type UpdateCuttingReportInput = {
 export async function updateCuttingReportAction(
   data: UpdateCuttingReportInput,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(EDITOR_ROLES)
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const reportRef = db.collection('cuttingReports').doc(data.id)
@@ -193,8 +190,8 @@ export async function updateCuttingReportAction(
 }
 
 export async function deleteCuttingReportAction(id: string): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(EDITOR_ROLES)
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const reportRef = db.collection('cuttingReports').doc(id)
@@ -242,8 +239,8 @@ export async function alreadyReadAction(
   reportId: string,
   staff: string,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles([])
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   const readValue = staff === 'R&D' ? 'R&D' : auth.uid
@@ -260,8 +257,8 @@ export async function updateTokushimaStockAction(
   productId: string,
   stock: number,
 ): Promise<ActionResult> {
-  const auth = await ensureAuth()
-  if ('ok' in auth) return auth
+  const auth = await ensureRoles(EDITOR_ROLES)
+  if (!auth.ok) return auth
 
   const db = getAdminDb()
   await db.collection('products').doc(productId).update({

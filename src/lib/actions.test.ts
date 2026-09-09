@@ -1,12 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/auth/session', () => ({ verifyServerSession: vi.fn() }))
+vi.mock('@/lib/firebase/admin', () => ({ getAdminDb: vi.fn() }))
 
 import { verifyServerSession } from '@/lib/auth/session'
-import { runAuthedAction, runAuthedActionWith } from './actions'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { ensureRoles, hasAnyRole, runAuthedAction, runAuthedActionWith } from './actions'
+
+const mockUserDocGet = vi.fn()
 
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.mocked(getAdminDb).mockReturnValue({
+    collection: () => ({ doc: () => ({ get: mockUserDocGet }) }),
+  } as any)
 })
 
 describe('runAuthedAction', () => {
@@ -63,5 +70,53 @@ describe('runAuthedActionWith', () => {
     const fn = vi.fn().mockRejectedValue(new Error('DB接続エラー'))
     const result = await runAuthedActionWith(fn, 'フォールバックエラー')
     expect(result).toEqual({ ok: false, error: 'DB接続エラー' })
+  })
+})
+
+describe('ensureRoles', () => {
+  it('未認証の場合は { ok: false, error: "認証が必要です" } を返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue(null)
+    const result = await ensureRoles(['admin'])
+    expect(result).toEqual({ ok: false, error: '認証が必要です' })
+  })
+
+  it('users ドキュメントが無い場合は { ok: false, error: "権限がありません" } を返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
+    mockUserDocGet.mockResolvedValue({ exists: false, data: () => undefined })
+    const result = await ensureRoles(['admin'])
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('必要なロールをひとつも持たない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
+    mockUserDocGet.mockResolvedValue({ exists: true, data: () => ({ sales: true }) })
+    const result = await ensureRoles(['rd', 'admin'])
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+  })
+
+  it('必要なロールのいずれかを持つ場合は uid とロールを返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
+    mockUserDocGet.mockResolvedValue({ exists: true, data: () => ({ rd: true }) })
+    const result = await ensureRoles(['rd', 'admin'])
+    expect(result).toEqual({ ok: true, uid: 'user1', roles: expect.objectContaining({ rd: true, admin: false }) })
+  })
+
+  it('ロール未指定の場合はログイン済みなら通し、ロールも返す', async () => {
+    vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
+    mockUserDocGet.mockResolvedValue({ exists: true, data: () => ({ tokushima: true }) })
+    const result = await ensureRoles([])
+    expect(result).toEqual({ ok: true, uid: 'user1', roles: expect.objectContaining({ tokushima: true }) })
+  })
+})
+
+describe('hasAnyRole', () => {
+  const roles = { admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+
+  it('必要なロールのいずれかを持てば true', () => {
+    expect(hasAnyRole(roles, ['rd', 'admin'])).toBe(true)
+  })
+
+  it('ひとつも持たなければ false', () => {
+    expect(hasAnyRole(roles, ['tokushima', 'admin'])).toBe(false)
   })
 })

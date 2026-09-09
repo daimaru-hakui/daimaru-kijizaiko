@@ -5,11 +5,22 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getTodayDate } from '@/lib/dates'
 import { mathRound2nd } from '@/lib/utils'
-import { ensureAuth, runAuthedAction, runAuthedActionWith } from '@/lib/actions'
+import { ensureAuth, ensureRoles, hasAnyRole, runAuthedAction, runAuthedActionWith } from '@/lib/actions'
+import { canEditAccountingRecord, canEditRecord } from '@/lib/permissions'
 import { toPlainData } from '@/lib/firestore/serialize'
 import { prepareSerialNumber } from '@/lib/firestore/serialNumber'
 import type { ActionResult, ActionResultWith } from '@/lib/actions'
 import type { History } from '../../../../../types'
+
+/**
+ * 仕入の履歴を更新/削除できるのは 徳島 / R&D (と管理者) か、その履歴を作った本人だけ。
+ * UI (FabricPurchase*Table の isTokushima || isRD) と同じ条件をサーバー側でも守る。
+ */
+async function ensurePurchaseEditor(): Promise<{ uid: string; privileged: boolean }> {
+  const auth = await ensureRoles([])
+  if (!auth.ok) throw new Error(auth.error)
+  return { uid: auth.uid, privileged: hasAnyRole(auth.roles, ['tokushima', 'rd', 'admin']) }
+}
 
 export async function getFabricPurchaseConfirmsByDateAction(
   startDay: string,
@@ -222,12 +233,18 @@ export type UpdateFabricPurchaseOrderInput = {
 export async function updateFabricPurchaseOrderAction(
   data: UpdateFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+  const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensurePurchaseEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const orderRef = db.collection('fabricPurchaseOrders').doc(data.historyId)
 
     await db.runTransaction(async (tx) => {
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
@@ -273,11 +290,17 @@ export async function deleteFabricPurchaseOrderAction(
   data: DeleteFabricPurchaseOrderInput,
 ): Promise<ActionResult> {
   const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensurePurchaseEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const orderRef = db.collection('fabricPurchaseOrders').doc(data.historyId)
 
     await db.runTransaction(async (tx) => {
+      const orderSnap = await tx.get(orderRef)
+      if (!canEditRecord({ createUser: orderSnap.data()?.createUser }, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const arrivingQuantity: number = productSnap.data()?.arrivingQuantity ?? 0
       const externalStock: number = productSnap.data()?.externalStock ?? 0
@@ -315,12 +338,23 @@ export type UpdateFabricPurchaseConfirmInput = {
 export async function updateFabricPurchaseConfirmAction(
   data: UpdateFabricPurchaseConfirmInput,
 ): Promise<ActionResult> {
-  const result = await runAuthedAction(async (uid) => {
+  const result = await runAuthedAction(async () => {
+    const { uid, privileged } = await ensurePurchaseEditor()
     const db = getAdminDb()
     const productRef = db.collection('products').doc(data.productId)
     const confirmRef = db.collection('fabricPurchaseConfirms').doc(data.historyId)
 
     await db.runTransaction(async (tx) => {
+      // 経理処理済みの入荷は誰も編集できない (UI の canEditAccountingRecord と同じ)
+      const confirmSnap = await tx.get(confirmRef)
+      const confirm = {
+        createUser: confirmSnap.data()?.createUser,
+        accounting: confirmSnap.data()?.accounting,
+      }
+      if (!canEditAccountingRecord(confirm, uid, privileged)) {
+        throw new Error('権限がありません')
+      }
+
       const productSnap = await tx.get(productRef)
       const tokushimaStock: number = productSnap.data()?.tokushimaStock ?? 0
 

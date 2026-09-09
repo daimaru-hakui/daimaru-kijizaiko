@@ -29,25 +29,45 @@ const mockDelete = vi.fn()
 const mockSet = vi.fn()
 const mockDocGet = vi.fn()
 const mockRunTransaction = vi.fn()
+let roles: Record<string, boolean>
 
 const makeMockDb = () => ({
-  collection: () => ({
-    add: mockAdd,
-    doc: () => ({
-      update: mockUpdate,
-      delete: mockDelete,
-      get: mockDocGet,
-      set: mockSet,
-    }),
-  }),
+  collection: (name: string) =>
+    name === 'users'
+      ? { doc: () => ({ get: async () => ({ exists: true, data: () => roles }) }) }
+      : {
+          add: mockAdd,
+          doc: () => ({
+            update: mockUpdate,
+            delete: mockDelete,
+            get: mockDocGet,
+            set: mockSet,
+          }),
+        },
   runTransaction: mockRunTransaction,
 })
 
 beforeEach(() => {
   vi.clearAllMocks()
+  roles = { admin: true }
+  mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
 })
+
+/** トランザクション内の get が常に data を返すモックを組み、書き込み spy を返す */
+function installTransaction(data: Record<string, unknown>) {
+  const tx = {
+    get: vi.fn().mockResolvedValue({ exists: true, data: () => data }),
+    update: vi.fn(),
+    set: vi.fn(),
+    delete: vi.fn(),
+  }
+  mockRunTransaction.mockImplementation(async (fn: Function) => {
+    await fn(tx)
+  })
+  return tx
+}
 
 /** トランザクション内の update payload を集めて返す */
 function captureUpdates(data: Record<string, unknown>): Record<string, unknown>[] {
@@ -96,6 +116,18 @@ describe('addGrayFabricAction', () => {
     expect(mockAdd).toHaveBeenCalledOnce()
     expect(result).toEqual({ ok: true })
   })
+
+  it('ロールがなくてもログイン済みなら追加できる', async () => {
+    roles = {}
+    mockAdd.mockResolvedValue({ id: 'new-id' })
+    const result = await addGrayFabricAction({
+      supplierId: 's1',
+      productNumber: 'ABC123',
+      productName: 'テスト生地',
+      comment: '',
+    })
+    expect(result).toEqual({ ok: true })
+  })
 })
 
 describe('updateGrayFabricAction', () => {
@@ -121,6 +153,44 @@ describe('updateGrayFabricAction', () => {
     expect(mockUpdate).toHaveBeenCalledOnce()
     expect(result).toEqual({ ok: true })
   })
+
+  describe('権限', () => {
+    const data = { supplierId: 's1', productNumber: 'ABC', productName: '', comment: '' }
+
+    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      const result = await updateGrayFabricAction('id1', data)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore に書き込まない', async () => {
+      roles = { sales: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      await updateGrayFabricAction('id1', data)
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('所有者ならロールがなくても更新できる', async () => {
+      roles = {}
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
+      const result = await updateGrayFabricAction('id1', data)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd ロールなら他人のキバタも更新できる', async () => {
+      roles = { rd: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      const result = await updateGrayFabricAction('id1', data)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('キバタが存在しない場合はエラーを返す', async () => {
+      mockDocGet.mockResolvedValue({ exists: false, data: () => undefined })
+      const result = await updateGrayFabricAction('id1', data)
+      expect(result).toEqual({ ok: false, error: 'キバタが登録されていません' })
+    })
+  })
 })
 
 describe('deleteGrayFabricAction', () => {
@@ -135,6 +205,36 @@ describe('deleteGrayFabricAction', () => {
     const result = await deleteGrayFabricAction('id1')
     expect(mockDelete).toHaveBeenCalledOnce()
     expect(result).toEqual({ ok: true })
+  })
+
+  describe('権限', () => {
+    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      const result = await deleteGrayFabricAction('id1')
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore から削除しない', async () => {
+      roles = { sales: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      await deleteGrayFabricAction('id1')
+      expect(mockDelete).not.toHaveBeenCalled()
+    })
+
+    it('所有者ならロールがなくても削除できる', async () => {
+      roles = {}
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
+      const result = await deleteGrayFabricAction('id1')
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd ロールなら他人のキバタも削除できる', async () => {
+      roles = { rd: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
+      const result = await deleteGrayFabricAction('id1')
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
 
@@ -212,6 +312,13 @@ describe('orderGrayFabricAction', () => {
     await orderGrayFabricAction(grayFabric, items)
     expect(capturedSetData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
   })
+
+  it('ロールがなくてもログイン済みなら発注できる', async () => {
+    roles = {}
+    installTransaction({ serialNumber: 5, wip: 10 })
+    const result = await orderGrayFabricAction(grayFabric, items)
+    expect(result).toEqual({ ok: true })
+  })
 })
 
 describe('deleteGrayFabricOrderAction', () => {
@@ -239,6 +346,37 @@ describe('deleteGrayFabricOrderAction', () => {
     const updates = captureUpdates({ wip: 100.2 })
     await deleteGrayFabricOrderAction('h1', 'gf1', 33.4)
     expect(updates[0]).toEqual({ wip: 66.8 })
+  })
+
+  describe('権限', () => {
+    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      installTransaction({ wip: 100, createUser: 'other' })
+      const result = await deleteGrayFabricOrderAction('h1', 'gf1', 50)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore に書き込まない', async () => {
+      roles = { sales: true }
+      const tx = installTransaction({ wip: 100, createUser: 'other' })
+      await deleteGrayFabricOrderAction('h1', 'gf1', 50)
+      expect(tx.update).not.toHaveBeenCalled()
+      expect(tx.delete).not.toHaveBeenCalled()
+    })
+
+    it('所有者ならロールがなくても削除できる', async () => {
+      roles = {}
+      installTransaction({ wip: 100, createUser: 'user1' })
+      const result = await deleteGrayFabricOrderAction('h1', 'gf1', 50)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd ロールなら他人の発注も削除できる', async () => {
+      roles = { rd: true }
+      installTransaction({ wip: 100, createUser: 'other' })
+      const result = await deleteGrayFabricOrderAction('h1', 'gf1', 50)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
 
@@ -268,6 +406,36 @@ describe('updateOrderHistoryAction', () => {
     await updateOrderHistoryAction('h1', 'gf1', 33.4, { ...items, quantity: 0 })
     expect(updates[0]).toEqual({ wip: 66.8 })
   })
+
+  describe('権限', () => {
+    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      installTransaction({ wip: 100, createUser: 'other' })
+      const result = await updateOrderHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore に書き込まない', async () => {
+      roles = { sales: true }
+      const tx = installTransaction({ wip: 100, createUser: 'other' })
+      await updateOrderHistoryAction('h1', 'gf1', 100, items)
+      expect(tx.update).not.toHaveBeenCalled()
+    })
+
+    it('所有者ならロールがなくても更新できる', async () => {
+      roles = {}
+      installTransaction({ wip: 100, createUser: 'user1' })
+      const result = await updateOrderHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('admin ロールなら他人の発注も更新できる', async () => {
+      roles = { admin: true }
+      installTransaction({ wip: 100, createUser: 'other' })
+      const result = await updateOrderHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: true })
+    })
+  })
 })
 
 describe('updateConfirmHistoryAction', () => {
@@ -295,6 +463,36 @@ describe('updateConfirmHistoryAction', () => {
     const updates = captureUpdates({ stock: 100.2 })
     await updateConfirmHistoryAction('h1', 'gf1', 33.4, { ...items, quantity: 0 })
     expect(updates[0]).toEqual({ stock: 66.8 })
+  })
+
+  describe('権限', () => {
+    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      installTransaction({ stock: 200, createUser: 'other' })
+      const result = await updateConfirmHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore に書き込まない', async () => {
+      roles = { sales: true }
+      const tx = installTransaction({ stock: 200, createUser: 'other' })
+      await updateConfirmHistoryAction('h1', 'gf1', 100, items)
+      expect(tx.update).not.toHaveBeenCalled()
+    })
+
+    it('所有者ならロールがなくても更新できる', async () => {
+      roles = {}
+      installTransaction({ stock: 200, createUser: 'user1' })
+      const result = await updateConfirmHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd ロールなら他人の確定履歴も更新できる', async () => {
+      roles = { rd: true }
+      installTransaction({ stock: 200, createUser: 'other' })
+      const result = await updateConfirmHistoryAction('h1', 'gf1', 100, items)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
 
@@ -366,5 +564,36 @@ describe('confirmProcessingAction', () => {
     })
     await confirmProcessingAction(history, items)
     expect(capturedSetData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
+  })
+
+  describe('権限', () => {
+    it('発注の所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+      roles = { sales: true }
+      installTransaction({ wip: 100, stock: 0, createUser: 'other' })
+      const result = await confirmProcessingAction(history, items)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('権限がない場合は Firestore に書き込まない', async () => {
+      roles = { sales: true }
+      const tx = installTransaction({ wip: 100, stock: 0, createUser: 'other' })
+      await confirmProcessingAction(history, items)
+      expect(tx.update).not.toHaveBeenCalled()
+      expect(tx.set).not.toHaveBeenCalled()
+    })
+
+    it('発注の所有者ならロールがなくても確定できる', async () => {
+      roles = {}
+      installTransaction({ wip: 100, stock: 0, createUser: 'user1' })
+      const result = await confirmProcessingAction(history, items)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd ロールなら他人の発注も確定できる', async () => {
+      roles = { rd: true }
+      installTransaction({ wip: 100, stock: 0, createUser: 'other' })
+      const result = await confirmProcessingAction(history, items)
+      expect(result).toEqual({ ok: true })
+    })
   })
 })

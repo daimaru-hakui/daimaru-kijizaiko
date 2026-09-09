@@ -17,13 +17,22 @@ import {
 const mockSet = vi.fn()
 const mockUpdate = vi.fn()
 const mockGet = vi.fn()
+const mockProductGet = vi.fn()
+const mockUserDocGet = vi.fn()
 const mockCollectionGet = vi.fn()
+let roles: Record<string, boolean>
+
+const docGetFor = (name: string) => {
+  if (name === 'users') return mockUserDocGet
+  if (name === 'products') return mockProductGet
+  return mockGet
+}
 
 const makeMockDb = () => ({
-  collection: (_name: string) => ({
+  collection: (name: string) => ({
     doc: (id?: string) => ({
       id: id || 'auto-id',
-      get: mockGet,
+      get: docGetFor(name),
       set: mockSet,
       update: mockUpdate,
     }),
@@ -38,6 +47,10 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user1' } as any)
   vi.mocked(getAdminDb).mockReturnValue(makeMockDb() as any)
+  // 既定は特権なし。所有者判定は product doc の createUser で行う
+  roles = {}
+  mockUserDocGet.mockImplementation(async () => ({ exists: true, data: () => roles }))
+  mockProductGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
 })
 
 // ----------------------------------------------------------------
@@ -235,6 +248,57 @@ describe('updateProductAction', () => {
     expect(updateData.externalStock).toBe(10.01)
     expect(updateData.tokushimaStock).toBe(5)
   })
+
+  describe('認可', () => {
+    const othersProduct = { exists: true, data: () => ({ createUser: 'other' }) }
+
+    beforeEach(() => {
+      mockGet.mockResolvedValue({ exists: true, data: () => ({ name: '仕入先B' }) })
+    })
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await updateProductAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は Firestore に書き込まない', async () => {
+      mockProductGet.mockResolvedValue(othersProduct)
+      await updateProductAction(base)
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('特権なしでも所有者なら更新できる', async () => {
+      const result = await updateProductAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('rd は非所有者の生地も更新できる', async () => {
+      roles = { rd: true }
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await updateProductAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('admin は非所有者の生地も更新できる', async () => {
+      roles = { admin: true }
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await updateProductAction(base)
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('tokushima は非所有者の生地を更新できない', async () => {
+      roles = { tokushima: true }
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await updateProductAction(base)
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('users doc の読み取りは 1 回だけ', async () => {
+      await updateProductAction(base)
+      expect(mockUserDocGet).toHaveBeenCalledOnce()
+    })
+  })
 })
 
 // ----------------------------------------------------------------
@@ -254,5 +318,28 @@ describe('deleteProductAction', () => {
     expect(mockUpdate).toHaveBeenCalledOnce()
     const updateData = mockUpdate.mock.calls[0][0]
     expect(updateData.deletedAt).toBe('2026-05-22')
+  })
+
+  describe('認可', () => {
+    const othersProduct = { exists: true, data: () => ({ createUser: 'other' }) }
+
+    it('特権なし・非所有者は { ok: false, error: "権限がありません" } を返す', async () => {
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await deleteProductAction('prod1')
+      expect(result).toEqual({ ok: false, error: '権限がありません' })
+    })
+
+    it('特権なし・非所有者は deletedAt を書き込まない', async () => {
+      mockProductGet.mockResolvedValue(othersProduct)
+      await deleteProductAction('prod1')
+      expect(mockUpdate).not.toHaveBeenCalled()
+    })
+
+    it('rd は非所有者の生地も削除できる', async () => {
+      roles = { rd: true }
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await deleteProductAction('prod1')
+      expect(result).toEqual({ ok: true })
+    })
   })
 })
