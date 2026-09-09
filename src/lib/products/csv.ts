@@ -1,4 +1,5 @@
 import { getMixed, getFabricStd } from "@/lib/utils";
+import { buildCsv } from "@/lib/csv";
 import type { Product } from "../../../types";
 
 type ProductRow = Omit<Product, "createdAt" | "updatedAt">;
@@ -19,10 +20,6 @@ const HEADERS = [
   "規格",
   "機能性",
 ];
-
-function escapeCsvCell(value: unknown): string {
-  return `"${String(value ?? "").replace(/"/g, '""')}"`;
-}
 
 export function buildProductCsv(
   products: ProductRow[],
@@ -45,9 +42,5 @@ export function buildProductCsv(
     (p.features ?? []).join(" "),
   ]);
 
-  const csv = [HEADERS, ...rows]
-    .map((row) => row.map(escapeCsvCell).join(","))
-    .join("\n");
-
-  return "﻿" + csv;
+  return buildCsv(HEADERS, rows);
 }

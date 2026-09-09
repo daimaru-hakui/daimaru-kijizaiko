@@ -21,6 +21,7 @@ import {
 import { Menu, Settings } from "lucide-react";
 import { NavLinks } from "./nav-links";
 import type { UserRoles } from "./types";
+import { UserRolesProvider } from "./roles-context";
 
 export type { UserRoles };
 
@@ -112,7 +113,9 @@ export function AppShell({ userName, roles, children }: Props) {
       </aside>
 
       {/* Main content */}
-      <main className="pt-12 2xl:pl-60">{children}</main>
+      <main className="pt-12 2xl:pl-60">
+        <UserRolesProvider roles={roles}>{children}</UserRolesProvider>
+      </main>
     </div>
   );
 }

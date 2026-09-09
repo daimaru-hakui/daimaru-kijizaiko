@@ -16,9 +16,8 @@ import {
   getFabricStd,
   getCuttingScheduleTotal,
 } from "@/lib/utils";
-import { getTodayDate } from "@/lib/dates";
 import { buildProductCsv } from "@/lib/products/csv";
-import { downloadCsv } from "@/lib/download";
+import { CsvDownloadButton } from "@/components/list/CsvDownloadButton";
 import { canEditRecord } from "@/lib/permissions";
 import { useDebounce, SEARCH_DEBOUNCE_MS } from "@/hooks/useDebounce";
 import { buildOptions } from "@/lib/filters/options";
@@ -115,13 +114,6 @@ export function ProductListTable({
     }
   };
 
-  const handleCsv = () => {
-    downloadCsv(
-      buildProductCsv(filtered, usersMap),
-      `生地一覧_${getTodayDate()}.csv`,
-    );
-  };
-
   const canEdit = (p: Omit<Product, "createdAt" | "updatedAt">) =>
     canEditRecord(p, userId, isAdmin || isRD);
 
@@ -141,14 +133,10 @@ export function ProductListTable({
               </span>
               表示
             </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCsv}
-              className="text-xs"
-            >
-              CSV
-            </Button>
+            <CsvDownloadButton
+              filename="生地一覧"
+              build={() => buildProductCsv(filtered, usersMap)}
+            />
             <Button
               size="sm"
               asChild
