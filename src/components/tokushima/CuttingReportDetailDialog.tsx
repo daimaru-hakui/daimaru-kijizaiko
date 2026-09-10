@@ -20,6 +20,7 @@ import {
 import { HEAD } from '@/components/ui/table-styles'
 import { CuttingReportForm } from './CuttingReportForm'
 import { deleteCuttingReportAction } from '@/app/(app)/tokushima/cutting-reports/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 
@@ -77,7 +78,8 @@ export function CuttingReportDetailDialog({
 
   const handleDelete = async () => {
     if (!window.confirm('削除してよろしいですか？')) return
-    await deleteCuttingReportAction(report.id)
+    const result = await deleteCuttingReportAction(report.id)
+    if (!notifyResult(result, TOAST.deleted)) return
     onCloseAction()
   }
 

@@ -18,6 +18,7 @@ import {
   updateFabricPurchaseOrderAction,
   updateFabricPurchaseConfirmAction,
 } from '@/app/(app)/tokushima/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory, StockPlace } from '../../../types'
 
 type Props = {
@@ -68,12 +69,9 @@ export function TokushimaFabricPurchaseEditDialog({ history, type, stockPlaces =
         comment,
       })
     }
-    if (result.ok) {
-      onCloseAction()
-      router.refresh()
-    } else {
-      alert(result.error)
-    }
+    if (!notifyResult(result, TOAST.updated)) return
+    onCloseAction()
+    router.refresh()
   }
 
   return (
