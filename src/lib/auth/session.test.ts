@@ -11,7 +11,7 @@ vi.mock('next/headers', () => ({
 
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { cookies } from 'next/headers'
-import { verifyAdminSession } from './session'
+import { verifyServerSession, verifyAdminSession } from './session'
 
 const mockVerifySessionCookie = vi.fn()
 const mockDocGet = vi.fn()
@@ -22,6 +22,29 @@ beforeEach(() => {
   vi.mocked(getAdminDb).mockReturnValue({
     collection: () => ({ doc: () => ({ get: mockDocGet }) }),
   } as any)
+})
+
+describe('verifyServerSession', () => {
+  it('セッションクッキーがない場合は null を返す', async () => {
+    vi.mocked(cookies).mockResolvedValue({ get: () => undefined } as any)
+    const result = await verifyServerSession()
+    expect(result).toBeNull()
+  })
+
+  it('セッションクッキーが有効な場合は DecodedIdToken を返す', async () => {
+    const token = { uid: 'user123' }
+    vi.mocked(cookies).mockResolvedValue({ get: () => ({ value: 'valid-cookie' }) } as any)
+    mockVerifySessionCookie.mockResolvedValue(token)
+    const result = await verifyServerSession()
+    expect(result).toEqual(token)
+  })
+
+  it('verifySessionCookie が例外を投げた場合は null を返す', async () => {
+    vi.mocked(cookies).mockResolvedValue({ get: () => ({ value: 'expired-cookie' }) } as any)
+    mockVerifySessionCookie.mockRejectedValue(new Error('invalid cookie'))
+    const result = await verifyServerSession()
+    expect(result).toBeNull()
+  })
 })
 
 describe('verifyAdminSession', () => {
