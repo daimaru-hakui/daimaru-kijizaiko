@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCuttingScheduleTotal } from "@/lib/utils";
+import { useUserRoles } from "@/components/app-shell/roles-context";
+import { deleteScheduleAction } from "@/app/(app)/schedules/actions";
 import type { CuttingSchedule } from "../../../types";
 
 type Props = {
@@ -32,10 +35,22 @@ export function ProductCuttingScheduleModal({
   usersMap,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const { tokushima } = useUserRoles();
   const total = getCuttingScheduleTotal(scheduleIds, schedulesMap);
   const schedules = scheduleIds.flatMap((id) =>
     schedulesMap[id] ? [schedulesMap[id]] : [],
   );
+
+  const handleDelete = async (id: string, productId: string) => {
+    if (!window.confirm("削除してもよいですか？")) return;
+    const result = await deleteScheduleAction(id, productId);
+    if (result.ok) {
+      router.refresh();
+    } else {
+      alert(result.error);
+    }
+  };
 
   return (
     <>
@@ -75,6 +90,7 @@ export function ProductCuttingScheduleModal({
                   <TableHead className="text-xs font-semibold text-slate-500">
                     製品納期
                   </TableHead>
+                  {tokushima && <TableHead />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -87,6 +103,18 @@ export function ProductCuttingScheduleModal({
                       {s.quantity.toLocaleString()}m
                     </TableCell>
                     <TableCell>{s.scheduledAt}</TableCell>
+                    {tokushima && (
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDelete(s.id, s.productId)}
+                        >
+                          削除
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

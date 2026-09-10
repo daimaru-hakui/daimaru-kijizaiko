@@ -39,7 +39,8 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
   )
   const handleDelete = async (id: string, productId: string) => {
     if (!window.confirm('削除してもよいですか？')) return
-    await deleteScheduleAction(id, productId)
+    const result = await deleteScheduleAction(id, productId)
+    if (!result.ok) alert(result.error)
   }
 
   return (
