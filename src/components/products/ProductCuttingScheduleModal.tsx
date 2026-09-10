@@ -21,6 +21,7 @@ import {
 import { getCuttingScheduleTotal } from "@/lib/utils";
 import { useUserRoles } from "@/components/app-shell/roles-context";
 import { deleteScheduleAction } from "@/app/(app)/schedules/actions";
+import { notifyResult, TOAST } from "@/components/ui/toast";
 import type { CuttingSchedule } from "../../../types";
 
 type Props = {
@@ -45,11 +46,8 @@ export function ProductCuttingScheduleModal({
   const handleDelete = async (id: string, productId: string) => {
     if (!window.confirm("削除してもよいですか？")) return;
     const result = await deleteScheduleAction(id, productId);
-    if (result.ok) {
-      router.refresh();
-    } else {
-      alert(result.error);
-    }
+    if (!notifyResult(result, TOAST.deleted)) return;
+    router.refresh();
   };
 
   return (

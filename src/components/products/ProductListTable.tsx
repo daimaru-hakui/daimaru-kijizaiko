@@ -10,6 +10,7 @@ import {
   FilterCheckbox,
 } from "@/components/filters/fields";
 import { deleteProductAction } from "@/app/(app)/products/actions";
+import { notifyResult, TOAST } from "@/components/ui/toast";
 import {
   matchesProductNumber,
   getMixed,
@@ -105,11 +106,8 @@ export function ProductListTable({
   ) => {
     if (!window.confirm(`${product.productNumber} を削除しますか？`)) return;
     const result = await deleteProductAction(product.id);
-    if (result.ok) {
-      router.refresh();
-    } else {
-      alert(result.error);
-    }
+    if (!notifyResult(result, TOAST.deleted)) return;
+    router.refresh();
   };
 
   const canEdit = (p: SerializableProduct) =>

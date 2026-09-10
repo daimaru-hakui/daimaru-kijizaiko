@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { confirmFabricPurchaseAction } from '@/app/(app)/products/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { getTodayDate } from '@/lib/dates'
 import { calcRemainingOrder } from '@/lib/orders/remaining'
 import type { History, StockPlace } from '../../../../types'
@@ -75,8 +76,9 @@ export function FabricPurchaseConfirmOrderDialog({ order, stockPlaces, open, onC
       scheduledAt,
       fixedAt,
     })
-    if (result.ok) { onClose(); router.refresh() }
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.confirmed)) return
+    onClose()
+    router.refresh()
   }
 
   return (

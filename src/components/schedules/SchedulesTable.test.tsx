@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { SchedulesTable } from './SchedulesTable'
+import { renderWithToast } from '@/test-utils/toast'
 import {
   setupSearchDebounceTimers,
   setupUser,
@@ -52,20 +53,29 @@ describe('SchedulesTable', () => {
     expect(screen.getByText('現在登録された情報はありません。')).toBeInTheDocument()
   })
 
-  it('削除に失敗するとエラーが表示される', async () => {
+  it('削除に失敗するとエラーがトーストで表示される', async () => {
     const { deleteScheduleAction } = await import('@/app/(app)/schedules/actions')
     vi.mocked(deleteScheduleAction).mockResolvedValueOnce({
       ok: false,
       error: '権限がありません',
     })
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     const user = userEvent.setup()
 
-    render(<SchedulesTable {...defaultProps} />)
+    renderWithToast(<SchedulesTable {...defaultProps} />)
     await user.click(screen.getByRole('button', { name: '削除' }))
 
-    expect(alertSpy).toHaveBeenCalledWith('権限がありません')
+    expect(await screen.findByText('権限がありません')).toBeInTheDocument()
+  })
+
+  it('削除に成功すると成功トーストが表示される', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const user = userEvent.setup()
+
+    renderWithToast(<SchedulesTable {...defaultProps} />)
+    await user.click(screen.getByRole('button', { name: '削除' }))
+
+    expect(await screen.findByText('削除しました')).toBeInTheDocument()
   })
 })
 

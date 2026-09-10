@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
+import { renderWithToast } from '@/test-utils/toast'
 import type { CuttingReportType } from '../../../types'
 
 vi.mock('next/navigation', () => ({
@@ -67,5 +69,31 @@ describe('CuttingReportDetailDialog', () => {
     render(<CuttingReportDetailDialog {...defaultProps} isTokushima />)
     const heading = screen.getByRole('heading', { name: '裁断報告書' })
     expect(heading).not.toContainElement(screen.getByRole('button', { name: '編集' }))
+  })
+
+  it('削除に失敗するとエラーがトーストで表示され、ダイアログは閉じない', async () => {
+    const { deleteCuttingReportAction } = await import('@/app/(app)/tokushima/cutting-reports/actions')
+    vi.mocked(deleteCuttingReportAction).mockResolvedValueOnce({ ok: false, error: '権限がありません' })
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const onCloseAction = vi.fn()
+    const user = userEvent.setup()
+
+    renderWithToast(<CuttingReportDetailDialog {...defaultProps} isTokushima onCloseAction={onCloseAction} />)
+    await user.click(screen.getByRole('button', { name: '削除' }))
+
+    expect(await screen.findByText('権限がありません')).toBeInTheDocument()
+    expect(onCloseAction).not.toHaveBeenCalled()
+  })
+
+  it('削除に成功すると成功トーストが表示されダイアログが閉じる', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const onCloseAction = vi.fn()
+    const user = userEvent.setup()
+
+    renderWithToast(<CuttingReportDetailDialog {...defaultProps} isTokushima onCloseAction={onCloseAction} />)
+    await user.click(screen.getByRole('button', { name: '削除' }))
+
+    expect(await screen.findByText('削除しました')).toBeInTheDocument()
+    expect(onCloseAction).toHaveBeenCalled()
   })
 })

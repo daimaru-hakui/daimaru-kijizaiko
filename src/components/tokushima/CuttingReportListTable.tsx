@@ -9,6 +9,7 @@ import { CsvDownloadButton } from '@/components/list/CsvDownloadButton'
 import { buildCuttingReportCsv } from '@/lib/cutting-reports/csv'
 import { CuttingReportDetailDialog } from './CuttingReportDetailDialog'
 import { alreadyReadAction } from '@/app/(app)/tokushima/cutting-reports/actions'
+import { notifyError } from '@/components/ui/toast'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { usePeriodSearch } from '@/hooks/usePeriodSearch'
@@ -63,7 +64,11 @@ export function CuttingReportListTable({
   }
 
   const handleAlreadyRead = async (report: CuttingReportType) => {
-    await alreadyReadAction(report.id, report.staff)
+    const result = await alreadyReadAction(report.id, report.staff)
+    if (!result.ok) {
+      notifyError(result.error)
+      return
+    }
     router.refresh()
   }
 

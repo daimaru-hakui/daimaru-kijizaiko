@@ -15,6 +15,7 @@ import { CommentModal } from '@/components/CommentModal'
 import { GrayFabricEditModal } from './GrayFabricEditModal'
 import { GrayFabricOrderAreaModal } from './GrayFabricOrderAreaModal'
 import { deleteGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { EmptyState } from '@/components/list/EmptyState'
 import { ListTitle } from '@/components/list/ListTitle'
 import type { GrayFabric } from '../../../types'
@@ -51,9 +52,7 @@ export function GrayFabricListTable({ grayFabrics, suppliers, currentUserId, isR
     if (!confirm('削除して宜しいでしょうか。')) return
     if (!confirm('本当に削除して宜しいでしょうか。')) return
     startTransition(() => {
-      void deleteGrayFabricAction(id).then((result) => {
-        if (!result.ok) alert(result.error)
-      })
+      void deleteGrayFabricAction(id).then((result) => notifyResult(result, TOAST.deleted))
     })
   }
 

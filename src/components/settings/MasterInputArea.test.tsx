@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithToast } from '@/test-utils/toast'
 
 const push = vi.fn()
 const refresh = vi.fn()
@@ -51,12 +52,11 @@ const saved: Item = {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.spyOn(window, 'confirm').mockReturnValue(true)
-  vi.spyOn(window, 'alert').mockImplementation(() => {})
 })
 
 describe('MasterInputArea の項目描画', () => {
   it('設定した項目が名前と備考の間に並ぶ', () => {
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     expect(screen.getByLabelText('項目名')).toBeInTheDocument()
     expect(screen.getByText('フリガナ')).toBeInTheDocument()
@@ -66,13 +66,13 @@ describe('MasterInputArea の項目描画', () => {
   })
 
   it('数値項目は初期値入りのスピンボタンになる', () => {
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     expect(screen.getByRole('spinbutton')).toHaveValue('3')
   })
 
   it('編集時は既存の値が入っている', () => {
-    render(<MasterInputArea type="edit" row={saved} form={form} />)
+    renderWithToast(<MasterInputArea type="edit" row={saved} form={form} />)
 
     expect(screen.getByLabelText('項目名')).toHaveValue('大丸商事')
     expect(screen.getByRole('spinbutton')).toHaveValue('5')
@@ -83,7 +83,7 @@ describe('MasterInputArea の項目描画', () => {
 describe('MasterInputArea の新規登録', () => {
   it('名前が空のまま登録すると必須メッセージが出て Action は呼ばれない', async () => {
     const user = userEvent.setup()
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     await user.click(screen.getByRole('button', { name: '登録' }))
 
@@ -93,7 +93,7 @@ describe('MasterInputArea の新規登録', () => {
 
   it('登録済みの名前を入力すると警告が出て登録できない', async () => {
     const user = userEvent.setup()
-    render(
+    renderWithToast(
       <MasterInputArea type="new" row={empty} form={form} existingNames={['大丸商事']} />
     )
 
@@ -105,7 +105,7 @@ describe('MasterInputArea の新規登録', () => {
 
   it('確認して登録すると Action が呼ばれ一覧へ戻る', async () => {
     const user = userEvent.setup()
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     await user.type(screen.getByLabelText('項目名'), '新規商事')
     await user.click(screen.getByRole('button', { name: '登録' }))
@@ -114,13 +114,14 @@ describe('MasterInputArea の新規登録', () => {
     expect(addAction).toHaveBeenCalledWith(
       expect.objectContaining({ name: '新規商事', order: 3, comment: '' })
     )
+    expect(await screen.findByText('登録しました')).toBeInTheDocument()
     expect(push).toHaveBeenCalledWith('/settings/items')
   })
 
   it('確認をキャンセルすると Action は呼ばれない', async () => {
     const user = userEvent.setup()
     vi.spyOn(window, 'confirm').mockReturnValue(false)
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     await user.type(screen.getByLabelText('項目名'), '新規商事')
     await user.click(screen.getByRole('button', { name: '登録' }))
@@ -129,15 +130,15 @@ describe('MasterInputArea の新規登録', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
-  it('Action が失敗するとエラーを alert して遷移しない', async () => {
+  it('Action が失敗するとエラーがトーストで表示され遷移しない', async () => {
     const user = userEvent.setup()
     addAction.mockResolvedValueOnce({ ok: false, error: '失敗しました' } as never)
-    render(<MasterInputArea type="new" row={empty} form={form} />)
+    renderWithToast(<MasterInputArea type="new" row={empty} form={form} />)
 
     await user.type(screen.getByLabelText('項目名'), '新規商事')
     await user.click(screen.getByRole('button', { name: '登録' }))
 
-    expect(window.alert).toHaveBeenCalledWith('失敗しました')
+    expect(await screen.findByText('失敗しました')).toBeInTheDocument()
     expect(push).not.toHaveBeenCalled()
   })
 })
@@ -146,7 +147,7 @@ describe('MasterInputArea の更新', () => {
   it('確認して更新すると id 付きで Action が呼ばれ onSuccess が呼ばれる', async () => {
     const user = userEvent.setup()
     const onSuccess = vi.fn()
-    render(<MasterInputArea type="edit" row={saved} form={form} onSuccess={onSuccess} />)
+    renderWithToast(<MasterInputArea type="edit" row={saved} form={form} onSuccess={onSuccess} />)
 
     await user.clear(screen.getByLabelText('項目名'))
     await user.type(screen.getByLabelText('項目名'), '大丸商事 改')
@@ -157,12 +158,13 @@ describe('MasterInputArea の更新', () => {
       'i1',
       expect.objectContaining({ name: '大丸商事 改', kana: 'ダイマル', order: 5 })
     )
+    expect(await screen.findByText('更新しました')).toBeInTheDocument()
     expect(refresh).toHaveBeenCalled()
     expect(onSuccess).toHaveBeenCalled()
   })
 
   it('編集時は既存の名前と同じでも重複扱いにしない', () => {
-    render(
+    renderWithToast(
       <MasterInputArea type="edit" row={saved} form={form} existingNames={['大丸商事']} />
     )
 

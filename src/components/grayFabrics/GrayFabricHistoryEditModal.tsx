@@ -18,6 +18,7 @@ import {
   updateOrderHistoryAction,
   updateConfirmHistoryAction,
 } from '@/app/(app)/gray-fabrics/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { GrayFabricHistory } from '../../../types'
 
 type Props = {
@@ -46,13 +47,11 @@ export function GrayFabricHistoryEditModal({ history, type }: Props) {
   })
 
   const onSubmit = async (data: FormValues) => {
-    if (type === 'order') {
-      const result = await updateOrderHistoryAction(history.id, history.grayFabricId, history.quantity, data)
-      if (!result.ok) { alert(result.error); return }
-    } else {
-      const result = await updateConfirmHistoryAction(history.id, history.grayFabricId, history.quantity, data)
-      if (!result.ok) { alert(result.error); return }
-    }
+    const result =
+      type === 'order'
+        ? await updateOrderHistoryAction(history.id, history.grayFabricId, history.quantity, data)
+        : await updateConfirmHistoryAction(history.id, history.grayFabricId, history.quantity, data)
+    if (!notifyResult(result, TOAST.updated)) return
     reset()
     setOpen(false)
   }

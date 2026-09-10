@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { StockPlaceSelect } from '@/components/StockPlaceSelect'
 import { confirmFabricPurchaseAction } from '@/app/(app)/tokushima/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory, StockPlace } from '../../../types'
 import { getTodayDate } from '@/lib/dates'
 import { calcRemainingOrder } from '@/lib/orders/remaining'
@@ -75,12 +76,9 @@ export function TokushimaOrderToConfirmDialog({ order, stockPlaces, open, onClos
       scheduledAt,
       fixedAt,
     })
-    if (result.ok) {
-      onCloseAction()
-      router.refresh()
-    } else {
-      alert(result.error)
-    }
+    if (!notifyResult(result, TOAST.confirmed)) return
+    onCloseAction()
+    router.refresh()
   }
 
   return (

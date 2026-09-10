@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_JP } from 'next/font/google'
+import { AppToastContainer } from '@/components/ui/toast'
 import './globals.css'
 
 const notoSansJp = Noto_Sans_JP({
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="ja" className={notoSansJp.variable}>
       <body className="min-h-screen bg-background font-sans antialiased">
         {children}
+        <AppToastContainer />
       </body>
     </html>
   )

@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, type MockInstance } from "vitest";
+import { renderWithToast } from "@/test-utils/toast";
 import { ProductOrderDialog } from "./ProductOrderDialog";
 import type { SerializableProduct, StockPlace } from "../../../../types";
 
@@ -69,21 +70,19 @@ const mockStockPlaces: StockPlace[] = [
 ];
 
 describe("ProductOrderDialog — コメント必須バリデーション", () => {
-  let alertSpy: MockInstance;
   let confirmSpy: MockInstance;
 
   beforeEach(() => {
-    alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
     confirmSpy = vi
       .spyOn(window, "confirm")
       .mockImplementation(() => true);
   });
 
-  it("コメントが空のまま「発注する」を押すと alert が呼ばれてサブミットされない", async () => {
+  it("コメントが空のまま「発注する」を押すとトーストが出てサブミットされない", async () => {
     const user = userEvent.setup();
     const onCloseAction = vi.fn();
 
-    render(
+    renderWithToast(
       <ProductOrderDialog
         product={mockProduct}
         stockPlaces={mockStockPlaces}
@@ -100,16 +99,16 @@ describe("ProductOrderDialog — コメント必須バリデーション", () =>
     // コメントは空のまま「発注する」を押す
     await user.click(screen.getByRole("button", { name: "発注する" }));
 
-    expect(alertSpy).toHaveBeenCalledWith("コメントを入力してください");
+    expect(await screen.findByText("コメントを入力してください")).toBeInTheDocument();
     expect(confirmSpy).not.toHaveBeenCalled();
     expect(onCloseAction).not.toHaveBeenCalled();
   });
 
-  it("コメントを入力して「発注する」を押すと alert が呼ばれない（バリデーション通過）", async () => {
+  it("コメントを入力して「発注する」を押すとバリデーショントーストは出ない（バリデーション通過）", async () => {
     const user = userEvent.setup();
     const onCloseAction = vi.fn();
 
-    render(
+    renderWithToast(
       <ProductOrderDialog
         product={mockProduct}
         stockPlaces={mockStockPlaces}
@@ -130,7 +129,7 @@ describe("ProductOrderDialog — コメント必須バリデーション", () =>
     // 「発注する」を押す
     await user.click(screen.getByRole("button", { name: "発注する" }));
 
-    expect(alertSpy).not.toHaveBeenCalledWith("コメントを入力してください");
+    expect(screen.queryByText("コメントを入力してください")).not.toBeInTheDocument();
     expect(confirmSpy).toHaveBeenCalled();
   });
 });
@@ -138,14 +137,13 @@ describe("ProductOrderDialog — コメント必須バリデーション", () =>
 describe("ProductOrderDialog — 生地購入発注後の遷移", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(window, "alert").mockImplementation(() => {});
     vi.spyOn(window, "confirm").mockImplementation(() => true);
   });
 
   it("発注に成功すると発注書作成画面へ遷移する", async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithToast(
       <ProductOrderDialog
         product={mockProduct}
         stockPlaces={mockStockPlaces}

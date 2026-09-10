@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { History, StockPlace } from '../../../../types'
 
 type Props = {
@@ -48,8 +49,9 @@ export function FabricPurchaseEditOrderDialog({ order, stockPlaces, open, onClos
       stockPlace,
       comment,
     })
-    if (result.ok) { onClose(); router.refresh() }
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.updated)) return
+    onClose()
+    router.refresh()
   }
 
   return (

@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricPurchaseConfirmAction } from '@/app/(app)/products/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory } from '../../../../types'
 
 type Props = {
@@ -41,8 +42,9 @@ export function FabricPurchaseEditConfirmDialog({ history, open, onClose }: Prop
       fixedAt,
       comment,
     })
-    if (result.ok) { onClose(); router.refresh() }
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.updated)) return
+    onClose()
+    router.refresh()
   }
 
   return (

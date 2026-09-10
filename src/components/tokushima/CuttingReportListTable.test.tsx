@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { CuttingReportListTable } from './CuttingReportListTable'
+import { renderWithToast } from '@/test-utils/toast'
 import { getDefaultPeriod } from '@/lib/dates'
 import type { CuttingReportType, SerializableProduct } from '../../../types'
 
@@ -68,6 +69,17 @@ describe('CuttingReportListTable', () => {
   it('自分の未読報告書に未読ボタンが表示される', () => {
     render(<CuttingReportListTable {...defaultProps} />)
     expect(screen.getByRole('button', { name: '未読' })).toBeInTheDocument()
+  })
+
+  it('既読にする操作が失敗するとエラーがトーストで表示される', async () => {
+    const { alreadyReadAction } = await import('@/app/(app)/tokushima/cutting-reports/actions')
+    vi.mocked(alreadyReadAction).mockResolvedValueOnce({ ok: false, error: '権限がありません' })
+    const user = userEvent.setup()
+
+    renderWithToast(<CuttingReportListTable {...defaultProps} />)
+    await user.click(screen.getByRole('button', { name: '未読' }))
+
+    expect(await screen.findByText('権限がありません')).toBeInTheDocument()
   })
 
   it('報告書が空のとき空状態が表示される', () => {

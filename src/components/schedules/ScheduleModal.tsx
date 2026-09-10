@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { addScheduleAction, updateScheduleAction } from '@/app/(app)/schedules/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { CuttingSchedule } from '../../../types'
 
 type UserOption = { id: string; name: string }
@@ -49,11 +50,11 @@ export function ScheduleModal({ mode, salesUsers, products, initData = {} }: Pro
   })
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (mode === 'new') {
-      await addScheduleAction(data)
-    } else {
-      await updateScheduleAction({ id: initData.id!, ...data })
-    }
+    const result =
+      mode === 'new'
+        ? await addScheduleAction(data)
+        : await updateScheduleAction({ id: initData.id!, ...data })
+    if (!notifyResult(result, mode === 'new' ? TOAST.created : TOAST.updated)) return
     setOpen(false)
   }
 

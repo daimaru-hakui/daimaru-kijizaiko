@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { HEAD } from '@/components/ui/table-styles'
 import type { ActionResult } from '@/lib/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { MasterEditModal } from './MasterEditModal'
 import type { MasterEntity, MasterFormConfig } from './MasterInputArea'
 
@@ -55,9 +56,7 @@ export function MasterTable<T extends MasterEntity>({
   const handleDelete = (id: string) => {
     if (!window.confirm('削除して宜しいでしょうか')) return
     startTransition(() => {
-      void deleteAction(id).then((result) => {
-        if (!result.ok) alert(result.error)
-      })
+      void deleteAction(id).then((result) => notifyResult(result, TOAST.deleted))
     })
   }
 

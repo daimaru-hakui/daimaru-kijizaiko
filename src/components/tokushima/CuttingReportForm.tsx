@@ -13,6 +13,7 @@ import { formatSerialNumber } from '@/lib/serialnumbers/format'
 import { CuttingReportFabricRow } from './CuttingReportFabricRow'
 import { addCuttingReportAction, updateCuttingReportAction } from '@/app/(app)/tokushima/cutting-reports/actions'
 import { getTodayDate } from '@/lib/dates'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableProduct, CuttingReportType, CuttingProductType } from '../../../types'
 
 type UserOption = { id: string; name: string }
@@ -93,18 +94,12 @@ export function CuttingReportForm({ products, salesUsers, initData, onCloseActio
 
     if (isEdit) {
       const result = await updateCuttingReportAction({ id: initData!.id, ...payload })
-      if (result.ok) {
-        onCloseAction?.()
-      } else {
-        alert(result.error)
-      }
+      if (!notifyResult(result, TOAST.updated)) return
+      onCloseAction?.()
     } else {
       const result = await addCuttingReportAction(payload)
-      if (result.ok) {
-        router.push('/tokushima/cutting-reports')
-      } else {
-        alert(result.error)
-      }
+      if (!notifyResult(result, TOAST.created)) return
+      router.push('/tokushima/cutting-reports')
     }
   }
 

@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { AdjustmentGrayFabricRow } from './AdjustmentGrayFabricRow'
+import { renderWithToast } from '@/test-utils/toast'
 import type { GrayFabric } from '../../../types'
 
 vi.mock('@/app/(app)/adjustment/actions', () => ({
@@ -23,6 +25,15 @@ const makeGrayFabric = (overrides: Partial<GrayFabric> = {}): GrayFabric =>
 
 const renderRow = (grayFabric: GrayFabric) =>
   render(
+    <table>
+      <tbody>
+        <AdjustmentGrayFabricRow grayFabric={grayFabric} />
+      </tbody>
+    </table>,
+  )
+
+const renderRowWithToast = (grayFabric: GrayFabric) =>
+  renderWithToast(
     <table>
       <tbody>
         <AdjustmentGrayFabricRow grayFabric={grayFabric} />
@@ -68,5 +79,30 @@ describe('AdjustmentGrayFabricRow', () => {
     const inputs = screen.getAllByRole('spinbutton')
     expect(inputs[0]).toHaveValue('800')
     expect(inputs[2]).toHaveValue('3.5')
+  })
+
+  it('更新に成功すると成功トーストが表示される', async () => {
+    const { updateGrayFabricAdjustmentAction } = await import('@/app/(app)/adjustment/actions')
+    vi.mocked(updateGrayFabricAdjustmentAction).mockResolvedValueOnce({ ok: true })
+    const user = userEvent.setup()
+    renderRowWithToast(makeGrayFabric())
+
+    await user.click(screen.getByRole('button', { name: '更新' }))
+
+    expect(await screen.findByText('更新しました')).toBeInTheDocument()
+  })
+
+  it('更新に失敗するとエラーがトーストで表示される', async () => {
+    const { updateGrayFabricAdjustmentAction } = await import('@/app/(app)/adjustment/actions')
+    vi.mocked(updateGrayFabricAdjustmentAction).mockResolvedValueOnce({
+      ok: false,
+      error: '権限がありません',
+    })
+    const user = userEvent.setup()
+    renderRowWithToast(makeGrayFabric())
+
+    await user.click(screen.getByRole('button', { name: '更新' }))
+
+    expect(await screen.findByText('権限がありません')).toBeInTheDocument()
   })
 })

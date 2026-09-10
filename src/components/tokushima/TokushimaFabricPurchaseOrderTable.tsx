@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { TokushimaOrderToConfirmDialog } from './TokushimaOrderToConfirmDialog'
 import { TokushimaFabricPurchaseEditDialog } from './TokushimaFabricPurchaseEditDialog'
 import { deleteFabricPurchaseOrderAction } from '@/app/(app)/tokushima/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { HistoryListCard } from '@/components/list/HistoryListCard'
 import { EmptyState } from '@/components/list/EmptyState'
 import { ListTitle } from '@/components/list/ListTitle'
@@ -57,11 +58,8 @@ export function TokushimaFabricPurchaseOrderTable({
       stockType: order.stockType ?? 'ranning',
       quantity: order.quantity,
     })
-    if (result.ok) {
-      router.refresh()
-    } else {
-      alert(result.error)
-    }
+    if (!notifyResult(result, TOAST.deleted)) return
+    router.refresh()
   }
 
   const canConfirmOrEdit = (order: SerializableHistory) =>

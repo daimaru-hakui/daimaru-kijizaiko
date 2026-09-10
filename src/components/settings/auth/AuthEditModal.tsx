@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { updateUserProfileAction } from "@/app/(app)/settings/actions";
+import { notifyResult, TOAST } from "@/components/ui/toast";
 
 type Props = {
   uid: string;
@@ -32,7 +33,7 @@ export const AuthEditModal: FC<Props> = ({ uid, initialRank, initialName }) => {
 
   const handleSave = async () => {
     const result = await updateUserProfileAction(uid, rank, name);
-    if (!result.ok) { alert(result.error); return; }
+    if (!notifyResult(result, TOAST.updated)) return;
     setOpen(false);
   };
 

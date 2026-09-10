@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { confirmFabricDyeingAction } from '@/app/(app)/products/fabric-dyeing/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { getTodayDate } from '@/lib/dates'
 import { calcRemainingOrder } from '@/lib/orders/remaining'
 import type { SerializableHistory } from '../../../../types'
@@ -70,8 +71,9 @@ export function FabricDyeingConfirmOrderDialog({ order, open, onClose }: Props) 
       scheduledAt,
       fixedAt,
     })
-    if (result.ok) { onClose(); router.refresh() }
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.confirmed)) return
+    onClose()
+    router.refresh()
   }
 
   return (

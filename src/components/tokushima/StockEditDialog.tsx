@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
 import { updateTokushimaStockAction } from '@/app/(app)/tokushima/cutting-reports/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 
 type Props = {
   productId: string
@@ -25,7 +26,8 @@ export function StockEditDialog({ productId, currentStock, onUpdatedAction }: Pr
 
   const handleSave = async () => {
     if (!window.confirm('更新してよろしいでしょうか')) return
-    await updateTokushimaStockAction(productId, stock)
+    const result = await updateTokushimaStockAction(productId, stock)
+    if (!notifyResult(result, TOAST.updated)) return
     onUpdatedAction?.(stock)
     setOpen(false)
   }

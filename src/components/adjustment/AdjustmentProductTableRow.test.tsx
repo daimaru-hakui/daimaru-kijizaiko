@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { AdjustmentProductTableRow } from './AdjustmentProductTableRow'
+import { renderWithToast } from '@/test-utils/toast'
 import type { Product } from '../../../types'
 
 vi.mock('@/app/(app)/adjustment/actions', () => ({
@@ -57,6 +59,20 @@ const renderRow = (product: Product) =>
     </table>,
   )
 
+const renderRowWithToast = (product: Product) =>
+  renderWithToast(
+    <table>
+      <tbody>
+        <AdjustmentProductTableRow
+          product={product}
+          usersMap={{}}
+          isRD={true}
+          isTokushima={true}
+        />
+      </tbody>
+    </table>,
+  )
+
 describe('AdjustmentProductTableRow', () => {
   it('在庫数値が入力欄に表示される', () => {
     renderRow(makeProduct())
@@ -94,5 +110,30 @@ describe('AdjustmentProductTableRow', () => {
     const inputs = screen.getAllByRole('spinbutton')
     expect(inputs[0]).toHaveValue('1500')
     expect(inputs[1]).toHaveValue('2.5')
+  })
+
+  it('更新に成功すると成功トーストが表示される', async () => {
+    const { updateProductAdjustmentAction } = await import('@/app/(app)/adjustment/actions')
+    vi.mocked(updateProductAdjustmentAction).mockResolvedValueOnce({ ok: true })
+    const user = userEvent.setup()
+    renderRowWithToast(makeProduct())
+
+    await user.click(screen.getByRole('button', { name: '更新' }))
+
+    expect(await screen.findByText('更新しました')).toBeInTheDocument()
+  })
+
+  it('更新に失敗するとエラーがトーストで表示される', async () => {
+    const { updateProductAdjustmentAction } = await import('@/app/(app)/adjustment/actions')
+    vi.mocked(updateProductAdjustmentAction).mockResolvedValueOnce({
+      ok: false,
+      error: '権限がありません',
+    })
+    const user = userEvent.setup()
+    renderRowWithToast(makeProduct())
+
+    await user.click(screen.getByRole('button', { name: '更新' }))
+
+    expect(await screen.findByText('権限がありません')).toBeInTheDocument()
   })
 })

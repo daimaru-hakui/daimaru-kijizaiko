@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { renderWithToast } from '@/test-utils/toast'
 import { ProductForm } from './ProductForm'
 
 const { push } = vi.hoisted(() => ({ push: vi.fn() }))
@@ -21,7 +22,6 @@ const baseProps = {
 }
 
 beforeEach(() => {
-  vi.spyOn(window, 'alert').mockImplementation(() => {})
   vi.spyOn(window, 'confirm').mockImplementation(() => true)
 })
 
@@ -40,12 +40,12 @@ describe('ProductForm', () => {
     expect(screen.getByRole('button', { name: '登録' })).toBeInTheDocument()
   })
 
-  it('仕入先未選択で登録するとアラートが出て送信されない', async () => {
+  it('仕入先未選択で登録するとトーストが出て送信されない', async () => {
     const user = userEvent.setup()
     const { addProductAction } = await import('@/app/(app)/products/actions')
-    render(<ProductForm {...baseProps} />)
+    renderWithToast(<ProductForm {...baseProps} />)
     await user.click(screen.getByRole('button', { name: '登録' }))
-    expect(window.alert).toHaveBeenCalledWith('仕入先を選択してください')
+    expect(await screen.findByText('仕入先を選択してください')).toBeInTheDocument()
     expect(addProductAction).not.toHaveBeenCalled()
   })
 
