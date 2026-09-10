@@ -10,6 +10,7 @@ import { ListFilterBar } from '@/components/filters/ListFilterBar'
 import { useListFilter } from '@/hooks/useListFilter'
 import { matchesListFilter } from '@/lib/filters/list-filter'
 import { deleteScheduleAction } from '@/app/(app)/schedules/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { CuttingSchedule } from '../../../types'
 import { buildOptions } from '@/lib/filters/options'
 import { EmptyState } from '@/components/list/EmptyState'
@@ -40,7 +41,7 @@ export function SchedulesTable({ schedules, usersMap, salesUsers, products, prod
   const handleDelete = async (id: string, productId: string) => {
     if (!window.confirm('削除してもよいですか？')) return
     const result = await deleteScheduleAction(id, productId)
-    if (!result.ok) alert(result.error)
+    notifyResult(result, TOAST.deleted)
   }
 
   return (
