@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { NumberInput } from '@/components/ui/number-input'
 import { confirmProcessingAccountingAction } from '@/app/(app)/accounting-dept/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {
@@ -35,13 +36,14 @@ export function AccountingOrderToConfirmModal({ history }: Props) {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (!window.confirm('確定して宜しいでしょうか')) return
-    await confirmProcessingAccountingAction(
+    const result = await confirmProcessingAccountingAction(
       history.id,
       history.productId,
       history.stockPlace,
       history.quantity,
       data,
     )
+    if (!notifyResult(result, TOAST.confirmed)) return
     setOpen(false)
   }
 

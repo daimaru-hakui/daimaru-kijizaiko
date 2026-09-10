@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { NumberInput } from '@/components/ui/number-input'
 import { updateHistoryAccountingOrderAction } from '@/app/(app)/accounting-dept/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory } from '../../../types'
 
 type Props = {
@@ -42,13 +43,14 @@ export function AccountingEditModal({ history }: Props) {
   })
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await updateHistoryAccountingOrderAction(
+    const result = await updateHistoryAccountingOrderAction(
       history.id,
       history.productId,
       history.stockPlace,
       history.quantity,
       data,
     )
+    if (!notifyResult(result, TOAST.updated)) return
     setOpen(false)
   }
 

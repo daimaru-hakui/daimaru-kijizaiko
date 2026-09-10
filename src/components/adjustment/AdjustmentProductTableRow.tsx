@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
 import { updateProductAdjustmentAction } from '@/app/(app)/adjustment/actions'
 import { mathRound2nd } from '@/lib/utils'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { Product } from '../../../types'
 
 type EditableFields = {
@@ -48,8 +49,9 @@ export function AdjustmentProductTableRow({ product, usersMap, isRD, isTokushima
 
   const handleUpdate = async () => {
     setSaving(true)
-    await updateProductAdjustmentAction(product.id, items)
+    const result = await updateProductAdjustmentAction(product.id, items)
     setSaving(false)
+    notifyResult(result, TOAST.updated)
   }
 
   const handleReset = () => {

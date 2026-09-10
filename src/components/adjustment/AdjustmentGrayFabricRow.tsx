@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
 import { updateGrayFabricAdjustmentAction } from '@/app/(app)/adjustment/actions'
 import { mathRound2nd } from '@/lib/utils'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { GrayFabric } from '../../../types'
 
 type EditableFields = {
@@ -41,8 +42,9 @@ export function AdjustmentGrayFabricRow({ grayFabric }: Props) {
 
   const handleUpdate = async () => {
     setSaving(true)
-    await updateGrayFabricAdjustmentAction(grayFabric.id, items)
+    const result = await updateGrayFabricAdjustmentAction(grayFabric.id, items)
     setSaving(false)
+    notifyResult(result, TOAST.updated)
   }
 
   const handleReset = () => {
