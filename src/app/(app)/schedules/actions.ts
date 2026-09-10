@@ -6,8 +6,8 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { ensureRoles, type ActionResult } from '@/lib/actions'
 import { mathRound2nd } from '@/lib/utils'
 
-/** 使用予定は徳島工場の担当者 (と R&D / 管理者) だけが登録・更新・削除できる */
-const SCHEDULE_ROLES = ['tokushima', 'rd', 'admin'] as const
+/** 使用予定は徳島工場の担当者だけが登録・更新・削除できる */
+const SCHEDULE_ROLES = ['tokushima'] as const
 
 export type AddScheduleInput = {
   staff: string

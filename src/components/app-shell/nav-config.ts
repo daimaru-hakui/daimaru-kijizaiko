@@ -58,7 +58,7 @@ export const NAV_SECTIONS: NavSection[] = [
       {
         title: '使用予定一覧',
         href: '/schedules',
-        visible: (roles) => roles.tokushima || roles.rd || roles.admin,
+        visible: (roles) => roles.tokushima,
       },
     ],
   },
