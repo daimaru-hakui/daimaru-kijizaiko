@@ -15,6 +15,7 @@ import { canEditRecord } from '@/lib/permissions'
 import { GrayFabricOrderToConfirmModal } from './GrayFabricOrderToConfirmModal'
 import { GrayFabricHistoryEditModal } from './GrayFabricHistoryEditModal'
 import { deleteGrayFabricOrderAction } from '@/app/(app)/gray-fabrics/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { GrayFabricHistory } from '../../../types'
 import { buildOptions } from '@/lib/filters/options'
 
@@ -42,7 +43,7 @@ export function GrayFabricOrderTable({ orders, currentUserId, isRD, users }: Pro
     if (!confirm('削除して宜しいでしょうか')) return
     startTransition(() => {
       void deleteGrayFabricOrderAction(history.id, history.grayFabricId, history.quantity).then(
-        (result) => { if (!result.ok) alert(result.error) }
+        (result) => notifyResult(result, TOAST.deleted)
       )
     })
   }

@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { orderGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { GrayFabric } from '../../../types'
 
 type Props = {
@@ -36,7 +37,7 @@ export function GrayFabricOrderAreaModal({ grayFabric }: Props) {
 
   const onSubmit = async (data: FormValues) => {
     const result = await orderGrayFabricAction(grayFabric, data)
-    if (!result.ok) { alert(result.error); return }
+    if (!notifyResult(result, TOAST.ordered)) return
     reset()
     setOpen(false)
   }

@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { confirmProcessingAction } from '@/app/(app)/gray-fabrics/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { getTodayDate } from '@/lib/gray-fabrics/dates'
 import type { GrayFabricHistory } from '../../../types'
 
@@ -60,7 +61,7 @@ export function GrayFabricOrderToConfirmModal({ history, canEdit }: Props) {
       comment: history.comment,
     })
     setIsSubmitting(false)
-    if (!result.ok) { alert(result.error); return }
+    if (!notifyResult(result, TOAST.confirmed)) return
     setOpen(false)
   }
 

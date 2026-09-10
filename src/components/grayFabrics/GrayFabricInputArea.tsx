@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import type { GrayFabric } from '../../../types'
 import { addGrayFabricAction, updateGrayFabricAction } from '@/app/(app)/gray-fabrics/actions'
 import { isDuplicateName } from '@/lib/validation/duplicate'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 
 type Supplier = { id: string; name: string }
 
@@ -56,11 +57,11 @@ export function GrayFabricInputArea({ mode, grayFabric, suppliers, existingProdu
   const onSubmit = async (data: FormValues) => {
     if (mode === 'new') {
       const result = await addGrayFabricAction(data)
-      if (!result.ok) { alert(result.error); return }
+      if (!notifyResult(result, TOAST.created)) return
       router.push('/gray-fabrics')
     } else {
       const result = await updateGrayFabricAction(grayFabric!.id, data)
-      if (!result.ok) { alert(result.error); return }
+      if (!notifyResult(result, TOAST.updated)) return
       router.refresh()
       onSuccessAction?.()
     }
