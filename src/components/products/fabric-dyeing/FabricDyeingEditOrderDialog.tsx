@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { updateFabricDyeingOrderAction } from '@/app/(app)/products/fabric-dyeing/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import type { SerializableHistory } from '../../../../types'
 
 type Props = {
@@ -44,8 +45,9 @@ export function FabricDyeingEditOrderDialog({ order, open, onClose }: Props) {
       scheduledAt,
       comment,
     })
-    if (result.ok) { onClose(); router.refresh() }
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.updated)) return
+    onClose()
+    router.refresh()
   }
 
   return (

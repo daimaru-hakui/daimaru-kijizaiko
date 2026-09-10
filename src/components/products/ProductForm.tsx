@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { addProductAction, updateProductAction } from '@/app/(app)/products/actions'
 import { MATERIAL_ENTRIES } from '@/lib/utils'
 import { isNumericDraft, toFiniteNumber } from '@/lib/numbers'
+import { notifyError, notifyResult, TOAST } from '@/components/ui/toast'
 import type { GrayFabric, Location, Product, Supplier } from '../../../types'
 
 type Props = {
@@ -143,8 +144,8 @@ export function ProductForm({
     })
 
   const handleSubmit = async () => {
-    if (!form.supplierId) { alert('仕入先を選択してください'); return }
-    if (!form.colorName) { alert('色を選択してください'); return }
+    if (!form.supplierId) { notifyError('仕入先を選択してください'); return }
+    if (!form.colorName) { notifyError('色を選択してください'); return }
 
     const data = {
       productType: form.productType,
@@ -186,15 +187,12 @@ export function ProductForm({
       result = await addProductAction(data)
     }
 
-    if (result.ok) {
-      if (onCloseAction) {
-        onCloseAction()
-        router.refresh()
-      } else {
-        router.push('/products')
-      }
+    if (!notifyResult(result, isEdit ? TOAST.updated : TOAST.created)) return
+    if (onCloseAction) {
+      onCloseAction()
+      router.refresh()
     } else {
-      alert(result.error)
+      router.push('/products')
     }
   }
 

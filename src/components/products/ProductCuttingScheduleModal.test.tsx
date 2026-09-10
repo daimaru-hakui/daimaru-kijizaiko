@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { ProductCuttingScheduleModal } from "./ProductCuttingScheduleModal";
 import { UserRolesProvider } from "@/components/app-shell/roles-context";
+import { renderWithToast } from "@/test-utils/toast";
 import type { UserRoles } from "@/components/app-shell/types";
 import type { CuttingSchedule } from "../../../types";
 
@@ -43,7 +44,7 @@ const defaultProps = {
 };
 
 const renderModal = (roles: Partial<UserRoles> = {}) => {
-  render(
+  renderWithToast(
     <UserRolesProvider roles={{ ...NO_ROLES, ...roles }}>
       <ProductCuttingScheduleModal {...defaultProps} />
     </UserRolesProvider>,
@@ -79,15 +80,14 @@ describe("ProductCuttingScheduleModal 削除ボタン", () => {
     expect(mockRefresh).toHaveBeenCalled();
   });
 
-  it("削除に失敗するとエラーが表示される", async () => {
+  it("削除に失敗するとエラーがトーストで表示される", async () => {
     deleteScheduleAction.mockResolvedValue({ ok: false, error: "権限がありません" });
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
     renderModal({ tokushima: true });
 
     await userEvent.click(screen.getByRole("button", { name: "50m" }));
     await userEvent.click(screen.getByRole("button", { name: "削除" }));
 
-    expect(alertSpy).toHaveBeenCalledWith("権限がありません");
+    expect(await screen.findByText("権限がありません")).toBeInTheDocument();
   });
 });

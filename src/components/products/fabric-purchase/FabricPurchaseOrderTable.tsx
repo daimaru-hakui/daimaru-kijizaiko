@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { deleteFabricPurchaseOrderAction } from '@/app/(app)/products/fabric-purchase/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 import { HistoryListCard } from '@/components/list/HistoryListCard'
 import { EmptyState } from '@/components/list/EmptyState'
 import { ListTitle } from '@/components/list/ListTitle'
@@ -61,8 +62,8 @@ export function FabricPurchaseOrderTable({
       stockType: order.stockType ?? 'ranning',
       quantity: order.quantity,
     })
-    if (result.ok) router.refresh()
-    else alert(result.error)
+    if (!notifyResult(result, TOAST.deleted)) return
+    router.refresh()
   }
 
   return (

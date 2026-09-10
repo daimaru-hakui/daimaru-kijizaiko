@@ -8,6 +8,7 @@ import {
 } from '@/app/(app)/products/fabric-dyeing/actions'
 import { orderFabricPurchaseAction } from '@/app/(app)/products/fabric-purchase/actions'
 import { getTodayDate } from '@/lib/dates'
+import { notifyError, notifyResult, TOAST } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -51,11 +52,11 @@ export function ProductOrderForm({ product, stockPlaces, tab, onCloseAction: onC
 
   const handleSubmit = async () => {
     if (!stockType) {
-      alert('在庫種別を選択してください')
+      notifyError('在庫種別を選択してください')
       return
     }
     if (!comment.trim()) {
-      alert('コメントを入力してください')
+      notifyError('コメントを入力してください')
       return
     }
     if (!window.confirm('登録してよろしいでしょうか')) return
@@ -82,20 +83,14 @@ export function ProductOrderForm({ product, stockPlaces, tab, onCloseAction: onC
         stockType === 'stock'
           ? await orderFabricDyeingFromStockAction(data)
           : await orderFabricDyeingFromRunningAction(data)
-      if (!result.ok) {
-        alert(result.error)
-        return
-      }
+      if (!notifyResult(result, TOAST.ordered)) return
       onClose()
       router.refresh()
       return
     }
 
     const result = await orderFabricPurchaseAction({ ...baseInput, stockPlace })
-    if (!result.ok) {
-      alert(result.error)
-      return
-    }
+    if (!notifyResult(result, TOAST.ordered)) return
     onClose()
 
     // 生地購入発注のみ発注書を発行するため、発注No. を渡して作成画面へ送る
