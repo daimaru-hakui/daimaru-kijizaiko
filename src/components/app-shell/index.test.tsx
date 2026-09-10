@@ -20,9 +20,29 @@ describe('AppShell', () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true })
   })
 
+  it('email を表示する', () => {
+    render(
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    expect(screen.getByText('test@example.com')).toBeInTheDocument()
+  })
+
+  it('email はスマホサイズでは非表示にする', () => {
+    render(
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    expect(screen.getByText('test@example.com').className).toContain('hidden')
+  })
+
   it('ログアウト後に router.refresh() が呼ばれる', async () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -37,7 +57,7 @@ describe('AppShell', () => {
 
   it('ログアウト後に /login へ遷移する', async () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -52,7 +72,7 @@ describe('AppShell', () => {
 
   it('サイドバーは横スクロールバーを出さない', () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -62,7 +82,7 @@ describe('AppShell', () => {
 
   it('サイドバー内のナビゲーションも横スクロールバーを出さない', () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -74,7 +94,7 @@ describe('AppShell', () => {
 
   it('権限のないユーザーには使用予定一覧が表示されない', () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -84,7 +104,7 @@ describe('AppShell', () => {
 
   it('tokushima 権限のユーザーには使用予定一覧が表示される', () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: true, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: false, rd: false, tokushima: true, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )
@@ -94,7 +114,7 @@ describe('AppShell', () => {
 
   it('rd や admin だけの権限では使用予定一覧が表示されない', () => {
     render(
-      <AppShell userName="テストユーザー" roles={{ admin: true, rd: true, tokushima: false, accounting: false, sales: false }}>
+      <AppShell userName="テストユーザー" userEmail="test@example.com" roles={{ admin: true, rd: true, tokushima: false, accounting: false, sales: false }}>
         <div>content</div>
       </AppShell>
     )

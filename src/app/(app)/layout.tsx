@@ -16,7 +16,7 @@ export default async function AppLayout({
   const { userName, roles } = await getAppShellUser(token.uid)
 
   return (
-    <AppShell userName={userName} roles={roles}>
+    <AppShell userName={userName} userEmail={token.email ?? ''} roles={roles}>
       {children}
     </AppShell>
   )

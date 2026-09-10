@@ -42,7 +42,7 @@ describe('AppLayout', () => {
   })
 
   it('セッションがある場合は AppShell 付きで children を描画する', async () => {
-    mockVerifyServerSession.mockResolvedValue({ uid: 'user-1' })
+    mockVerifyServerSession.mockResolvedValue({ uid: 'user-1', email: 'test@example.com' })
     mockUserDocGet.mockResolvedValue({
       data: () => ({ name: 'テストユーザー', admin: true }),
     })
@@ -50,6 +50,7 @@ describe('AppLayout', () => {
     render(await AppLayout({ children: <div>page content</div> }))
 
     expect(screen.getByText('テストユーザー')).toBeInTheDocument()
+    expect(screen.getByText('test@example.com')).toBeInTheDocument()
     expect(screen.getByText('page content')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '生地在庫WEB' })).toBeInTheDocument()
   })

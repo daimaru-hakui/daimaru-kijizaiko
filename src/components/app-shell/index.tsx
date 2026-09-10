@@ -27,11 +27,12 @@ export type { UserRoles };
 
 type Props = {
   userName: string;
+  userEmail: string;
   roles: UserRoles;
   children: React.ReactNode;
 };
 
-export function AppShell({ userName, roles, children }: Props) {
+export function AppShell({ userName, userEmail, roles, children }: Props) {
   const pathname = usePathname() ?? "";
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -82,6 +83,9 @@ export function AppShell({ userName, roles, children }: Props) {
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-500 hidden 2xl:block">
               {userName}
+            </span>
+            <span className="text-sm text-slate-400 hidden sm:block">
+              {userEmail}
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
