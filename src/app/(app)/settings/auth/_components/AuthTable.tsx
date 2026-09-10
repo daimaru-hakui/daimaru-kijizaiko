@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { HEAD } from "@/components/ui/table-styles";
 import { Button } from "@/components/ui/button";
+import { notifyError } from "@/components/ui/toast";
 
 type Props = {
   users: User[];
@@ -27,7 +28,7 @@ export const AuthTable: FC<Props> = ({ users }) => {
   const toggle = (uid: string, prop: string, current: boolean) => {
     startTransition(() => {
       void toggleUserAuthAction(uid, prop, current).then((result) => {
-        if (!result.ok) alert(result.error);
+        if (!result.ok) notifyError(result.error);
       });
     });
   };

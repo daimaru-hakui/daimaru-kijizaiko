@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { addColorAction, deleteColorAction, reorderColorsAction } from "@/app/(app)/settings/actions";
+import { notifyError, notifyResult, notifySuccess, TOAST } from "@/components/ui/toast";
 
 type Props = {
   initialColors: string[];
@@ -30,7 +31,7 @@ export const ColorsClient: FC<Props> = ({ initialColors }) => {
   const handleAdd = async () => {
     if (!color.trim()) return;
     const result = await addColorAction(color.trim());
-    if (!result.ok) { alert(result.error); return; }
+    if (!notifyResult(result, TOAST.created)) return;
     setColors((prev) => [...prev, color.trim()]);
     setColor("");
   };
@@ -38,7 +39,7 @@ export const ColorsClient: FC<Props> = ({ initialColors }) => {
   const handleDelete = async (c: string) => {
     if (!window.confirm("削除して宜しいでしょうか")) return;
     const result = await deleteColorAction(c);
-    if (!result.ok) { alert(result.error); return; }
+    if (!notifyResult(result, TOAST.deleted)) return;
     setColors((prev) => prev.filter((x) => x !== c));
   };
 
@@ -59,8 +60,10 @@ export const ColorsClient: FC<Props> = ({ initialColors }) => {
 
   const dragEnd = async () => {
     const result = await reorderColorsAction(colors);
-    if (!result.ok) {
-      alert(result.error);
+    if (result.ok) {
+      notifySuccess("並び順を保存しました");
+    } else {
+      notifyError(result.error);
       if (prevColors) setColors(prevColors);
     }
     setDragIdx(null);

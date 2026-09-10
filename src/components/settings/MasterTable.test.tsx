@@ -1,6 +1,7 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithToast } from '@/test-utils/toast'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }))
 
@@ -27,7 +28,7 @@ const rows: Item[] = [
 ]
 
 const setup = (props: Partial<React.ComponentProps<typeof MasterTable<Item>>> = {}) =>
-  render(
+  renderWithToast(
     <MasterTable
       rows={rows}
       columns={[
@@ -45,7 +46,6 @@ const setup = (props: Partial<React.ComponentProps<typeof MasterTable<Item>>> = 
 beforeEach(() => {
   vi.clearAllMocks()
   vi.spyOn(window, 'confirm').mockReturnValue(true)
-  vi.spyOn(window, 'alert').mockImplementation(() => {})
 })
 
 describe('MasterTable の表示', () => {
@@ -97,14 +97,23 @@ describe('MasterTable の削除', () => {
     expect(deleteAction).not.toHaveBeenCalled()
   })
 
-  it('Action が失敗するとエラーを alert する', async () => {
+  it('Action が失敗するとエラーがトーストで表示される', async () => {
     const user = userEvent.setup()
     deleteAction.mockResolvedValueOnce({ ok: false, error: '削除できません' } as never)
     setup()
 
     await user.click(screen.getAllByRole('button', { name: '削除' })[0])
 
-    expect(window.alert).toHaveBeenCalledWith('削除できません')
+    expect(await screen.findByText('削除できません')).toBeInTheDocument()
+  })
+
+  it('Action が成功すると成功トーストが表示される', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await user.click(screen.getAllByRole('button', { name: '削除' })[0])
+
+    expect(await screen.findByText('削除しました')).toBeInTheDocument()
   })
 
   it('canDelete が false の行には削除アイコンが出ない', () => {

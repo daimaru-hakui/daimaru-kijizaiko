@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { addMaterialNameAction, deleteMaterialNameAction } from "@/app/(app)/settings/actions";
+import { notifyResult, TOAST } from "@/components/ui/toast";
 
 type Props = {
   initialNames: string[];
@@ -27,7 +28,7 @@ export const MaterialNamesClient: FC<Props> = ({ initialNames }) => {
   const handleAdd = async () => {
     if (!name.trim()) return;
     const result = await addMaterialNameAction(name.trim());
-    if (!result.ok) { alert(result.error); return; }
+    if (!notifyResult(result, TOAST.created)) return;
     setNames((prev) => [...prev, name.trim()].sort());
     setName("");
   };
@@ -35,7 +36,7 @@ export const MaterialNamesClient: FC<Props> = ({ initialNames }) => {
   const handleDelete = async (n: string) => {
     if (!window.confirm("削除して宜しいでしょうか")) return;
     const result = await deleteMaterialNameAction(n);
-    if (!result.ok) { alert(result.error); return; }
+    if (!notifyResult(result, TOAST.deleted)) return;
     setNames((prev) => prev.filter((x) => x !== n));
   };
 

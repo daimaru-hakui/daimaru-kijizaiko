@@ -10,6 +10,7 @@ import { NumberInput } from '@/components/ui/number-input'
 import { Label } from '@/components/ui/label'
 import { isDuplicateName } from '@/lib/validation/duplicate'
 import type { ActionResult } from '@/lib/actions'
+import { notifyResult, TOAST } from '@/components/ui/toast'
 
 /** 設定画面のマスタ (仕入先・送り先・保管場所) に共通する項目 */
 export type MasterEntity = { id: string; name: string; comment: string }
@@ -81,18 +82,12 @@ export function MasterInputArea<T extends MasterEntity>({
     if (type === 'new') {
       if (!window.confirm('登録して宜しいでしょうか')) return
       const result = await form.addAction(data)
-      if (!result.ok) {
-        alert(result.error)
-        return
-      }
+      if (!notifyResult(result, TOAST.created)) return
       router.push(form.listPath)
     } else {
       if (!window.confirm('変更して宜しいでしょうか')) return
       const result = await form.updateAction(row.id, data)
-      if (!result.ok) {
-        alert(result.error)
-        return
-      }
+      if (!notifyResult(result, TOAST.updated)) return
       router.refresh()
       onSuccess?.()
     }
