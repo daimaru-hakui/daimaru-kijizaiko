@@ -99,6 +99,18 @@ describe('matchRoute', () => {
       expect(matchRoute('/tokushima/fabric-purchase/orders', rd)).toBe(true)
       expect(matchRoute('/tokushima/fabric-purchase/orders', noRole)).toBe(false)
     })
+
+    it('使用予定一覧は tokushima / rd / admin が通過する', () => {
+      const rd: UserClaims = { uid: 'u6', admin: false, rd: true, sales: false, accounting: false, tokushima: false, order: false }
+      expect(matchRoute('/schedules', tokushima)).toBe(true)
+      expect(matchRoute('/schedules', rd)).toBe(true)
+      expect(matchRoute('/schedules', admin)).toBe(true)
+    })
+
+    it('使用予定一覧は tokushima / rd / admin のいずれも持たないユーザーに 403', () => {
+      expect(matchRoute('/schedules', sales)).toBe(false)
+      expect(matchRoute('/schedules', noRole)).toBe(false)
+    })
   })
 })
 

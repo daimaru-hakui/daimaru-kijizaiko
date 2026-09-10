@@ -31,7 +31,7 @@ const pathRoleMatrix: Array<{ pattern: RegExp; rule: RouteRule }> = [
   { pattern: /^\/accounting-dept/, rule: { roles: ['accounting', 'admin'] } },
   { pattern: /^\/gray-fabrics/, rule: { authenticated: true } },
   { pattern: /^\/products/, rule: { authenticated: true } },
-  { pattern: /^\/schedules/, rule: { authenticated: true } },
+  { pattern: /^\/schedules/, rule: { roles: ['tokushima', 'rd', 'admin'] } },
   { pattern: /^\/serialnumbers/, rule: { roles: ['admin'] } },
   { pattern: /^\/adjustment/, rule: { authenticated: true } },
   { pattern: /^\/complete/, rule: { authenticated: true } },

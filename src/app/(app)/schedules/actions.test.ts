@@ -100,8 +100,15 @@ describe('addScheduleAction', () => {
     expect(setData).toMatchObject({ createUser: 'user1', updateUser: 'user1' })
   })
 
-  it('ロールがなくてもログイン済みなら登録できる', async () => {
-    roles = {}
+  it('tokushima / rd / admin いずれも持たないと権限がありませんを返す', async () => {
+    roles = { sales: true }
+    const result = await addScheduleAction(base)
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+    expect(mockRunTransaction).not.toHaveBeenCalled()
+  })
+
+  it('tokushima ロールなら登録できる', async () => {
+    roles = { tokushima: true }
     mockTransactionGet.mockResolvedValue({ exists: true })
     const result = await addScheduleAction(base)
     expect(result).toEqual({ ok: true })
@@ -147,23 +154,21 @@ describe('updateScheduleAction', () => {
   })
 
   describe('権限', () => {
-    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+    it('tokushima / rd / admin いずれも持たない場合は { ok: false, error: "権限がありません" } を返す', async () => {
       roles = { sales: true }
-      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
       const result = await updateScheduleAction(base)
       expect(result).toEqual({ ok: false, error: '権限がありません' })
     })
 
     it('権限がない場合は Firestore に書き込まない', async () => {
       roles = { sales: true }
-      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
       await updateScheduleAction(base)
       expect(mockUpdate).not.toHaveBeenCalled()
     })
 
-    it('所有者ならロールがなくても更新できる', async () => {
-      roles = {}
-      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
+    it('tokushima ロールなら他人の予定も更新できる', async () => {
+      roles = { tokushima: true }
+      mockDocGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
       const result = await updateScheduleAction(base)
       expect(result).toEqual({ ok: true })
     })
@@ -176,6 +181,7 @@ describe('updateScheduleAction', () => {
     })
 
     it('予定が存在しない場合はエラーを返す', async () => {
+      roles = { rd: true }
       mockDocGet.mockResolvedValue({ exists: false, data: () => undefined })
       const result = await updateScheduleAction(base)
       expect(result).toEqual({ ok: false, error: 'データが登録されていません' })
@@ -206,24 +212,16 @@ describe('deleteScheduleAction', () => {
   })
 
   describe('権限', () => {
-    it('所有者でも rd/admin でもない場合は { ok: false, error: "権限がありません" } を返す', async () => {
+    it('tokushima / rd / admin いずれも持たない場合は { ok: false, error: "権限がありません" } を返す', async () => {
       roles = { sales: true }
-      mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
       const result = await deleteScheduleAction('sched1', 'prod1')
       expect(result).toEqual({ ok: false, error: '権限がありません' })
+      expect(mockRunTransaction).not.toHaveBeenCalled()
     })
 
-    it('権限がない場合は Firestore に書き込まない', async () => {
-      roles = { sales: true }
+    it('tokushima ロールなら他人の予定も削除できる', async () => {
+      roles = { tokushima: true }
       mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'other' }) })
-      await deleteScheduleAction('sched1', 'prod1')
-      expect(mockTransactionDelete).not.toHaveBeenCalled()
-      expect(mockTransactionUpdate).not.toHaveBeenCalled()
-    })
-
-    it('所有者ならロールがなくても削除できる', async () => {
-      roles = {}
-      mockTransactionGet.mockResolvedValue({ exists: true, data: () => ({ createUser: 'user1' }) })
       const result = await deleteScheduleAction('sched1', 'prod1')
       expect(result).toEqual({ ok: true })
     })

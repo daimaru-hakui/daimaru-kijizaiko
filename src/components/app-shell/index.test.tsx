@@ -71,4 +71,24 @@ describe('AppShell', () => {
 
     expect(nav.className).toContain('overflow-x-hidden')
   })
+
+  it('権限のないユーザーには使用予定一覧が表示されない', () => {
+    render(
+      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: false, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    expect(screen.queryByRole('link', { name: '使用予定一覧' })).toBeNull()
+  })
+
+  it('tokushima 権限のユーザーには使用予定一覧が表示される', () => {
+    render(
+      <AppShell userName="テストユーザー" roles={{ admin: false, rd: false, tokushima: true, accounting: false, sales: false }}>
+        <div>content</div>
+      </AppShell>
+    )
+
+    expect(screen.getByRole('link', { name: '使用予定一覧' })).toBeInTheDocument()
+  })
 })
