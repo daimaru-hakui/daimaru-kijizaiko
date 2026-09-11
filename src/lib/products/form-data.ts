@@ -1,5 +1,6 @@
 import { getAdminDb } from '@/lib/firebase/admin'
 import { withId } from '@/lib/firestore/with-id'
+import { getColorsPageData, getMaterialNamesPageData } from '@/lib/settings/queries'
 import type { GrayFabric, Location, Supplier } from '../../../types'
 
 export type ProductFormOptions = {
@@ -14,13 +15,15 @@ export type ProductFormOptions = {
 /** 生地の登録・編集フォームが必要とするマスタ一式 */
 export async function getProductFormOptions(): Promise<ProductFormOptions> {
   const db = getAdminDb()
-  const [suppliersSnap, grayFabricsSnap, locationsSnap, colorsSnap, materialNamesSnap, usersSnap] =
+  // 色・組織名は設定画面が書き込む components/{colors,materialNames} の data 配列が正。
+  // 並び順も設定画面の並び替えをそのまま反映する
+  const [suppliersSnap, grayFabricsSnap, locationsSnap, { colors }, { names: materialNames }, usersSnap] =
     await Promise.all([
       db.collection('suppliers').orderBy('kana').get(),
       db.collection('grayFabrics').orderBy('productNumber').get(),
       db.collection('locations').orderBy('order').get(),
-      db.collection('colors').orderBy('name').get(),
-      db.collection('materialNames').orderBy('name').get(),
+      getColorsPageData(),
+      getMaterialNamesPageData(),
       db.collection('users').get(),
     ])
 
@@ -28,8 +31,8 @@ export async function getProductFormOptions(): Promise<ProductFormOptions> {
     suppliers: suppliersSnap.docs.map((d) => withId<Supplier>(d)),
     grayFabrics: grayFabricsSnap.docs.map((d) => withId<GrayFabric>(d)),
     locations: locationsSnap.docs.map((d) => withId<Location>(d)),
-    colors: colorsSnap.docs.map((d) => d.data().name as string),
-    materialNames: materialNamesSnap.docs.map((d) => d.data().name as string),
+    colors,
+    materialNames,
     salesUsers: usersSnap.docs
       .filter((d) => d.data().sales === true)
       .map((d) => ({ id: d.id, name: (d.data().name ?? d.id) as string })),
