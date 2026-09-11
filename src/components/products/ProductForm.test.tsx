@@ -35,6 +35,13 @@ describe('ProductForm', () => {
     expect(push).toHaveBeenCalledWith('/products')
   })
 
+  it('渡した色マスタが色セレクトの候補として表示される', () => {
+    render(<ProductForm {...baseProps} />)
+    const select = screen.getByLabelText(/^色 /)
+    const options = Array.from(select.querySelectorAll('option')).map((o) => o.textContent)
+    expect(options).toEqual(['色を選択', 'ブラック', 'ホワイト'])
+  })
+
   it('登録ボタンが表示される', () => {
     render(<ProductForm {...baseProps} />)
     expect(screen.getByRole('button', { name: '登録' })).toBeInTheDocument()

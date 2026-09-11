@@ -54,7 +54,7 @@ export async function getProductsPageData(uid: string): Promise<ProductsPageData
     db.collection('suppliers').get(),
     db.collection('users').doc(uid).get(),
     db.collection('cuttingSchedules').get(),
-    db.collection('stockPlaces').orderBy('kana').get(),
+    db.collection('stockPlaces').get(),
     db.collection('locations').get(),
     db.collection('grayFabrics').get(),
   ])
@@ -85,7 +85,8 @@ export async function getProductsPageData(uid: string): Promise<ProductsPageData
         { ...(toPlainData(d.data()) as Record<string, unknown>), id: d.id } as CuttingSchedule,
       ]),
     ),
-    stockPlaces: stockPlacesSnap.docs.map(toStockPlace),
+    // Firestore の orderBy('kana') はカナ未登録の doc を取りこぼすため JS 側で並べる
+    stockPlaces: sortByKana(stockPlacesSnap.docs.map(toStockPlace)),
     isAdmin,
     isRD,
   }
@@ -227,7 +228,7 @@ export async function getProductOrderNewPageData(): Promise<ProductOrderNewPageD
   const db = getAdminDb()
   const [productsSnap, stockPlacesSnap] = await Promise.all([
     db.collection('products').orderBy('productNumber').get(),
-    db.collection('stockPlaces').orderBy('kana').get(),
+    db.collection('stockPlaces').get(),
   ])
 
   return {
@@ -235,7 +236,8 @@ export async function getProductOrderNewPageData(): Promise<ProductOrderNewPageD
     products: productsSnap.docs
       .filter((d) => !d.data().deletedAt)
       .map((d) => withId<SerializableProduct>(d)),
-    stockPlaces: stockPlacesSnap.docs.map(toStockPlace),
+    // Firestore の orderBy('kana') はカナ未登録の doc を取りこぼすため JS 側で並べる
+    stockPlaces: sortByKana(stockPlacesSnap.docs.map(toStockPlace)),
   }
 }
 
