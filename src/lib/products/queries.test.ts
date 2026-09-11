@@ -70,6 +70,18 @@ describe('getProductsPageData', () => {
     collections.stockPlaces = [{ id: 'sp1', data: { name: '東京', kana: 'とうきょう' } }]
   })
 
+  it('出荷先はフリガナ順で、カナ未登録は落とさず末尾に回す', async () => {
+    collections.stockPlaces = [
+      { id: 'sp1', data: { name: '横浜', kana: 'よこはま' } },
+      { id: 'sp3', data: { name: 'カナ未登録' } },
+      { id: 'sp2', data: { name: '大阪', kana: 'おおさか' } },
+    ]
+
+    const data = await getProductsPageData('u1')
+
+    expect(data.stockPlaces.map((s) => s.name)).toEqual(['大阪', '横浜', 'カナ未登録'])
+  })
+
   it('論理削除された生地は含まない', async () => {
     const data = await getProductsPageData('u1')
 
@@ -258,11 +270,22 @@ describe('getProductOrderNewPageData', () => {
     expect(data.products.map((p) => p.id)).toEqual(['p1'])
   })
 
-  it('生地は品番順、出荷先はフリガナ順で取得する', async () => {
+  it('生地は品番順で取得する', async () => {
     await getProductOrderNewPageData()
 
     expect(callArgs('products', 'orderBy')).toEqual([['productNumber']])
-    expect(callArgs('stockPlaces', 'orderBy')).toEqual([['kana']])
+  })
+
+  it('出荷先はフリガナ順で、カナ未登録は落とさず末尾に回す', async () => {
+    collections.stockPlaces = [
+      { id: 'sp1', data: { name: '横浜', kana: 'よこはま' } },
+      { id: 'sp3', data: { name: 'カナ未登録' } },
+      { id: 'sp2', data: { name: '大阪', kana: 'おおさか' } },
+    ]
+
+    const data = await getProductOrderNewPageData()
+
+    expect(data.stockPlaces.map((s) => s.name)).toEqual(['大阪', '横浜', 'カナ未登録'])
   })
 })
 
