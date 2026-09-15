@@ -114,22 +114,32 @@ describe('getProductsPageData', () => {
     expect(data.cuttingSchedulesMap.c1.productId).toBe('p1')
   })
 
-  it('管理者は R&D の権限も兼ねる', async () => {
+  it('管理者は R&D・徳島工場の権限も兼ねる', async () => {
     userRoles = { admin: true }
 
     const data = await getProductsPageData('u1')
 
     expect(data.isAdmin).toBe(true)
     expect(data.isRD).toBe(true)
+    expect(data.isTokushima).toBe(true)
   })
 
-  it('一般ユーザーは管理者でも R&D でもない', async () => {
+  it('一般ユーザーは管理者でも R&D でも徳島工場でもない', async () => {
     userRoles = {}
 
     const data = await getProductsPageData('u1')
 
     expect(data.isAdmin).toBe(false)
     expect(data.isRD).toBe(false)
+    expect(data.isTokushima).toBe(false)
+  })
+
+  it('徳島工場ロールを返す', async () => {
+    userRoles = { tokushima: true }
+
+    const data = await getProductsPageData('u1')
+
+    expect(data.isTokushima).toBe(true)
   })
 })
 
@@ -329,6 +339,14 @@ describe('getProductEditPageData', () => {
 
   it('R&D は他人が作った生地も編集できる', async () => {
     userRoles = { rd: true }
+
+    const data = await getProductEditPageData('p1', 'other')
+
+    expect(data?.canEdit).toBe(true)
+  })
+
+  it('徳島工場は他人が作った生地も編集できる', async () => {
+    userRoles = { tokushima: true }
 
     const data = await getProductEditPageData('p1', 'other')
 

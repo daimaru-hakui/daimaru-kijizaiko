@@ -50,6 +50,7 @@ type Props = {
   userId: string;
   isAdmin: boolean;
   isRD: boolean;
+  isTokushima: boolean;
 };
 
 export function ProductListTable({
@@ -62,6 +63,7 @@ export function ProductListTable({
   stockPlaces,
   isAdmin,
   isRD,
+  isTokushima,
   userId,
 }: Props) {
   const router = useRouter();
@@ -111,7 +113,7 @@ export function ProductListTable({
   };
 
   const canEdit = (p: SerializableProduct) =>
-    canEditRecord(p, userId, isAdmin || isRD);
+    canEditRecord(p, userId, isAdmin || isRD || isTokushima);
 
   return (
     <div className="space-y-4">
