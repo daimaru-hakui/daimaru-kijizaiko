@@ -43,6 +43,7 @@ const defaultProps = {
   userId: "user1",
   isAdmin: false,
   isRD: false,
+  isTokushima: false,
 };
 
 describe("ProductListTable 裁断予定の絞り込み", () => {

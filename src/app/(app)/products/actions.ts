@@ -13,13 +13,13 @@ import type { ActionResult } from '@/lib/actions'
 import type { AddProductInput, Product, UpdateProductInput } from '../../../../types'
 
 /**
- * 生地を更新/削除できるのは R&D (と管理者) か、その生地を登録した本人だけ。
- * UI (ProductListTable の isAdmin || isRD, 編集ページの isPrivileged) と同じ条件をサーバー側でも守る。
+ * 生地を更新/削除できるのは R&D・徳島工場 (と管理者) か、その生地を登録した本人だけ。
+ * UI (ProductListTable の isAdmin || isRD || isTokushima, 編集ページの isPrivileged) と同じ条件をサーバー側でも守る。
  */
 async function ensureProductEditor(productId: string): Promise<{ uid: string }> {
   const auth = await ensureRoles([])
   if (!auth.ok) throw new Error(auth.error)
-  const privileged = hasAnyRole(auth.roles, ['rd', 'admin'])
+  const privileged = hasAnyRole(auth.roles, ['rd', 'admin', 'tokushima'])
   const productSnap = await getAdminDb().collection('products').doc(productId).get()
   if (!canEditRecord({ createUser: productSnap.data()?.createUser }, auth.uid, privileged)) {
     throw new Error('権限がありません')

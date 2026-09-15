@@ -34,6 +34,7 @@ export type ProductsPageData = {
   stockPlaces: StockPlace[]
   isAdmin: boolean
   isRD: boolean
+  isTokushima: boolean
 }
 
 /** 生地一覧。表示名の引き当てに使うマスタをまとめて返す */
@@ -59,7 +60,7 @@ export async function getProductsPageData(uid: string): Promise<ProductsPageData
     db.collection('grayFabrics').get(),
   ])
 
-  const { isAdmin, isRD } = buildRoleFlags(userDocSnap.data())
+  const { isAdmin, isRD, isTokushima } = buildRoleFlags(userDocSnap.data())
 
   return {
     // 論理削除された生地は一覧に出さない
@@ -89,6 +90,7 @@ export async function getProductsPageData(uid: string): Promise<ProductsPageData
     stockPlaces: sortByKana(stockPlacesSnap.docs.map(toStockPlace)),
     isAdmin,
     isRD,
+    isTokushima,
   }
 }
 
@@ -249,7 +251,7 @@ export type ProductEditPageData = {
 
 /**
  * 生地の編集フォーム。存在しない・論理削除済みの生地は null。
- * 編集できるのは作成者本人と R&D / 管理者だけ。
+ * 編集できるのは作成者本人と R&D・徳島工場 / 管理者だけ。
  */
 export async function getProductEditPageData(
   id: string,
@@ -265,7 +267,11 @@ export async function getProductEditPageData(
   if (!productSnap.exists || productSnap.data()?.deletedAt) return null
 
   const product = withId<Product>(productSnap)
-  const { isAdmin, isRD } = buildRoleFlags(userDocSnap.data())
+  const { isAdmin, isRD, isTokushima } = buildRoleFlags(userDocSnap.data())
 
-  return { product, options, canEdit: canEditRecord(product, uid, isAdmin || isRD) }
+  return {
+    product,
+    options,
+    canEdit: canEditRecord(product, uid, isAdmin || isRD || isTokushima),
+  }
 }

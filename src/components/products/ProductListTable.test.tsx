@@ -32,6 +32,7 @@ const defaultProps = {
   userId: "user1",
   isAdmin: false,
   isRD: false,
+  isTokushima: false,
 };
 
 describe("ProductListTable 品番検索", () => {
@@ -76,6 +77,7 @@ describe("ProductListTable 生地の編集", () => {
         {...defaultProps}
         isRD={false}
         isAdmin={false}
+        isTokushima={false}
         userId="other-user"
       />,
     );
@@ -83,6 +85,21 @@ describe("ProductListTable 生地の編集", () => {
     await userEvent.click(screen.getByRole("button", { name: "詳細" }));
 
     expect(screen.queryByRole("button", { name: "編集" })).toBeNull();
+  });
+
+  it("徳島工場ロールなら他人が登録した生地でも編集ボタンから編集画面へ遷移する", async () => {
+    render(
+      <ProductListTable
+        {...defaultProps}
+        isTokushima
+        userId="other-user"
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "詳細" }));
+    await userEvent.click(screen.getByRole("button", { name: "編集" }));
+
+    expect(mockPush).toHaveBeenCalledWith("/products/p1/edit");
   });
 });
 

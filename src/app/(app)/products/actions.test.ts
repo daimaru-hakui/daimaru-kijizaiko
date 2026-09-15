@@ -287,11 +287,11 @@ describe('updateProductAction', () => {
       expect(result).toEqual({ ok: true })
     })
 
-    it('tokushima は非所有者の生地を更新できない', async () => {
+    it('tokushima は非所有者の生地も更新できる', async () => {
       roles = { tokushima: true }
       mockProductGet.mockResolvedValue(othersProduct)
       const result = await updateProductAction(base)
-      expect(result).toEqual({ ok: false, error: '権限がありません' })
+      expect(result).toEqual({ ok: true })
     })
 
     it('users doc の読み取りは 1 回だけ', async () => {
@@ -337,6 +337,13 @@ describe('deleteProductAction', () => {
 
     it('rd は非所有者の生地も削除できる', async () => {
       roles = { rd: true }
+      mockProductGet.mockResolvedValue(othersProduct)
+      const result = await deleteProductAction('prod1')
+      expect(result).toEqual({ ok: true })
+    })
+
+    it('tokushima は非所有者の生地も削除できる', async () => {
+      roles = { tokushima: true }
       mockProductGet.mockResolvedValue(othersProduct)
       const result = await deleteProductAction('prod1')
       expect(result).toEqual({ ok: true })

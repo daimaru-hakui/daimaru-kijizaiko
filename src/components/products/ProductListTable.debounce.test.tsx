@@ -28,6 +28,7 @@ const defaultProps = {
   userId: 'user1',
   isAdmin: false,
   isRD: false,
+  isTokushima: false,
 }
 
 beforeEach(() => {
