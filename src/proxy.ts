@@ -7,6 +7,13 @@ import {
   type ProxySession,
 } from './lib/auth/proxy-session'
 
+// 静的ファイルでセッション検証 (Admin SDK + Firestore 読み取り) を走らせない
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
+  ],
+}
+
 export async function proxy(req: NextRequest): Promise<Response> {
   const url = new URL(req.url)
   const pathname = url.pathname

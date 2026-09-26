@@ -1,4 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import type { UserClaims } from '@/lib/auth/roles'
 import { PROXY_SESSION_HEADER, decodeProxySession } from '@/lib/auth/proxy-session'
 
@@ -120,4 +121,29 @@ describe('proxy', () => {
     expect(res!.status).toBe(302)
     expect(res!.headers.get('location')).toContain('/login')
   })
+})
+
+describe('proxy の matcher', () => {
+  async function matches(url: string) {
+    const { config } = await import('./proxy')
+    return unstable_doesMiddlewareMatch({ config, url })
+  }
+
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
+  it.each(['/_next/static/chunks/main.js', '/_next/image', '/favicon.ico', '/vercel.svg'])(
+    '静的ファイル %s は proxy を通さない',
+    async (url) => {
+      expect(await matches(url)).toBe(false)
+    },
+  )
+
+  it.each(['/', '/login', '/dashboard', '/products/abc/edit', '/api/session', '/api/cutting-reports'])(
+    'ページ・API %s は proxy を通す',
+    async (url) => {
+      expect(await matches(url)).toBe(true)
+    },
+  )
 })
