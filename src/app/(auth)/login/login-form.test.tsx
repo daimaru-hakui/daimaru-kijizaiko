@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { LoginForm } from './login-form'
 
 // next/navigation モック
@@ -84,5 +85,53 @@ describe('LoginForm', () => {
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith('/dashboard')
     })
+  })
+
+  it('送信中はスピナーが表示されボタンが無効になる', async () => {
+    // /api/session が返ってこない間の状態を固定する
+    global.fetch = vi.fn().mockReturnValue(new Promise(() => {}))
+    render(<LoginForm />)
+    await fillAndSubmit()
+
+    const button = await screen.findByRole('button', { name: 'サインイン中...' })
+    expect(button).toBeDisabled()
+    expect(button.querySelector('svg.animate-spin')).toBeInTheDocument()
+  })
+
+  it('ログイン成功後も遷移完了までボタンは無効のまま', async () => {
+    render(<LoginForm />)
+    await fillAndSubmit()
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/dashboard')
+    })
+    const button = screen.getByRole('button', { name: 'サインイン中...' })
+    expect(button).toBeDisabled()
+    expect(button.querySelector('svg.animate-spin')).toBeInTheDocument()
+  })
+
+  it('Firebase 認証に失敗したらボタンが再び有効になる', async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValueOnce(
+      new Error('auth/wrong-password'),
+    )
+    render(<LoginForm />)
+    await fillAndSubmit()
+
+    expect(await screen.findByText('ログインに失敗しました')).toBeInTheDocument()
+    const button = screen.getByRole('button', { name: 'サインイン' })
+    expect(button).toBeEnabled()
+    expect(button.querySelector('svg.animate-spin')).not.toBeInTheDocument()
+  })
+
+  it('セッション作成に失敗したらボタンが再び有効になる', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false })
+    render(<LoginForm />)
+    await fillAndSubmit()
+
+    expect(
+      await screen.findByText('セッションの作成に失敗しました'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'サインイン' })).toBeEnabled()
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 })

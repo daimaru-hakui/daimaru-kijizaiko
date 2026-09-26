@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Lock } from 'lucide-react'
+import { Loader2, Lock } from 'lucide-react'
 
 export function LoginForm() {
   const router = useRouter()
@@ -38,6 +38,7 @@ export function LoginForm() {
       })
       if (!res.ok) {
         setError('セッションの作成に失敗しました')
+        setLoading(false)
         return
       }
       const rawFrom = searchParams?.get('from') ?? '/dashboard'
@@ -45,10 +46,12 @@ export function LoginForm() {
         rawFrom.startsWith('/') && !rawFrom.startsWith('//')
           ? rawFrom
           : '/dashboard'
+      // 遷移完了までボタンを無効のままにする。
+      // router.replace は遷移完了を待たずに返るため、ここで loading を解除すると
+      // ダッシュボード描画前にボタンが元に戻り、無反応に見える。
       router.replace(from)
     } catch {
       setError('ログインに失敗しました')
-    } finally {
       setLoading(false)
     }
   }
@@ -89,6 +92,7 @@ export function LoginForm() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="animate-spin" aria-hidden="true" />}
               {loading ? 'サインイン中...' : 'サインイン'}
             </Button>
           </form>
