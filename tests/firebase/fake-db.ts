@@ -3,6 +3,9 @@
  * where / orderBy / startAt / endAt は呼び出しを記録するだけで、
  * get() は collections に渡したドキュメントをそのまま返す。
  * 「どの条件で引いたか」と「取得後に lib が何を絞り込んだか」を分けて検証するため。
+ * select() は記録に加えて get() の結果を指定フィールドに射影する
+ * (必要なフィールドを取り忘れていないかを検証できるように)。
+ * count() は集計クエリの形 ({ data: () => ({ count }) }) で件数を返す。
  */
 export type FakeDoc = { id: string; data: () => Record<string, unknown> }
 
@@ -12,6 +15,8 @@ export type QueryCall = {
   orderBy: Array<[string, string]>
   startAt?: unknown
   endAt?: unknown
+  select?: string[]
+  count?: boolean
 }
 
 export function doc(id: string, data: Record<string, unknown>): FakeDoc {
@@ -43,8 +48,29 @@ export function createFakeDb(collections: Record<string, FakeDoc[]>) {
         call.endAt = value
         return query
       },
+      select(...fields: string[]) {
+        call.select = fields
+        return query
+      },
+      count() {
+        call.count = true
+        return {
+          async get() {
+            return { data: () => ({ count: docs().length }) }
+          },
+        }
+      },
       async get() {
-        return { docs: docs(), size: docs().length }
+        const fields = call.select
+        const result = fields
+          ? docs().map((d) => ({
+              id: d.id,
+              data: () => Object.fromEntries(
+                Object.entries(d.data()).filter(([k]) => fields.includes(k)),
+              ),
+            }))
+          : docs()
+        return { docs: result, size: result.length }
       },
       doc(id: string) {
         return {

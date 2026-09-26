@@ -3,8 +3,21 @@ import { buildUsersMap, type UsersMap } from '@/lib/users/map'
 import type { ProductLabelMap } from './ranking'
 import type { Product } from '../../../types'
 
+/** ダッシュボードが生地マスタから使うフィールド。在庫合計 (stats.ts) とランキングのラベル用 */
+const DASHBOARD_PRODUCT_FIELDS = [
+  'productNumber',
+  'colorName',
+  'price',
+  'wip',
+  'externalStock',
+  'arrivingQuantity',
+  'tokushimaStock',
+] as const
+
+export type DashboardProduct = Pick<Product, 'id' | (typeof DASHBOARD_PRODUCT_FIELDS)[number]>
+
 export type DashboardData = {
-  products: Product[]
+  products: DashboardProduct[]
   productsMap: ProductLabelMap
   usersMap: UsersMap
   grayFabricCount: number
@@ -16,27 +29,32 @@ export type DashboardData = {
 /**
  * ダッシュボードの概況。
  * 在庫合計の対象は論理削除されていない生地のみ、仕掛・入荷予定は数量が残っているものだけ数える。
+ *
+ * 件数しか使わないコレクションは count() 集計クエリで数え、ドキュメント本体を転送しない。
+ * 生地・担当者は必要なフィールドだけ select() で射影し、ログイン直後の初回表示を軽くする。
  */
 export async function getDashboardData(): Promise<DashboardData> {
   const db = getAdminDb()
 
   const [
     productsSnap,
-    grayFabricsSnap,
-    grayFabricOrdersSnap,
-    fabricDyeingOrdersSnap,
-    fabricPurchaseOrdersSnap,
+    grayFabricsCount,
+    grayFabricOrdersCount,
+    fabricDyeingOrdersCount,
+    fabricPurchaseOrdersCount,
     usersSnap,
   ] = await Promise.all([
-    db.collection('products').where('deletedAt', '==', '').get(),
-    db.collection('grayFabrics').get(),
-    db.collection('grayFabricOrders').where('quantity', '>', 0).get(),
-    db.collection('fabricDyeingOrders').where('quantity', '>', 0).get(),
-    db.collection('fabricPurchaseOrders').where('quantity', '>', 0).get(),
-    db.collection('users').get(),
+    db.collection('products').where('deletedAt', '==', '').select(...DASHBOARD_PRODUCT_FIELDS).get(),
+    db.collection('grayFabrics').count().get(),
+    db.collection('grayFabricOrders').where('quantity', '>', 0).count().get(),
+    db.collection('fabricDyeingOrders').where('quantity', '>', 0).count().get(),
+    db.collection('fabricPurchaseOrders').where('quantity', '>', 0).count().get(),
+    db.collection('users').select('name').get(),
   ])
 
-  const products: Product[] = productsSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Product)
+  const products = productsSnap.docs.map(
+    (d) => ({ id: d.id, ...d.data() }) as DashboardProduct,
+  )
 
   return {
     products,
@@ -44,9 +62,9 @@ export async function getDashboardData(): Promise<DashboardData> {
       products.map((p) => [p.id, { productNumber: p.productNumber, colorName: p.colorName }]),
     ),
     usersMap: buildUsersMap(usersSnap.docs),
-    grayFabricCount: grayFabricsSnap.size,
-    grayFabricOrderCount: grayFabricOrdersSnap.size,
-    fabricDyeingOrderCount: fabricDyeingOrdersSnap.size,
-    fabricPurchaseOrderCount: fabricPurchaseOrdersSnap.size,
+    grayFabricCount: grayFabricsCount.data().count,
+    grayFabricOrderCount: grayFabricOrdersCount.data().count,
+    fabricDyeingOrderCount: fabricDyeingOrdersCount.data().count,
+    fabricPurchaseOrderCount: fabricPurchaseOrdersCount.data().count,
   }
 }
