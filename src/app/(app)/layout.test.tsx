@@ -12,8 +12,10 @@ vi.mock('next/navigation', () => ({
 }))
 
 const mockVerifyServerSession = vi.fn()
+const mockGetProxyUserProfile = vi.fn()
 vi.mock('@/lib/auth/session', () => ({
   verifyServerSession: () => mockVerifyServerSession(),
+  getProxyUserProfile: () => mockGetProxyUserProfile(),
 }))
 
 const mockUserDocGet = vi.fn()
@@ -30,6 +32,8 @@ vi.mock('@/lib/firebase/client', () => ({
 describe('AppLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // 既定: proxy 経由のプロフィールなし → users ドキュメントを読む
+    mockGetProxyUserProfile.mockResolvedValue(null)
   })
 
   it('セッションが無い場合は /login へ redirect する', async () => {
@@ -53,5 +57,15 @@ describe('AppLayout', () => {
     expect(screen.getByText('test@example.com')).toBeInTheDocument()
     expect(screen.getByText('page content')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '生地在庫WEB' })).toBeInTheDocument()
+  })
+
+  it('proxy が users ドキュメントを転送していれば Firestore を読み直さない', async () => {
+    mockVerifyServerSession.mockResolvedValue({ uid: 'user-1', email: 'test@example.com' })
+    mockGetProxyUserProfile.mockResolvedValue({ name: '経由太郎', admin: true })
+
+    render(await AppLayout({ children: <div>page content</div> }))
+
+    expect(screen.getByText('経由太郎')).toBeInTheDocument()
+    expect(mockUserDocGet).not.toHaveBeenCalled()
   })
 })

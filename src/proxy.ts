@@ -1,30 +1,31 @@
+import { NextResponse, type NextRequest } from 'next/server'
 import { matchRoute, type UserClaims } from './lib/auth/roles'
 import { getAdminAuth, getAdminDb } from './lib/firebase/admin'
+import {
+  buildProxyRequestHeaders,
+  toProxyUserProfile,
+  type ProxySession,
+} from './lib/auth/proxy-session'
 
-export async function proxy(req: Request): Promise<Response | undefined> {
+export async function proxy(req: NextRequest): Promise<Response> {
   const url = new URL(req.url)
   const pathname = url.pathname
 
   const cookieHeader = req.headers.get('cookie') ?? ''
   const sessionCookie = parseCookie(cookieHeader, '__session')
 
+  let session: ProxySession | null = null
   let user: UserClaims | null = null
 
   if (sessionCookie) {
     try {
       const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true)
       const userDoc = await getAdminDb().collection('users').doc(decoded.uid).get()
-      const data = userDoc.data() ?? {}
-      user = {
-        uid: decoded.uid,
-        admin: !!data.admin,
-        rd: !!data.rd,
-        sales: !!data.sales,
-        accounting: !!data.accounting,
-        tokushima: !!data.tokushima,
-        order: !!data.order,
-      }
+      const profile = toProxyUserProfile(userDoc.data() ?? {})
+      session = { token: decoded, profile }
+      user = { uid: decoded.uid, ...profile }
     } catch {
+      session = null
       user = null
     }
   }
@@ -40,7 +41,11 @@ export async function proxy(req: Request): Promise<Response | undefined> {
     return new Response('Forbidden', { status: 403 })
   }
 
-  return undefined
+  // 検証結果を下流に渡し、layout / page / Server Action での再検証を省く。
+  // セッションが無いときもクライアント由来の同名ヘッダを捨てるため必ず経由させる。
+  return NextResponse.next({
+    request: { headers: buildProxyRequestHeaders(req.headers, session) },
+  })
 }
 
 function parseCookie(cookieHeader: string, name: string): string | undefined {
