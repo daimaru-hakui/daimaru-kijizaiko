@@ -45,4 +45,15 @@ describe('calcTotalPrice', () => {
   it('空配列は 0 を返す', () => {
     expect(calcTotalPrice([], ['wip'])).toBe(0)
   })
+  it('円未満を四捨五入する', () => {
+    const products = [makeProduct({ price: 333, wip: 1.5 })]
+    expect(calcTotalPrice(products, ['wip'])).toBe(500)
+  })
+  it('合計してから四捨五入する (product ごとには丸めない)', () => {
+    const products = [
+      makeProduct({ price: 333, wip: 0.5 }),
+      makeProduct({ price: 333, wip: 0.5 }),
+    ]
+    expect(calcTotalPrice(products, ['wip'])).toBe(333)
+  })
 })
