@@ -4,7 +4,7 @@ vi.mock('@/lib/firebase/admin', () => ({ getAdminDb: vi.fn() }))
 
 import { getAdminDb } from '@/lib/firebase/admin'
 import { createFakeDb, doc } from '../../../tests/firebase/fake-db'
-import { getAppShellUser } from './queries'
+import { getAppShellUser, toAppShellUser } from './queries'
 
 let fake: ReturnType<typeof createFakeDb>
 
@@ -52,5 +52,14 @@ describe('getAppShellUser', () => {
     const user = await getAppShellUser('missing')
     expect(user.userName).toBe('')
     expect(user.roles.admin).toBe(false)
+  })
+})
+
+describe('toAppShellUser', () => {
+  it('users ドキュメントの生データから名前とナビ用ロールを組み立てる', () => {
+    expect(toAppShellUser({ name: '経由太郎', admin: true, order: true })).toEqual({
+      userName: '経由太郎',
+      roles: { admin: true, rd: false, tokushima: false, accounting: false, sales: false },
+    })
   })
 })

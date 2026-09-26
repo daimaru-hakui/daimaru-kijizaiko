@@ -12,10 +12,7 @@ export type AppShellUser = {
  * ナビの表示条件 (nav-config.ts) が管理者を個別に見ているため、
  * ここで管理者に他の部門ロールを付けると表示範囲が変わってしまう。
  */
-export async function getAppShellUser(uid: string): Promise<AppShellUser> {
-  const userDoc = await getAdminDb().collection('users').doc(uid).get()
-  const data = (userDoc.data() ?? {}) as Record<string, unknown>
-
+export function toAppShellUser(data: Record<string, unknown>): AppShellUser {
   return {
     userName: (data.name as string) ?? '',
     roles: {
@@ -26,4 +23,9 @@ export async function getAppShellUser(uid: string): Promise<AppShellUser> {
       sales: !!data.sales,
     },
   }
+}
+
+export async function getAppShellUser(uid: string): Promise<AppShellUser> {
+  const userDoc = await getAdminDb().collection('users').doc(uid).get()
+  return toAppShellUser((userDoc.data() ?? {}) as Record<string, unknown>)
 }
