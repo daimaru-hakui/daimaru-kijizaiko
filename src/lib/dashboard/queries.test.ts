@@ -12,7 +12,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   fake = createFakeDb({
     products: [
-      doc('p1', { productNumber: 'A-1', colorName: '白', price: 100, wip: 1, externalStock: 0, arrivingQuantity: 0, tokushimaStock: 0 }),
+      doc('p1', { productNumber: 'A-1', colorName: '白', price: 100, wip: 1, externalStock: 0, arrivingQuantity: 0, tokushimaStock: 0, noteProduct: '合計に不要な長文' }),
       doc('p2', { productNumber: 'A-2', colorName: '黒', price: 200, wip: 2, externalStock: 0, arrivingQuantity: 0, tokushimaStock: 0 }),
     ],
     grayFabrics: [doc('g1', {}), doc('g2', {}), doc('g3', {})],
@@ -57,5 +57,31 @@ describe('getDashboardData', () => {
   it('担当者名の表示用に uid → 名前 を返す', async () => {
     const data = await getDashboardData()
     expect(data.usersMap).toEqual({ u1: '担当太郎' })
+  })
+
+  it('件数だけ使うコレクションは集計クエリで数え、ドキュメント本体を読まない', async () => {
+    await getDashboardData()
+    for (const name of ['grayFabrics', 'grayFabricOrders', 'fabricDyeingOrders', 'fabricPurchaseOrders']) {
+      expect(fake.callFor(name)?.count, name).toBe(true)
+    }
+  })
+
+  it('生地は在庫合計とランキングのラベルに必要なフィールドだけ取得する', async () => {
+    const data = await getDashboardData()
+    expect(data.products[0]).toEqual({
+      id: 'p1',
+      productNumber: 'A-1',
+      colorName: '白',
+      price: 100,
+      wip: 1,
+      externalStock: 0,
+      arrivingQuantity: 0,
+      tokushimaStock: 0,
+    })
+  })
+
+  it('担当者は表示名だけ取得する', async () => {
+    await getDashboardData()
+    expect(fake.callFor('users')?.select).toEqual(['name'])
   })
 })
