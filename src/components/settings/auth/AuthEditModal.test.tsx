@@ -31,14 +31,24 @@ describe('AuthEditModal', () => {
     const input = screen.getByLabelText('メールアドレス')
     await user.clear(input)
     await user.type(input, 'new@example.com')
-    await user.click(screen.getByRole('button', { name: 'OK' }))
+    await user.click(screen.getByRole('button', { name: '保存' }))
 
     expect(updateUserEmailAction).toHaveBeenCalledWith('u1', 'new@example.com')
   })
 
+  it('ID と名前を変更するとプロフィールを更新する', async () => {
+    const user = await openModal()
+    const name = screen.getByLabelText('名前')
+    await user.clear(name)
+    await user.type(name, '佐藤')
+    await user.click(screen.getByRole('button', { name: '保存' }))
+
+    expect(updateUserProfileAction).toHaveBeenCalledWith('u1', 1, '佐藤')
+  })
+
   it('メールアドレスを変えていなければメール更新を呼ばない', async () => {
     const user = await openModal()
-    await user.click(screen.getByRole('button', { name: 'OK' }))
+    await user.click(screen.getByRole('button', { name: '保存' }))
 
     expect(updateUserEmailAction).not.toHaveBeenCalled()
   })
@@ -52,7 +62,7 @@ describe('AuthEditModal', () => {
     const input = screen.getByLabelText('メールアドレス')
     await user.clear(input)
     await user.type(input, 'dup@example.com')
-    await user.click(screen.getByRole('button', { name: 'OK' }))
+    await user.click(screen.getByRole('button', { name: '保存' }))
 
     expect(
       await screen.findByText('このメールアドレスは既に他のアカウントで使用されています'),
