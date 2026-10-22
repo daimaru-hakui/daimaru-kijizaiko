@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/firebase/admin', () => ({
   getAdminDb: vi.fn(),
+  getAdminAuth: vi.fn(),
 }))
 
 vi.mock('next/cache', () => ({
@@ -12,7 +13,7 @@ vi.mock('@/lib/auth/session', () => ({
   verifyServerSession: vi.fn(),
 }))
 
-import { getAdminDb } from '@/lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { verifyServerSession } from '@/lib/auth/session'
 import {
   addSupplierAction,
@@ -26,6 +27,7 @@ import {
   deleteLocationAction,
   toggleUserAuthAction,
   updateUserProfileAction,
+  updateUserEmailAction,
   addColorAction,
   deleteColorAction,
   reorderColorsAction,
@@ -35,6 +37,7 @@ import {
 
 const mockCollection = vi.fn()
 const mockUserUpdate = vi.fn()
+const mockAuthUpdateUser = vi.fn()
 let roles: Record<string, boolean>
 
 beforeEach(() => {
@@ -49,6 +52,7 @@ beforeEach(() => {
     collection: (name: string) => (name === 'users' ? { doc: () => usersDoc } : mockCollection(name)),
   } as any)
   vi.mocked(verifyServerSession).mockResolvedValue({ uid: 'user123' } as any)
+  vi.mocked(getAdminAuth).mockReturnValue({ updateUser: mockAuthUpdateUser } as any)
 })
 
 describe('未認証のとき', () => {
@@ -204,6 +208,36 @@ describe('updateUserProfileAction', () => {
     const result = await updateUserProfileAction('user123', 1, '山田')
     expect(result).toEqual({ ok: false, error: '権限がありません' })
     expect(mockUserUpdate).not.toHaveBeenCalled()
+  })
+})
+
+describe('updateUserEmailAction', () => {
+  it('admin でないユーザーはメールアドレスを変更できない', async () => {
+    roles = { rd: true }
+    const result = await updateUserEmailAction('u1', 'new@example.com')
+    expect(result).toEqual({ ok: false, error: '権限がありません' })
+    expect(mockAuthUpdateUser).not.toHaveBeenCalled()
+  })
+
+  it('メールアドレスの形式でないとき ok:false を返す', async () => {
+    const result = await updateUserEmailAction('u1', 'not-an-email')
+    expect(result).toEqual({ ok: false, error: 'メールアドレスの形式が正しくありません' })
+    expect(mockAuthUpdateUser).not.toHaveBeenCalled()
+  })
+
+  it('正常系: 前後の空白を除いて Firebase Auth のメールアドレスを更新する', async () => {
+    mockAuthUpdateUser.mockResolvedValue({})
+    const result = await updateUserEmailAction('u1', ' new@example.com ')
+    expect(mockAuthUpdateUser).toHaveBeenCalledWith('u1', { email: 'new@example.com' })
+    expect(result).toEqual({ ok: true })
+  })
+
+  it('他のアカウントが使用中のメールアドレスのとき日本語のエラーを返す', async () => {
+    mockAuthUpdateUser.mockRejectedValue(
+      Object.assign(new Error('in use'), { code: 'auth/email-already-exists' }),
+    )
+    const result = await updateUserEmailAction('u1', 'dup@example.com')
+    expect(result).toEqual({ ok: false, error: 'このメールアドレスは既に他のアカウントで使用されています' })
   })
 })
 

@@ -2,6 +2,7 @@
 
 import { FC, useTransition } from "react";
 import { User } from "../../../../../../types";
+import type { AuthUser } from "@/lib/settings/queries";
 import { toggleUserAuthAction } from "@/app/(app)/settings/actions";
 import { AuthEditModal } from "@/components/settings/auth/AuthEditModal";
 import { CsvDownloadButton } from "@/components/list/CsvDownloadButton";
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { notifyError } from "@/components/ui/toast";
 
 type Props = {
-  users: User[];
+  users: AuthUser[];
 };
 
 export const AuthTable: FC<Props> = ({ users }) => {
@@ -56,6 +57,7 @@ export const AuthTable: FC<Props> = ({ users }) => {
           <TableRow className="bg-slate-50">
             <TableHead className={HEAD}>ID</TableHead>
             <TableHead className={HEAD}>名前</TableHead>
+            <TableHead className={HEAD}>メールアドレス</TableHead>
             <TableHead className={HEAD}>管理者</TableHead>
             <TableHead className={HEAD}>R&D</TableHead>
             <TableHead className={HEAD}>営業</TableHead>
@@ -69,13 +71,14 @@ export const AuthTable: FC<Props> = ({ users }) => {
             <TableRow key={user.uid}>
               <TableCell>{user.rank}</TableCell>
               <TableCell>{user.name}</TableCell>
+              <TableCell className="text-slate-600">{user.email || "-"}</TableCell>
               <TableCell>{authButton(user, "admin")}</TableCell>
               <TableCell>{authButton(user, "rd")}</TableCell>
               <TableCell>{authButton(user, "sales")}</TableCell>
               <TableCell>{authButton(user, "accounting")}</TableCell>
               <TableCell>{authButton(user, "tokushima")}</TableCell>
               <TableCell>
-                <AuthEditModal uid={user.uid} initialRank={user.rank} initialName={user.name} />
+                <AuthEditModal uid={user.uid} initialRank={user.rank} initialName={user.name} initialEmail={user.email} />
               </TableCell>
             </TableRow>
           ))}
