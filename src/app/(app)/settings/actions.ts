@@ -1,8 +1,9 @@
 'use server'
 
-import { getAdminDb } from '@/lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { revalidatePath } from 'next/cache'
 import { FieldValue } from 'firebase-admin/firestore'
+import { z } from 'zod'
 import { ensureRoles, ROLES, type ActionResult, type Role } from '@/lib/actions'
 import type { Supplier, StockPlace, Location } from '../../../../types'
 
@@ -48,6 +49,25 @@ export async function updateUserProfileAction(
     revalidatePath('/settings/auth')
     return { ok: true }
   } catch (e) {
+    return { ok: false, error: String(e) }
+  }
+}
+
+/** ログインに使うメールアドレスは Firebase Auth 側にあるので Admin SDK で書き換える */
+export async function updateUserEmailAction(uid: string, email: string): Promise<ActionResult> {
+  const authErr = await ensureRole(['admin'])
+  if (authErr) return authErr
+  if (!uid) return { ok: false, error: 'uid は必須です' }
+  const parsed = z.email().safeParse(email.trim())
+  if (!parsed.success) return { ok: false, error: 'メールアドレスの形式が正しくありません' }
+  try {
+    await getAdminAuth().updateUser(uid, { email: parsed.data })
+    revalidatePath('/settings/auth')
+    return { ok: true }
+  } catch (e) {
+    if ((e as { code?: string }).code === 'auth/email-already-exists') {
+      return { ok: false, error: 'このメールアドレスは既に他のアカウントで使用されています' }
+    }
     return { ok: false, error: String(e) }
   }
 }

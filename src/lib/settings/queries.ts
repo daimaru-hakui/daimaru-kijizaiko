@@ -1,4 +1,4 @@
-import { getAdminDb } from '@/lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { parseDocs } from '@/lib/firestore/parse'
 import {
   locationSchema,
@@ -18,15 +18,34 @@ async function fetchNames(collection: string): Promise<string[]> {
   return snap.docs.map((d) => (d.data().name ?? '') as string)
 }
 
+/** メールアドレスは Firestore ではなく Firebase Auth が持っている */
+export type AuthUser = User & { email: string }
+
 export type AuthPageData = {
-  users: User[]
+  users: AuthUser[]
+}
+
+/** Admin SDK の getUsers は 1 回 100 件まで */
+const GET_USERS_LIMIT = 100
+
+async function fetchEmails(uids: string[]): Promise<Map<string, string>> {
+  const chunks: string[][] = []
+  for (let i = 0; i < uids.length; i += GET_USERS_LIMIT) {
+    chunks.push(uids.slice(i, i + GET_USERS_LIMIT))
+  }
+  const results = await Promise.all(
+    chunks.map((chunk) => getAdminAuth().getUsers(chunk.map((uid) => ({ uid })))),
+  )
+  return new Map(results.flatMap((r) => r.users.map((u) => [u.uid, u.email ?? ''] as const)))
 }
 
 /** 権限管理。ランクの昇順で並べる */
 export async function getAuthPageData(): Promise<AuthPageData> {
   const snap = await getAdminDb().collection('users').orderBy('rank', 'asc').get()
+  const users = parseDocs(snap.docs, userSchema, 'users')
+  const emails = await fetchEmails(users.map((u) => u.uid))
 
-  return { users: parseDocs(snap.docs, userSchema, 'users') }
+  return { users: users.map((u) => ({ ...u, email: emails.get(u.uid) ?? '' })) }
 }
 
 export type SuppliersPageData = {

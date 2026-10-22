@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-vi.mock('@/lib/firebase/admin', () => ({ getAdminDb: vi.fn() }))
+vi.mock('@/lib/firebase/admin', () => ({ getAdminDb: vi.fn(), getAdminAuth: vi.fn() }))
 
-import { getAdminDb } from '@/lib/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { createFakeDb, doc } from '../../../tests/firebase/fake-db'
 import {
   getAuthPageData,
@@ -23,8 +23,12 @@ function useDb(collections: Parameters<typeof createFakeDb>[0]) {
   vi.mocked(getAdminDb).mockReturnValue(fake.db as never)
 }
 
+const mockGetUsers = vi.fn()
+
 beforeEach(() => {
   vi.clearAllMocks()
+  mockGetUsers.mockResolvedValue({ users: [], notFound: [] })
+  vi.mocked(getAdminAuth).mockReturnValue({ getUsers: mockGetUsers } as never)
 })
 
 describe('getAuthPageData', () => {
@@ -48,6 +52,28 @@ describe('getAuthPageData', () => {
     const data = await getAuthPageData()
 
     expect(data.users.map((u) => u.id)).toEqual(['u1', 'u2'])
+  })
+
+  it('メールアドレスは Firebase Auth から uid で引いて付ける', async () => {
+    mockGetUsers.mockResolvedValue({
+      users: [{ uid: 'u1', email: 'admin@example.com' }],
+      notFound: [{ uid: 'u2' }],
+    })
+
+    const data = await getAuthPageData()
+
+    expect(mockGetUsers).toHaveBeenCalledWith([{ uid: 'u1' }, { uid: 'u2' }])
+    expect(data.users.map((u) => u.email)).toEqual(['admin@example.com', ''])
+  })
+
+  it('getUsers の上限 100 件ごとに分けて引く', async () => {
+    useDb({
+      users: Array.from({ length: 101 }, (_, i) => doc(`u${i}`, { uid: `u${i}`, name: `user${i}`, rank: i })),
+    })
+
+    await getAuthPageData()
+
+    expect(mockGetUsers.mock.calls.map(([ids]) => ids.length)).toEqual([100, 1])
   })
 })
 
