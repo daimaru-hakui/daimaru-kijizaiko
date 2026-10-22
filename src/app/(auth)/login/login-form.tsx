@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase/client'
@@ -96,6 +97,11 @@ export function LoginForm() {
               {loading ? 'サインイン中...' : 'サインイン'}
             </Button>
           </form>
+          <div className="mt-4 text-center text-xs">
+            <Link href="/forgot-password" className="text-primary hover:opacity-80">
+              パスワードを再設定する
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

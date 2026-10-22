@@ -123,6 +123,14 @@ describe('LoginForm', () => {
     expect(button.querySelector('svg.animate-spin')).not.toBeInTheDocument()
   })
 
+  it('パスワード再設定ページへのリンクがある', () => {
+    render(<LoginForm />)
+
+    expect(
+      screen.getByRole('link', { name: 'パスワードを再設定する' }),
+    ).toHaveAttribute('href', '/forgot-password')
+  })
+
   it('セッション作成に失敗したらボタンが再び有効になる', async () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false })
     render(<LoginForm />)

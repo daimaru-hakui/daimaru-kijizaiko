@@ -11,6 +11,10 @@ describe('matchRoute', () => {
     expect(matchRoute('/login', null)).toBe(true)
   })
 
+  it('/forgot-password は認証なしで通過', () => {
+    expect(matchRoute('/forgot-password', null)).toBe(true)
+  })
+
   it('/ (トップ) は認証なしで通過', () => {
     expect(matchRoute('/', null)).toBe(true)
   })

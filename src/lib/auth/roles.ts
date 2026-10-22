@@ -21,6 +21,7 @@ const pathRoleMatrix: Array<{ pattern: RegExp; rule: RouteRule }> = [
   { pattern: /^\/favicon\.ico$/, rule: { public: true } },
   { pattern: /^\/$/, rule: { public: true } },
   { pattern: /^\/login$/, rule: { public: true } },
+  { pattern: /^\/forgot-password$/, rule: { public: true } },
   { pattern: /^\/dashboard/, rule: { authenticated: true } },
   // 先に定義したものが優先される。裁断報告書の一覧は全社で参照するため誰でも見られる
   { pattern: /^\/tokushima\/cutting-reports\/new/, rule: { roles: ['tokushima', 'rd', 'admin'] } },
