@@ -7,7 +7,7 @@ import { timingSafeEqual } from 'node:crypto'
  * 従来の `?API_KEY=` クエリは URL ごとログに残るため、portal が送らなくなるまでの移行期間だけ受け付ける。
  */
 export function verifyApiKey(request: Request): boolean {
-  const expected = process.env.BACKEND_API_KEY
+  const expected = process.env.KIJIZAIKO_API_KEY
   if (!expected) return false
 
   const provided = readProvidedKey(request)

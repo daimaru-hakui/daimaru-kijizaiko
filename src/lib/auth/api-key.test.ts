@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { verifyApiKey } from './api-key'
 
-const ORIGINAL = process.env.BACKEND_API_KEY
+const ORIGINAL = process.env.KIJIZAIKO_API_KEY
 
 beforeEach(() => {
-  process.env.BACKEND_API_KEY = 'secret-key'
+  process.env.KIJIZAIKO_API_KEY = 'secret-key'
 })
 
 afterEach(() => {
-  process.env.BACKEND_API_KEY = ORIGINAL
+  process.env.KIJIZAIKO_API_KEY = ORIGINAL
 })
 
 function request(query: string, headers?: HeadersInit) {
@@ -46,8 +46,8 @@ describe('verifyApiKey', () => {
     ).toBe(false)
   })
 
-  it('サーバー側に BACKEND_API_KEY が設定されていないとき常に false を返す', () => {
-    delete process.env.BACKEND_API_KEY
+  it('サーバー側に KIJIZAIKO_API_KEY が設定されていないとき常に false を返す', () => {
+    delete process.env.KIJIZAIKO_API_KEY
     expect(verifyApiKey(request('?API_KEY=secret-key'))).toBe(false)
     expect(verifyApiKey(request('', { Authorization: 'Bearer secret-key' }))).toBe(false)
     expect(verifyApiKey(request(''))).toBe(false)
