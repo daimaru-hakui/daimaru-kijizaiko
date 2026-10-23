@@ -138,4 +138,4 @@ tests/              I/O 境界の統合テスト用の足場 (msw / Firebase Emu
 - 管理者 UID をソースコードにハードコードする (権限は Firestore の users ドキュメントのフラグで判定する)
 - Server Action を `ensureAuth` (ログイン確認) だけで通す。更新・削除は必ず `ensureRoles` と `lib/permissions.ts` でサーバー側の認可を行う
 - `BACKEND_API_KEY` だけで API を認可する
-  - 例外: `/api/cutting-reports` のみ。外部システム (daimaru-portal) がセッションクッキーを持てないため。ヘッダ方式への移行は portal 側の改修待ち
+  - 例外: `/api/cutting-reports` のみ。外部システム (daimaru-portal) がセッションクッキーを持てないため。キーは `Authorization: Bearer` で受ける。旧 `?API_KEY=` クエリは portal がクエリ送信をやめたら削除する
