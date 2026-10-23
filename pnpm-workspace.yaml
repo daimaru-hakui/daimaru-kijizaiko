@@ -8,3 +8,10 @@ allowBuilds:
   protobufjs: true
   sharp: true
   unrs-resolver: true
+
+# firebase / firebase-admin が推移的依存を脆弱なバージョンに固定しているため上書きする
+# - @grpc/grpc-js: @firebase/firestore が ~1.9.0 固定 (GHSA-m9gg-hp2v-232j, GHSA-f596-whhp-79r4)
+# - uuid: gaxios 6 / teeny-request 9 が ^9 を要求 (GHSA-w5hq-g745-h8pq)。12 以降は CJS を持たないため 11 系に留める
+overrides:
+  '@grpc/grpc-js': ^1.14.5
+  uuid: ^11.1.1
