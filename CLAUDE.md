@@ -61,7 +61,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY=  # App Check。未設定なら App Check を初期化しない
 NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN=  # ローカル開発のみ。Firebase コンソールで登録したデバッグトークン
 FIREBASE_SERVICE_ACCOUNT_KEY=  # JSON 文字列
-BACKEND_API_KEY=                # /api/cutting-reports (外部システム連携) 専用
+KIJIZAIKO_API_KEY=              # /api/cutting-reports (外部システム連携) 専用
 ```
 
 ---
@@ -137,5 +137,5 @@ tests/              I/O 境界の統合テスト用の足場 (msw / Firebase Emu
 - `--no-verify` でコミットフックを skip する
 - 管理者 UID をソースコードにハードコードする (権限は Firestore の users ドキュメントのフラグで判定する)
 - Server Action を `ensureAuth` (ログイン確認) だけで通す。更新・削除は必ず `ensureRoles` と `lib/permissions.ts` でサーバー側の認可を行う
-- `BACKEND_API_KEY` だけで API を認可する
-  - 例外: `/api/cutting-reports` のみ。外部システム (daimaru-portal) がセッションクッキーを持てないため。ヘッダ方式への移行は portal 側の改修待ち
+- `KIJIZAIKO_API_KEY` だけで API を認可する
+  - 例外: `/api/cutting-reports` のみ。外部システム (daimaru-portal) がセッションクッキーを持てないため。キーは `Authorization: Bearer` で受ける。旧 `?API_KEY=` クエリは portal がクエリ送信をやめたら削除する

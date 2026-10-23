@@ -6,7 +6,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // 外部システム (daimaru-portal のトップページ「本日登録の裁断報告書」) が参照する。
-// Pages Router 時代から URL・レスポンス形式・認可方式を変更できない。
+// Pages Router 時代から URL・レスポンス形式を変更できない。
 // 取得範囲は旧実装と同じ「直近12時間に登録されたもの」。
 const WINDOW_MS = 1000 * 60 * 60 * 12
 

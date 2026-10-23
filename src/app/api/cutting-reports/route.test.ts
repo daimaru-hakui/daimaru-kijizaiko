@@ -6,7 +6,7 @@ vi.mock('@/lib/firebase/admin', () => ({
   getAdminDb: () => ({ collection: mockCollection }),
 }))
 
-const ORIGINAL = process.env.BACKEND_API_KEY
+const ORIGINAL = process.env.KIJIZAIKO_API_KEY
 
 function setupFirestore(options: {
   users?: { id: string; data: Record<string, unknown> }[]
@@ -38,11 +38,11 @@ async function callGet(query: string) {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.resetModules()
-  process.env.BACKEND_API_KEY = 'secret-key'
+  process.env.KIJIZAIKO_API_KEY = 'secret-key'
 })
 
 afterEach(() => {
-  process.env.BACKEND_API_KEY = ORIGINAL
+  process.env.KIJIZAIKO_API_KEY = ORIGINAL
 })
 
 describe('GET /api/cutting-reports', () => {
